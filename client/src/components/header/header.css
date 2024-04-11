@@ -1,0 +1,7 @@
+.dropdown button {
+  background-color: transparent !important;
+  border: none;
+}
+.dropdown button::after {
+  color: gray;
+}

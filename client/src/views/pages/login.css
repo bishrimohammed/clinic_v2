@@ -1,0 +1,63 @@
+.headtext {
+  font-size: clamp(15px, 50%, 40px);
+
+  text-wrap: nowrap;
+}
+
+.wrapper {
+  background-image: url("../../assets/Team-bro.png");
+  background-position: "center";
+  background-size: 600px;
+  background-repeat: no-repeat;
+  background-position-x: 70px;
+  height: 100%;
+  position: relative;
+}
+.content {
+  position: absolute;
+  /* right: 20px; */
+  top: 50%;
+  /* bottom: 50%; */
+  /* left: 50%; */
+  right: 10px;
+  transform: translateY(-50%);
+  margin-top: -40px;
+}
+.fromcontainer {
+  width: 400px;
+  max-width: 100%;
+}
+.inputborderRadious {
+  border-radius: 5px;
+}
+.formCardBorderRadius {
+  border-radius: 10px;
+}
+@media (min-width: 768px) {
+  /* For desktop: */
+  .content {
+    right: 100px;
+  }
+}
+
+@media (max-width: 500px) {
+  /* For desktop: */
+  .wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+    height: 100%;
+    background-image: initial;
+  }
+  .content {
+    position: static;
+    /* flex-grow: 1; */
+    margin-top: initial;
+    width: 300px;
+  }
+  .fromcontainer {
+    width: 600;
+  }
+}

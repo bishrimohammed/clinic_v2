@@ -1,0 +1,158 @@
+* {
+  box-sizing: border-box;
+}
+a {
+  text-decoration: none !important;
+}
+.wrapper {
+  padding-left: 16rem;
+}
+.sidebar {
+  box-shadow: 5px 2px 5px 0px rgba(0, 0, 0, 0.2) !important;
+}
+
+@media screen and (max-width: 768px) {
+  .wrapper {
+    padding-left: 0;
+  }
+  .sidebar {
+    box-shadow: initial;
+  }
+  /* .sidebar_container {
+    display: block;
+  } */
+}
+
+.physical_vital {
+  position: relative;
+}
+.physical_vital::after {
+  content: "Vital-Sign";
+  position: absolute;
+  background-color: aliceblue;
+  top: -14px;
+  left: 10%;
+  transform: translateX(-50%);
+}
+
+.accordion-item > .accordion-header {
+  background-color: #198754 !important;
+  z-index: 1;
+}
+.form-check-inline .form-check-input {
+  width: 1.4rem !important;
+  height: 1.4rem;
+  border-width: 3px;
+}
+
+.bluewhite-bg {
+  background-color: #cfe2ff;
+}
+.borderRadius7px {
+  border-radius: 7px;
+}
+.border-color {
+  /* border: 1px solid #6c757d; */
+  /*  border-color: rgb(108, 117, 125); */
+  border-color: #c0c1c2 !important;
+}
+.boxshadow {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.hrunboxshadow {
+  box-shadow: 0 0 20px 5px rgba(8, 41, 73, 0.01);
+}
+.bg-hrun-box {
+  background-color: rgb(255, 255, 255);
+  border-radius: 5px;
+}
+.bg-hrun-content {
+  background-color: rgb(235, 237, 239);
+}
+.curserpointer {
+  cursor: pointer;
+}
+.bg-gredient {
+  background: rgb(136, 136, 136);
+  background: linear-gradient(
+    94deg,
+    rgba(204, 204, 204, 0.916) 0%,
+    rgba(214, 214, 219, 0.9716678907891282) 48%
+  );
+}
+.width23 {
+  width: 23%;
+}
+.width30 {
+  width: 30%;
+}
+.height150 {
+  height: 150px;
+}
+.minHeight100 {
+  min-height: 100%;
+}
+.minHeight50 {
+  min-height: 50%;
+}
+.report-info div {
+  font-size: 13px;
+}
+/* body {
+  font-family: Arial, sans-serif;
+} */
+
+.result {
+  margin-bottom: 20px;
+}
+
+.test-results table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.test-results th,
+.test-results td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.test-results th {
+  background-color: #f2f2f2;
+}
+.test-results tr {
+  font-size: 13px;
+}
+
+/* .patientDetailsidebar {
+  overflow-y: scroll;
+}
+.patientDetailsidebar::-webkit-scrollbar {
+  width: 0;
+}
+.patientDetailsidebarContainer {
+  height: calc(100% - 100px);
+} */
+.closehistorybutton:hover {
+  background-color: rgb(243, 244, 247);
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+input:focus {
+  outline: none;
+}
+
+.employee-dropdown.dropdown-toggle::after {
+  display: none;
+}
+
+.sort {
+  cursor: pointer;
+  user-select: none;
+}
