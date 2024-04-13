@@ -197,6 +197,7 @@ const RoleTable = ({
                       <Dropdown.Item
                         className="d-flex gap-2 align-items-center"
                         role="button"
+                        disabled={!rowEl.original.status}
                         style={{ zIndex: "50" }}
                         onClick={(event) => {
                           event.stopPropagation();

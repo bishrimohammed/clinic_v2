@@ -1,3 +1,7 @@
+import React, { useMemo, useState } from "react";
+import useDebounce from "../../../../hooks/useDebounce";
+import { useNavigate } from "react-router-dom";
+import { Table, Button } from "react-bootstrap";
 import {
   flexRender,
   getCoreRowModel,
@@ -5,18 +9,12 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useMemo, useState } from "react";
-import { Clinic_Service_Columns } from "../utils/Clinic_Service_Columns";
-import { Button, Container, Table } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { ServiceItemColumns } from "../utils/ServiceItemColumns";
 import { FaUserLock } from "react-icons/fa";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import { TbEdit } from "react-icons/tb";
-import useDebounce from "../../../../hooks/useDebounce";
 import SearchInput from "../../../../components/inputs/SearchInput";
 
-const ClinicServiceTable = ({ clinicServices, setShowDeactiveModal }) => {
-  //   console.log(clinicServices);
+const ServiceItemTable = ({ items }) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = React.useState({
@@ -24,10 +22,10 @@ const ClinicServiceTable = ({ clinicServices, setShowDeactiveModal }) => {
     pageSize: 10,
   });
   const debouncedValue = useDebounce(search, 500);
-  const Columns = useMemo(() => Clinic_Service_Columns, []);
+  const Columns = useMemo(() => ServiceItemColumns, []);
   const tableInstance = useReactTable({
     columns: Columns,
-    data: clinicServices,
+    data: items,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -38,21 +36,22 @@ const ClinicServiceTable = ({ clinicServices, setShowDeactiveModal }) => {
     },
     onGlobalFilterChange: setSearch,
   });
-  //   console.log(tableInstance.getRowModel());
+
   return (
     <div className="p-3">
-      {" "}
       <h5>Clinic Service List</h5>
       <hr />
       <div className=" d-flex justify-content-between flex-wrap gap-2 align-items-center w-100 mb-1 mt-2">
         <SearchInput searchvalue={search} setSearch={setSearch} />
-        <Button
-          className=" ms-auto "
-          onClick={() => navigate("createlabservice")}
-        >
-          {"  "}
-          Add New Service
-        </Button>
+        <div className="d-flex gap-2">
+          <Button
+            className=" ms-auto "
+            onClick={() => navigate("createlabservice")}
+          >
+            {"  "}+ New Item
+          </Button>
+          <Button>+ New Group</Button>
+        </div>
       </div>
       <Table striped responsive bordered>
         <thead>
@@ -200,4 +199,4 @@ const ClinicServiceTable = ({ clinicServices, setShowDeactiveModal }) => {
   );
 };
 
-export default ClinicServiceTable;
+export default ServiceItemTable;

@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Button,
   Col,
@@ -16,25 +22,29 @@ import { useGetEmplooyeDoesNotHaveAccount } from "./hooks/useGetEmplooyeDoesNotH
 import { useGetRoles } from "../hooks/useGetRoles";
 import { generatePassword } from "./utils/generatePassword";
 import { useGetPermissions } from "../Administration/Role/hooks/useGetPermissions";
+import PermissionList from "./PermissionList";
 const schema = yup.object().shape({
   employeeId: yup.string().required("Employee is required"),
   // email: yup.string().email("invalid email").required("Email is required"),
   username: yup.string().required("Username is required"),
   password: yup.string().required("Password is required"),
   role: yup.string().required("role is required"),
-  permissions: yup.array().of(
-    yup.object().shape({
-      create: yup.boolean().transform((value) => Boolean(value)),
-      read: yup.boolean().transform((value) => Boolean(value)),
-      update: yup.boolean().transform((value) => Boolean(value)),
-      delete: yup.boolean().transform((value) => Boolean(value)),
-      admin: yup.boolean().transform((value) => Boolean(value)),
-      permissionId: yup.string().required("permissionId is required"),
-    })
-  ),
+  permissions: yup
+    .array()
+    .of(
+      yup.object().shape({
+        create: yup.boolean().transform((value) => Boolean(value)),
+        read: yup.boolean().transform((value) => Boolean(value)),
+        update: yup.boolean().transform((value) => Boolean(value)),
+        delete: yup.boolean().transform((value) => Boolean(value)),
+        admin: yup.boolean().transform((value) => Boolean(value)),
+        permissionId: yup.string().required("permissionId is required"),
+      })
+    )
+    .default([]),
 });
 const AddUser = () => {
-  const { mutate, mutateAsync, isPending } = useAddUser();
+  // const { mutate, mutateAsync, isPending } = useAddUser();
   const { data: employees } = useGetEmplooyeDoesNotHaveAccount();
   const { data: roles, isPending: ispending } = useGetRoles();
 
@@ -43,99 +53,132 @@ const AddUser = () => {
   // console.log(roles);
   // console.log(permissions);
   // return;
-  const password = useMemo(() => generatePassword(8), []);
-  // console.log(p);
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    control,
-    setValue,
-    reset,
-    setError,
-  } = useForm({
-    defaultValues: {
-      employeeId: "",
-      role: "",
-      username: "",
-      password: password,
-    },
-    resolver: yupResolver(schema),
-  });
-  const watchPermissions = useWatch({ control, name: "permissions" });
-  const roleWatcher = useWatch({ control, name: "role" });
+  // const password = useMemo(() => generatePassword(8), []);
+  // console.log(roles);
+  // console.log(permissions);
+  // const {
+  //   register,
+  //   formState: { errors },
+  //   handleSubmit,
+  //   control,
+  //   setValue,
+  //   reset,
+  //   setError,
+  // } = useForm({
+  //   defaultValues: {
+  //     employeeId: "",
+  //     role: "",
+  //     username: "",
+  //     password: password,
+  //   },
+  //   resolver: yupResolver(schema),
+  // });
+  const [defaultPermissions, setDefaultPermissions] = useState([]);
+  // const handleRoleChange = (e) => {
+  //   console.log("saklcnldskjcb DVHKSJJJJJJJJJJJJJJJJJJJ");
+  //   const selectedRoleId = parseInt(e.target.value);
+  //   const selectedRole = roles
+  //     ?.filter((r) => r.id === selectedRoleId)
+  //     ?.map((item) =>
+  //       item.permissions.map((permission) => permission.rolepermission)
+  //     )
+  //     .flat();
+  //   console.log(selectedRole);
+  //   if (selectedRole) {
+  //     // const rolePermissions = selectedRole.permissions.map((permission) => ({
+  //     //   id: permission.id,
+  //     //   name: permission.name,
+  //     //   admin: permission.rolepermission.create,
+  //     //   create: permission.rolepermission.create,
+  //     //   read: permission.rolepermission.read,
+  //     //   update: permission.rolepermission.update,
+  //     //   delete: permission.rolepermission.delete,
+  //     // }));
+  //     // console.log(rolePermissions);
+  //     setDefaultPermissions(selectedRole);
+  //   } else {
+  //     setDefaultPermissions([]);
+  //   }
+  // };
+  // console.log(defaultPermissions);
+  // const resetPermissions = () => {
+  //   console.log("mmmmmmmmmmmmmmmmmm");
+  //   setDefaultPermissions([]);
+  // };
+  // const watchPermissions = useWatch({ control, name: "permissions" });
+  // const roleWatcher = useWatch({ control, name: "role" });
   // useEffect(() => {
   //   setValue("permissions", []);
   // }, [roleWatcher]);
-  // console.log(watchPermissions);
-  const handleAdminCheck = (index, permissionId) => {
-    let isAdmin = watchPermissions && watchPermissions[index].admin;
-    // isAdmin = isAdmin === undefined ? true : isAdmin;
-    // console.log(isAdmin);
-    let p = {};
-    if (isAdmin) {
-      // console.log("def");
-      p = {
-        create: !isAdmin,
-        read: !isAdmin,
-        delete: !isAdmin,
-        update: !isAdmin,
-        admin: !isAdmin,
-        permissionId: permissionId,
-      };
-    } else {
-      p = {
-        create: true,
-        read: true,
-        delete: true,
-        update: true,
-        admin: true,
-        permissionId: permissionId,
-      };
-    }
 
-    // console.log(p);
-    setValue(`permissions.${index}`, p);
-    // console.log(index);
-  };
+  // const handleAdminCheck = (index, permissionId) => {
+  //   let isAdmin = watchPermissions && watchPermissions[index].admin;
+  //   // isAdmin = isAdmin === undefined ? true : isAdmin;
+  //   // console.log(isAdmin);
+  //   let p = {};
+  //   if (isAdmin) {
+  //     // console.log("def");
+  //     p = {
+  //       create: !isAdmin,
+  //       read: !isAdmin,
+  //       delete: !isAdmin,
+  //       update: !isAdmin,
+  //       admin: !isAdmin,
+  //       permissionId: permissionId,
+  //     };
+  //   } else {
+  //     p = {
+  //       create: true,
+  //       read: true,
+  //       delete: true,
+  //       update: true,
+  //       admin: true,
+  //       permissionId: permissionId,
+  //     };
+  //   }
 
-  const handleChangeRead = (index) => {
-    // console.log(watchPermissions);
-    let isRead = watchPermissions && watchPermissions[index]?.read;
-    // isRead = isRead !== undefined ? !isRead : true;
+  //   // console.log(p);
+  //   setValue(`permissions.${index}`, p);
+  //   // console.log(index);
+  // };
 
-    const some =
-      watchPermissions &&
-      (watchPermissions[index].read ||
-        watchPermissions[index].create ||
-        watchPermissions[index].delete ||
-        watchPermissions[index].update);
-    let read;
-    if (isRead) {
-      read = false;
-    }
-    if (some) {
-      read = true;
-    } else {
-      read = !isRead;
-    }
-    setValue(`permissions.${index}.read`, read);
-    // console.log(" is read  " + isRead);
-    // console.log(" read  " + read);
-  };
+  // const handleChangeRead = (index) => {
+  //   // console.log(watchPermissions);
+  //   let isRead = watchPermissions && watchPermissions[index]?.read;
+  //   // isRead = isRead !== undefined ? !isRead : true;
+
+  //   const some =
+  //     watchPermissions &&
+  //     (watchPermissions[index].read ||
+  //       watchPermissions[index].create ||
+  //       watchPermissions[index].delete ||
+  //       watchPermissions[index].update);
+  //   let read;
+  //   if (isRead) {
+  //     read = false;
+  //   }
+  //   if (some) {
+  //     read = true;
+  //   } else {
+  //     read = !isRead;
+  //   }
+  //   setValue(`permissions.${index}.read`, read);
+  //   // console.log(" is read  " + isRead);
+  //   // console.log(" read  " + read);
+  // };
   // console.log(errors);    p?.rolepermission
   // const roleWatcher = watch("role");
-  const rolepermissions = useMemo(
-    () =>
-      // .map((p) => console.log(p)),
-      roles
-        ?.filter((r) => r.id === parseInt(roleWatcher))
-        ?.map((item) =>
-          item.permissions.map((permission) => permission.rolepermission)
-        )
-        .flat(),
-    [roleWatcher]
-  );
+  // const rolepermissions = useMemo(
+  //   () =>
+  //     // .map((p) => console.log(p)),
+  //     roles
+  //       ?.filter((r) => r.id === parseInt(roleWatcher))
+  //       ?.map((item) =>
+  //         item.permissions.map((permission) => permission.rolepermission)
+  //       )
+  //       .flat(),
+  //   [roleWatcher]
+  // );
   // const rolepermissions = roles
   //   // ?.filter((r) => r.id === parseInt(roleWatcher))
   //   ?.map((item) =>
@@ -146,82 +189,82 @@ const AddUser = () => {
   // console.log(roleWatcher);
   // console.log(rolepermissions);
 
-  console.log(rolepermissions);
-  const isDisabled = (permissionId, index) => {
-    const permission = rolepermissions?.filter(
-      (p) => p.permission_id == permissionId
-    );
-    // console.log(permission);
-    let isDisabled = false;
-    let watching = false;
-    if (watchPermissions) {
-      watching =
-        watchPermissions[index]?.admin ||
-        watchPermissions[index]?.create ||
-        watchPermissions[index]?.update ||
-        watchPermissions[index]?.delete;
-      // watchPermissions[index]?.read;
-    }
-    // console.log(watching + "  watching");
-    if (permission?.length > 0) {
-      // console.log(isDisabled);
-      isDisabled =
-        permission[0].create || permission[0].update || permission[0].delete;
-    } else {
-      isDisabled = true;
-    }
-    // if (!isDisabled && permission?.length === 0) {
-    //   console.log("bishri");
-    //   isDisabled = false;
-    //   // console.log("jbkhgvhgv");
-    // }
-    // console.log("dis " + isDisabled);
-    return Boolean(watchPermissions ? isDisabled && watching : isDisabled);
-  };
+  // console.log(watchPermissions);
+  // const isDisabled = (permissionId, index) => {
+  //   const permission = rolepermissions?.filter(
+  //     (p) => p.permission_id == permissionId
+  //   );
+  //   // console.log(permission);
+  //   let isDisabled = false;
+  //   let watching = false;
+  //   if (watchPermissions) {
+  //     watching =
+  //       watchPermissions[index]?.admin ||
+  //       watchPermissions[index]?.create ||
+  //       watchPermissions[index]?.update ||
+  //       watchPermissions[index]?.delete;
+  //     // watchPermissions[index]?.read;
+  //   }
+  //   // console.log(watching + "  watching");
+  //   if (permission?.length > 0) {
+  //     // console.log(isDisabled);
+  //     isDisabled =
+  //       permission[0].create || permission[0].update || permission[0].delete;
+  //   } else {
+  //     isDisabled = true;
+  //   }
+  //   // if (!isDisabled && permission?.length === 0) {
+  //   //   console.log("bishri");
+  //   //   isDisabled = false;
+  //   //   // console.log("jbkhgvhgv");
+  //   // }
+  //   // console.log("dis " + isDisabled);
+  //   return Boolean(watchPermissions ? isDisabled && watching : isDisabled);
+  // };
   // setValue("permissions", [{}]);
-  const submitHandler = (data) => {
-    // console.log(data);
-    const selectedPermissions = data.permissions.filter(
-      (p) => p.create || p.read || p.update || p.delete
-    );
-    const user = {
-      username: data.username,
-      password: data.password,
-      // email: data.email,
-      employeeId: data.employeeId,
-      role: data.role,
-      permissions: selectedPermissions,
-    };
-    // console.log(user);
-    // // return;
-    // // mutate(user);
-    // return;
-    mutateAsync(user)
-      .then((res) => {
-        console.log(res);
-        if (res.status === 201) {
-          handleClose();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        const errors = err.response.data.message;
-        errors.map((err) => {
-          const msg = err.message;
-          console.log(err.message);
-          // setError(err.path, msg.join(""));
-          setError(err.path, {
-            type: "server",
-            message: err.message,
-            shouldFocus: true,
-          });
-        });
-        // errors.map((err) => setError(err.path, err.message));
-      })
-      .finally(() => {
-        console.log("jhvkhgckvgh");
-      });
-  };
+  // const submitHandler = (data) => {
+  //   // console.log(data);
+  //   const selectedPermissions = data.permissions.filter(
+  //     (p) => p.create || p.read || p.update || p.delete
+  //   );
+  //   const user = {
+  //     username: data.username,
+  //     password: data.password,
+  //     // email: data.email,
+  //     employeeId: data.employeeId,
+  //     role: data.role,
+  //     permissions: selectedPermissions,
+  //   };
+  //   console.log(user);
+  //   return;
+  //   // // mutate(user);
+  //   // return;
+  //   mutateAsync(user)
+  //     .then((res) => {
+  //       console.log(res);
+  //       if (res.status === 201) {
+  //         handleClose();
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       const errors = err.response.data.message;
+  //       errors.map((err) => {
+  //         const msg = err.message;
+  //         console.log(err.message);
+  //         // setError(err.path, msg.join(""));
+  //         setError(err.path, {
+  //           type: "server",
+  //           message: err.message,
+  //           shouldFocus: true,
+  //         });
+  //       });
+  //       // errors.map((err) => setError(err.path, err.message));
+  //     })
+  //     .finally(() => {
+  //       console.log("jhvkhgckvgh");
+  //     });
+  // };
   if (ispending || permissionPending) {
     return <Spinner animation="border" variant="primary" />;
   }
@@ -238,26 +281,33 @@ const AddUser = () => {
   //     : null;
   //   return result;
   // };
-  const setUserName = (id) => {
-    // console.log(id);
-    // const employee = getGetEmployeeName(id);
-    const employee = employees?.find((e) => e.id === parseInt(id));
-    const randomNumber = Math.floor(Math.random() * 1000); // Generate a random number between 0 and 999
-    const username = employee
-      ? `${employee?.firstName
-          ?.slice(0, 4)
-          .toLowerCase()}_${employee.middleName.toLowerCase()}_${randomNumber}`
-      : "";
-    setValue("username", username);
-    console.log(employee);
-    // return employee?.username;
-  };
+  // const setUserName = (id) => {
+  //   // console.log(id);
+  //   // const employee = getGetEmployeeName(id);
+  //   const employee = employees?.find((e) => e.id === parseInt(id));
+  //   const randomNumber = Math.floor(Math.random() * 1000); // Generate a random number between 0 and 999
+  //   const username = employee
+  //     ? `${employee?.firstName
+  //         ?.slice(0, 4)
+  //         .toLowerCase()}_${employee.middleName.toLowerCase()}_${randomNumber}`
+  //     : "";
+  //   setValue("username", username);
+  //   console.log(employee);
+  //   // return employee?.username;
+  // };
   // console.log(employees);
   // console.log(getGetEmployeeName(7));
 
   return (
     <Container className="p-3">
-      <Form onSubmit={handleSubmit(submitHandler)}>
+      <PermissionList
+        permissions={permissions}
+        defaultPermissions={defaultPermissions}
+        roles={roles}
+        employees={employees}
+        setDefaultPermissions={setDefaultPermissions}
+      />
+      {/* <Form onSubmit={handleSubmit(submitHandler)}>
         <Row>
           <Col md={4} sm={6} className="mb-2">
             <Form.Group>
@@ -319,11 +369,10 @@ const AddUser = () => {
               <Form.Select
                 // ref={roleref}
                 {...register("role", {
-                  // onChange: () =>
-                  //   setValue(
-                  //     "permissions",
-                  //     watchPermissions?.map((p, index) => {})
-                  //   ),
+                  onChange: (e) => {
+                    resetPermissions();
+                    handleRoleChange(e);
+                  },
                 })}
                 name="role"
                 aria-label="Default select example"
@@ -372,9 +421,8 @@ const AddUser = () => {
                     value={p.id}
                   />
                 </td>
-                {/* {permissionList(index, p.id)} */}
+
                 <td>
-                  {/* <p>{typeof checkPermissionSet(p.id, "create")}</p> */}
                   <Form.Check
                     type="checkbox"
                     name="permissions[${index}].create"
@@ -384,20 +432,11 @@ const AddUser = () => {
                     disabled={
                       watchPermissions && watchPermissions[index]?.admin
                     }
+                    checked={defaultPermissions.some(
+                      (permission) =>
+                        permission.permission_id === p.id && permission.create
+                    )}
                     // defaultChecked={checkPermissionSet(p.id, "create")}
-                    // defaultChecked={rolepermissions?.find((pp) => {
-                    //   let exist = false;
-                    //   // console.log(pp.create);
-                    //   if (pp.permission_id === p.id) {
-                    //     exist = pp.create;
-                    //   }
-                    //   return exist;
-                    // })}
-                    // defaultValue={
-                    //   rolepermissions?.find((pp) => {
-                    //     return pp.permission_id === p.id;
-                    //   })?.create
-                    // }
                   />
                 </td>
                 <td>
@@ -407,29 +446,10 @@ const AddUser = () => {
                     {...register(`permissions[${index}].read`, {
                       // onChange: () => handleChangeRead(index),
                     })}
-                    // defaultChecked={checkPermissionSet(p.id, "read")}
-                    // defaultChecked={rolepermissions?.find((pp) => {
-                    //   let exist = false;
-                    //   if (pp.permission_id === p.id) {
-                    //     exist = pp.read;
-                    //   } else {
-                    //     exist = false;
-                    //   }
-                    //   return exist;
-                    // })}
-                    // defaultChecked={checkPermissionSet(p.id)?.read}
-                    // defaultChecked={
-                    //   checkPermissionSet(p.id)?.read
-                    //     ? checkPermissionSet(p.id)?.read
-                    //     : false
-                    // }
-                    // disabled={
-                    //   watchPermissions &&
-                    //   (watchPermissions[index]?.admin ||
-                    //     watchPermissions[index]?.create ||
-                    //     watchPermissions[index]?.update ||
-                    //     watchPermissions[index]?.delete)
-                    // }
+                    checked={defaultPermissions.some(
+                      (permission) =>
+                        permission.permission_id === p.id && permission.read
+                    )}
                     disabled={isDisabled(p.id, index)}
                   />
                 </td>
@@ -443,29 +463,12 @@ const AddUser = () => {
                     disabled={
                       watchPermissions && watchPermissions[index]?.admin
                     }
-                    // defaultChecked={checkPermissionSet(p.id, "update")}4
-                    // defaultChecked={
-
-                    //   rolepermissions?.find((pp) => {
-                    //     let exist = false;
-                    //     if (pp.permission_id == p.id) {
-                    //       exist = pp.update;
-                    //     } else {
-                    //       exist = false;
-                    //     }
-                    //     return exist;
-                    //   })
-                    // }
-                    // defaultChecked={checkPermissionSet(p.id)?.update}
-                    // defaultChecked={
-                    //   checkPermissionSet(p.id)
-                    //     ? checkPermissionSet(p.id).update
-                    //     : false
-                    // }
-                    // defaultChecked={
-                    //   watchPermissions && watchPermissions[index].admin
-                    // }
+                    checked={defaultPermissions.some(
+                      (permission) =>
+                        permission.permission_id === p.id && permission.update
+                    )}
                   />
+                 
                 </td>
                 <td>
                   <Form.Check
@@ -477,37 +480,19 @@ const AddUser = () => {
                     disabled={
                       watchPermissions && watchPermissions[index]?.admin
                     }
-                    // defaultChecked={rolepermissions?.find((pp) => {
-                    //   let exist = false;
-                    //   if (pp.permission_id === p.id) {
-                    //     exist = pp.delete;
-                    //   }
-                    //   return exist;
-                    // })}
-                    // defaultChecked={checkPermissionSet(p.id)?.delete}
-                    // defaultChecked={
-                    //   checkPermissionSet(p.id)
-                    //     ? checkPermissionSet(p.id).delete
-                    //     : false
-                    // }
-                    // defaultChecked={
-                    //   watchPermissions && watchPermissions[index].admin
-                    // }
+                    checked={defaultPermissions.some(
+                      (permission) =>
+                        permission.permission_id === p.id && permission.delete
+                    )}
                   />
                 </td>
               </tr>
             ))}
+
           </tbody>
         </Table>
-        {/* <Row>
-        <Col md={4} sm={6} className="mb-2">
-           
-           </Col>
-           
-          </Col>
-        </Row> */}
 
-        {/* <hr /> */}
+       
         <div className="d-flex justify-content-end">
           <Button
             variant="primary"
@@ -520,7 +505,60 @@ const AddUser = () => {
             Save
           </Button>
         </div>
-      </Form>
+      </Form> */}
+      {/* <PermissionList permissions={permissions} defaultPermissions={defaultPermissions} wa/> */}
+      {/* {permissions.map((permission, index) => (
+          <div key={permission.id}>
+            <label>
+              {permission.name}:
+              <input
+                type="checkbox"
+                name={`permissions[${index}].admin`}
+                // ref={register}
+                {...register(`permissions[${index}].admin`)}
+                defaultChecked={permission.admin}
+              />
+              Admin
+            </label>
+            <input
+              type="checkbox"
+              name={`permissions[${index}].create`}
+              {...register(`permissions[${index}].create`)}
+              defaultChecked={permission.create}
+            />
+            Create
+            <input
+              type="checkbox"
+              name={`permissions[${index}].read`}
+              {...register(`permissions[${index}].read`)}
+              defaultChecked={
+                defaultPermissions.find(
+                  (p) => p.permission_id === permission.id
+                )
+                  ? defaultPermissions.find(
+                      (p) => p.permission_id === permission.id
+                    )?.read
+                  : false
+              }
+            />
+            Read
+            <input
+              type="checkbox"
+              name={`permissions[${index}].update`}
+              {...register(`permissions[${index}].update`)}
+              defaultChecked={permission.update}
+            />
+            Update
+            <input
+              type="checkbox"
+              name={`permissions[${index}].delete`}
+              {...register(`permissions[${index}].delete`)}
+              defaultChecked={permission.delete}
+            />
+            Delete
+          </div>
+        ))} */}
+      {/* <hr /> */}
     </Container>
   );
 };

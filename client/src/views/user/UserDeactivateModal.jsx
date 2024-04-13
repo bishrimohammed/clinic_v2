@@ -34,7 +34,7 @@ const UserDeactivateModal = ({ show, handleClose, userId, action }) => {
       backdrop="static"
       keyboard={false}
     >
-      <Modal.Body>{`Are you sure you want to ${action} role?`}</Modal.Body>
+      <Modal.Body>{`Are you sure you want to ${action} User?`}</Modal.Body>
 
       <div className="d-flex justify-content-end gap-3 p-3">
         <Button variant="secondary" onClick={() => handleClose(false)}>
