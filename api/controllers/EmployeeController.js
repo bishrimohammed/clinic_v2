@@ -12,11 +12,9 @@ module.exports = EmployeeController = {
     // console.log(Status);
     let where = {};
     if (req.query.status) {
-      // const Status = req.query.status.map((s) => s === "true");
-      // console.log(Status);
       where.status = Boolean(req.query.status);
     }
-    // where.status = Status;
+
     if (req.query.position) {
       where.position = req.query.position;
     }
@@ -111,6 +109,7 @@ module.exports = EmployeeController = {
   }),
   // @desc get employee that does not have user account
   getEmployeesWithNoUserAccounts: asynHandler(async (req, res) => {
+    console.log("emp no");
     const employees = await db.Employee.findAll({
       include: [
         {
@@ -120,7 +119,7 @@ module.exports = EmployeeController = {
       ],
     });
     const employee = employees.filter((e) => e.user === null);
-    // console.log(employee);
+    console.log(employees[5].user);
     res.json(employee);
   }),
   getEmployeePostions: asynHandler(async (req, res) => {

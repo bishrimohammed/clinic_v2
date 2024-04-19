@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       // references: {
     },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
   });
+  ServiceCategory.sync({ alert: false });
   return ServiceCategory;
 };

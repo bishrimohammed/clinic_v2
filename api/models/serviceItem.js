@@ -1,10 +1,16 @@
 // service item sequilize model. it contain service name, price , service_category id , unit_id, status
 
-const { DataTypes } = require("sequelize");
+// const { DataTypes } = require("sequelize");
 const { sequelize } = require(".");
 
 module.exports = (sequelize, DataTypes) => {
   const ServiceItem = sequelize.define("serviceitem", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
     service_name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -12,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     price: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      defaultValue: 0,
       valiate: {
         min: 0,
       },
@@ -24,33 +31,18 @@ module.exports = (sequelize, DataTypes) => {
       //     key: "id",
       // },
     },
-    unit_id: {
-      type: DataTypes.INTEGER,
+    unit: {
+      type: DataTypes.STRING,
       allowNull: true,
-      // references: {
-      //     model: Unit,
-      //     key: "id",
-      // },
     },
     status: {
-      type: DataTypes.STRING,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,
     },
-    is_laboratory: {
+    isFixed: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    is_imaging: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    is_registration: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    is_others: {
-      type: DataTypes.BOOLEAN,
+      allowNull: true,
       defaultValue: false,
     },
   });

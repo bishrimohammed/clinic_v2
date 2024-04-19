@@ -84,8 +84,21 @@ module.exports = RoleController = {
     // console.log(role);
     // res.status(404).json({ err: "dfvgrsg" });
     // return;
-    await role.setPermissions([]);
-    await db.rolePermission.bulkCreate(selectedPermission);
+    const hasRolePermission = await db.rolePermission.findOne({
+      where: {
+        role_id: req.params.id,
+      },
+    });
+    if (hasRolePermission) {
+      // await role.setPermissions([]);
+      await role.setPermissions([]);
+      await db.rolePermission.bulkCreate(selectedPermission);
+    } else {
+      await db.rolePermission.bulkCreate(selectedPermission);
+    }
+    console.log(hasRolePermission);
+
+    // await db.rolePermission.bulkCreate(selectedPermission);
     // for (const permission of selectedPermission) {
     //   const {
     //     permission_id,
@@ -108,7 +121,6 @@ module.exports = RoleController = {
     role.save();
 
     res.json(role);
-    return;
   }),
   deleteRole: expressAsyncHandler(async (req, res) => {
     const role = await db.Role.destroy({

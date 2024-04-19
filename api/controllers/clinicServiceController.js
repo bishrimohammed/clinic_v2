@@ -1,67 +1,157 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../models");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 module.exports.clinicServiceController = {
   getClinicServices: asyncHandler(async (req, res) => {
-    const clinicServices = await db.ClinicService.findAll();
+    let where = {};
+    // console.log(req.query.status === "false");
+    // if (req.query.status !== "") {
+    //   where.status = !!req.query.status;
+    // }
+    if (req.query.status === "false") {
+      where.status = false;
+    } else if (req.query.status === "true") {
+      where.status = true;
+    }
+    // console.log(Boolean(req.query.status));
+    // console.log(where);
+    // console.log(req.query);
+    // const clin
+    //   where = {
+    //     status: req.query.status
+    //   }
+
+    const clinicServices = await db.ClinicService.findAll({
+      where: where,
+    });
     res.json(clinicServices);
   }),
-  // @desc get clinic service by id
-  getClinicServiceItems: asyncHandler(async (req, res) => {
+  getServiceGroup: asyncHandler(async (req, res) => {
     const { id } = req.params;
+    console.log(req.query);
+    // console.log(id);
     const clinicService = await db.ClinicService.findByPk(id);
     if (!clinicService) {
       res.status(404);
       throw new Error("Clinic service not found");
     }
+    // const serviceGroup = await clinicService.getServiceCategory();
+    const serviceGroup = await db.ServiceCategory.findAll({
+      where: {
+        clinicService_id: id,
+      },
+      include: [
+        {
+          model: db.ClinicService,
+          as: "clinicService",
+        },
+      ],
+    });
+    res.json(serviceGroup);
+  }),
+  addServiceGroup: asyncHandler(async (req, res) => {
+    const { name, clinicService_id } = req.body;
+    console.log(req.body);
+    // return;
+    const serviceGroup = await db.ServiceCategory.create({
+      name,
+      clinicService_id: parseInt(clinicService_id),
+    });
+    res.status(201).json(serviceGroup);
+  }),
+  updateServiceGroup: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { name, clinicService_id } = req.body;
+    const serviceGroup = await db.ServiceCategory.update(
+      {
+        name,
+        clinicService_id: parseInt(clinicService_id),
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    res.json(serviceGroup);
+  }),
+  // @desk activate service group
+  activateServiceGroup: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const serviceGroup = await db.ServiceCategory.update(
+      {
+        status: true,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    res.json(serviceGroup);
+  }),
+
+  // @desk deactivate service group
+  deactiveServiceGroup: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const serviceGroup = await db.ServiceCategory.update(
+      {
+        status: false,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    res.json(serviceGroup);
+  }),
+  // @desk delete service group
+  // @desc get clinic service by id
+  getClinicServiceItems: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    // console.log(id);
+    let where = {};
+    if (req.query.status) {
+      where.status = Boolean(req.query.status);
+    }
+
+    // if (req.query.gender) {
+    //   where.gender = req.query.gender;
+    // }
+    console.log(req.query);
+    const clinicService = await db.ClinicService.findByPk(id);
+    if (!clinicService) {
+      res.status(404);
+      throw new Error("Clinic service not found");
+    }
+    // console.log("sjdbkajcvdgh");
     // let items = [];
     const categorys = await clinicService.getServiceCategory();
     const categoryIds = categorys.map((category) => category.id);
+    if (req.query.groups) {
+      where.serviceCategory_id = req.query.groups;
+    } else {
+      where.serviceCategory_id = categoryIds;
+    }
     const items = await db.ServiceItem.findAll({
-      where: {
-        serviceCategory_id: categoryIds,
-      },
+      where: where,
+      order: [["service_name", "ASC"]],
       include: [
         {
           model: db.ServiceCategory,
           as: "serviceCategory",
-          attributes: ["name"],
+          attributes: ["name", "id"],
         },
         {
-          model: db.Unit,
-          as: "unit",
-          attributes: ["name"],
+          model: db.LabTestProfile,
+          as: "labTestProfile",
+          // attributes: ["id"],
+          include: [{ model: db.PanelUnderpanel, as: "underPanels" }],
         },
       ],
     });
-    // .then((c) => {
-    //   return Promise.all(
-    //     c.map(async (category) => await category.getServiceItem())
-    //   );
-    // });
-    // .then((items) => {
-    //   items.forEach((categoryItems) => {
-    //     categoryItems.forEach((item) => {
-    //       items.push(item);
-    //     });
-    //     // console.log(items);
-    //     return items;
-    //     // console.log(items);
-    //     // console.log(ccc);
-    //   });
-    //   // return items.map((i) => i);
-    // });
-
-    // ccc.forEach((categoryItems) => {
-    //   categoryItems.forEach((item) => {
-    //     items.push(item);
-    //   });
-    // });
-    // const ggg = await ccc[0].getServiceItem();
-    // items = await Promise.all(
-    //   cc.map(async (category) => await category.getServiceItem())
-    // );
     res.json(items);
   }),
 
@@ -75,10 +165,182 @@ module.exports.clinicServiceController = {
           as: "serviceCategory",
           attributes: ["name"],
         },
+        {
+          model: db.LabTestProfile,
+          as: "labTestProfile",
+          // attributes: ["id"],
+          include: [{ model: db.PanelUnderpanel, as: "underPanels" }],
+        },
       ],
     });
     res.json(labServiceItems);
   }),
+  ggggg: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const clinicService = await db.ClinicService.findByPk(id);
+    if (!clinicService) {
+      res.status(404);
+      throw new Error("Clinic service not found");
+    }
+    const categorys = await clinicService.getServiceCategory();
+    const categoryIds = categorys.map((category) => category.id);
+    const labServiceItems = await db.ServiceItem.findAll({
+      where: {
+        serviceCategory_id: categoryIds,
+        // is_laboratory: true,
+      },
+    });
+    await Promise.all(
+      labServiceItems.map((item) => {
+        return db.LabTestProfile.create({
+          labTest_id: item.id,
+          isPanel: false,
+          isFixed: false,
+          parentId: null,
+        });
+      })
+    );
+  }),
+  // @desc add service items
+  addServiceItems: asyncHandler(async (req, res) => {
+    const { service_name, price, unit, isFixed, islab, lab } = req.body;
+    console.log(req.body);
+    // return;
+    const labServiceItem = await db.ServiceItem.create({
+      service_name: service_name,
+      price,
+      isFixed: isFixed,
+      // is_laboratory: true,
+      unit: unit,
+      serviceCategory_id: parseInt(req.body.serviceGroup),
+    });
+    if (islab) {
+      const labProfile = await db.LabTestProfile.create({
+        labTest_id: labServiceItem.id,
+        isPanel: lab.isPanel,
+        isFixed: lab.isFixed,
+      });
+      // const labs = await db.ServiceItem.findAll({
+      //   where: { id: lab.childService },
+      // });
+      console.log(lab.childService);
+      if (lab.isPanel) {
+        const lbProfiles = await db.LabTestProfile.findAll(
+          // { parentId: labProfile.id },
+          { where: { labTest_id: { [db.Sequelize.Op.in]: lab.childService } } }
+        );
+        const lbProfileIds = lbProfiles.map((p) => p.id);
+        console.log(lbProfileIds);
+        await Promise.all(
+          // lab.childService.map((id) => {
+          //   console.log(id);
+          //   return db.PanelUnderpanel.create({
+          //     panel_id: labProfile.id,
+          //     underpanel_id: id,
+          //   });
+          // })
+          lbProfileIds.map((id) => {
+            return db.PanelUnderpanel.create({
+              panel_id: labProfile.id,
+              underpanel_id: id,
+            });
+          })
+        );
+
+        // const panel = await labProfile.addUnderPanel(lbProfileIds);
+      }
+    }
+    res.status(201).json(labServiceItem);
+  }),
+  // @desc update service items
+  updateServiceItems: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { service_name, price, unit, isFixed, islab, lab } = req.body;
+    console.log(req.body);
+    // return;
+    const labServiceItem = await db.ServiceItem.update(
+      {
+        service_name: service_name,
+        price,
+        isFixed: isFixed,
+        // is_laboratory: true,
+        unit: unit,
+        serviceCategory_id: parseInt(req.body.serviceGroup),
+      },
+      { where: { id: id } }
+    );
+    if (islab) {
+      const labProfile = await db.LabTestProfile.findOne({
+        where: { labTest_id: id },
+      });
+
+      // console.log(labProfile);
+      // return;
+      // const labProfile = await db.LabTestProfile.update(
+      //   {
+      //     isPanel: lab.isPanel,
+      //     isFixed: lab.isFixed,
+      //   },
+      //   { where: { labTest_id: id } }
+      // );
+      // const labs = await db.ServiceItem.findAll({
+      //   where: { id: lab}
+      const lbProfiles = await db.LabTestProfile.findAll(
+        // { parentId: labProfile.id },
+        {
+          where: {
+            labTest_id: { [db.Sequelize.Op.in]: lab?.childService || [] },
+          },
+        }
+      );
+      const lbProfileIds = lbProfiles.map((p) => p.id);
+      console.log(lbProfileIds);
+      console.log(lab.childService);
+      if (lab.underPanel && labProfile.isPanel) {
+        // console.log(lbProfileIds);
+        console.log("hello");
+        await db.PanelUnderpanel.destroy({
+          where: {
+            panel_id: labProfile.id,
+            // underpanel_id: labProfile.underPanel.id
+          },
+        });
+
+        // const panel = await labProfile.addUnderPanel(lbProfileIds);
+      } else if (lab.isPanel && labProfile.isPanel) {
+        // console.log(lbProfileIds);
+        await db.PanelUnderpanel.destroy({
+          where: {
+            panel_id: labProfile.id,
+            // underpanel_id: labProfile.underPanel.id
+          },
+        });
+        await Promise.all(
+          lbProfileIds.map((id) => {
+            return db.PanelUnderpanel.create({
+              panel_id: labProfile.id,
+              underpanel_id: id,
+            });
+          })
+        );
+      } else if (lab.isPanel && !labProfile.isPanel) {
+        console.log("\n\nunderpanel to panel\n\n");
+        await Promise.all(
+          lbProfileIds.map((id) => {
+            return db.PanelUnderpanel.create({
+              panel_id: labProfile.id,
+              underpanel_id: id,
+            });
+          })
+        );
+      }
+      labProfile.isPanel = lab.isPanel;
+      labProfile.isFixed = lab.isFixed;
+      await labProfile.save();
+    }
+    res.json({ msg: "ok" });
+  }),
+
   // @desc create lab service items item
 
   createLabServiceItem: asyncHandler(async (req, res) => {
@@ -250,10 +512,11 @@ module.exports.clinicServiceController = {
   }),
   updateClinicService: asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { service_name } = req.body;
+    const { service_name, status } = req.body;
     const clinicService = await db.ClinicService.update(
       {
         service_name,
+        status,
       },
       {
         where: {
@@ -285,5 +548,52 @@ module.exports.clinicServiceController = {
       }
     );
     res.json(clinicService);
+  }),
+  activateClinicService: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const clinicService = await db.ClinicService.update(
+      {
+        status: true,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    res.json(clinicService);
+  }),
+  // @desc deactivate  service items
+  deactiveServiceItem: asyncHandler(async (req, res) => {
+    console.log("\n\n bishri \n\n");
+
+    const { id } = req.params;
+    // console.log("\n\n" + id + "\n\n");
+    const serviceItem = await db.ServiceItem.update(
+      {
+        status: false,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    res.json(serviceItem);
+  }),
+  // @desc activate  service items
+  activateServiceItem: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const serviceItem = await db.ServiceItem.update(
+      {
+        status: true,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    );
+    res.json(serviceItem);
   }),
 };

@@ -13,10 +13,12 @@ const {
   employeeAssociation,
   roleAssociation,
   userAssociation,
+  clinicServiceAssociation,
 } = require("./associations/index.js");
 // const { medicalRecordDetailAssocations } = require("./associations/medicalRecordDetailAssocations.js");
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
+  // host: "127.0.0.1",
   host: dbConfig.HOST,
   port: 3306,
   dialect: dbConfig.dialect,
@@ -51,6 +53,8 @@ db.Schedule = require("./Schedule.js")(sequelize, DataTypes);
 db.ClinicService = require("./clinicService.js")(sequelize, DataTypes);
 db.ServiceCategory = require("./serviceCategory.js")(sequelize, DataTypes);
 db.ServiceItem = require("./serviceItem.js")(sequelize, DataTypes);
+db.LabTestProfile = require("./labTestProfile.js")(sequelize, DataTypes);
+db.PanelUnderpanel = require("./PanelUnderpanel .js")(sequelize, DataTypes);
 db.Unit = require("./Unit.js")(sequelize, DataTypes);
 
 // user
@@ -113,6 +117,7 @@ InvestiagtionAssocation(db);
 employeeAssociation(db);
 roleAssociation(db);
 userAssociation(db);
+clinicServiceAssociation(db);
 
 db.ClinicProfile.belongsTo(db.Address, {
   foreignKey: "address_id",
@@ -148,14 +153,14 @@ db.ServiceItem.belongsTo(db.ServiceCategory, {
 
 // unit has many service item
 
-db.Unit.hasMany(db.ServiceItem, {
-  foreignKey: "unit_id",
-  as: "serviceItem",
-});
-db.ServiceItem.belongsTo(db.Unit, {
-  foreignKey: "unit_id",
-  as: "unit",
-});
+// db.Unit.hasMany(db.ServiceItem, {
+//   foreignKey: "unit_id",
+//   as: "serviceItem",
+// });
+// db.ServiceItem.belongsTo(db.Unit, {
+//   foreignKey: "unit_id",
+//   as: "unit",
+// });
 // user associations
 db.User.belongsTo(db.Role, {
   foreignKey: "role_id",
