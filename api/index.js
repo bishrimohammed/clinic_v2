@@ -19,6 +19,7 @@ const medicalRecordRoute = require("./routes/MedicalRecord.router.js");
 const serviceRoute = require("./routes/cilicService.router.js");
 const unitsRoute = require("./routes/unit.router.js");
 const clinicprofileRoute = require("./routes/ClinicProfile.router.js");
+const fieldRoute = require("./routes/FieldConfig.router.js");
 // employye route
 const employeeRoute = require("./routes/employee.router.js");
 // role and permission
@@ -70,6 +71,15 @@ app.use("/api/v1/employee", employeeRoute);
 app.use("/api/v1/role", roleRoute);
 
 app.use("/api/v1/permissions", permissionsRoute);
+
+app.use("/api/v1/fields", fieldRoute);
+// app.use("/api/v1/upload", upload.single("file"), (req, res) => {
+//   const file = req.file;
+//   if (!file) {
+//     return res.status(400).send("No file uploaded");
+//   }
+//   res.send(file);
+// });
 
 app.use(notFound);
 app.use(errorHandler);

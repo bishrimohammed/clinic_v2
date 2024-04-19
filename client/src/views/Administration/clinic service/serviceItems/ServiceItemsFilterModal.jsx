@@ -20,8 +20,8 @@ const ServiceItemsFilterModal = ({
 }) => {
   const { data: groups } = useGetServiceGroups(serviceId);
   // console.log(positions);
-  console.log("ServiceItemsFilterModal");
-  console.log(groups);
+  // console.log("ServiceItemsFilterModal");
+  // console.log(groups);
   const status = [
     {
       value: "",

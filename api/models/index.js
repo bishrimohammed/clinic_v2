@@ -100,6 +100,15 @@ db.OrderedTest = require("./medicalRecords/orderedTest.js")(
   sequelize,
   DataTypes
 );
+
+/// field config
+
+db.VitalSignField = require("./VitalSignField.js")(sequelize, DataTypes);
+db.PhysicalExaminationField = require("./PhysicalExaminationField.js")(
+  sequelize,
+  DataTypes
+);
+
 // db.PatientDetail = require("./patient/PatientDetail.js")(sequelize, DataTypes);
 // db.Appointment = require("./patient/Appointment.js")(sequelize, DataTypes);
 // db.AppointmentDetail = require("./patient/AppointmentDetail.js")(

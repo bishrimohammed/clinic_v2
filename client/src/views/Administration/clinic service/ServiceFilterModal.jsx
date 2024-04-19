@@ -5,7 +5,7 @@ const ServiceFilterModal = ({ show, handleClose, setFilter, filter }) => {
   const statusRef = useRef(filter.status);
 
   const filterHandler = (event) => {
-    console.log(statusRef.current.value);
+    // console.log(statusRef.current.value);
     // return;
     event.preventDefault();
     setFilter({ status: statusRef.current.value });

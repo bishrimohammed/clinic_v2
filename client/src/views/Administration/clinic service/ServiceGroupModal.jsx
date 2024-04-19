@@ -22,12 +22,14 @@ const schema = yup.object().shape({
 });
 const ServiceGroupModal = ({ show, handleClose }) => {
   const { state } = useLocation();
+  // console.log(state);
   const [action, setAction] = useState("Save");
   const [selectedServiceGroup, setSelectedServiceGroup] = useState(null);
   const { data: services } = useGetClinicService();
   const { data: groups } = useGetServiceGroups(state.id);
   const [successState, setSuccessState] = useState("");
   const [errorState, setErrorState] = useState("");
+  const [showForm, setShowForm] = useState(false);
   const [showDeactiveModal, setShowDeactiveModal] = useState({
     // isShow: false,
     id: null,
@@ -35,7 +37,7 @@ const ServiceGroupModal = ({ show, handleClose }) => {
   });
   const deactiveMutation = useDeactivateServiceGroup();
   const activateMutation = useActivateServiceGroup();
-  console.log(showDeactiveModal);
+  // console.log(showDeactiveModal);
   const {
     register,
     setValue,
@@ -144,8 +146,13 @@ const ServiceGroupModal = ({ show, handleClose }) => {
         show={show}
         onHide={() => handleClose(false)}
       >
-        <Modal.Header closeButton>
-          <Modal.Title> Service Groups</Modal.Title>
+        <Modal.Header className="p" closeButton>
+          <Modal.Title className="text-nowrap"> Service Groups</Modal.Title>
+          <div className="d-flex justify-content-center w-100 me-3">
+            <Button className="me-5" onClick={() => setShowForm(true)}>
+              Add +
+            </Button>
+          </div>
         </Modal.Header>
         <Modal.Body>
           {successState && (
@@ -158,9 +165,7 @@ const ServiceGroupModal = ({ show, handleClose }) => {
               {errorState}
             </Alert>
           )}
-          {/* <Alert variant="success" dismissible="true">
-          gvkhgvkgh
-        </Alert> */}
+
           <Row>
             <Col md={7}>
               <Table
@@ -205,12 +210,6 @@ const ServiceGroupModal = ({ show, handleClose }) => {
                                   "Deactivate"
                                 );
                               }
-                              // alert("hello");
-                              // setShowDeactiveModal({
-                              //   isShow: true,
-                              //   id: group.id,
-                              //   action: "Deactivate",
-                              // });
                             }}
                           >
                             <FaLock color="red" />
@@ -244,47 +243,50 @@ const ServiceGroupModal = ({ show, handleClose }) => {
                 </tbody>
               </Table>
             </Col>
-            <Col md={5} className="mt-md-0 mt-3">
-              <Form onSubmit={handleSubmit(submitHandler)}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Group Name</Form.Label>
-                  <Form.Control
-                    //   required
-                    type="text"
-                    placeholder="Group Name"
-                    {...register("name")}
-                    defaultValue={
-                      action === "Save" ? "" : selectedServiceGroup.name
-                    }
-                    isInvalid={errors.name}
+            <Col md={5} className="mt-md-9 mt-3">
+              {showForm && (
+                <Form onSubmit={handleSubmit(submitHandler)}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Group Name</Form.Label>
+                    <Form.Control
+                      //   required
+                      type="text"
+                      placeholder="Group Name"
+                      {...register("name")}
+                      defaultValue={
+                        action === "Save" ? "" : selectedServiceGroup.name
+                      }
+                      isInvalid={errors.name}
 
-                    //   name="groupName"
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.name?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Service Type</Form.Label>
-                  <Form.Select
-                    type="text"
-                    placeholder="Service Type"
-                    name="serviceType"
-                    {...register("serviceType")}
-                    isInvalid={errors.serviceType}
-                  >
-                    <option value="">Please Select</option>
-                    {services?.map((service) => (
-                      <option key={service.id} value={service.id}>
-                        {service.service_name}
-                      </option>
-                    ))}
-                  </Form.Select>
-                  <Form.Control.Feedback type="invalid">
-                    {errors.serviceType?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                {/* <Form.Group>
+                      //   name="groupName"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.name?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Service Type</Form.Label>
+                    <Form.Select
+                      type="text"
+                      placeholder="Service Type"
+                      disabled={true}
+                      name="serviceType"
+                      {...register("serviceType")}
+                      value={state.id}
+                      isInvalid={errors.serviceType}
+                    >
+                      <option value="">Please Select</option>
+                      {services?.map((service) => (
+                        <option key={service.id} value={service.id}>
+                          {service.service_name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.serviceType?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                  {/* <Form.Group>
                 <Form.Label>Description</Form.Label>
                 <Form.Control
                   type="text"
@@ -292,12 +294,13 @@ const ServiceGroupModal = ({ show, handleClose }) => {
                   name="description"
                 />
               </Form.Group> */}
-                <div className="d-flex justify-content-end mt-2">
-                  <Button variant="primary" type="submit">
-                    {action}
-                  </Button>
-                </div>
-              </Form>
+                  <div className="d-flex justify-content-end mt-2">
+                    <Button variant="primary" type="submit">
+                      {action}
+                    </Button>
+                  </div>
+                </Form>
+              )}
             </Col>
           </Row>
         </Modal.Body>

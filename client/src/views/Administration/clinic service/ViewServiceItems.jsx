@@ -21,7 +21,7 @@ const ViewServiceItems = () => {
     id: null,
     action: "",
   });
-  console.log(data);
+  // console.log(data);
   const [showFilter, setShowFilter] = useState(false);
   const [viewServiceItem, setViewServiceItem] = useState({
     isShow: false,
@@ -33,7 +33,7 @@ const ViewServiceItems = () => {
   });
   const [showServiceGroupModal, setShowServiceGroupModal] = useState(false);
   const items = useMemo(() => data || [], [data, isPending, isFetching]);
-  console.log(state);
+  // console.log(state);
   return (
     <div>
       <ServiceItemTable

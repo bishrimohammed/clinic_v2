@@ -1,14 +1,15 @@
+import React from "react";
 import { Container } from "react-bootstrap";
 import { Outlet } from "react-router-dom";
 
-const User = () => {
+const FieldConfig = () => {
   return (
-    <Container className="p-3 mb-5">
+    <Container className="p-3 ">
       <div className="bg-hrun-box hrunboxshadow">
         <Outlet />
-      </div>{" "}
+      </div>
     </Container>
   );
 };
 
-export default User;
+export default FieldConfig;

@@ -30,7 +30,7 @@ export const useUpdateUser = () => {
       });
       // console.log(?);
       // <Navigate to="administrations/user/userlist" />;
-      navigate("administrations/user/userlist");
+      navigate("/user/account");
       // navigate(-1);
       // console.log(variables);
     },

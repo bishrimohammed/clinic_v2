@@ -15,7 +15,7 @@ const ClinicServiceList = () => {
     id: null,
     action: "",
   });
-  console.log(filter);
+  // console.log(filter);
   const [showEditServiceModal, setShowEditServiceModal] = useState({
     isShow: true,
     service: null,

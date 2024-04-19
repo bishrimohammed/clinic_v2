@@ -11,9 +11,9 @@ export const useDeactivateEmployee = () => {
         queryKey: ["Employees"],
         // exact: true,
       });
-      queryClient.refetchQueries({
-        queryKey: ["Employees"],
-      });
+      // queryClient.refetchQueries({
+      //   queryKey: ["Employees"],
+      // });
       toast.success("Employee is deactivated successfully");
     },
     onError: async (error) => {

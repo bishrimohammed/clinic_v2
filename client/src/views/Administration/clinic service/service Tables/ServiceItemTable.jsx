@@ -13,7 +13,7 @@ import {
 } from "@tanstack/react-table";
 import { ServiceItemColumns } from "../utils/ServiceItemColumns";
 import { FaSortDown, FaSortUp, FaUserLock } from "react-icons/fa";
-import { TbEdit } from "react-icons/tb";
+// import { TbEdit } from "react-icons/tb";
 import SearchInput from "../../../../components/inputs/SearchInput";
 import { CgLockUnlock } from "react-icons/cg";
 import { RiEditLine } from "react-icons/ri";

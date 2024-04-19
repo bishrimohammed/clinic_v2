@@ -4,6 +4,8 @@ import { Route, Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
 import CreateServiceItems from "../views/Administration/clinic service/serviceItems/CreateServiceItems";
+import FieldConfig from "../views/Administration/field config/FieldConfig";
+import FieldConfigList from "../views/Administration/field config/FieldConfigList";
 const Role = React.lazy(() => import("../views/Administration/Role/Role"));
 const RoleList = React.lazy(() =>
   import("../views/Administration/Role/RoleList")
@@ -295,6 +297,9 @@ const AppContent = () => {
               <Route index element={<ViewEmployees />} />
               <Route path="add" element={<AddEmployee />}></Route>
             </Route>
+            <Route path="fieldconfig" element={<FieldConfig />}>
+              <Route index element={<FieldConfigList />} />
+            </Route>
 
             {/* route role */}
             <Route path="role" element={<Role />}>
@@ -303,7 +308,24 @@ const AppContent = () => {
               <Route path="edit/:roleId" element={<UpdateRole />} />
             </Route>
           </Route>
+          <Route path="user" element={<User />}>
+            <Route path="employee" element={<Employee />}>
+              <Route index element={<ViewEmployees />} />
+              <Route path="add" element={<AddEmployee />} />
+            </Route>
+            <Route path="account" element={<UserList />} />
+            {/* <Route index element={<UserList />} /> */}
+            <Route path="account/newuser" element={<AddUser />} />
+            <Route path="account/edit/:userId" element={<UpdateUser />} />
 
+            {/* role */}
+            <Route path="role" element={<RoleList />} />
+            {/* <Route index element={<RoleList />} /> */}
+            <Route path="role/createrole" element={<CreateRole />} />
+            <Route path="role/edit/:roleId" element={<UpdateRole />} />
+            {/* </Route> */}
+            {/* </Route> */}
+          </Route>
           <Route path="report" element={<Report />}>
             <Route path="billreport" element={<BillReport />} />
           </Route>

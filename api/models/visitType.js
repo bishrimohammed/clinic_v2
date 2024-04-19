@@ -7,9 +7,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
   });
-  //   VisitType.sync({ alter: false }).then(() => {
-  //     console.log("visitType model synced");
-  //   });
+  VisitType.sync({ alter: false });
   return VisitType;
 };

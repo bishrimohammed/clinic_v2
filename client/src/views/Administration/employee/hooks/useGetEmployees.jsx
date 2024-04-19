@@ -8,7 +8,7 @@ export const useGetEmployees = (query) => {
       { status: query.status, position: query.position, gender: query.gender },
     ],
     queryFn: async () => {
-      console.log("fetched");
+      // console.log("fetched");
       return Axiosinstance.get(`/employee`, {
         params: query,
       }).then((res) => res.data);

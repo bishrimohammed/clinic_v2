@@ -18,7 +18,7 @@ import "simplebar-react/dist/simplebar.min.css";
 import { Link, NavLink, useLocation } from "react-router-dom";
 // import { cilPuzzle, cilSpeedometer } from "@coreui/icons";
 import { changeSidebarShow } from "../store/sidebarSlice";
-import { FaKitMedical } from "react-icons/fa6";
+import { FaKitMedical, FaUser } from "react-icons/fa6";
 import { GiMedicalThermometer, GiUltrasound } from "react-icons/gi";
 import {
   MdSpaceDashboard,
@@ -172,6 +172,27 @@ const Sidebar = () => {
           )}
           {currentUser.role?.name === "admin" && (
             <CNavGroup
+              idx="User Management"
+              visible={location.pathname.startsWith("report")}
+              toggler={navLink(
+                "User Management",
+                // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
+                <FaUser className="nav-icon" />
+              )}
+            >
+              <CNavItem to="/user/employee" component={NavLink}>
+                Employee Mgmt
+              </CNavItem>
+              <CNavItem to="/user/role" component={NavLink}>
+                Role Mgmt
+              </CNavItem>
+              <CNavItem to="/user/account" component={NavLink}>
+                Account Mgmt
+              </CNavItem>
+            </CNavGroup>
+          )}
+          {currentUser.role?.name === "admin" && (
+            <CNavGroup
               idx="administrations"
               visible={location.pathname.startsWith("Configurations")}
               toggler={navLink(
@@ -182,25 +203,32 @@ const Sidebar = () => {
             >
               {" "}
               <CNavItem to="/administrations/services" component={NavLink}>
-                Clinic Services
+                Clinic Services Mgmt
               </CNavItem>
-              <CNavItem to="/administrations/user" component={NavLink}>
+              {/* <CNavItem to="/administrations/user" component={NavLink}>
                 Users
-              </CNavItem>
+              </CNavItem> */}
               <CNavItem
                 to="/administrations/setting/editclinicinfo"
                 component={NavLink}
               >
-                Clinic Profile
+                Clinic Profile Mgmt
               </CNavItem>
-              <CNavItem to="/administrations/employee" component={NavLink}>
+              {/* <CNavItem to="/administrations/employee" component={NavLink}>
                 Employee Management
               </CNavItem>
               <CNavItem to="/administrations/role" component={NavLink}>
                 Role Management
+              </CNavItem> */}
+              <CNavItem to="/administrations/fieldconfig" component={NavLink}>
+                Field Configuration
+              </CNavItem>
+              <CNavItem to="/administrations/creditservice" component={NavLink}>
+                Field Configuration
               </CNavItem>
             </CNavGroup>
           )}
+
           {currentUser.role?.name === "admin" && (
             <CNavItem to="/report/billreport" component={NavLink}>
               <TbReportAnalytics className="nav-icon" />

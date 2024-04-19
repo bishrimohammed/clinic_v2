@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const db = require("../models/");
 const { generateToken } = require("../utils/generateToken.js");
 const { Op } = require("sequelize");
+// const db = require("../models/index.js");
 // const { getPaddedName } = require("../utils/getPaddedName.js");
 const User = db.User;
 const UserController = {
