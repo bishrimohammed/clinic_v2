@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 // import { CSpinner } from "@coreui/react";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
+import CreateServiceItems from "../views/Administration/clinic service/serviceItems/CreateServiceItems";
 const Role = React.lazy(() => import("../views/Administration/Role/Role"));
 const RoleList = React.lazy(() =>
   import("../views/Administration/Role/RoleList")
@@ -257,6 +258,10 @@ const AppContent = () => {
           <Route path="administrations" element={<ClinicService />}>
             <Route path="services" element={<Service />}>
               <Route index element={<ClinicServiceList />} />
+              <Route
+                path="createserviceitem"
+                element={<CreateServiceItems />}
+              />
               <Route path="createlabservice" element={<CreateLabService />} />
               <Route path="viewserviceitems" element={<ViewServiceItems />} />
               <Route

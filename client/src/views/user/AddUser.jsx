@@ -20,29 +20,10 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useGetEmplooyeDoesNotHaveAccount } from "./hooks/useGetEmplooyeDoesNotHaveAccount";
 import { useGetRoles } from "../hooks/useGetRoles";
-import { generatePassword } from "./utils/generatePassword";
+// import { generatePassword } from "./utils/generatePassword";
 import { useGetPermissions } from "../Administration/Role/hooks/useGetPermissions";
 import PermissionList from "./PermissionList";
-const schema = yup.object().shape({
-  employeeId: yup.string().required("Employee is required"),
-  // email: yup.string().email("invalid email").required("Email is required"),
-  username: yup.string().required("Username is required"),
-  password: yup.string().required("Password is required"),
-  role: yup.string().required("role is required"),
-  permissions: yup
-    .array()
-    .of(
-      yup.object().shape({
-        create: yup.boolean().transform((value) => Boolean(value)),
-        read: yup.boolean().transform((value) => Boolean(value)),
-        update: yup.boolean().transform((value) => Boolean(value)),
-        delete: yup.boolean().transform((value) => Boolean(value)),
-        admin: yup.boolean().transform((value) => Boolean(value)),
-        permissionId: yup.string().required("permissionId is required"),
-      })
-    )
-    .default([]),
-});
+
 const AddUser = () => {
   // const { mutate, mutateAsync, isPending } = useAddUser();
   const { data: employees } = useGetEmplooyeDoesNotHaveAccount();

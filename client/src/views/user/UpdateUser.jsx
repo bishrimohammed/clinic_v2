@@ -182,7 +182,7 @@ const UpdateUser = () => {
   };
   // console.log(errors);
   const userpermissions = user?.userPermissions?.map((p) => p.userpermission);
-  console.log(userpermissions);
+  // console.log(userpermissions);
   const checkPermissionset = (permissionId) => {
     const p = userpermissions.find((p) => p.permission_id === permissionId);
     // console.log(p);

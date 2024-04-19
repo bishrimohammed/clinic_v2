@@ -1,18 +1,29 @@
 import React from "react";
 import { Button, Modal, Spinner } from "react-bootstrap";
 import { useDeactivateService } from "./hooks/useDeactivateService";
+import { useActivateService } from "./hooks/useActivateService";
 
-const DeactiveServiceModal = ({ show, handleClose, serviceId }) => {
+const DeactiveServiceModal = ({ show, handleClose, serviceId, action }) => {
   const deactiveMutation = useDeactivateService();
+  const activateMutation = useActivateService();
   console.log("hello");
   console.log(show);
   const clickHandler = () => {
-    deactiveMutation.mutateAsync(serviceId).then(async (res) => {
-      if (res.status === 200) {
-        // await refetch();
-        handleClose(false);
-      }
-    });
+    if (action === "Activate") {
+      activateMutation.mutateAsync(serviceId).then(async (res) => {
+        if (res.status === 200) {
+          // await refetch();
+          handleClose(false);
+        }
+      });
+    } else {
+      deactiveMutation.mutateAsync(serviceId).then(async (res) => {
+        if (res.status === 200) {
+          // await refetch();
+          handleClose(false);
+        }
+      });
+    }
   };
   return (
     <Modal
@@ -30,14 +41,14 @@ const DeactiveServiceModal = ({ show, handleClose, serviceId }) => {
           Cancel
         </Button>
         <Button
-          variant="danger"
-          disabled={deactiveMutation.isPending}
+          variant={action === "Activate" ? "success" : "danger"}
+          disabled={deactiveMutation.isPending || activateMutation.isPending}
           onClick={clickHandler}
         >
-          {deactiveMutation.isPending && (
+          {(deactiveMutation.isPending || activateMutation.isPending) && (
             <Spinner animation="border" size="sm" />
           )}
-          Deactivate
+          {action}
         </Button>
       </div>
     </Modal>

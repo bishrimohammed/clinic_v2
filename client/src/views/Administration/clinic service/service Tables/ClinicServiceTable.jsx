@@ -3,26 +3,38 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import React, { useMemo, useState } from "react";
 import { Clinic_Service_Columns } from "../utils/Clinic_Service_Columns";
-import { Button, Container, Table } from "react-bootstrap";
+import { Button, Container, Dropdown, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { FaUserLock } from "react-icons/fa";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { FaSortDown, FaSortUp, FaUserLock } from "react-icons/fa";
+import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
 import { TbEdit } from "react-icons/tb";
 import useDebounce from "../../../../hooks/useDebounce";
 import SearchInput from "../../../../components/inputs/SearchInput";
+import { CgLockUnlock } from "react-icons/cg";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { LuFilter } from "react-icons/lu";
 
-const ClinicServiceTable = ({ clinicServices, setShowDeactiveModal }) => {
+const ClinicServiceTable = ({
+  clinicServices,
+  setShowDeactiveModal,
+  setShowEditServiceModal,
+  setShowFilter,
+  setFilter,
+}) => {
   //   console.log(clinicServices);
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [sorting, setSorting] = useState([]);
   const debouncedValue = useDebounce(search, 500);
   const Columns = useMemo(() => Clinic_Service_Columns, []);
   const tableInstance = useReactTable({
@@ -31,44 +43,87 @@ const ClinicServiceTable = ({ clinicServices, setShowDeactiveModal }) => {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     onPaginationChange: setPagination,
+    onSortingChange: setSorting,
     state: {
       globalFilter: debouncedValue,
       pagination: pagination,
+      sorting: sorting,
     },
     onGlobalFilterChange: setSearch,
   });
   //   console.log(tableInstance.getRowModel());
+  const handleToggleDropdown = (index, event) => {
+    setOpenDropdownIndex(index === openDropdownIndex ? null : index);
+    // setDropdownPosition({ left: event.clientX - 20, top: event.clientY - 200 });
+  };
   return (
     <div className="p-3">
       {" "}
       <h5>Clinic Service List</h5>
       <hr />
-      <div className=" d-flex justify-content-between flex-wrap gap-2 align-items-center w-100 mb-1 mt-2">
+      <div className=" d-flex flex-wrap gap-2 align-items-center w-100 mb-2">
         <SearchInput searchvalue={search} setSearch={setSearch} />
         <Button
+          variant="secondary"
+          className="d-flex align-items-center gap-1"
+          onClick={() => setShowFilter(true)}
+        >
+          <LuFilter size={16} /> Filter
+        </Button>
+        <Button variant="warning" onClick={() => setFilter({ status: "" })}>
+          Reset
+        </Button>
+        {/* <Button
           className=" ms-auto "
           onClick={() => navigate("createlabservice")}
         >
           {"  "}
           Add New Service
-        </Button>
+        </Button> */}
       </div>
       <Table striped responsive bordered>
         <thead>
           {tableInstance.getHeaderGroups().map((headerEl) => {
             return (
               <tr key={headerEl.id}>
-                {headerEl.headers.map((columnEl) => {
+                {headerEl.headers.map((columnEl, index) => {
                   return (
-                    <th key={columnEl.id}>
-                      {flexRender(
-                        columnEl.column.columnDef.header,
-                        columnEl.getContext()
+                    <th key={columnEl.id} colSpan={columnEl.colSpan}>
+                      {columnEl.isPlaceholder ? null : (
+                        <div
+                          className={
+                            columnEl.column?.getCanSort()
+                              ? "cursor-pointer select-none sort"
+                              : ""
+                          }
+                          onClick={columnEl.column.getToggleSortingHandler()}
+                          title={
+                            columnEl.column.getCanSort()
+                              ? columnEl.column.getNextSortingOrder() === "asc"
+                                ? "Sort ascending"
+                                : columnEl.column.getNextSortingOrder() ===
+                                  "desc"
+                                ? "Sort descending"
+                                : "Clear sort"
+                              : undefined
+                          }
+                        >
+                          {flexRender(
+                            columnEl.column.columnDef.header,
+                            columnEl.getContext()
+                          )}
+                          {{
+                            asc: <FaSortUp />,
+                            desc: <FaSortDown />,
+                          }[columnEl.column.getIsSorted()] ?? null}
+                        </div>
                       )}
                     </th>
                   );
                 })}
+
                 <th>Actions</th>
               </tr>
             );
@@ -96,7 +151,95 @@ const ClinicServiceTable = ({ clinicServices, setShowDeactiveModal }) => {
                     </td>
                   );
                 })}
-                <td>
+                <td
+                  className="p-0"
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    zIndex: "0",
+                  }}
+                >
+                  <Dropdown
+                    id={rowEl.original.id + "dropdown"}
+                    autoClose="outside"
+                    //
+                    // show={openDropdowns[rowEl.original.id]}
+                    onToggle={(event) => handleToggleDropdown(null, event)}
+                    show={openDropdownIndex === rowEl.original.id}
+                  >
+                    <Dropdown.Toggle
+                      caret="false"
+                      className="employee-dropdown px-3"
+                      style={{ zIndex: 6 }}
+                      id={`dropdown-${rowEl.original.id}`}
+                      onClick={(event) =>
+                        handleToggleDropdown(rowEl.original.id, event)
+                      }
+                    >
+                      <span
+                        // style={{ color: "red", zIndex: -1 }}
+                        className="text-dark"
+                      >
+                        <BsThreeDotsVertical />
+                      </span>
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                      <Dropdown.Item
+                        className="d-flex gap-2 align-items-center"
+                        role="button"
+                        disabled={!rowEl.original.status}
+                        style={{ zIndex: "50" }}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          // setData_to_be_Edited(rowEl.original);
+                          // handleShowEdit();
+                          setShowEditServiceModal({
+                            isShow: true,
+                            service: rowEl.original,
+                            // action: "Edit",
+                          });
+                        }}
+                      >
+                        <RiEditLine /> Edit{" "}
+                      </Dropdown.Item>
+                      {rowEl.original.status ? (
+                        <Dropdown.Item
+                          className="d-flex gap-2 align-items-center"
+                          role="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setShowDeactiveModal({
+                              isShow: true,
+                              id: rowEl.original.id,
+                              action: "Deactivate",
+                            });
+                            // setShowDelete(true);
+                          }}
+                        >
+                          <FaUserLock color="red" /> Deactivate
+                        </Dropdown.Item>
+                      ) : (
+                        <Dropdown.Item
+                          className="d-flex gap-2 align-items-center"
+                          role="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setShowDeactiveModal({
+                              isShow: true,
+                              id: rowEl.original.id,
+                              action: "Activate",
+                            });
+                            // setShowDelete(true);
+                          }}
+                        >
+                          <CgLockUnlock /> Activate
+                        </Dropdown.Item>
+                      )}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </td>
+
+                {/* <td>
                   {
                     <div className="d-flex align-items-center gap-1">
                       <span
@@ -110,22 +253,40 @@ const ClinicServiceTable = ({ clinicServices, setShowDeactiveModal }) => {
                       >
                         <TbEdit />
                       </span>
-                      <span
-                        className="p-1 bg-warning text-white d-flex align-items-center justify-content-center"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setShowDeactiveModal({
-                            isShow: true,
-                            id: rowEl.original.id,
-                          });
-                          // setShowDelete(true);
-                        }}
-                      >
-                        <FaUserLock />
-                      </span>
+                      {rowEl.original.status ? (
+                        <span
+                          className="p-1 bg-warning text-white d-flex align-items-center justify-content-center"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setShowDeactiveModal({
+                              isShow: true,
+                              id: rowEl.original.id,
+                              action: "Deactivate",
+                            });
+                            // setShowDelete(true);
+                          }}
+                        >
+                          <FaUserLock />
+                        </span>
+                      ) : (
+                        <span
+                          className="p-1 bg-warning text-white d-flex align-items-center justify-content-center"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setShowDeactiveModal({
+                              isShow: true,
+                              id: rowEl.original.id,
+                              action: "Activate",
+                            });
+                            // setShowDelete(true);
+                          }}
+                        >
+                          <FaUserLock />
+                        </span>
+                      )}
                     </div>
                   }
-                </td>
+                </td> */}
               </tr>
             );
           })}

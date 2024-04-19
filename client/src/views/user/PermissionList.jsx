@@ -28,7 +28,7 @@ const schema = yup.object().shape({
   // email: yup.string().email("invalid email").required("Email is required"),
   username: yup.string().required("Username is required"),
   password: yup.string().required("Password is required"),
-  role: yup.string().required("role is required"),
+  role: yup.string().required("Role is required"),
   permissions: yup.array().of(
     yup.object().shape({
       create: yup.boolean().transform((value) => Boolean(value)),
@@ -50,26 +50,27 @@ const PermissionList = ({
 }) => {
   const password = useMemo(() => generatePassword(8), []);
   const { mutate, mutateAsync, isPending } = useAddUser();
-  const defaultPermission = useMemo(
-    () =>
-      permissions.map((p) => ({
-        permissionId: p.id,
-        admin: false,
-        create: defaultPermissions.some(
-          (permission) => permission.permission_id === p.id && permission.create
-        ),
-        read: defaultPermissions.some(
-          (permission) => permission.permission_id === p.id && permission.read
-        ),
-        update: defaultPermissions.some(
-          (permission) => permission.permission_id === p.id && permission.update
-        ),
-        delete: defaultPermissions.some(
-          (permission) => permission.permission_id === p.id && permission.delete
-        ),
-      })),
-    [defaultPermissions]
-  );
+  console.log(defaultPermissions);
+  // const defaultPermission = useMemo(
+  //   () =>
+  //     permissions.map((p) => ({
+  //       permissionId: p.id,
+  //       admin: false,
+  //       create: defaultPermissions.some(
+  //         (permission) => permission.permission_id === p.id && permission.create
+  //       ),
+  //       read: defaultPermissions.some(
+  //         (permission) => permission.permission_id === p.id && permission.read
+  //       ),
+  //       update: defaultPermissions.some(
+  //         (permission) => permission.permission_id === p.id && permission.update
+  //       ),
+  //       delete: defaultPermissions.some(
+  //         (permission) => permission.permission_id === p.id && permission.delete
+  //       ),
+  //     })),
+  //   [defaultPermissions]
+  // );
   const {
     register,
     formState: { errors },
@@ -84,12 +85,12 @@ const PermissionList = ({
       role: "",
       username: "",
       password: password,
-      permissions: defaultPermission,
+      // permissions: defaultPermission,
     },
     resolver: yupResolver(schema),
   });
   const handleRoleChange = (e) => {
-    console.log("saklcnldskjcb DVHKSJJJJJJJJJJJJJJJJJJJ");
+    // console.log("saklcnldskjcb DVHKSJJJJJJJJJJJJJJJJJJJ");
     const selectedRoleId = parseInt(e.target.value);
     const selectedRole = roles
       ?.filter((r) => r.id === selectedRoleId)
@@ -97,7 +98,7 @@ const PermissionList = ({
         item.permissions.map((permission) => permission.rolepermission)
       )
       .flat();
-    console.log(selectedRole);
+    // console.log(selectedRole);
     if (selectedRole) {
       // const rolePermissions = selectedRole.permissions.map((permission) => ({
       //   id: permission.id,
@@ -114,7 +115,7 @@ const PermissionList = ({
       setDefaultPermissions([]);
     }
   };
-  console.log(defaultPermissions);
+  //   console.log(defaultPermissions);
   const resetPermissions = () => {
     console.log("mmmmmmmmmmmmmmmmmm");
     setDefaultPermissions([]);
@@ -124,8 +125,8 @@ const PermissionList = ({
   // useEffect(() => {
   //   setValue("permissions", []);
   // }, [roleWatcher]);
-  console.log(watchPermissions);
-  console.log(roles);
+  //   console.log(watchPermissions);
+  //   console.log(roles);
   const handleAdminCheck = (index, permissionId) => {
     let isAdmin = watchPermissions && watchPermissions[index].admin;
     // isAdmin = isAdmin === undefined ? true : isAdmin;
@@ -248,8 +249,8 @@ const PermissionList = ({
       role: data.role,
       permissions: selectedPermissions,
     };
-    console.log(user);
-    return;
+    // console.log(user);
+    // return;
     // // mutate(user);
     // return;
     mutateAsync(user)
@@ -416,16 +417,31 @@ const PermissionList = ({
                     onChange: (e) => {
                       handleChangeRead(index);
                       // watchPermissions[index].create === !e.target.checked;
+                      // setValue(
+                      //   `permissions[${index}].create`,
+                      //   !e.target.checked
+                      // );
                     },
                   })}
                   disabled={watchPermissions && watchPermissions[index]?.admin}
-                  //   checked={
-                  //     watchPermissions ||
-                  //     defaultPermissions.some(
-                  //       (permission) =>
-                  //         permission.permission_id === p.id && permission.create
-                  //     )
+                  // checked={defaultPermissions.find(
+                  //   (permission) =>
+                  //     permission.permission_id === p.id && permission?.create
+                  // )}
+                  // checked={defaultPermissions.find((permission) => {
+                  //   if (permission.permission_id === p.id) {
+                  //     return permission?.create;
+                  //   } else {
+                  //     return false;
                   //   }
+                  // })}
+                  // defaultChecked={defaultPermissions.find((permission) => {
+                  //   if (permission.permission_id === p.id) {
+                  //     return permission?.create;
+                  //   } else {
+                  //     return false;
+                  //   }
+                  // })}
                   //   checked="checked"
                   //   value={true}
                   // defaultChecked={checkPermissionSet(p.id, "create")}
@@ -467,10 +483,10 @@ const PermissionList = ({
                     onChange: () => handleChangeRead(index),
                   })}
                   disabled={watchPermissions && watchPermissions[index]?.admin}
-                  checked={defaultPermissions.some(
-                    (permission) =>
-                      permission.permission_id === p.id && permission.delete
-                  )}
+                  //   checked={defaultPermissions.some(
+                  //     (permission) =>
+                  //       permission.permission_id === p.id && permission.delete
+                  //   )}
                 />
               </td>
             </tr>
