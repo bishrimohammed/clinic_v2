@@ -1,6 +1,8 @@
 import React from "react";
 import { Tab, Tabs } from "react-bootstrap";
 import VitalSignConfig from "./VitalSignConfig";
+import PhysicalExaminationFields from "./PhysicalExaminationFields";
+import VisitTypes from "./VisitTypes";
 
 const FieldConfigList = () => {
   return (
@@ -14,10 +16,10 @@ const FieldConfigList = () => {
           <VitalSignConfig />
         </Tab>
         <Tab eventKey="Physicalexaminations" title="Physical examinations">
-          Physical examinations
+          <PhysicalExaminationFields />
         </Tab>
         <Tab eventKey="Visittypes" title="Visit types">
-          Tab content for Contact
+          <VisitTypes />
         </Tab>
       </Tabs>
     </div>

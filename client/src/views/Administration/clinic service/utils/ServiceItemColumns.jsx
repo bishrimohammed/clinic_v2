@@ -19,7 +19,7 @@ export const ServiceItemColumns = [
   },
   {
     header: "Price",
-    accessorFn: (row) => row.price,
+    accessorFn: (row) => (row.price !== 0 ? row.price : "--"),
   },
   // {
   //   header: "is Fixed",

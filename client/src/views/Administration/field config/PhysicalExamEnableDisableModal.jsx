@@ -1,25 +1,26 @@
 import React from "react";
+import { useDisablePhysicalExam } from "./hooks/useDisablePhysicalExam";
+import { useEnablePhysicalExam } from "./hooks/useEnablePhysicalExam";
 import { Button, Modal, Spinner } from "react-bootstrap";
-import { useDisableVitalSign } from "./hooks/useDisableVitalSign";
-import { useEnableVitalSign } from "./hooks/useEnableVitalSign";
 
-const VitalSignDeactivateActivateModal = ({
+export const PhysicalExamEnableDisableModal = ({
   show,
   handleClose,
-  vitalSignId,
   action,
+  phyicalExamId,
 }) => {
-  const disableMutation = useDisableVitalSign();
-  const enableMutation = useEnableVitalSign();
+  console.log(phyicalExamId);
+  const disableMutation = useDisablePhysicalExam();
+  const enableMutation = useEnablePhysicalExam();
   const submitHandler = () => {
     if (action === "Disable") {
-      disableMutation.mutateAsync(vitalSignId).then((res) => {
+      disableMutation.mutateAsync(phyicalExamId).then((res) => {
         if (res.status === 200) {
           handleClose(false);
         }
       });
     } else {
-      enableMutation.mutateAsync(vitalSignId).then((res) => {
+      enableMutation.mutateAsync(phyicalExamId).then((res) => {
         if (res.status === 200) {
           handleClose(false);
         }
@@ -50,15 +51,13 @@ const VitalSignDeactivateActivateModal = ({
             <Spinner animation="border" size="sm" />
           )}
           {/* {action === "delete"
-            ? "Delete"
-            : action === "deactivate"
-            ? "Deactivate"
-            : "Activate"} */}
+              ? "Delete"
+              : action === "deactivate"
+              ? "Deactivate"
+              : "Activate"} */}
           {action}
         </Button>
       </div>
     </Modal>
   );
 };
-
-export default VitalSignDeactivateActivateModal;

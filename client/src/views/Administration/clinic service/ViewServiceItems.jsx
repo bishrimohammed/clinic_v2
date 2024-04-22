@@ -7,6 +7,7 @@ import ServiceItemsFilterModal from "./serviceItems/ServiceItemsFilterModal";
 import ViewServiceItemDetail from "./serviceItems/ViewServiceItemDetail";
 import UpdateServiceItemModal from "./update/UpdateServiceItemModal";
 import ServiceGroupModal from "./ServiceGroupModal";
+import CreateServiceItemModal from "./serviceItems/createServiceItemModal";
 
 const ViewServiceItems = () => {
   const [filter, setFilter] = useState({
@@ -31,9 +32,13 @@ const ViewServiceItems = () => {
     isShow: false,
     serviceItem: null,
   });
+  const [showAddServiceItemModal, setShowAddServiceItemModal] = useState({
+    isShow: false,
+    state: null,
+  });
   const [showServiceGroupModal, setShowServiceGroupModal] = useState(false);
   const items = useMemo(() => data || [], [data, isPending, isFetching]);
-  // console.log(state);
+  console.log(showAddServiceItemModal);
   return (
     <div>
       <ServiceItemTable
@@ -45,6 +50,7 @@ const ViewServiceItems = () => {
         setViewServiceItem={setViewServiceItem}
         setUpdateServiceItemModal={setUpdateServiceItemModal}
         setShowServiceGroupModal={setShowServiceGroupModal}
+        setShowAddServiceItemModal={setShowAddServiceItemModal}
       />
       {showDeactiveModal.isShow && showDeactiveModal.id && (
         <DeactivateServiceItemModal
@@ -82,6 +88,13 @@ const ViewServiceItems = () => {
           show={showServiceGroupModal}
           handleClose={setShowServiceGroupModal}
           // setFilter={setFilter}
+        />
+      )}
+      {showAddServiceItemModal.isShow && (
+        <CreateServiceItemModal
+          show={showAddServiceItemModal.isShow}
+          handleClose={setShowAddServiceItemModal}
+          state={showAddServiceItemModal.state}
         />
       )}
     </div>

@@ -1,14 +1,14 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
-import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { Button, Col, Form, Row, Modal } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { useLocation } from "react-router-dom";
+
 import * as yup from "yup";
 import { useGetServiceGroups } from "../hooks/useGetServiceGroups";
+import { useLocation } from "react-router-dom";
 import { useGetServiceItems } from "../hooks/useGetServiceItems";
-import { useUpdateServiceItem } from "../hooks/service item/useUpdateServiceItem";
+import { useAddServiceItem } from "../hooks/service item/useAddServiceItem";
 const serviceItemSchema = yup.object().shape({
-  id: yup.number(),
   service_name: yup.string().required("Service Name is required"),
   allowgroup: yup.boolean(),
   islab: yup.boolean(),
@@ -31,7 +31,7 @@ const serviceItemSchema = yup.object().shape({
       childService: yup.array().of(yup.number()),
     })
     .when("islab", ([islab], schema) => {
-      console.log(islab);
+      // console.log(islab);
       if (islab) {
         return schema.required("rew is required");
       }
@@ -57,47 +57,32 @@ const serviceItemSchema = yup.object().shape({
       return schema.nullable();
     }),
 });
-const UpdateServiceItemModal = ({ show, handleClose, serviceItem }) => {
-  const { state } = useLocation();
-  // console.log(serviceItem);
-  const { data: groups } = useGetServiceGroups(state.id);
-  const { data, isFetching } = useGetServiceItems(state.id, {
-    status: "",
-    groups: [],
-  });
-  const { mutateAsync } = useUpdateServiceItem();
+
+const CreateServiceItemModal = ({ show, handleClose, state }) => {
+  //   const { state } = useLocation();
+  //   console.log("kjbhvjchfxgdszxcgvhbbhgfcd");
+  const { mutateAsync, isPending } = useAddServiceItem();
   const {
     register,
     // formState = { errors },
     handleSubmit,
     watch,
-    formState: { errors },
     setValue,
+    formState: { errors },
   } = useForm({
     defaultValues: {
-      service_name: serviceItem.service_name,
-      serviceGroup: serviceItem.serviceCategory.id,
-      price: serviceItem?.labTestProfile?.isPanel ? serviceItem.price : "",
-      // price: "",
-      unit: serviceItem.unit,
-      isFixed: serviceItem?.isFixed,
-      // referenceRange: serviceItem.referenceRange,
-      // allowgroup: serviceItem.allowgroup,
-      // islab: serviceItem.islab,
-      lab: {
-        // childService: serviceItem?.labTestProfile?.underPanels?.map(
-        //   (l) => l.underpanel_id
-        // ),
-        isPanel: serviceItem?.labTestProfile?.isPanel,
-        isFixed: serviceItem?.labTestProfile?.isFixed,
-        underPanel: !serviceItem?.labTestProfile?.isPanel,
-      },
       islab: state.is_laboratory,
-      allowgroup: state.is_laboratory || state.is_imaging,
+      allowgroup: state.is_laboratory,
     },
     resolver: yupResolver(serviceItemSchema),
   });
-  // console.log(state);
+
+  const { data: groups } = useGetServiceGroups(state.id);
+  const { data, isFetching } = useGetServiceItems(state.id, {
+    status: "",
+    groups: [],
+  });
+  // console.log(data);
   const allowGroupingWatcher = watch("allowgroup");
   const isPanelWathcer = watch("lab.isPanel");
   const underPanelWatcher = watch("lab.underPanel");
@@ -105,33 +90,21 @@ const UpdateServiceItemModal = ({ show, handleClose, serviceItem }) => {
   // console.log(state);
   // console.log(groups);
   const submitHandler = (data) => {
-    // console.log(data);
+    console.log(data);
     // return;
-    const Data = {
-      serviceItemData: data,
-      serviceItemId: serviceItem.id,
-    };
-    mutateAsync(Data).then((res) => {
+    mutateAsync(data).then((res) => {
       console.log(res);
-      if (res.status === 200) {
+      if (res.status === 201) {
         handleClose(false);
       }
     });
   };
-  // const ss = serviceItem?.labTestProfile?.underPanels?.map(
-  //   (l) => l.underpanel_id
-  // );
-  // const dd = data.filter((s) => {
-  //   if (ss.includes(s.labTestProfile.id)) return s.labTestProfile.id;
-  // });
-  // console.log(ss);
-  // console.log(dd);
-  // const isServiceItemSelected = (serviceId) => {};
-  // console.log(serviceItem);
+  console.log(errors);
+
   return (
     <Modal size="lg" show={show} onHide={() => handleClose(false)}>
       <Modal.Header closeButton>
-        <Modal.Title>Update Service Item</Modal.Title>
+        <Modal.Title>Add Service Item</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit(submitHandler)}>
@@ -184,7 +157,7 @@ const UpdateServiceItemModal = ({ show, handleClose, serviceItem }) => {
                   placeholder="price"
                   type="number"
                   disabled={underPanelWatcher}
-                  step="any"
+                  step="0.01"
                   min={0}
                   isInvalid={errors.price}
                 >
@@ -224,7 +197,10 @@ const UpdateServiceItemModal = ({ show, handleClose, serviceItem }) => {
                     <Form.Label>Under Panel</Form.Label>
                     <Form.Check
                       {...register("lab.underPanel", {
-                        onChange: () => setValue("lab.isPanel", false),
+                        onChange: () => {
+                          isPanelWathcer && setValue("lab.isPanel", false);
+                          //   isFixedWatcher && setValue("lab.isFixed", false);
+                        },
                       })}
                       type="checkbox"
                     />
@@ -244,32 +220,13 @@ const UpdateServiceItemModal = ({ show, handleClose, serviceItem }) => {
                   <Col md={4} sm={12} className="mb-3">
                     <Form.Group>
                       <Form.Label>Child Service</Form.Label>
-                      <Form.Select
-                        multiple
-                        {...register("lab.childService")}
-                        // defaultValue={serviceItem?.labTestProfile?.underPanels?.map(
-                        //   (s) => s.underpanel_id
-                        // )}
-                      >
-                        {/* <option value="">Please Select</option> */}
-                        {data
-                          ?.filter((s) => s.id !== serviceItem.id)
-                          .map((item) => (
-                            <option
-                              key={item.id}
-                              value={item.id}
-                              selected={
-                                serviceItem?.labTestProfile?.underPanels?.some(
-                                  (x) =>
-                                    x.underpanel_id === item.labTestProfile.id
-                                )
-                                  ? true
-                                  : false
-                              }
-                            >
-                              {item.service_name}
-                            </option>
-                          ))}
+                      <Form.Select multiple {...register("lab.childService")}>
+                        <option value="">Please Select</option>
+                        {data?.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.service_name}
+                          </option>
+                        ))}
                       </Form.Select>
                     </Form.Group>
                   </Col>
@@ -290,22 +247,14 @@ const UpdateServiceItemModal = ({ show, handleClose, serviceItem }) => {
               </Form.Group>
             </Col>
           </Row>
-          {/* <div className="d-flex justify-content-end">
+          <div className="d-flex justify-content-end">
             {" "}
-            <Button type="submit">Update</Button>
-          </div> */}
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => handleClose(false)}>
-              Close
-            </Button>
-            <Button variant="primary" type="submit">
-              Update
-            </Button>
-          </Modal.Footer>
+            <Button type="submit">Save</Button>
+          </div>
         </Form>
       </Modal.Body>
     </Modal>
   );
 };
 
-export default UpdateServiceItemModal;
+export default CreateServiceItemModal;

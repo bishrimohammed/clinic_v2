@@ -23,7 +23,7 @@ const serviceItemSchema = yup.object().shape({
       childService: yup.array().of(yup.number()),
     })
     .when("islab", ([islab], schema) => {
-      console.log(islab);
+      // console.log(islab);
       if (islab) {
         return schema.required("rew is required");
       }

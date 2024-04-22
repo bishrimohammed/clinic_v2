@@ -16,7 +16,7 @@ export const useAddServiceItem = () => {
         queryKey: ["service-items", state.id, { groups: [], status: "" }],
       });
       toast.success("Service Item added succeessfully");
-      navigate(-1);
+      // navigate(-1);
     },
     onError: async (err) => {
       // console.log(err.response)

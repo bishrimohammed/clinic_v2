@@ -218,7 +218,7 @@ module.exports.clinicServiceController = {
       const labProfile = await db.LabTestProfile.create({
         labTest_id: labServiceItem.id,
         isPanel: lab.isPanel,
-        isFixed: lab.isFixed,
+        isFixed: isFixed,
       });
       // const labs = await db.ServiceItem.findAll({
       //   where: { id: lab.childService },
@@ -335,7 +335,7 @@ module.exports.clinicServiceController = {
         );
       }
       labProfile.isPanel = lab.isPanel;
-      labProfile.isFixed = lab.isFixed;
+      labProfile.isFixed = isFixed;
       await labProfile.save();
     }
     res.json({ msg: "ok" });

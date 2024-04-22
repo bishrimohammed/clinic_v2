@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { useGetVitalSignFields } from "../../hooks/useGetVitalSignFields";
 import { Dropdown, Table } from "react-bootstrap";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { RiEditLine } from "react-icons/ri";
-import { FaLock, FaUserLock } from "react-icons/fa";
 import { CgLockUnlock } from "react-icons/cg";
-import VitalSignDeactivateActivateModal from "./VitalSignDeactivateActivateModal";
+import { FaLock } from "react-icons/fa6";
+import { useGetPhysicalExaminationField } from "../../hooks/useGetPhysicalExaminationField";
+import { PhysicalExamEnableDisableModal } from "./PhysicalExamEnableDisableModal";
 
-const VitalSignConfig = () => {
-  const { data } = useGetVitalSignFields();
+const PhysicalExaminationFields = () => {
+  const { data } = useGetPhysicalExaminationField();
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const handleToggleDropdown = (index, event) => {
     setOpenDropdownIndex(index === openDropdownIndex ? null : index);
@@ -19,7 +18,6 @@ const VitalSignConfig = () => {
     action: "",
     id: null,
   });
-  //   console.log(data);
   return (
     <div>
       <Table striped bordered hover>
@@ -107,20 +105,6 @@ const VitalSignConfig = () => {
                         <CgLockUnlock /> Enable
                       </Dropdown.Item>
                     )}
-                    {/* <Dropdown.Item
-                          className="d-flex gap-2 align-items-center"
-                          role="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setSelectedEmployee({
-                              id: rowEl.original.id,
-                              selectedFor: "deactivate",
-                            });
-                            setShowDelete(true);
-                          }}
-                        >
-                          <FaUserLock /> Deactivate
-                        </Dropdown.Item> */}
                   </Dropdown.Menu>
                 </Dropdown>
               </td>
@@ -129,10 +113,10 @@ const VitalSignConfig = () => {
         </tbody>
       </Table>
       {showEnableDisableModal.isShow && (
-        <VitalSignDeactivateActivateModal
+        <PhysicalExamEnableDisableModal
           show={showEnableDisableModal.isShow}
           handleClose={() => setShowEnableDisableModal({ isShow: false })}
-          vitalSignId={showEnableDisableModal.id}
+          phyicalExamId={showEnableDisableModal.id}
           action={showEnableDisableModal.action}
         />
       )}
@@ -140,4 +124,4 @@ const VitalSignConfig = () => {
   );
 };
 
-export default VitalSignConfig;
+export default PhysicalExaminationFields;

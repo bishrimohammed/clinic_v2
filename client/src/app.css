@@ -156,3 +156,7 @@ input:focus {
   cursor: pointer;
   user-select: none;
 }
+
+.nav-item.nav-link {
+  padding-left: 0;
+}

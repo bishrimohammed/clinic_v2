@@ -29,6 +29,7 @@ const ServiceItemTable = ({
   setViewServiceItem,
   setUpdateServiceItemModal,
   setShowServiceGroupModal,
+  setShowAddServiceItemModal,
 }) => {
   const navigate = useNavigate();
   const service = useLocation().state;
@@ -98,10 +99,15 @@ const ServiceItemTable = ({
 
         <Button
           className=" ms-auto "
-          onClick={() =>
-            navigate("/administrations/services/createserviceitem", {
-              state: service,
-            })
+          onClick={
+            () =>
+              setShowAddServiceItemModal({
+                isShow: true,
+                state: service,
+              })
+            // navigate("/administrations/services/createserviceitem", {
+            //   state: service,
+            // })
           }
         >
           {"  "}+ New Item

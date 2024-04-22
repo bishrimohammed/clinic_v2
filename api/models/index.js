@@ -14,6 +14,7 @@ const {
   roleAssociation,
   userAssociation,
   clinicServiceAssociation,
+  creditCompanyAssociation,
 } = require("./associations/index.js");
 // const { medicalRecordDetailAssocations } = require("./associations/medicalRecordDetailAssocations.js");
 
@@ -109,6 +110,14 @@ db.PhysicalExaminationField = require("./PhysicalExaminationField.js")(
   DataTypes
 );
 
+// credit
+
+db.CreditAgreement = require("./creditAgreement.js")(sequelize, DataTypes);
+db.CreditCompanyProfile = require("./creditCompanyProfile.js")(
+  sequelize,
+  DataTypes
+);
+
 // db.PatientDetail = require("./patient/PatientDetail.js")(sequelize, DataTypes);
 // db.Appointment = require("./patient/Appointment.js")(sequelize, DataTypes);
 // db.AppointmentDetail = require("./patient/AppointmentDetail.js")(
@@ -127,6 +136,7 @@ employeeAssociation(db);
 roleAssociation(db);
 userAssociation(db);
 clinicServiceAssociation(db);
+creditCompanyAssociation(db);
 
 db.ClinicProfile.belongsTo(db.Address, {
   foreignKey: "address_id",

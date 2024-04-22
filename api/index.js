@@ -25,6 +25,8 @@ const employeeRoute = require("./routes/employee.router.js");
 // role and permission
 const roleRoute = require("./routes/Role.router.js");
 const permissionsRoute = require("./routes/permission.router.js");
+
+const creditCompanyRoute = require("./routes/CreditCompany.router.js");
 const { notFound, errorHandler } = require("./middleware/errorMiddleWare.js");
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -73,6 +75,8 @@ app.use("/api/v1/role", roleRoute);
 app.use("/api/v1/permissions", permissionsRoute);
 
 app.use("/api/v1/fields", fieldRoute);
+
+app.use("/api/v1/creditcompany", creditCompanyRoute);
 // app.use("/api/v1/upload", upload.single("file"), (req, res) => {
 //   const file = req.file;
 //   if (!file) {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Col, Image, Modal, Row, Table } from "react-bootstrap";
 import { Host_URL } from "../../../utils/getHost_URL";
-import { differenceInYears } from "date-fns";
+// import { differenceInYears } from "date-fns";
 
 const ViewEmployeeDetail = ({ show, handleClose, employee }) => {
   // console.log(employee);

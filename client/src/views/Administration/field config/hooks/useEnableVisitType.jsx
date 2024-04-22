@@ -1,20 +1,20 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
+import React from "react";
 import Axiosinstance from "../../../../api/axiosInstance";
 import { toast } from "react-toastify";
 
-export const useDisableVitalSign = () => {
+export const useEnableVisitType = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id) => {
-      return Axiosinstance.patch(`/fields/vitalsignField/${id}/disable`);
+      return Axiosinstance.patch(`/visittype/activate/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["vital_sign_fields"],
+        queryKey: ["visit Type"],
         exact: true,
       });
-      toast.success("Vital sign Field disabled successfully");
+      toast.success("Visit type enabled successfully");
     },
     onError: (err) => {
       toast.error(err.response.data.message);

@@ -19,7 +19,7 @@ export const useUpdateServiceItem = () => {
       queryClient.invalidateQueries({
         queryKey: ["service-items", state.id, { groups: [], status: "" }],
       });
-      toast.success("Service Item added succeessfully");
+      toast.success("Service Item updated succeessfully");
       //   navigate("/administrations/services/viewserviceitems");
     },
     onError: async (err) => {

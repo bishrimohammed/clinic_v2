@@ -6,6 +6,9 @@ import { Spinner } from "react-bootstrap";
 import CreateServiceItems from "../views/Administration/clinic service/serviceItems/CreateServiceItems";
 import FieldConfig from "../views/Administration/field config/FieldConfig";
 import FieldConfigList from "../views/Administration/field config/FieldConfigList";
+import CreditCompany from "../views/Administration/credit company/CreditCompany";
+import CreditCompanyList from "../views/Administration/credit company/CreditCompanyList";
+import RegisterCreditCompany from "../views/Administration/credit company/RegisterCreditCompany";
 const Role = React.lazy(() => import("../views/Administration/Role/Role"));
 const RoleList = React.lazy(() =>
   import("../views/Administration/Role/RoleList")
@@ -307,6 +310,10 @@ const AppContent = () => {
               <Route path="createrole" element={<CreateRole />} />
               <Route path="edit/:roleId" element={<UpdateRole />} />
             </Route>
+            <Route path="creditcompany" element={<CreditCompany />}>
+              <Route index element={<CreditCompanyList />} />
+              <Route path="create" element={<RegisterCreditCompany />} />
+            </Route>
           </Route>
           <Route path="user" element={<User />}>
             <Route path="employee" element={<Employee />}>
@@ -329,9 +336,6 @@ const AppContent = () => {
           <Route path="report" element={<Report />}>
             <Route path="billreport" element={<BillReport />} />
           </Route>
-          {/*  </Route> */}
-
-          {/*  <Route path="/" element={<Navigate to="dashboard" replace />} /> */}
         </Routes>
       </Suspense>
     </>

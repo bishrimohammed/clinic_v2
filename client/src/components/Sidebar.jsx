@@ -64,7 +64,7 @@ const Sidebar = () => {
       >
         Softnet Clinic System
       </CSidebarBrand>
-      <CSidebarNav>
+      <CSidebarNav className="px-0">
         <SimpleBar>
           <CNavItem to="/" component={NavLink}>
             {/* <CIcon icon={cilSpeedometer} customClassName="nav-icon" /> */}
@@ -181,13 +181,13 @@ const Sidebar = () => {
               )}
             >
               <CNavItem to="/user/employee" component={NavLink}>
-                Employee Mgmt
+                Employee Management
               </CNavItem>
               <CNavItem to="/user/role" component={NavLink}>
-                Role Mgmt
+                Role Management
               </CNavItem>
               <CNavItem to="/user/account" component={NavLink}>
-                Account Mgmt
+                Account Management
               </CNavItem>
             </CNavGroup>
           )}
@@ -196,14 +196,18 @@ const Sidebar = () => {
               idx="administrations"
               visible={location.pathname.startsWith("Configurations")}
               toggler={navLink(
-                "Configurations",
+                "Clinic Configurations",
                 // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
                 <MdAdminPanelSettings className="nav-icon" />
               )}
             >
               {" "}
-              <CNavItem to="/administrations/services" component={NavLink}>
-                Clinic Services Mgmt
+              <CNavItem
+                to="/administrations/services"
+                component={NavLink}
+                className=""
+              >
+                Clinic Services Management
               </CNavItem>
               {/* <CNavItem to="/administrations/user" component={NavLink}>
                 Users
@@ -212,7 +216,7 @@ const Sidebar = () => {
                 to="/administrations/setting/editclinicinfo"
                 component={NavLink}
               >
-                Clinic Profile Mgmt
+                Clinic Profile Management
               </CNavItem>
               {/* <CNavItem to="/administrations/employee" component={NavLink}>
                 Employee Management
@@ -223,8 +227,8 @@ const Sidebar = () => {
               <CNavItem to="/administrations/fieldconfig" component={NavLink}>
                 Field Configuration
               </CNavItem>
-              <CNavItem to="/administrations/creditservice" component={NavLink}>
-                Field Configuration
+              <CNavItem to="/administrations/creditcompany" component={NavLink}>
+                Credit Service
               </CNavItem>
             </CNavGroup>
           )}

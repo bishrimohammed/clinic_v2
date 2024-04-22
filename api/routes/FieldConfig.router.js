@@ -8,5 +8,23 @@ router.get(
 );
 
 router.get("/vitalsignFields", FieldConfigController.getVitalSignFields);
+router.patch(
+  "/vitalsignField/:id/enable",
+  FieldConfigController.enableVitalSignField
+);
 
+router.patch(
+  "/vitalsignField/:id/disable",
+  FieldConfigController.disableVitalSignField
+);
+
+router.patch(
+  "/physicalExaminationField/:id/enable",
+  FieldConfigController.enablePhycicalExaminationField
+);
+
+router.patch(
+  "/physicalExaminationField/:id/disable",
+  FieldConfigController.disablePhycicalExaminationField
+);
 module.exports = router;

@@ -13,9 +13,10 @@ const HOST =
 // console.log(HOST);
 module.exports = {
   HOST: "localhost",
+  // HOST: "104.192.7.115",
   USER: "root",
   // PASSWORD: "bimo@1234",
-  PASSWORD: "",
+  // PASSWORD: "",
   DB: "clinic_db",
   PORT: 3306,
   // HOST,

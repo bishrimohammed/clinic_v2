@@ -67,6 +67,7 @@ const CreateServiceItems = () => {
     // formState = { errors },
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -132,7 +133,7 @@ const CreateServiceItems = () => {
                   isInvalid={errors.serviceGroup}
                 >
                   <option value="">Please Select</option>
-                  {groups.map((group) => (
+                  {groups?.map((group) => (
                     <option key={group.id} value={group.id}>
                       {group.name}
                     </option>
@@ -148,8 +149,8 @@ const CreateServiceItems = () => {
                 {...register("price")}
                 placeholder="price"
                 type="number"
-                disabled={underPanelWatcher || isFixedWatcher}
-                step="any"
+                disabled={underPanelWatcher}
+                step="0.01"
                 min={0}
                 isInvalid={errors.price}
               >
@@ -178,7 +179,14 @@ const CreateServiceItems = () => {
               <Col md={4} sm={12} className="mb-3">
                 <Form.Group>
                   <Form.Label>Under Panel</Form.Label>
-                  <Form.Check {...register("lab.underPanel")} type="checkbox" />
+                  <Form.Check
+                    {...register("lab.underPanel", {
+                      onChange: () => {
+                        isPanelWathcer && setValue("lab.isPanel", false);
+                      },
+                    })}
+                    type="checkbox"
+                  />
                 </Form.Group>
               </Col>
               <Col md={4} sm={12} className="mb-3">

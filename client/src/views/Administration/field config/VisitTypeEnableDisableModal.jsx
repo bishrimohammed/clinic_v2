@@ -1,27 +1,27 @@
 import React from "react";
+import { useDisableVisitType } from "./hooks/useDisableVisitType";
+import { useEnableVisitType } from "./hooks/useEnableVisitType";
 import { Button, Modal, Spinner } from "react-bootstrap";
-import { useDisableVitalSign } from "./hooks/useDisableVitalSign";
-import { useEnableVitalSign } from "./hooks/useEnableVitalSign";
 
-const VitalSignDeactivateActivateModal = ({
+const VisitTypeEnableDisableModal = ({
   show,
   handleClose,
-  vitalSignId,
   action,
+  visitTypeId,
 }) => {
-  const disableMutation = useDisableVitalSign();
-  const enableMutation = useEnableVitalSign();
+  const disableMutation = useDisableVisitType();
+  const enableMutation = useEnableVisitType();
   const submitHandler = () => {
     if (action === "Disable") {
-      disableMutation.mutateAsync(vitalSignId).then((res) => {
+      disableMutation.mutateAsync(visitTypeId).then((res) => {
         if (res.status === 200) {
-          handleClose(false);
+          handleClose();
         }
       });
     } else {
-      enableMutation.mutateAsync(vitalSignId).then((res) => {
+      enableMutation.mutateAsync(visitTypeId).then((res) => {
         if (res.status === 200) {
-          handleClose(false);
+          handleClose();
         }
       });
     }
@@ -30,7 +30,8 @@ const VitalSignDeactivateActivateModal = ({
     <Modal
       size="sm"
       show={show}
-      onHide={() => handleClose(false)}
+      //   onHide={() => handleClose(false)}
+      onHide={handleClose}
       centered
       backdrop="static"
       keyboard={false}
@@ -50,10 +51,10 @@ const VitalSignDeactivateActivateModal = ({
             <Spinner animation="border" size="sm" />
           )}
           {/* {action === "delete"
-            ? "Delete"
-            : action === "deactivate"
-            ? "Deactivate"
-            : "Activate"} */}
+                ? "Delete"
+                : action === "deactivate"
+                ? "Deactivate"
+                : "Activate"} */}
           {action}
         </Button>
       </div>
@@ -61,4 +62,4 @@ const VitalSignDeactivateActivateModal = ({
   );
 };
 
-export default VitalSignDeactivateActivateModal;
+export default VisitTypeEnableDisableModal;

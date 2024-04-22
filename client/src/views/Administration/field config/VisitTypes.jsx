@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { useGetVitalSignFields } from "../../hooks/useGetVitalSignFields";
+import { useGetVisitType } from "../../hooks/useGetVisitType";
 import { Dropdown, Table } from "react-bootstrap";
+// import VisitTypeEnableDisanbleModel from "./VisitTypeEnableDisanbleModel";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { RiEditLine } from "react-icons/ri";
-import { FaLock, FaUserLock } from "react-icons/fa";
+import { FaLock } from "react-icons/fa6";
 import { CgLockUnlock } from "react-icons/cg";
-import VitalSignDeactivateActivateModal from "./VitalSignDeactivateActivateModal";
+import VisitTypeEnableDisableModal from "./VisitTypeEnableDisableModal";
 
-const VitalSignConfig = () => {
-  const { data } = useGetVitalSignFields();
+const VisitTypes = () => {
+  const { data } = useGetVisitType();
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const handleToggleDropdown = (index, event) => {
     setOpenDropdownIndex(index === openDropdownIndex ? null : index);
@@ -107,20 +107,6 @@ const VitalSignConfig = () => {
                         <CgLockUnlock /> Enable
                       </Dropdown.Item>
                     )}
-                    {/* <Dropdown.Item
-                          className="d-flex gap-2 align-items-center"
-                          role="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setSelectedEmployee({
-                              id: rowEl.original.id,
-                              selectedFor: "deactivate",
-                            });
-                            setShowDelete(true);
-                          }}
-                        >
-                          <FaUserLock /> Deactivate
-                        </Dropdown.Item> */}
                   </Dropdown.Menu>
                 </Dropdown>
               </td>
@@ -129,10 +115,10 @@ const VitalSignConfig = () => {
         </tbody>
       </Table>
       {showEnableDisableModal.isShow && (
-        <VitalSignDeactivateActivateModal
+        <VisitTypeEnableDisableModal
           show={showEnableDisableModal.isShow}
           handleClose={() => setShowEnableDisableModal({ isShow: false })}
-          vitalSignId={showEnableDisableModal.id}
+          visitTypeId={showEnableDisableModal.id}
           action={showEnableDisableModal.action}
         />
       )}
@@ -140,4 +126,4 @@ const VitalSignConfig = () => {
   );
 };
 
-export default VitalSignConfig;
+export default VisitTypes;

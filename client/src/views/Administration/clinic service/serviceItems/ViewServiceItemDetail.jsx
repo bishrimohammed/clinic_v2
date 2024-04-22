@@ -2,7 +2,8 @@ import React from "react";
 import { Button, Col, Modal, Row } from "react-bootstrap";
 
 const ViewServiceItemDetail = ({ show, handleClose, action, serviceItem }) => {
-  // console.log(serviceItem);
+  console.log(serviceItem);
+  console.log(show);
   return (
     <Modal show={show} onHide={() => handleClose(false)}>
       <Modal.Header closeButton className="py-2 px-md-4 px-3">
@@ -33,7 +34,13 @@ const ViewServiceItemDetail = ({ show, handleClose, action, serviceItem }) => {
         <Row className="px-3">
           <Col sm={6} className="px-4">
             <p className="mb-0 text-muted fw-bold ">Unit</p>
-            <p className="small ps-1">{serviceItem.unit?.name}</p>
+            <p className="small ps-1">
+              {serviceItem.unit ? (
+                serviceItem.unit
+              ) : (
+                <span className="text-danger">__</span>
+              )}
+            </p>
           </Col>
           <Col sm={6} className="px-4">
             <p className="mb-0 text-muted fw-bold">Status</p>

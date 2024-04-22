@@ -1,38 +1,33 @@
 import React, { useMemo, useState } from "react";
 import { Button, Dropdown, Spinner, Table } from "react-bootstrap";
-import SearchInput from "../../../../components/inputs/SearchInput";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { FaSortDown, FaSortUp } from "react-icons/fa";
-import { LuFilter } from "react-icons/lu";
-import { CgLockUnlock } from "react-icons/cg";
+import { Company_Column } from "./utils/company_Column";
+import useDebounce from "../../../hooks/useDebounce";
 import {
   flexRender,
-  useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  filterFns,
+  useReactTable,
 } from "@tanstack/react-table";
-import { COLUMNS } from "../utils/COLUMNS";
-import { FaUserLock } from "react-icons/fa";
-
 import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
-import useDebounce from "../../../../hooks/useDebounce";
+import { FaSortDown, FaSortUp, FaUserLock } from "react-icons/fa6";
+import { CgLockUnlock } from "react-icons/cg";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import SearchInput from "../../../components/inputs/SearchInput";
+import { LuFilter } from "react-icons/lu";
 
-const EmployeeTable = ({
-  setAddEmployeeModal,
-  handleShowEdit,
-  setData_to_be_Edited,
-  Data,
+const CreditCompanyTable = ({
+  setShowAddCreditCompanyModal,
+  companies,
   isPending,
-  setSelectedEmployee,
-  setShowDelete,
-  setShowViewEmployee,
-  setEmployee,
-  setFilter,
   setShowFilter,
+  setUpdateCreditCompany,
+  setShowDeactiveModal,
+  setViewCompanyDetail,
+  setFilter,
 }) => {
+  // console.log(companies);
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = React.useState({
@@ -48,11 +43,11 @@ const EmployeeTable = ({
 
   const debouncedValue = useDebounce(search, 500);
   // const employeeData = useMemo(() => Data, []);
-  const columns = useMemo(() => COLUMNS, []);
+  const columns = useMemo(() => Company_Column, []);
 
   const tableInstance = useReactTable({
     columns: columns,
-    data: Data,
+    data: companies,
 
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -67,10 +62,13 @@ const EmployeeTable = ({
     },
     onGlobalFilterChange: setSearch,
   });
-
   return (
+    // <div>
+    //   CreditCompanyTable
+    //   <Button onClick={() => setShowAddCreditCompanyModal(true)}>ADD +</Button>
+    // </div>
     <>
-      <div className=" d-flex flex-wrap  gap-2 align-items-center p-1 w-100 mb-1 mt-2">
+      <div className=" d-flex flex-wrap  gap-2 align-items-center  w-100 mb-1 mt-2">
         <SearchInput searchvalue={search} setSearch={setSearch} />
 
         <Button
@@ -80,17 +78,16 @@ const EmployeeTable = ({
         >
           <LuFilter size={16} /> Filter
         </Button>
-        <Button
-          variant="warning"
-          onClick={() => setFilter({ status: "", position: [], gender: "" })}
-        >
+        <Button variant="warning" onClick={() => setFilter({ status: "" })}>
           Reset
         </Button>
       </div>
       <div className="d-flex justify-content-between gap-2 align-items-center w-100 mb-1 mt-2">
-        <Button className=" ms-auto " onClick={() => setAddEmployeeModal(true)}>
-          {"  "}
-          +Add Employee
+        <Button
+          className="ms-auto"
+          onClick={() => setShowAddCreditCompanyModal(true)}
+        >
+          + Add Company
         </Button>
       </div>
       <Table
@@ -163,8 +160,11 @@ const EmployeeTable = ({
                   key={rowEl.id}
                   style={{ cursor: "pointer", zIndex: "-1" }}
                   onClick={() => {
-                    setShowViewEmployee(true);
-                    setEmployee(rowEl.original);
+                    setViewCompanyDetail({
+                      isShow: true,
+                      company: rowEl.original,
+                    });
+                    // setEmployee(rowEl.original);
                   }}
                 >
                   {rowEl.getVisibleCells().map((cellEl, index) => {
@@ -217,8 +217,12 @@ const EmployeeTable = ({
                           style={{ zIndex: "50" }}
                           onClick={(event) => {
                             event.stopPropagation();
-                            setData_to_be_Edited(rowEl.original);
-                            handleShowEdit();
+                            setUpdateCreditCompany({
+                              isShow: true,
+                              company: rowEl.original,
+                              //  status: rowEl.original.status,
+                            });
+                            // handleShowEdit();
                           }}
                         >
                           <RiEditLine /> Edit
@@ -229,14 +233,15 @@ const EmployeeTable = ({
                             role="button"
                             onClick={(event) => {
                               event.stopPropagation();
-                              setSelectedEmployee({
+                              setShowDeactiveModal({
                                 id: rowEl.original.id,
-                                selectedFor: "deactivate",
+                                isShow: true,
+                                action: "Close",
                               });
-                              setShowDelete(true);
+                              // setShowDelete(true);
                             }}
                           >
-                            <FaUserLock color="red" /> Deactivate
+                            <FaUserLock color="red" /> Close Agreement
                           </Dropdown.Item>
                         ) : (
                           <Dropdown.Item
@@ -244,44 +249,32 @@ const EmployeeTable = ({
                             role="button"
                             onClick={(event) => {
                               event.stopPropagation();
-                              setSelectedEmployee({
+                              setShowDeactiveModal({
                                 id: rowEl.original.id,
-                                selectedFor: "activate",
+                                isShow: true,
+                                action: "Open",
                               });
-                              setShowDelete(true);
                             }}
                           >
-                            <CgLockUnlock /> Activate
+                            <CgLockUnlock /> open Agreement
                           </Dropdown.Item>
                         )}
+
                         {/* <Dropdown.Item
-                          className="d-flex gap-2 align-items-center"
                           role="button"
                           onClick={(event) => {
                             event.stopPropagation();
-                            setSelectedEmployee({
-                              id: rowEl.original.id,
-                              selectedFor: "deactivate",
+                            setShowDeactiveModal({
+                             id: rowEl.original.id,
+                              isShow: true,
+                              action: "Delete",
                             });
-                            setShowDelete(true);
-                          }}
-                        >
-                          <FaUserLock /> Deactivate
-                        </Dropdown.Item> */}
-                        <Dropdown.Item
-                          role="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setSelectedEmployee({
-                              id: rowEl.original.id,
-                              selectedFor: "delete",
-                            });
-                            setShowDelete(true);
+                           
                           }}
                           className="d-flex gap-2 align-items-center"
                         >
                           <RiDeleteBin6Line color="red" /> Delete
-                        </Dropdown.Item>
+                        </Dropdown.Item> */}
                       </Dropdown.Menu>
                     </Dropdown>
                   </td>
@@ -358,6 +351,5 @@ const EmployeeTable = ({
     </>
   );
 };
-// const MemoizedEmployeeTable = React.memo(EmployeeTable);
-// export default MemoizedEmployeeTable;
-export default EmployeeTable;
+
+export default CreditCompanyTable;
