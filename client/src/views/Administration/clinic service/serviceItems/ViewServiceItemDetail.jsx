@@ -7,8 +7,7 @@ const ViewServiceItemDetail = ({ show, handleClose, action, serviceItem }) => {
   return (
     <Modal show={show} onHide={() => handleClose(false)}>
       <Modal.Header closeButton className="py-2 px-md-4 px-3">
-        <Modal.Title>View Item Details</Modal.Title>
-        {/* <p>Service Name: {serviceItem.service_name}</p> */}
+        <Modal.Title>Service Item Details</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Row className="px-3">
@@ -34,7 +33,7 @@ const ViewServiceItemDetail = ({ show, handleClose, action, serviceItem }) => {
         <Row className="px-3">
           <Col sm={6} className="px-4">
             <p className="mb-0 text-muted fw-bold ">Unit</p>
-            <p className="small ps-1">
+            <p className="small">
               {serviceItem.unit ? (
                 serviceItem.unit
               ) : (

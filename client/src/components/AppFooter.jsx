@@ -11,7 +11,7 @@ const AppFooter = () => {
       </div>
       <div className="">
         <span className="me-1">Powered by</span>
-        Bishri
+        Softnet
       </div>
     </div>
   );

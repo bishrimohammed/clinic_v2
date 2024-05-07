@@ -9,9 +9,28 @@ import { useGetServiceGroups } from "../hooks/useGetServiceGroups";
 const FilterSchema = yup.object().shape({
   status: yup.string(),
   groups: yup.array().of(yup.string()),
+  price: yup.string(),
   // gender: yup.string(),
 });
 
+const priceFilter = [
+  {
+    label: "All",
+    value: "",
+  },
+  {
+    value: "0-100",
+    label: "0 - 100",
+  },
+  {
+    value: "100-500",
+    label: "100 - 500",
+  },
+  {
+    value: "500+",
+    label: "500 +",
+  },
+];
 const ServiceItemsFilterModal = ({
   show,
   handleClose,
@@ -62,6 +81,7 @@ const ServiceItemsFilterModal = ({
     setFilter({
       status: data.status,
       groups: groups,
+      price: data.price,
       // gender: data.gender,
     });
     handleClose(false);
@@ -97,6 +117,16 @@ const ServiceItemsFilterModal = ({
                 // defaultValue=""
               />
             ))}
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Price</Form.Label>
+            <Form.Control as="select" {...register("price")}>
+              {priceFilter.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </Form.Control>
           </Form.Group>
 
           <div className="d-flex justify-content-end gap-3 ">

@@ -61,7 +61,7 @@ const DefaultLayout = () => {
       <div>
         <Sidebar />
         <div
-          style={{ paddingLeft: sidebarShow ? "16rem" : 0 }}
+          style={{ paddingLeft: sidebarShow ? "17rem" : 0 }}
           className="d-flex flex-column min-vh-100 bg-light"
         >
           <AppHeader />

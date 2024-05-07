@@ -152,7 +152,7 @@ module.exports = EmployeeController = {
     // return;
     const emergence = JSON.parse(Emergency);
     const address = JSON.parse(req.body?.address);
-    console.log(emergence);
+    // console.log(emergence);
     // return;
     const addressExits = await db.Address.findOne({
       // where: { [Op.or]: [{ phone_1: address.phone_1, email: address.email }] },

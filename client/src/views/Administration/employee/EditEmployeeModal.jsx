@@ -552,15 +552,12 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
                     aria-label="Default select example"
                     isInvalid={errors.address?.region_id}
                   >
-                    <option value="">please select</option>
+                    <option value="">Please Select</option>
                     {regions?.map((region, index) => (
                       <option key={region.id} value={region.id}>
                         {region.name}
                       </option>
                     ))}
-
-                    {/* <option value="Oromia">Oromia</option>
-                <option value="Afar">Afar</option> */}
                   </Form.Select>
                   <Form.Control.Feedback type="invalid">
                     {errors?.address?.region_id?.message}

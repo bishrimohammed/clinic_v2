@@ -116,7 +116,34 @@ module.exports.clinicServiceController = {
     if (req.query.status) {
       where.status = Boolean(req.query.status);
     }
+    if (req.query.price !== "") {
+      if (req.query.price === "500+") {
+        where.price = {
+          [Op.gte]: 500,
+        };
+        console.log("llllllmlkmnkj");
+        // return;
+      } else {
+        let minPrice = parseInt(req.query.price.split("-")[0]);
+        let maxPrice = parseInt(req.query.price.split("-")[1]);
+        console.log("minPrice: " + minPrice);
+        console.log("maxPrice: " + maxPrice);
 
+        // price range between minprice and maxprice
+        where.price = {
+          [Op.gte]: minPrice,
+          [Op.lte]: maxPrice,
+        };
+      }
+
+      // where.price = {
+      //   [Op.gte]: req.query.price
+      // }
+
+      // where.price = {
+      //   [Op.gte]: req.query.price
+      // }
+    }
     // if (req.query.gender) {
     //   where.gender = req.query.gender;
     // }
@@ -148,7 +175,18 @@ module.exports.clinicServiceController = {
           model: db.LabTestProfile,
           as: "labTestProfile",
           // attributes: ["id"],
-          include: [{ model: db.PanelUnderpanel, as: "underPanels" }],
+          include: [
+            {
+              model: db.PanelUnderpanel,
+              as: "underPanels",
+              include: [
+                {
+                  model: db.LabTestProfile,
+                  as: "ParentPanel",
+                },
+              ],
+            },
+          ],
         },
       ],
     });

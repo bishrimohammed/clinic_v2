@@ -9,6 +9,14 @@ import FieldConfigList from "../views/Administration/field config/FieldConfigLis
 import CreditCompany from "../views/Administration/credit company/CreditCompany";
 import CreditCompanyList from "../views/Administration/credit company/CreditCompanyList";
 import RegisterCreditCompany from "../views/Administration/credit company/RegisterCreditCompany";
+import Schedule from "../views/Scheduling/Schedule";
+import StaffWorkingHour from "../views/Scheduling/StaffWorkingHour";
+import DutyManagement from "../views/Scheduling/DutyManagement";
+import AddStaffWorkHourForEmployee from "../views/Scheduling/AddStaffWorkHourForEmployee";
+import CreditCompanyDetail from "../views/Administration/credit company/CreditCompanyDetail";
+import CreateNewWeekProgram from "../views/Scheduling/duty/CreateNewWeekProgram";
+import Appointment from "../views/appointment/Appointment";
+import AppointmentList from "../views/appointment/AppointmentList";
 const Role = React.lazy(() => import("../views/Administration/Role/Role"));
 const RoleList = React.lazy(() =>
   import("../views/Administration/Role/RoleList")
@@ -210,11 +218,11 @@ const AppContent = () => {
           </Route>
           {/* patient */}
           <Route path="patients" element={<Patient />}>
+            {/* <Route index element={<PatientList />} /> */}
             <Route index element={<PatientList />} />
-            <Route index path="patientlist" element={<PatientList />} />
 
             <Route path="newpatient" element={<NewPatient />} />
-            <Route path="editpatient/:id" element={<UpdatePatient />} />
+            <Route path="editpatient" element={<UpdatePatient />} />
             <Route path="assign/:id" element={<AssignPatient />} />
             <Route path="view/:id" element={<PatientDetails />} />
 
@@ -312,6 +320,7 @@ const AppContent = () => {
             </Route>
             <Route path="creditcompany" element={<CreditCompany />}>
               <Route index element={<CreditCompanyList />} />
+              <Route path="detail" element={<CreditCompanyDetail />} />
               <Route path="create" element={<RegisterCreditCompany />} />
             </Route>
           </Route>
@@ -333,8 +342,20 @@ const AppContent = () => {
             {/* </Route> */}
             {/* </Route> */}
           </Route>
+          <Route path="Scheduling" element={<Schedule />}>
+            <Route path="staffworkinghour" element={<StaffWorkingHour />} />
+            <Route
+              path="staffworkinghour/create"
+              element={<AddStaffWorkHourForEmployee />}
+            />
+            <Route path="duty" element={<DutyManagement />} />
+            <Route path="duty/newprogram" element={<CreateNewWeekProgram />} />
+          </Route>
           <Route path="report" element={<Report />}>
             <Route path="billreport" element={<BillReport />} />
+          </Route>
+          <Route path="appointment" element={<Appointment />}>
+            <Route index element={<AppointmentList />} />
           </Route>
         </Routes>
       </Suspense>

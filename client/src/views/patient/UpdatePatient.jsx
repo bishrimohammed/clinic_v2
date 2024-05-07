@@ -10,46 +10,26 @@ import TextInput from "../../components/inputs/TextInput";
 import NumberInput from "../../components/inputs/NumberInput";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Axiosinstance from "../../api/axiosInstance";
+import { useGetPatient } from "./hooks/patientHooks/useGetPatient";
+import PatientForm from "./forms/PatientForm";
+import { IoMdArrowRoundBack } from "react-icons/io";
 const schema = yup.object().shape({
   firstName: yup.string().required("first Name is required"),
   middleName: yup.string().required("middle Name is required"),
   lastName: yup.string().required(" lastName is required"),
   phone: yup.string().required("phone Number is required"),
   gender: yup.string().required("gender is required"),
-  age: yup
-    .number()
-    .transform((value) => (isNaN(value) ? undefined : value))
-    .positive()
-    .integer()
-    .required("age is required"),
-  woreda: yup.string(),
-  kebele: yup.string(),
 });
 const UpdatePatient = () => {
   const navigate = useNavigate();
-
-  const { id } = useParams();
   const { state } = useLocation();
+  const { id } = useParams();
+  const { data } = useGetPatient(state.id);
+  // const { state } = useLocation();
   //console.log(id);
-  let name = state.name.split(" ");
+  // let name = state.name.split(" ");
   // console.log(name);
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = useForm({
-    defaultValues: {
-      firstName: name[0],
-      middleName: name[1],
-      lastName: name[2],
-      age: state.age,
-      gender: state.gender,
-      kebele: state.kebele,
-      phone: state.phone,
-      woreda: state.woreda,
-    },
-    resolver: yupResolver(schema),
-  });
+
   const queryClient = useQueryClient();
   const UpdateMutation = useMutation({
     mutationFn: async (data) => {
@@ -74,13 +54,20 @@ const UpdatePatient = () => {
   };
 
   return (
-    <Container className="p-3 ">
+    <Container className="p-3 mb-5">
       <div className="p-3  bg-hrun-box hrunboxshadow">
-        <div className="mb-4">
+        <div className="mb-4 d-flex gap-3 align-items-center">
+          <IoMdArrowRoundBack
+            className="cursorpointer"
+            size={22}
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate(-1)}
+          />
           <h4>Update Patient Information</h4>
         </div>
-        <hr />
-        <Form onSubmit={handleSubmit(handleUpdate)}>
+
+        <PatientForm patient={data} />
+        {/* <Form onSubmit={handleSubmit(handleUpdate)}>
           <Row>
             <Col>
               <TextInput
@@ -184,7 +171,7 @@ const UpdatePatient = () => {
               </Button>
             </Col>
           </div>
-        </Form>
+        </Form> */}
       </div>
     </Container>
   );

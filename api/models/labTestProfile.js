@@ -28,6 +28,6 @@ module.exports = (sequelize, DataTypes) => {
     //   allowNull: true,
     // },
   });
-  labTestProfile.sync({ alter: true, force: false });
+  labTestProfile.sync({ alter: false, force: false });
   return labTestProfile;
 };

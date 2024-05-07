@@ -15,5 +15,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
   });
+  MedicalRecord.sync({ force: false, alter: false });
   return MedicalRecord;
 };

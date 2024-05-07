@@ -10,107 +10,21 @@ import { useAddPatient } from "./hooks/useAddPatient";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Axiosinstance from "../../api/axiosInstance";
-import { patientSchema } from "../../utils/Schemas";
+import { patientSchema } from "./utils/patientSchema";
+import PatientForm from "./forms/PatientForm";
+// import { patientSchema } from "../../utils/Schemas";
 const NewPatient = () => {
-  const { mutateAsync, isPending } = useAddPatient();
-  const [isbirthdateknown, setIsbirthdateknown] = useState(true);
-  const woredas = useQuery({
-    queryKey: ["woredas"],
-    queryFn: async () => Axiosinstance.get("/woreda").then((res) => res.data),
-    staleTime: 5 * 1000 * 1000,
-  });
-  // console.log(woredas.data);
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    watch,
-    setValue,
-  } = useForm({
-    defaultValues: {
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      age: "",
-      gender: "",
-      address: {
-        street: "",
-        woreda_id: "",
-        house_number: "",
-        email: "",
-        phone_1: "",
-        phone_2: null,
-      },
-      birth_date: new Date().toISOString().substring(0, 10),
-      is_dependent: false,
-      is_new: true,
-      manual_card_id: null,
-      is_credit: false,
-      credit_company_id: null,
-    },
-    resolver: yupResolver(patientSchema),
-  });
-  console.log(errors);
-  // setValue("birth_date", new Date().toISOString().substring(0, 10));
-  const AgeWacher = watch("age");
-  const isCredit = watch("is_credit");
-  const isNewPatient = watch("is_new");
-  console.log(typeof isNewPatient);
-  console.log(errors);
-  const dc = new Date().toISOString().substring(0, 10);
-  // console.log(AgeWacher);
-  if (!isbirthdateknown) {
-    const today = new Date().toISOString().substring(0, 10);
-    const date = new Date(today);
-    date.setFullYear(date.getFullYear() - AgeWacher);
-    setValue("birth_date", date.toISOString().substring(0, 10));
-  }
-  const calulateBirthDatefromAge = (age) => {
-    const today = new Date().toISOString().substring(0, 10);
-    const date = new Date(today);
-    date.setFullYear(date.getFullYear() - age);
-    // setValue("birth_date", date.toISOString().substring(0, 10));
-    return date.toISOString().substring(0, 10);
-  };
-  // const age = calulateBirthDatefromAge(20);
-  // console.log(age);
-  const submitHandler = async (data) => {
-    console.log(data);
-    const { age, ...rest } = data;
-    //e.preventDefault();
-    mutateAsync(rest).then((res) => {
-      console.log(res);
-    });
-    return;
-  };
-
-  const CompanyAgreementList = isCredit ? (
-    <Form.Group className="">
-      <Form.Label className="text-nowrap">company agreement</Form.Label>
-      <Form.Select
-        {...register("credit_company_id")}
-        isInvalid={errors.credit_company_id}
-      >
-        <option value="">Select company</option>
-        <option value="1">softnet solution</option>
-        <option value="2">addis sw</option>
-      </Form.Select>
-
-      <Form.Control.Feedback type="invalid" className="small text-danger">
-        {errors.credit_company_id?.message}
-      </Form.Control.Feedback>
-    </Form.Group>
-  ) : null;
   return (
     <Container className="p-3 mb-4">
       <div className="p-3 bg-hrun-box hrunboxshadow">
         <div className="mb-2">
-          <h4> Patient Information</h4>
+          <h4> Patient Registration</h4>
         </div>
         <hr className="mt-1" />
-        <Form onSubmit={handleSubmit(submitHandler)}>
+        <PatientForm />
+        {/* <Form onSubmit={handleSubmit(submitHandler)}>
           <h6 className="border-bottom border-1 p-1 mb-3 fw-bold">
-            Basic Information
+          Patient Information
           </h6>
           <Row>
             <Col md={4} sm={12} className="mb-2">
@@ -198,17 +112,7 @@ const NewPatient = () => {
               <Form.Group className="mb-3">
                 <div className="d-flex gap-3">
                   <Form.Label>Age</Form.Label>
-                  {/* <Form.Check
-                    type="switch"
-                    size="sm"
-                    checked={isbirthdateknown}
-                    label="is known"
-                    // value={isbirthdateknown}
-                    onChange={(e) => {
-                      // console.log(e.target.checked);
-                      setIsbirthdateknown(e.target.checked);
-                    }}
-                  /> */}
+                  
                 </div>
 
                 <Form.Control
@@ -231,14 +135,7 @@ const NewPatient = () => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-            {/* <Col>
-              <TextInput
-                label="Phone"
-                register={register}
-                name="phone"
-                errors={errors.phone}
-              />
-            </Col> */}
+            
           </Row>
           <h6 className="border-bottom border-1 border-black py-2 mb-3 fw-bold">
             Address Information
@@ -269,12 +166,7 @@ const NewPatient = () => {
               </Form.Control.Feedback>
             </Col>
             <Col md={4} sm={12} className="mb-2">
-              {/* <TextInput
-                label="Alternative Phone"
-                register={register}
-                name="phone_2"
-                errors={errors.phone_2}
-              /> */}
+             
               <Form.Group>
                 <Form.Label>Email</Form.Label>
                 <Form.Control
@@ -295,7 +187,7 @@ const NewPatient = () => {
             <Col md={4} sm={12} className="mb-2">
               <Form.Group>
                 <Form.Label>Woreda</Form.Label>
-                {/* <Form.Control type="text" {...register("address.street")} /> */}
+               
                 <Form.Select {...register("address.woreda_id")}>
                   <option value="">Select Woreda</option>
                   {woredas?.data?.map((woreda, index) => (
@@ -314,12 +206,7 @@ const NewPatient = () => {
               </Form.Group>
             </Col>
             <Col md={4} sm={12} className="mb-2">
-              {/* <TextInput
-                  label="House Number"
-                  register={register}
-                  name="house_number"
-                  errors={errors.house_number}
-                /> */}
+             
               <Form.Group>
                 <Form.Label>House Number</Form.Label>
                 <Form.Control
@@ -351,9 +238,7 @@ const NewPatient = () => {
               </Form.Group>
             </Col>
           </Row>
-          {/* <h6 className="border-bottom border-1 p-1 mb-3 fw-bold">
-            Patient Type
-          </h6> */}
+         
           <h6 className="border-bottom border-1 border-black py-2 mb-3 fw-bold">
             Patient Type
           </h6>
@@ -362,7 +247,7 @@ const NewPatient = () => {
               <Form.Group className="">
                 <Form.Label className="text-nowrap">Patient Type</Form.Label>
                 <Form.Select {...register("is_new")} isInvalid={errors.is_new}>
-                  {/* <option value={null}>Select Patient Type</option> */}
+                  
 
                   <option value="true">New</option>
                   <option value="false">Existing</option>
@@ -401,27 +286,16 @@ const NewPatient = () => {
               <Form.Group className="">
                 <Form.Label className="text-nowrap">Payment way</Form.Label>
                 <Form.Select {...register("is_credit")}>
-                  {/* <option value="">Select Payment way</option> */}
+                
 
                   <option value="false">self payer</option>
                   <option value="true">credit</option>
                 </Form.Select>
               </Form.Group>
             </Col>
-            {/* // select company that have agrement with the clinics */}
+         
             <Col md={4} sm={12}>
-              {/* {isCredit ? (
-                <Form.Group className="">
-                  <Form.Label className="text-nowrap">
-                    company agreement
-                  </Form.Label>
-                  <Form.Select {...register("credit_company_id")}>
-                    <option value="">Select company</option>
-                    <option value="1">softnet solution</option>
-                    <option value="2">addis sw</option>
-                  </Form.Select>
-                </Form.Group>
-              ) : null} */}
+            
               {isCredit === "true" && CompanyAgreementList}
             </Col>
             <Col></Col>
@@ -440,7 +314,7 @@ const NewPatient = () => {
               </Button>
             </Col>
           </div>
-        </Form>
+        </Form> */}
       </div>
     </Container>
   );

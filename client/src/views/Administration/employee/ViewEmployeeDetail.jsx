@@ -231,17 +231,6 @@ const ViewEmployeeDetail = ({ show, handleClose, employee }) => {
         <Row className="px-3">
           {employee.address_id !== employee.emergencyContact.address_id && (
             <>
-              {/* <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">Email</p>
-                <p className="small mb-0">
-                  {employee.emergencyContact.address?.email ? (
-                    employee.emergencyContact.address.email
-                  ) : (
-                    <span className="text-danger w-100 fw-bold">___</span>
-                  )}
-                </p>
-              </Col> */}
-
               <Col sm={6} className="px-4">
                 <p className="mb-0 text-muted">Region</p>
                 <p className="small">

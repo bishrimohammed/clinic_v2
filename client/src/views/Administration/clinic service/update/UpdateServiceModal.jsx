@@ -67,7 +67,7 @@ const UpdateServiceModal = ({ show, handleClose, data }) => {
       status: data.status,
       // price: data.price,
     },
-    resolver: yupResolver(serviceSchema),
+    resolver: yupResolver(serviceItemSchema),
   });
   const submitHnadler = (Data) => {
     console.log(Data);

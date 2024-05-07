@@ -4,11 +4,11 @@ import { Button, Col, Modal, Row } from "react-bootstrap";
 import { Host_URL } from "../../../utils/getHost_URL";
 
 const ViewCreditCompanyDetail = ({ show, handleClose, company }) => {
-  console.log(company);
+  // console.log(company);
   return (
     <Modal size="lg" show={show} onHide={() => handleClose(false)}>
       <Modal.Header closeButton>
-        <Modal.Title>View Credit Company Details</Modal.Title>
+        <Modal.Title> Company Details</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <h6 className="border-bottom border-dark pt-2 py-2 ps-2 mx-3 mb-3 fw-bolder">
@@ -96,6 +96,16 @@ const ViewCreditCompanyDetail = ({ show, handleClose, company }) => {
         </Row>
         <Row className="px-3">
           <Col className="px-4">
+            <p className="mb-0 text-muted fw-bold">Street</p>
+            <p className="small mb-0">
+              {company.address?.street_name ? (
+                company.address?.street_name
+              ) : (
+                <span className="text-danger w-100 fw-bold">___</span>
+              )}
+            </p>
+          </Col>
+          <Col className="px-4">
             <p className="mb-0 text-muted fw-bold">House Number</p>
             <p className="small mb-0">
               {company.address?.house_number ? (
@@ -104,16 +114,6 @@ const ViewCreditCompanyDetail = ({ show, handleClose, company }) => {
                 <span className="text-danger w-100 fw-bold">___</span>
               )}
             </p>
-          </Col>
-          <Col className="px-4">
-            {/* <p className="mb-0 text-muted fw-bold">House Number</p>
-              <p className="small mb-0">
-                {employee.address?.house_number ? (
-                  employee.address?.house_number
-                ) : (
-                  <span className="text-danger w-100 fw-bold">___</span>
-                )}
-              </p> */}
           </Col>
         </Row>
         <h6 className="border-bottom border-dark py-2 ps-2 mx-3 mb-3 fw-bolder">

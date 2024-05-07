@@ -48,7 +48,37 @@ const PhysicalExaminationFields = () => {
                   zIndex: "0",
                 }}
               >
-                <Dropdown
+                {item.status ? (
+                  <div
+                    className="ps-2 curserpointer"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setShowEnableDisableModal({
+                        isShow: true,
+                        id: item.id,
+                        action: "Disable",
+                      });
+                      //   setShowDelete(true);
+                    }}
+                  >
+                    <FaLock color="red" />
+                  </div>
+                ) : (
+                  <div
+                    className="ps-2 curserpointer"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setShowEnableDisableModal({
+                        isShow: true,
+                        id: item.id,
+                        action: "Enable",
+                      });
+                    }}
+                  >
+                    <CgLockUnlock color="green" />
+                  </div>
+                )}
+                {/* <Dropdown
                   id={item.id + "dropdown"}
                   autoClose="outside"
                   //
@@ -106,7 +136,7 @@ const PhysicalExaminationFields = () => {
                       </Dropdown.Item>
                     )}
                   </Dropdown.Menu>
-                </Dropdown>
+                </Dropdown> */}
               </td>
             </tr>
           ))}

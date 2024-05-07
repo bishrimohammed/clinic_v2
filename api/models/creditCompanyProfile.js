@@ -43,6 +43,6 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: true,
     },
   });
-  creditCompanyProfile.sync({ alter: true, force: false });
+  creditCompanyProfile.sync({ alter: false, force: false });
   return creditCompanyProfile;
 };

@@ -15,6 +15,8 @@ const {
   userAssociation,
   clinicServiceAssociation,
   creditCompanyAssociation,
+  dutyAssociation,
+  patientAssocation,
 } = require("./associations/index.js");
 // const { medicalRecordDetailAssocations } = require("./associations/medicalRecordDetailAssocations.js");
 
@@ -80,6 +82,7 @@ db.Woreda = require("./address/Woreda.js")(sequelize, DataTypes);
 // patient
 
 db.Patient = require("./Patient.js")(sequelize, DataTypes);
+db.Appointment = require("./Appointment.js")(sequelize, DataTypes);
 db.PatientAssignment = require("./PatientAssignment.js")(sequelize, DataTypes);
 db.VisitType = require("./visitType.js")(sequelize, DataTypes);
 db.MedicalRecord = require("./MedicalRecord.js")(sequelize, DataTypes);
@@ -117,6 +120,17 @@ db.CreditCompanyProfile = require("./creditCompanyProfile.js")(
   sequelize,
   DataTypes
 );
+db.CompanyEmployee = require("./CompanyEmployee.js")(sequelize, DataTypes);
+db.CreditPatient = require("./CreditPatient.js")(sequelize, DataTypes);
+db.CreditPatientAttachment = require("./creditPatientAttachment.js")(
+  sequelize,
+  DataTypes
+);
+
+//duty
+
+db.DutyProgram = require("./DutyProgram.js")(sequelize, DataTypes);
+db.DutyAssignment = require("./DutyAssignment.js")(sequelize, DataTypes);
 
 // db.PatientDetail = require("./patient/PatientDetail.js")(sequelize, DataTypes);
 // db.Appointment = require("./patient/Appointment.js")(sequelize, DataTypes);
@@ -137,6 +151,8 @@ roleAssociation(db);
 userAssociation(db);
 clinicServiceAssociation(db);
 creditCompanyAssociation(db);
+dutyAssociation(db);
+patientAssocation(db);
 
 db.ClinicProfile.belongsTo(db.Address, {
   foreignKey: "address_id",
@@ -181,16 +197,12 @@ db.ServiceItem.belongsTo(db.ServiceCategory, {
 //   as: "unit",
 // });
 // user associations
-db.User.belongsTo(db.Role, {
-  foreignKey: "role_id",
-  as: "role",
-});
 
 // db.User.belongsTo(db.Address, { foreignKey: "address_id", as: "address" });
-db.Role.hasMany(db.User, {
-  foreignKey: "role_id",
-  as: "users",
-});
+// db.Role.hasMany(db.User, {
+//   foreignKey: "role_id",
+//   as: "users",
+// });
 
 // address relationship
 
@@ -237,52 +249,9 @@ db.Address.belongsTo(db.Woreda, {
   as: "woreda",
 });
 
-// address end
-
-// patient associations
-
-db.Patient.belongsTo(db.Address, {
-  foreignKey: "address_id",
-  as: "address",
-});
-db.Address.hasMany(db.Patient, {
-  foreignKey: "address_id",
-  as: "patients",
-});
-
 // patient has many patient assignments
 
-db.Patient.hasMany(db.PatientAssignment, {
-  foreignKey: "patient_id",
-  as: "patientAssignments",
-});
 // patient assignment belongs to one patient
-
-db.PatientAssignment.belongsTo(db.Patient, {
-  foreignKey: "patient_id",
-  as: "patient",
-});
-
-// patient has many medical records
-
-db.Patient.hasMany(db.MedicalRecord, {
-  foreignKey: "patient_id",
-  as: "medicalRecords",
-});
-
-// medical record belongs to one patient
-
-// db.MedicalRecord.belongsTo(db.Patient, {
-//   foreignKey: "patient_id",
-//   as: "patient",
-// });
-// patient has many patient assignments
-
-// db.Patient.hasMany(db.PatientAssignment, {
-//   foreignKey: "patient_id",
-//   as: "patientAssignments",
-// });
-// // patient assignment belongs to one patient
 
 // db.PatientAssignment.belongsTo(db.Patient, {
 //   foreignKey: "patient_id",

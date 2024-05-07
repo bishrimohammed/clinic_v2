@@ -100,7 +100,7 @@ const CreateServiceItemModal = ({ show, handleClose, state }) => {
     });
   };
   console.log(errors);
-
+  console.log(data);
   return (
     <Modal size="lg" show={show} onHide={() => handleClose(false)}>
       <Modal.Header closeButton>
@@ -222,11 +222,25 @@ const CreateServiceItemModal = ({ show, handleClose, state }) => {
                       <Form.Label>Child Service</Form.Label>
                       <Form.Select multiple {...register("lab.childService")}>
                         <option value="">Please Select</option>
-                        {data?.map((item) => (
-                          <option key={item.id} value={item.id}>
-                            {item.service_name}
-                          </option>
-                        ))}
+                        {/* {data
+                          ?.filter((t) => !t.labTestProfile.isPanel)
+                          ?.map((item) => (
+                            <option key={item.id} value={item.id}>
+                              {item.service_name}
+                            </option>
+                          ))} */}
+                        {data
+                          ?.filter((t) => !t.labTestProfile.isPanel)
+                          ?.map((item, index, array) => (
+                            <option
+                              className="mb-1"
+                              key={item.id}
+                              value={item.id}
+                            >
+                              {item.service_name}
+                              {index !== array.length - 1 ? ", " : ""}
+                            </option>
+                          ))}
                       </Form.Select>
                     </Form.Group>
                   </Col>

@@ -18,8 +18,16 @@ export const Company_Column = [
     accessorFn: (row) => row.address.email,
   },
   {
-    header: "Expiration Date",
+    header: "start Date",
+    accessorFn: (row) => format(row?.agreements[0]?.start_date, "MM/dd/yyyy"),
+  },
+  {
+    header: "End Date",
     accessorFn: (row) => format(row?.agreements[0]?.end_date, "MM/dd/yyyy"),
+  },
+  {
+    header: "Representative",
+    accessorFn: (row) => row.representative_name,
   },
   {
     header: "Maximum Limit",

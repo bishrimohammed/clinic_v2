@@ -9,24 +9,27 @@ import {
   CSidebarNav,
 } from "@coreui/react";
 // import CIcon from "@coreui/icons-react";
-
+// import { RiCalendarScheduleLine } from "react-icons/ri";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
-
+import { GrSchedule } from "react-icons/gr";
 // sidebar nav config
 //import navigation from "../_nav";
 import { Link, NavLink, useLocation } from "react-router-dom";
 // import { cilPuzzle, cilSpeedometer } from "@coreui/icons";
 import { changeSidebarShow } from "../store/sidebarSlice";
-import { FaKitMedical, FaUser } from "react-icons/fa6";
+import { FaKitMedical, FaUser, FaRegCalendarCheck } from "react-icons/fa6";
+// import { FaRegCalendarCheck } from "react-icons/fa6";
 import { GiMedicalThermometer, GiUltrasound } from "react-icons/gi";
 import {
   MdSpaceDashboard,
   MdAssignmentTurnedIn,
   MdAdminPanelSettings,
   MdOutlineMoneyOffCsred,
+  MdSchedule,
 } from "react-icons/md";
 import { TbReportAnalytics } from "react-icons/tb";
+import { hasPermission } from "../utils/hasPermission";
 const Sidebar = () => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -52,6 +55,9 @@ const Sidebar = () => {
           changeSidebarShow(visible) /* { type: "set", sidebarShow: visible } */
         );
       }}
+      style={{
+        width: sidebarShow && "17rem",
+      }}
     >
       <CSidebarBrand
         style={{
@@ -71,26 +77,28 @@ const Sidebar = () => {
             <MdSpaceDashboard className="nav-icon" />
             Dashboard
           </CNavItem>
-          <CNavGroup
-            idx="patient"
-            visible={location.pathname.startsWith("patients")}
-            toggler={navLink(
-              "Patients",
+          {hasPermission("Patient", "read") && (
+            <CNavGroup
+              idx="patient"
+              visible={location.pathname.startsWith("patients")}
+              toggler={navLink(
+                "Patients",
 
-              <FaKitMedical className="nav-icon" />
-              // </CIcon>
-            )}
-          >
-            {currentUser.role?.name === "cashier" && (
-              <CNavItem to="/patients/newpatient" component={NavLink}>
-                Add Patient
+                <FaKitMedical className="nav-icon" />
+                // </CIcon>
+              )}
+            >
+              {hasPermission("Patient", "create") && (
+                <CNavItem to="/patients/newpatient" component={NavLink}>
+                  Add Patient
+                </CNavItem>
+              )}
+
+              <CNavItem to="/patients" component={NavLink}>
+                Patient List
               </CNavItem>
-            )}
-
-            <CNavItem to="/patients/patientlist" component={NavLink}>
-              Patient List
-            </CNavItem>
-          </CNavGroup>
+            </CNavGroup>
+          )}
 
           {currentUser.role?.name === "laboratorian" && (
             <CNavGroup
@@ -225,20 +233,51 @@ const Sidebar = () => {
                 Role Management
               </CNavItem> */}
               <CNavItem to="/administrations/fieldconfig" component={NavLink}>
-                Field Configuration
+                Clinic Field Configuration
               </CNavItem>
               <CNavItem to="/administrations/creditcompany" component={NavLink}>
-                Credit Service
+                Clinic Credit Service
               </CNavItem>
             </CNavGroup>
           )}
-
+          {currentUser.role?.name === "admin" && (
+            <CNavGroup
+              idx="Scheduling"
+              visible={location.pathname.startsWith("Scheduling")}
+              toggler={navLink(
+                "Scheduling",
+                // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
+                <MdSchedule className="nav-icon" />
+              )}
+            >
+              // staff Working Hour
+              <CNavItem to="/Scheduling/staffworkinghour" component={NavLink}>
+                Staff Working Hour
+              </CNavItem>
+              <CNavItem to="/Scheduling/duty" component={NavLink}>
+                Duty Management
+              </CNavItem>
+            </CNavGroup>
+          )}
           {currentUser.role?.name === "admin" && (
             <CNavItem to="/report/billreport" component={NavLink}>
               <TbReportAnalytics className="nav-icon" />
               Report
             </CNavItem>
           )}
+          <CNavGroup
+            idx="appointment"
+            visible={location.pathname.startsWith("Configurations")}
+            toggler={navLink(
+              "Appointment",
+              // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
+              <FaRegCalendarCheck className="nav-icon" />
+            )}
+          >
+            <CNavItem to="/appointment" component={NavLink}>
+              Appointment List
+            </CNavItem>
+          </CNavGroup>
         </SimpleBar>
       </CSidebarNav>
     </CSidebar>

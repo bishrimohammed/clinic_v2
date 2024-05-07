@@ -13,22 +13,23 @@ const companySchema = yup.object().shape({
     .string()
     .transform((value) => value.trim())
     .required("Company Name is required"),
-  //   email: yup.string().email("Invalid Email").required("Email is required"),
-  //   phone: yup
-  //     .string()
-  //     .matches(/^(09|07)\d{8}$/, "Phone number is invalid")
-  //     .required("Phone Number is required"),
   tin: yup
-    .string()
-    .matches(/^\d{9}$/, "TIN number must be a 9-digit number")
+    .number()
+    .integer()
+    .typeError("TIN must be a number")
+    .positive("TIN must be a positive number")
+    .test(
+      "is-ten-digits",
+      "TIN must be a 10-digit number",
+      (value) => value.toString().length === 10
+    )
+
     .required("TIN is required"),
   representative_name: yup.string().required("Representative Name is required"),
-  // representative_email : yup.string().email("Invalid Email").required("Email is required"),
   representative_phone: yup
     .string()
     .matches(/^(09|07)\d{8}$/, "Phone number is invalid")
     .required("Phone Number is required"),
-  // representative_tin : yup.string().matches(/^\d{9}$/,"TIN number must be a 9-digit number").required("TIN is required"),
   address: yup.object().shape({
     street: yup.string(),
     region_id: yup.string().required("Region is required"),
@@ -67,12 +68,14 @@ const companySchema = yup.object().shape({
         }
         return value;
       })
-
+      .when("start_date", ([start_date], schema) => {
+        if (start_date) {
+          return schema.min(start_date, "End date must be after start date");
+        }
+        return schema;
+      })
       .nullable()
       .required("End date is required"),
-    // agreement_doc: yup.mixed().required("Agreement Document is required"),
-
-    //   .required("File is required"),
     max_limit: yup
       .number()
       .typeError("Credit limit must be a valid number")
@@ -85,7 +88,6 @@ const companySchema = yup.object().shape({
       "Agreement Document is required",
       function (value) {
         console.log(value.length);
-        //   if (Array.isArray(value) && value.length > 0 && value[0] === "") {
         if (value.length == 0) {
           return this.createError({
             path: "agreement.agreement_doc",
@@ -111,7 +113,7 @@ const CreateCreditCompanyModal = ({ show, handleClose }) => {
   } = useForm({
     resolver: yupResolver(companySchema),
   });
-  console.log(errors);
+  // console.log(errors);
   const { mutateAsync, isPending } = useAddCreditCompany();
   //   const [previewImage, setPreviewImage] = useState(null);
   const AddressregionWatcher = watch("address.region_id");
@@ -129,7 +131,7 @@ const CreateCreditCompanyModal = ({ show, handleClose }) => {
     formData.append("address", JSON.stringify(data.address));
     formData.append("agreement", JSON.stringify(data.agreement));
     formData.append("agreement_doc", data.agreement_doc[0]);
-    console.log(data);
+    // console.log(data);
     mutateAsync(formData).then((res) => {
       if (res.status === 201) {
         handleClose(false);
@@ -205,7 +207,7 @@ const CreateCreditCompanyModal = ({ show, handleClose }) => {
               <Form.Group className="mb-md-3 mb-1">
                 <Form.Label>TIN Number</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="number"
                   placeholder="TIN Number"
                   {...register("tin")}
                   isInvalid={errors.tin}

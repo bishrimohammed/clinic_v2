@@ -13,6 +13,7 @@ const ViewServiceItems = () => {
   const [filter, setFilter] = useState({
     status: "",
     groups: [],
+    price: "",
     // gender: "",
   });
   const { state } = useLocation();

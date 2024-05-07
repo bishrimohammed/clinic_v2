@@ -89,7 +89,7 @@ const ServiceItemTable = ({
         </Button>
         <Button
           variant="warning"
-          onClick={() => setFilter({ status: "", groups: [] })}
+          onClick={() => setFilter({ status: "", groups: [], price: "" })}
         >
           Reset
         </Button>

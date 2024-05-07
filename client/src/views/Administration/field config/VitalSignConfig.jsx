@@ -50,7 +50,37 @@ const VitalSignConfig = () => {
                   zIndex: "0",
                 }}
               >
-                <Dropdown
+                {item.status ? (
+                  <div
+                    className="ps-2 curserpointer"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setShowEnableDisableModal({
+                        isShow: true,
+                        id: item.id,
+                        action: "Disable",
+                      });
+                      //   setShowDelete(true);
+                    }}
+                  >
+                    <FaLock color="red" />
+                  </div>
+                ) : (
+                  <div
+                    className="ps-2 curserpointer"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setShowEnableDisableModal({
+                        isShow: true,
+                        id: item.id,
+                        action: "Enable",
+                      });
+                    }}
+                  >
+                    <CgLockUnlock color="green" />
+                  </div>
+                )}
+                {/* <Dropdown
                   id={item.id + "dropdown"}
                   autoClose="outside"
                   //
@@ -107,22 +137,9 @@ const VitalSignConfig = () => {
                         <CgLockUnlock /> Enable
                       </Dropdown.Item>
                     )}
-                    {/* <Dropdown.Item
-                          className="d-flex gap-2 align-items-center"
-                          role="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setSelectedEmployee({
-                              id: rowEl.original.id,
-                              selectedFor: "deactivate",
-                            });
-                            setShowDelete(true);
-                          }}
-                        >
-                          <FaUserLock /> Deactivate
-                        </Dropdown.Item> */}
+                   
                   </Dropdown.Menu>
-                </Dropdown>
+                </Dropdown> */}
               </td>
             </tr>
           ))}

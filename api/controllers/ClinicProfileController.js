@@ -144,7 +144,7 @@ module.exports = ClinicProfileController = {
         return await db.Schedule.update(
           {
             // clinic_id: clinic.id,
-            day_of_week: workHour.date_of_week,
+            // day_of_week: workHour.date_of_week,
             start_time: workHour.start_time,
             end_time: workHour.end_time,
           },

@@ -27,6 +27,7 @@ const roleRoute = require("./routes/Role.router.js");
 const permissionsRoute = require("./routes/permission.router.js");
 
 const creditCompanyRoute = require("./routes/CreditCompany.router.js");
+const dutyRoute = require("./routes/Duty.router.js");
 const { notFound, errorHandler } = require("./middleware/errorMiddleWare.js");
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -77,6 +78,8 @@ app.use("/api/v1/permissions", permissionsRoute);
 app.use("/api/v1/fields", fieldRoute);
 
 app.use("/api/v1/creditcompany", creditCompanyRoute);
+
+app.use("/api/v1/duty", dutyRoute);
 // app.use("/api/v1/upload", upload.single("file"), (req, res) => {
 //   const file = req.file;
 //   if (!file) {
@@ -118,7 +121,7 @@ app.use(errorHandler);
 //   console.error("Unable to connect to the database:", error);
 // }
 
-app.listen(5000, async () => {
+app.listen(5001, async () => {
   console.log("started listening");
   // createUser();
   // await db.Role.bulkCreate([

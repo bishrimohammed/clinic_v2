@@ -63,7 +63,7 @@ const CreditCompanyList = () => {
         <UpdateCreditCompanyModal
           show={showUpdateCreditCompany.isShow}
           handleClose={setUpdateCreditCompany}
-          data={showUpdateCreditCompany.company}
+          company={showUpdateCreditCompany.company}
         />
       )}
       {showFilter && (

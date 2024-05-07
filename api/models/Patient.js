@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const db = require(".");
 const { sequelize } = require(".");
 
@@ -18,19 +19,40 @@ module.exports = (sequelize, DataTypes) => {
     card_number: {
       type: DataTypes.STRING,
       allowNull: true,
-      unique: true,
+      // unique: true,
     },
     gender: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: DataTypes.ENUM,
+      // allowNull: false,
+      values: ["Male", "Female"],
     },
     birth_date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
-    is_dependent: {
+    has_phone: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: false,
+    },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        async checkPhone(value) {
+          if (value) {
+            const patient = await Patient.findOne({
+              where: {
+                id: { [Op.ne]: this.id },
+                phone: this.phone,
+              },
+            });
+            if (patient) {
+              throw new Error("Phone number already");
+            }
+          }
+        },
+      },
     },
     is_new: {
       type: DataTypes.BOOLEAN,
@@ -59,29 +81,42 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
+
     address_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    emergence_contact_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    company_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    marital_status: {
+      type: DataTypes.STRING,
+      // values: ['Single', 'Married', 'Divorced', 'Widowed'],
+      allowNull: true,
+    },
+    occupation: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    guardian_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    empoyeeId_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      defaultValue: true,
     },
   });
-  // Patient.afterSave(async (patient, options) => {
-  //   console.log(patient.id + "mmmm");
-  //   console.log(options);
-  //   const paddedCount = patient.id.toString().padStart(5, "0");
-  //   const card_no = `P${paddedCount}`;
-  //   console.log(card_no);
-  //   patient.card_number = card_no;
-  //   await patient.save();
-  // });
 
-  // Patient.hasMany(db.PatientAssignment, {
-  //   foreignKey: "patient_id",
-  //   as: "patientassignments",
-  // });
   Patient.sync({ force: false, alter: false });
   return Patient;
 };

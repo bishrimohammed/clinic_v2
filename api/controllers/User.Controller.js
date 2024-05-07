@@ -58,19 +58,21 @@ const UserController = {
     const role = await db.Role.findOne({
       where: {
         name: {
-          [Op.like]: `${query}%`,
+          [Op.like]: `%doctor%`,
         },
+        // status: true,
       },
-      include: ["users"],
+      // include: ["users"],
     });
     // destrut users from roles
 
     // console.log(role);
-    // const doctors = await User.findAll({
-    //   where: { role_id: 2 },
-    //   // include: ["role"],
-    // });
-    res.json(role.users);
+    const doctors = await User.findAll({
+      where: { role_id: role.id, status: true },
+      attributes: { exclude: ["password"] },
+      include: ["employee", "schedules", "role"],
+    });
+    res.json(doctors);
   }),
   getUserById: asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -119,16 +121,32 @@ const UserController = {
   }),
   loginUser: asyncHandler(async (req, res) => {
     const { username, password } = req.body;
+    console.log(req.body);
     const user = await db.User.findOne({
       where: {
         username: username,
       },
-      include: ["role", "employee"],
+      // include: ["role", "employee", "userPermissions"],
+      include: [
+        {
+          model: db.Role,
+          as: "role",
+          // include: ["permissions"],
+        },
+        {
+          model: db.Employee,
+          as: "employee",
+        },
+        {
+          model: db.Permission,
+          as: "userPermissions",
+        },
+      ],
       //   raw: true,
     });
     // console.log(req.body);
     // const userpassword = await user.getDataValue("password");
-    // console.log(user);
+    console.log(user);
     if (!user) {
       res.status(404);
       throw new Error("User not found");
@@ -147,16 +165,20 @@ const UserController = {
       role,
     } = user;
     const token = generateToken(res, user.id);
-    console.log(token);
+    // console.log(token);
+    const permissions = user.userPermissions;
     res.status(200).json({
       id: userId,
-      // firstName: firstName,
-      // lastName: lastName,
-      // role_id: role_id,
-      // gender: gender,
-      // address_id: address_id,
+      name:
+        user.employee.firstName +
+        " " +
+        user.employee.middleName +
+        " " +
+        user.employee.lastName,
       token,
       role: role,
+      permissions: user.userPermissions,
+      // user,
       // address: user.address,
     });
     // res.status(201).json(user);
@@ -221,6 +243,68 @@ const UserController = {
     // })
     res.json({ msg: "success" });
     console.log(updatedUser);
+  }),
+  addWorkingHour: asyncHandler(async (req, res) => {
+    // const { id } = req.params;
+    const { start_time, end_time, doctorId, day_of_week } = req.body;
+    // console.log(req.body);
+    const clinicISworking = await db.Schedule.findOne({
+      clinis_id: 4,
+      // doctor_id: doctorId,
+      day_of_week: day_of_week,
+    });
+    // i want to check if clinic is open or not
+    if (clinicISworking) {
+      if (
+        clinicISworking.start_time > start_time ||
+        clinicISworking.end_time < end_time
+      ) {
+        res.status(400);
+        throw new Error("Sorry, the clinic is not open at this time");
+      }
+    } else {
+      res.status(404);
+      throw new Error("Sorry, the clinic is not open on this day.");
+    }
+    const schedule = await db.Schedule.create({
+      start_time: start_time,
+      end_time: end_time,
+      doctor_id: doctorId,
+      day_of_week: day_of_week,
+    });
+    res.status(201).json({ msg: "success" });
+  }),
+  updateWorkHour: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { start_time, end_time, doctorId, day_of_week } = req.body;
+    // console.log(req.body);
+    // console.log(id);
+    const schedule = await db.Schedule.findByPk(id);
+    if (!schedule) {
+      res.status(404);
+      throw new Error("Schedule not found");
+    }
+    const clinicISworking = await db.Schedule.findOne({
+      clinis_id: 4,
+      // doctor_id: doctorId,
+      day_of_week: day_of_week,
+    });
+    // i want to check if clinic is open or not
+    if (clinicISworking) {
+      if (
+        clinicISworking.start_time > start_time ||
+        clinicISworking.end_time < end_time
+      ) {
+        res.status(400);
+        throw new Error("Sorry, the clinic is not open at this time range");
+      }
+    }
+    schedule.start_time = start_time;
+    schedule.end_time = end_time;
+    schedule.doctor_id = doctorId;
+    schedule.day_of_week = day_of_week;
+    await schedule.save();
+    res.json({ msg: "success" });
   }),
 };
 

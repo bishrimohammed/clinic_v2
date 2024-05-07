@@ -16,6 +16,8 @@ import { CgLockUnlock } from "react-icons/cg";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import SearchInput from "../../../components/inputs/SearchInput";
 import { LuFilter } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
+import { MdOutlineRemoveRedEye } from "react-icons/md";
 
 const CreditCompanyTable = ({
   setShowAddCreditCompanyModal,
@@ -40,7 +42,7 @@ const CreditCompanyTable = ({
     setOpenDropdownIndex(index === openDropdownIndex ? null : index);
     // setDropdownPosition({ left: event.clientX - 20, top: event.clientY - 200 });
   };
-
+  const navigate = useNavigate();
   const debouncedValue = useDebounce(search, 500);
   // const employeeData = useMemo(() => Data, []);
   const columns = useMemo(() => Company_Column, []);
@@ -160,11 +162,13 @@ const CreditCompanyTable = ({
                   key={rowEl.id}
                   style={{ cursor: "pointer", zIndex: "-1" }}
                   onClick={() => {
-                    setViewCompanyDetail({
-                      isShow: true,
-                      company: rowEl.original,
+                    navigate("detail", {
+                      state: rowEl.original,
                     });
-                    // setEmployee(rowEl.original);
+                    // setViewCompanyDetail({
+                    //   isShow: true,
+                    //   company: rowEl.original,
+                    // });
                   }}
                 >
                   {rowEl.getVisibleCells().map((cellEl, index) => {
@@ -227,6 +231,22 @@ const CreditCompanyTable = ({
                         >
                           <RiEditLine /> Edit
                         </Dropdown.Item>
+                        <Dropdown.Item
+                          className="d-flex gap-2 align-items-center"
+                          role="button"
+                          disabled={!rowEl.original.status}
+                          style={{ zIndex: "50" }}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setViewCompanyDetail({
+                              isShow: true,
+                              company: rowEl.original,
+                            });
+                            // handleShowEdit();
+                          }}
+                        >
+                          <MdOutlineRemoveRedEye /> View
+                        </Dropdown.Item>
                         {rowEl.original.status ? (
                           <Dropdown.Item
                             className="d-flex gap-2 align-items-center"
@@ -241,7 +261,7 @@ const CreditCompanyTable = ({
                               // setShowDelete(true);
                             }}
                           >
-                            <FaUserLock color="red" /> Close Agreement
+                            <FaUserLock color="red" /> Terminate Agreement
                           </Dropdown.Item>
                         ) : (
                           <Dropdown.Item

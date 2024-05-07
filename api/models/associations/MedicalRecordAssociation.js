@@ -11,7 +11,6 @@ module.exports.MedicalRecordAssociation = (db) => {
     foreignKey: "medicalRecord_id",
     as: "recordassignments",
   });
-
   db.MedicalRecord.hasMany(db.MedicalRecordDetail, {
     foreignKey: "medicalRecord_id",
     as: "recorddetails",

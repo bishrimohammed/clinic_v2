@@ -1,7 +1,3 @@
-// const { DataTypes } = require("sequelize");
-// const sequelize = require("../../config/database.js");
-// const Woreda = require("./Woreda.js");
-
 const { sequelize } = require("..");
 
 module.exports = (sequelize, DataTypes) => {
@@ -18,8 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     phone_1: {
       type: DataTypes.STRING,
-      // unique: true,
-      allowNull: true,
+      unique: {
+        args: true,
+        msg: "Phone number is taken",
+      },
+      allowNull: false,
     },
     phone_2: {
       type: DataTypes.STRING,
@@ -27,7 +26,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     email: {
       type: DataTypes.STRING,
-      // unique: true,
+      // unique: {
+      //   args: true,
+      //   msg: "Email is already taken",
+      // },
       allowNull: true,
     },
     street: {

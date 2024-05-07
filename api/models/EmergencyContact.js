@@ -15,9 +15,9 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     relationship: {
-      type: DataTypes.ENUM,
+      type: DataTypes.STRING,
       allowNull: false,
-      values: ["Father", "Mother", "Spouse", "Other"],
+      // values: ["Father", "Mother", "Spouse", "Other"],
     },
     other_relationship: {
       type: DataTypes.STRING,

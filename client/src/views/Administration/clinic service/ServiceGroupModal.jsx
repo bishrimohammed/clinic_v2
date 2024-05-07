@@ -149,7 +149,16 @@ const ServiceGroupModal = ({ show, handleClose }) => {
         <Modal.Header className="p" closeButton>
           <Modal.Title className="text-nowrap"> Service Groups</Modal.Title>
           <div className="d-flex justify-content-center w-100 me-3">
-            <Button className="me-5" onClick={() => setShowForm(true)}>
+            <Button
+              className="me-5"
+              onClick={() => {
+                setShowForm(true);
+                setAction("Save");
+                // setValue( name: "", serviceType: "" );
+                setValue("name", "");
+                setValue("serviceType", "");
+              }}
+            >
               Add +
             </Button>
           </div>
@@ -189,6 +198,7 @@ const ServiceGroupModal = ({ show, handleClose }) => {
                       // style={{ cursor: "pointer" }}
                       onClick={() => {
                         setSelectedServiceGroup(group);
+                        setShowForm(true);
                         setAction("Update");
                         setValue("name", group.name);
                         setValue("serviceType", group.clinicService_id);

@@ -63,6 +63,7 @@ const schema = yup.object().shape({
   clinicType: yup.string(),
   number_of_branch: yup
     .number()
+    .max(20, "Branch Number Must be less than 20")
     .transform((value, originalValue) => {
       if (originalValue === "") {
         return undefined; // Convert empty string to undefined
@@ -102,6 +103,7 @@ const EditClinicInfo = () => {
     isPending: ispending,
     error,
   } = useGetClinicInformation();
+  console.log(state);
   const { data: woredas } = useGetWoredas();
   // const { state } = useLocation();
   // console.log(state);
@@ -126,31 +128,13 @@ const EditClinicInfo = () => {
     watch,
     formState: { errors },
   } = useForm({
-    // defaultValues: {
-    //   name: state?.name,
-    //   logo: state?.logo,
-    //   card_valid_date: state?.card_valid_date,
-    //   website_url: state?.website_url,
-    //   address: {
-    //     id: state?.address?.id,
-    //     woreda_id: state?.address?.woreda_id,
-    //     street: state?.address?.street,
-    //     house_number: state?.address?.house_number,
-    //     email: state?.address?.email,
-    //     phone_1: state?.address?.phone_1,
-    //     phone_2: state?.address?.phone_2,
-    //   },
-    //   has_triage: state?.has_triage,
-    //   motto: state?.motto,
-    //   clinicType: state?.clinic_type,
-    //   number_of_branch: state?.number_of_branch ? state?.number_of_branch : 1,
-    //   branch_list: convertStringToArray(state?.branch_addresses),
-    //   brand_color: state?.brand_color,
-    // },
     defaultValues: {
       number_of_branch: state?.number_of_branch,
       branch_list: convertStringToArray(state?.branch_addresses),
       has_triage: state?.has_triage,
+      address: {
+        woreda_id: state?.address.woreda_id,
+      },
     },
     resolver: yupResolver(schema),
   });
@@ -173,7 +157,8 @@ const EditClinicInfo = () => {
     const branch_address = data.branch_list
       .map((b, index) => `address of brach ${index + 2} : ${b}\n`)
       .join(",");
-
+    // console.log(data);
+    // return;
     const formData = new FormData();
     formData.append("name", data.name);
 
@@ -195,7 +180,8 @@ const EditClinicInfo = () => {
     // console.log(data);
     mutate({ formData, id: state?.id });
   };
-  // console.log(errors);
+  if (isPending) return null;
+  console.log(errors);
   return (
     <Container className="p-3  mb-5">
       {/* <h1>Edit Clinic Profile</h1> */}
@@ -227,7 +213,7 @@ const EditClinicInfo = () => {
             <Col md={4} sm={12} className="mb-2">
               <Form.Group>
                 <Form.Label>Logo</Form.Label>
-                <div className="d-flex align-items-center justify-content-between gap-4 p-1">
+                <div className="d-flex align-items-center justify-content-between gap-2 p-1">
                   <Form.Control
                     type="file"
                     className="border-1"
@@ -244,13 +230,13 @@ const EditClinicInfo = () => {
                     isInvalid={errors.logo}
                   />
 
-                  <div className="flex-grow-1">
+                  <div className="flex-grow-1 bg-dark">
                     {getValues("logo")?.length === 1 ? (
                       <Image
                         src={previewImage}
                         /* {previewImage} */ width={30}
                         height={30}
-                        thumbnail
+                        // thumbnail
                         fluid
                       />
                     ) : (
@@ -373,11 +359,12 @@ const EditClinicInfo = () => {
                 <Form.Control
                   type="number"
                   className="w-100"
+                  // max={20}
                   {...register("number_of_branch")}
                   isInvalid={errors.number_of_branch}
                   defaultValue={state?.number_of_branch}
                   min="1"
-                  max="20"
+                  // max="20"
                 />
 
                 <Form.Text className="text-danger">
@@ -386,7 +373,8 @@ const EditClinicInfo = () => {
               </Form.Group>
             </Col>
 
-            {arrayBranch.length > 1 &&
+            {number_of_branch <= 20 &&
+              arrayBranch.length > 1 &&
               arrayBranch.splice(1).map((field, index) => {
                 return (
                   <Col key={index} md={4} sm={12} className="mb-2">
@@ -460,7 +448,11 @@ const EditClinicInfo = () => {
                 >
                   <option value="">Select Woreda</option>
                   {woredas?.map((woreda, index) => (
-                    <option key={index} value={woreda.id}>
+                    <option
+                      key={index}
+                      value={woreda.id}
+                      selected={woreda.id === state?.address?.woreda_id}
+                    >
                       {woreda.name} {woreda.SubCity?.Subcity_name}
                     </option>
                   ))}
@@ -612,10 +604,12 @@ const EditClinicInfo = () => {
               </Col>
             ))}
           </Row>
-          <Button variant="primary" disabled={isPending} type="submit">
-            {isPending && <Spinner animation="border" size="sm" />}
-            Submit
-          </Button>
+          <div className="d-flex justify-content-end mt-2">
+            <Button variant="primary" disabled={isPending} type="submit">
+              {isPending && <Spinner animation="border" size="sm" />}
+              Update
+            </Button>
+          </div>
         </Form>
       </div>
     </Container>

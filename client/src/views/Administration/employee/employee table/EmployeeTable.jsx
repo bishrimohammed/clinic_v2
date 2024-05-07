@@ -12,7 +12,6 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  filterFns,
 } from "@tanstack/react-table";
 import { COLUMNS } from "../utils/COLUMNS";
 import { FaUserLock } from "react-icons/fa";

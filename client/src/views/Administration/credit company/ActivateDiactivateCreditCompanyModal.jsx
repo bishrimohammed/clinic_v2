@@ -12,7 +12,7 @@ const ActivateDiactivateCreditCompanyModal = ({
   const openMutation = useActivateCreditCompany();
   const closeMutation = useDeactivateCreditCompany();
   // console.log(action);
-  console.log(closeMutation.isPending);
+  // console.log(closeMutation.isPending);
   const handleSubmit = async () => {
     if (action === "Close") {
       closeMutation.mutateAsync(companyId).then((res) => {
