@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     status: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
+      defaultValue: true,
     },
   });
   MedicalRecord.sync({ force: false, alter: false });

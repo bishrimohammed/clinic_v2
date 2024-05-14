@@ -24,34 +24,12 @@ const UpdatePatient = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { id } = useParams();
-  const { data } = useGetPatient(state.id);
+  const { data, isPending } = useGetPatient(state.id);
   // const { state } = useLocation();
   //console.log(id);
   // let name = state.name.split(" ");
   // console.log(name);
-
-  const queryClient = useQueryClient();
-  const UpdateMutation = useMutation({
-    mutationFn: async (data) => {
-      return Axiosinstance.put(`/patient/${id}`, data).then((res) => res.data);
-    },
-    onSuccess: async (response) => {
-      const { data } = response;
-      //console.log(data);
-
-      toast.success("updated successfully");
-      navigate("/patients/patientlist");
-    },
-    onError: async (err) => {
-      // console.log(err.response);
-      //  toast.error(err.response.data.message, {})
-      toast.error(err.response.data.message);
-    },
-  });
-
-  const handleUpdate = (data) => {
-    UpdateMutation.mutate(data);
-  };
+  if (isPending) return <Spinner animation="border" />;
 
   return (
     <Container className="p-3 mb-5">

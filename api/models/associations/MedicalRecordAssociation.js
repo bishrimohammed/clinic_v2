@@ -13,7 +13,7 @@ module.exports.MedicalRecordAssociation = (db) => {
   });
   db.MedicalRecord.hasMany(db.MedicalRecordDetail, {
     foreignKey: "medicalRecord_id",
-    as: "recorddetails",
+    as: "medicalRecordDetails",
   });
   db.MedicalRecord.hasMany(db.Vital, {
     foreignKey: "medicalRecord_id",
@@ -22,5 +22,17 @@ module.exports.MedicalRecordAssociation = (db) => {
   db.MedicalRecord.hasOne(db.InvestigationOrder, {
     foreignKey: "medicalRecord_id",
     as: "investigationOrder",
+  });
+  // db.MedicalRecord.hasMany(db.Vital, {
+  //   foreignKey: "medicalRecord_id",
+  //   as: "vitals",
+  // });
+  db.Vital.belongsTo(db.VitalSignField, {
+    foreignKey: "vitalSignField_id",
+    as: "vitalSignField",
+  });
+  db.Vital.belongsTo(db.User, {
+    foreignKey: "examiner_id",
+    as: "examiner",
   });
 };

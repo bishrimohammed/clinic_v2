@@ -45,6 +45,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    is_new: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
     status: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,

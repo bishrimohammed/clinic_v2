@@ -63,7 +63,7 @@ const UpdateCompanyEmployeeModal = ({ show, handleClose, employee }) => {
   const AddressWoredaWacher = watch("address.woreda_id");
 
   const updateHandler = (data) => {
-    console.log(data);
+    // console.log(data);
     const formData = new FormData();
     formData.append("company_id", state.id);
     formData.append("firstName", data.firstName);

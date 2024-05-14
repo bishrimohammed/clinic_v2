@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const db = require("../models/");
 const { generateToken } = require("../utils/generateToken.js");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 // const db = require("../models/index.js");
 // const { getPaddedName } = require("../utils/getPaddedName.js");
 const User = db.User;
@@ -146,7 +146,7 @@ const UserController = {
     });
     // console.log(req.body);
     // const userpassword = await user.getDataValue("password");
-    console.log(user);
+    // console.log(user);
     if (!user) {
       res.status(404);
       throw new Error("User not found");
@@ -166,9 +166,10 @@ const UserController = {
     } = user;
     const token = generateToken(res, user.id);
     // console.log(token);
-    const permissions = user.userPermissions;
+    // const permissions = user.userPermissions;
     res.status(200).json({
       id: userId,
+      is_new: user.is_new,
       name:
         user.employee.firstName +
         " " +
@@ -305,6 +306,60 @@ const UserController = {
     schedule.day_of_week = day_of_week;
     await schedule.save();
     res.json({ msg: "success" });
+  }),
+  changePassword: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { password, newPassword } = req.body;
+    const user = await db.User.findOne({
+      where: {
+        id: id,
+      },
+      include: [
+        {
+          model: db.Role,
+          as: "role",
+          // include: ["permissions"],
+        },
+        {
+          model: db.Employee,
+          as: "employee",
+        },
+        {
+          model: db.Permission,
+          as: "userPermissions",
+        },
+      ],
+    });
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      res.status(400);
+      throw new Error("Invalid password");
+    }
+    user.password = req.body.newPassword;
+    user.is_new = false;
+    await user.save();
+    const token = generateToken(res, user.id);
+    // console.log(token);
+    const permissions = user.userPermissions;
+    res.status(200).json({
+      id: user.id,
+      is_new: user.is_new,
+      name:
+        user.employee.firstName +
+        " " +
+        user.employee.middleName +
+        " " +
+        user.employee.lastName,
+      token,
+      role: user.role,
+      permissions: user.userPermissions,
+      // user,
+      // address: user.address,
+    });
   }),
 };
 

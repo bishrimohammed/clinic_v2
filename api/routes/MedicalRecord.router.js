@@ -39,5 +39,6 @@ router.post(
   protect,
   MedicalRecordController.addInvestigationResult
 );
+router.post("/:id/addVitalSign", protect, MedicalRecordController.addVitalSign);
 
 module.exports = router;

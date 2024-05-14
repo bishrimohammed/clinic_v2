@@ -6,14 +6,14 @@ module.exports = PatientController = {
   getAllPatients: expressAsyncHandler(async (req, res) => {
     console.log(req.query);
     let where = {};
-    if (req.query.status !== "") {
+    if (req.query?.status !== "") {
       if (req.query.status === "true") {
         where.status = true;
       } else if (req.query.status === "false") {
         where.status = false;
       }
     }
-    if (req.query.is_credit) {
+    if (req.query?.is_credit) {
       if (req.query.is_credit === "true") {
         where.is_credit = true;
       } else if (req.query.is_credit === "false") {
@@ -21,7 +21,7 @@ module.exports = PatientController = {
       }
       // where.is_credit = Boolean(req.query.is_credit);
     }
-    if (req.query.is_new) {
+    if (req.query?.is_new) {
       if (req.query.is_new === "true") {
         where.is_new = true;
       } else if (req.query.is_new === "false") {
@@ -29,8 +29,8 @@ module.exports = PatientController = {
       }
       // where.is_new = Boolean(req.query.is_new);
     }
-    if (req.query.gender !== "") {
-      where.gender = req.query.gender;
+    if (req.query?.gender) {
+      where.gender = req.query?.gender;
     }
     const patients = await db.Patient.findAll({
       where: where,
@@ -57,7 +57,57 @@ module.exports = PatientController = {
     res.status(200).json(patients);
   }),
   getPatients: expressAsyncHandler(async (req, res) => {}),
-
+  getPatientNameList: expressAsyncHandler(async (req, res) => {
+    // console.log("\n\nkjaduig\n\n");
+    const patients = await db.Patient.findAll({
+      attributes: ["id", "firstName", "lastName", "middleName"],
+    });
+    res.json(patients);
+  }),
+  getPatientOverViewData: expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const patient = await db.Patient.findByPk(id, {
+      include: [
+        {
+          model: db.MedicalRecord,
+          as: "medicalRecords",
+          include: [
+            {
+              model: db.MedicalRecordDetail,
+              as: "medicalRecordDetails",
+              include: [
+                {
+                  model: db.User,
+                  as: "doctor",
+                  include: [
+                    {
+                      model: db.Employee,
+                      as: "employee",
+                      attributes: ["id", "firstName", "lastName", "middleName"],
+                    },
+                  ],
+                  attributes: ["id"],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      attributes: [
+        "id",
+        "firstName",
+        "lastName",
+        "middleName",
+        "gender",
+        "birth_date",
+        "has_phone",
+        "phone",
+        "status",
+        "card_number",
+      ],
+    });
+    res.json(patient);
+  }),
   searchPatient: expressAsyncHandler(async (req, res) => {
     const { query } = req.query;
 

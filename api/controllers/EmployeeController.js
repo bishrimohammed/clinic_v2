@@ -164,7 +164,13 @@ module.exports = EmployeeController = {
       res.status(400);
       throw new Error("Employee phone is already in use");
     }
-    const newAddress = await db.Address.create(address);
+    const newAddress = await db.Address.create({
+      woreda_id: address.woreda_id,
+      house_number: address.house_number ? address.house_number : null,
+      phone_1: address.phone_1,
+      phone_2: address.phone_2 ? address.phone_2 : null,
+      email: address?.email ? address.email : null,
+    });
     let emergenceContact_AddressId;
     if (emergence.the_same_address_as_employee) {
       emergenceContact_AddressId = newAddress.id;
@@ -184,6 +190,7 @@ module.exports = EmployeeController = {
         house_number: emergence.house_number,
         phone_1: emergence.phone,
         phone_2: emergence.phone_2,
+        email: emergence?.email ? emergence.email : null,
       });
       emergenceContact_AddressId = newAddress1.id;
     }

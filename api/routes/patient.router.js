@@ -4,6 +4,8 @@ const upload = require("../config/multerConfig");
 const router = express.Router();
 
 router.get("/", PatientController.getAllPatients);
+router.get("/select", PatientController.getPatientNameList);
+router.get("/:id/over-view-data", PatientController.getPatientOverViewData);
 router.get("/:id", PatientController.getPatient);
 router.get("/search", PatientController.searchPatient);
 router.post(

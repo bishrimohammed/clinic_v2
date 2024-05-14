@@ -16,11 +16,12 @@ import {
 } from "date-fns";
 import enUS from "date-fns/locale/en-US";
 import "./calender.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AddWorkHourModal from "./AddWorkHourModal";
 import { useGetDoctors } from "./hooks/useGetDoctors";
 import { Spinner } from "react-bootstrap";
 import UpdateWorkHourModal from "./UpdateWorkHourModal";
+import { IoMdArrowRoundBack } from "react-icons/io";
 // import { use } from "../../../../api/routes/user.router";
 // import { startOfDay, add, setDay } from "date-fns";
 const AddStaffWorkHourForEmployee = () => {
@@ -51,9 +52,10 @@ const AddStaffWorkHourForEmployee = () => {
     isShow: false,
     event: null,
   });
-  const ddd = user?.schedules?.map((s) => {
-    return { ...s, allDay: true };
-  });
+  const navigate = useNavigate();
+  // const ddd = user?.schedules?.map((s) => {
+  //   return { ...s, allDay: true };
+  // });
   const [events, setEvents] = useState([user?.schedules]);
   useEffect(() => {
     setEvents(user?.schedules);
@@ -161,7 +163,20 @@ const AddStaffWorkHourForEmployee = () => {
   return (
     <div>
       {/* AddStaffWorkHourForEmployee */}
-      <div className="py-2">
+      <div className=" p-2  d-flex gap-3 align-items-center">
+        <IoMdArrowRoundBack
+          className="cursorpointer"
+          size={22}
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate(-1)}
+        />
+        <h5 className="mb-0">
+          {state.employee.firstName} {state.employee.middleName}{" "}
+          {state.employee.lastName} working hour
+        </h5>
+      </div>
+      <hr />
+      {/* <div className="py-2">
         <p>
           Employee Name : {state.employee.firstName} {state.employee.middleName}{" "}
           {state.employee.lastName}
@@ -171,7 +186,7 @@ const AddStaffWorkHourForEmployee = () => {
           Position :{" "}
           {state.role.name.charAt(0).toUpperCase() + state.role.name.slice(1)}
         </p>
-      </div>
+      </div> */}
       {/* <Calendar
         localizer={localizer}
         // events={myEventsList}

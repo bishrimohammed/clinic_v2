@@ -6,7 +6,7 @@ export default function useGetPatient(patientId) {
   return useQuery({
     queryKey: ["patient overviewdata", patientId],
     queryFn: async () => {
-      return Axiosinstance.get(`/patient/${patientId}/overviewdata`).then(
+      return Axiosinstance.get(`/patient/${patientId}/over-view-data`).then(
         (res) => res.data
       );
     },

@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+import { differenceInYears } from "date-fns";
 import React from "react";
 import { Col, Row } from "react-bootstrap";
 
@@ -8,7 +9,7 @@ const PatientInfo = ({ patient }) => {
     <div
       style={{
         borderRadius: 15,
-        borderTop: `2px solid rgb(50, 31, 219)`,
+        // borderTop: `2px solid rgb(50, 31, 219)`,
         // borderLeft: `2px solid rgb(50, 31, 219)`,
         // borderRight: `2px solid rgb(50, 31, 219)`,
       }}
@@ -19,7 +20,9 @@ const PatientInfo = ({ patient }) => {
         <Col>
           <div className="d-flex  align-items-center">
             <h6 className="mb-0">Name : </h6>
-            <p className="mb-0 ms-2">{patient.name}</p>
+            <p className="mb-0 ms-2">
+              {patient.firstName} {patient.miidleName} {patient.lastname}{" "}
+            </p>
           </div>
         </Col>
         <Col>
@@ -31,7 +34,7 @@ const PatientInfo = ({ patient }) => {
         <Col>
           <div className="d-flex  align-items-center">
             <h6 className="mb-0">Card Number : </h6>
-            <p className="mb-0  ms-2">{patient.cardNumber}</p>
+            <p className="mb-0  ms-2">{patient.card_number}</p>
           </div>
         </Col>
       </Row>
@@ -47,7 +50,9 @@ const PatientInfo = ({ patient }) => {
         <Col>
           <div className="d-flex  align-items-center">
             <h6 className="mb-0">Age : </h6>
-            <p className="mb-0 ms-2">{patient.age}</p>
+            <p className="mb-0 ms-2">
+              {differenceInYears(new Date(), patient.birth_date)} Years old
+            </p>
           </div>
         </Col>
         <Col>
@@ -57,7 +62,7 @@ const PatientInfo = ({ patient }) => {
           </div>
         </Col>
       </Row>
-      <Row className="mb-1"></Row>
+      {/* <Row className="mb-1"></Row> */}
     </div>
   );
 };

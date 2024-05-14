@@ -2,7 +2,7 @@
 
 module.exports.dutyAssociation = (db) => {
   db.DutyAssignment.belongsTo(db.DutyProgram, {
-    foreignKey: "dutypogram_id",
+    foreignKey: "dutyprogram_id",
     as: "dutyProgram",
   });
   db.DutyAssignment.belongsTo(db.Employee, {

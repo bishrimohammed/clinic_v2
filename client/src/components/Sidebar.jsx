@@ -88,11 +88,11 @@ const Sidebar = () => {
                 // </CIcon>
               )}
             >
-              {hasPermission("Patient", "create") && (
+              {/* {hasPermission("Patient", "create") && (
                 <CNavItem to="/patients/newpatient" component={NavLink}>
                   Add Patient
                 </CNavItem>
-              )}
+              )} */}
 
               <CNavItem to="/patients" component={NavLink}>
                 Patient List
@@ -276,6 +276,20 @@ const Sidebar = () => {
           >
             <CNavItem to="/appointment" component={NavLink}>
               Appointment List
+            </CNavItem>
+          </CNavGroup>
+
+          <CNavGroup
+            idx="patientvisit"
+            visible={location.pathname.startsWith("visit")}
+            toggler={navLink(
+              "Patient Visits",
+              // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
+              <FaRegCalendarCheck className="nav-icon" />
+            )}
+          >
+            <CNavItem to="/visit" component={NavLink}>
+              Visits
             </CNavItem>
           </CNavGroup>
         </SimpleBar>

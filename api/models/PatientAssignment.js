@@ -20,11 +20,18 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     assignment_date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
       // defaultValue: new Date(),
     },
-
+    visit_time: {
+      type: DataTypes.TIME,
+      allowNull: false,
+    },
+    visit_type: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     is_referred: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -38,6 +45,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    stage: {
+      type: DataTypes.ENUM,
+      allowNull: true,
+      values: [
+        "Waiting for service fee",
+        "Waiting for triage",
+        "Waiting for examiner",
+        "Performing triage",
+      ],
+    },
     status: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -50,6 +67,6 @@ module.exports = (sequelize, DataTypes) => {
   //     as: "patient",
   //   });
   // };
-  patientAssignment.sync({ force: false, alter: false });
+  patientAssignment.sync({ force: false, alter: true });
   return patientAssignment;
 };

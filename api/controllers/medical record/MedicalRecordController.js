@@ -474,4 +474,25 @@ module.exports = MedicalRecordController = {
     });
     res.json(investigation);
   }),
+
+  // @desc add vital sign
+  addVitalSign: asyncHandler(async (req, res) => {
+    // const { vitals } = req.body;
+    const today = new Date();
+    const vitals = req.body;
+    // console.log(req.body);
+    console.log(vitals);
+    const VitalSigns = vitals.map((v) => {
+      return {
+        ...v,
+        medicalRecord_id: req.params.id,
+        examiner_id: req.user.id,
+        taken_date: today,
+      };
+    });
+    // console.log(VitalSigns);
+    // return;
+    const newVitalSigns = await db.Vital.bulkCreate(VitalSigns);
+    res.status(201).json({ msg: "Vital Signatures added successfully" });
+  }),
 };

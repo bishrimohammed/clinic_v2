@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setlogin } from "../../../store/authSlice";
 //import { login } from "../store/authSlice";
@@ -47,10 +47,20 @@ const Login = () => {
       return Axiosinstance.post("/user/login", data).then((res) => res.data);
     },
     onSuccess: async (data) => {
-      //console.log(data);
-      dispatch(setlogin(data));
-      toast.success("success");
-      navigate("/");
+      console.log(data);
+      if (data.is_new) {
+        dispatch(setlogin(data));
+        toast.success("success");
+        // window.location.replace("/changePassword");
+        // <Navigate to="/changepassword" replace="true" />;
+        navigate("/changepassword", { state: data, replace: true });
+        // window.history.pushState(null, null, window.location.href);
+      } else {
+        console.log("not new");
+        dispatch(setlogin(data));
+        toast.success("success");
+        navigate("/", { replace: true });
+      }
     },
     onError: async (err) => {
       //console.log(err.response);

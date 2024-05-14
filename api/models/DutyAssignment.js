@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    dutypogram_id: {
+    dutyprogram_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     duty_date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     status: {
@@ -27,6 +27,6 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  DutyAssignment.sync({ alter: false, force: false });
+  DutyAssignment.sync({ alter: true, force: false });
   return DutyAssignment;
 };

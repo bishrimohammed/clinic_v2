@@ -65,7 +65,17 @@ const StaffWorkingHour = () => {
   });
 
   return (
-    <div>
+    <>
+      <div className="  d-flex gap-3 align-items-center">
+        {/* <IoMdArrowRoundBack
+          className="cursorpointer"
+          size={22}
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate(-1)}
+        /> */}
+        <h5 className="mb-0">Doctor Working Hour </h5>
+      </div>
+      <hr />
       <Table
         striped
         bordered
@@ -295,7 +305,7 @@ const StaffWorkingHour = () => {
           ))}
         </select>
       </div>
-    </div>
+    </>
   );
 };
 

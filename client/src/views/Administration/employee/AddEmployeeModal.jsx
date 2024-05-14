@@ -46,11 +46,16 @@ const AddEmployeeModal = ({ show, handleClose }) => {
     formData.append("address", JSON.stringify(data.address));
     formData.append("Emergency", JSON.stringify(data.Emergency));
     // console.log(formData);
-    mutateAsync(formData).then((res) => {
-      if (res.status === 201) {
-        handleClose();
-      }
-    });
+    mutateAsync(formData)
+      .then((res) => {
+        if (res.status === 201) {
+          handleClose();
+          // console.log(res);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   const getMaxYear = (value) => {
     const today = new Date().toISOString().substring(0, 10);

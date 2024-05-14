@@ -15,8 +15,8 @@ export const useAddEmployee = () => {
         exact: true,
       });
     },
-    onError: async (error) => {
-      // toast.error(error.response.data.message);
-    },
+    // onError: async (error) => {
+    //   // toast.error(error.response.data.message);
+    // },
   });
 };

@@ -13,6 +13,7 @@ const CityRoute = require("./routes/address/city.router.js");
 const SubCityRoute = require("./routes/address/subCity.router.js");
 
 const patientRoute = require("./routes/patient.router.js");
+const AppointmentRoute = require("./routes/Appointment.router.js");
 const visitTypeRoute = require("./routes/visitType.router.js");
 const assignPatientRoute = require("./routes/PatientAssignment.router.js");
 const medicalRecordRoute = require("./routes/MedicalRecord.router.js");
@@ -28,6 +29,8 @@ const permissionsRoute = require("./routes/permission.router.js");
 
 const creditCompanyRoute = require("./routes/CreditCompany.router.js");
 const dutyRoute = require("./routes/Duty.router.js");
+
+const patientVisitRoute = require("./routes/patientVisit.router.js");
 const { notFound, errorHandler } = require("./middleware/errorMiddleWare.js");
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -79,7 +82,11 @@ app.use("/api/v1/fields", fieldRoute);
 
 app.use("/api/v1/creditcompany", creditCompanyRoute);
 
-app.use("/api/v1/duty", dutyRoute);
+app.use("/api/v1/dutyprogram", dutyRoute);
+
+app.use("/api/v1/appointment", AppointmentRoute);
+
+app.use("/api/v1/patientvisits", patientVisitRoute);
 // app.use("/api/v1/upload", upload.single("file"), (req, res) => {
 //   const file = req.file;
 //   if (!file) {

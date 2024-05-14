@@ -8,6 +8,10 @@ router.get(
 );
 
 router.get("/vitalsignFields", FieldConfigController.getVitalSignFields);
+router.get(
+  "/vitalsignFields/active",
+  FieldConfigController.getActiveVitalSignFields
+);
 router.patch(
   "/vitalsignField/:id/enable",
   FieldConfigController.enableVitalSignField

@@ -1,26 +1,25 @@
-import { Accordion, Card, Col, Row } from "react-bootstrap";
-import moment from "moment";
+import { Accordion, Card, Col, Row, Table } from "react-bootstrap";
+// import moment from "moment";
 import { ContextAwareToggle } from "./ContextAwareToggle";
 import { Link } from "react-router-dom";
+import { format } from "date-fns";
 
-const AllHistoryOverview = ({ historys }) => {
+const AllHistoryOverview = ({ medicalRecords }) => {
   // console.log("AllHistoryOverview re");
-
+  console.log(medicalRecords.medicalRecordDetails);
+  medicalRecords.medicalRecordDetails?.map((detail) => {
+    console.log(detail);
+  });
   return (
     <Accordion defaultActiveKey="0">
-      {historys.map((history, index) => (
-        <Card key={history._id} className="mb-2">
+      {medicalRecords.map((history, index) => (
+        <Card key={history.id} className="mb-2">
           <Card.Header>
             <ContextAwareToggle eventKey={index}>
               <div className="d-flex justify-content-between">
-                {moment(history.createdAt).format("MM/DD/YYYY")}{" "}
+                {format(new Date(history.createdAt), "yyyy-mm-d")}
                 <Link
-                  to={`/patients/history/${history._id}`}
-                  /* onClick={(e) =>
-                    navigate(`/patients/history/${history._id}`, {
-                      replace: true,
-                    })
-                  } */
+                  to={`/patients/history/${history.id}`}
                   //replace
                   className="me-2"
                 >
@@ -31,17 +30,79 @@ const AllHistoryOverview = ({ historys }) => {
           </Card.Header>
           <Accordion.Collapse eventKey={index}>
             <Card.Body className="px-4">
-              <Row className="mb-0">
-                <Col xs={3}>
+              <div className="mb-0">
+                <div className="d-flex justify-content-center mb-2">
                   <span>Chief complaint</span>
-                </Col>
-                <Col xs={1} className="d-flex justify-content-center">
-                  <span className="fw-bold">:</span>
-                </Col>
-                <Col>{history?.chiefcomplaint}</Col>
-              </Row>
+                </div>
+
+                <Table striped bordered hover size="sm">
+                  {/* <caption>Monthly savings</caption> */}
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Chief complaint</th>
+                      <th>Doctor</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {history?.medicalRecordDetails?.map((detail, index) => (
+                      <tr key={detail.id}>
+                        {/* {console.log(detail)} */}
+                        <td>{index + 1}</td>
+                        <td>{detail.chief_complaint}</td>
+                        <td>
+                          {detail.doctor.employee.firstName}{" "}
+                          {detail.doctor.employee.middleName}{" "}
+                          {detail.doctor.employee.lastName}{" "}
+                        </td>
+                      </tr>
+                    ))}
+                    {/* <tr>
+                      <td>1</td>
+                      <td>{history?.medicalRecordDetails[0]?.chief_complaint}</td>
+                      <td>
+                        {history?.medicalRecordDetails[0]?.doctor.employee.firstName}{" "}
+                        {history?.medicalRecordDetails[0]?.doctor.employee.middleName}{" "}
+                        {history?.medicalRecordDetails[0]?.doctor.employee.lastName}
+                      </td>
+                    </tr> */}
+                  </tbody>
+                </Table>
+              </div>
+              <div className="mb-0">
+                <div className="d-flex justify-content-center mb-2">
+                  <span> History of Present Illness(HPI)</span>
+                </div>
+
+                <Table striped bordered hover size="sm">
+                  {/* <caption>Monthly savings</caption> */}
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>HPI</th>
+                      <th>Doctor</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {history?.medicalRecordDetails?.map((detail, index) => (
+                      <tr key={detail.id}>
+                        {/* {console.log(detail)} */}
+                        <td>{index + 1}</td>
+                        <td>{detail.hpi}</td>
+                        <td>
+                          {detail.doctor.employee.firstName}{" "}
+                          {detail.doctor.employee.middleName}{" "}
+                          {detail.doctor.employee.lastName}{" "}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
               <hr />
-              <Row>
+              {/* <Row>
                 <Col xs={3}>
                   <span className="text-nowrap">
                     History of Present Illness
@@ -52,27 +113,12 @@ const AllHistoryOverview = ({ historys }) => {
                 </Col>
                 <Col className="ps-0">{history?.HPI}</Col>
                 <Col xs={1}></Col>
-              </Row>
+              </Row> */}
             </Card.Body>
           </Accordion.Collapse>
         </Card>
+        // <div></div>
       ))}
-      {/* <Card className="mb-2">
-        <Card.Header>
-          <ContextAwareToggle eventKey="0">Click me!</ContextAwareToggle>
-        </Card.Header>
-        <Accordion.Collapse eventKey="0">
-          <Card.Body>Hello! I am the body</Card.Body>
-        </Accordion.Collapse>
-      </Card>*/}
-      {/*  <Card className="mb-2">
-        <Card.Header>
-          <ContextAwareToggle eventKey="10">Click me!</ContextAwareToggle>
-        </Card.Header>
-        <Accordion.Collapse eventKey="10">
-          <Card.Body>Hello! I am another body</Card.Body>
-        </Accordion.Collapse>
-      </Card> */}
     </Accordion>
   );
 };

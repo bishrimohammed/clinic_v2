@@ -19,7 +19,7 @@ const AddCompanyEmployeeModal = ({ show, handleClose }) => {
 
   const { mutateAsync, isPending } = useAddCompanyEmployee();
   const { state } = useLocation();
-  console.log(state);
+  // console.log(state);
   const {
     register,
     formState: { errors },

@@ -13,4 +13,8 @@ module.exports.patientAssignmentSAssociation = (db) => {
     foreignKey: "doctor_id",
     as: "doctor",
   });
+  db.PatientAssignment.belongsTo(db.Patient, {
+    foreignKey: "patient_id",
+    as: "patient",
+  });
 };

@@ -12,6 +12,7 @@
   background-position-x: 70px;
   height: 100%;
   position: relative;
+  /* height: 100vh; */
 }
 .content {
   position: absolute;

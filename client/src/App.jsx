@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./ProtectedRoute";
 import Login2 from "./views/pages/Login2";
+import ChangePassword from "./views/pages/ChangePassword";
 
 const loading = (
   <div className="pt-3 text-center">
@@ -44,6 +45,7 @@ function App() {
         <Routes>
           <Route exact path="/login" name="Login Page" element={<Login />} />
           <Route exact path="/login2" name="Login Page" element={<Login2 />} />
+          <Route path="/changePassword" element={<ChangePassword />}></Route>
           {/* <Route
             exact
             path="/register"

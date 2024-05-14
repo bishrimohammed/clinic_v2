@@ -3,7 +3,7 @@ export const hasPermission = (permissionName, action) => {
     localStorage.getItem("currentUser")
   )?.permissions;
   //   console.log(permissions);
-  return permissions.some((p) => {
+  return permissions?.some((p) => {
     if (p.name.toLowerCase() === permissionName.toLowerCase()) {
       if (action === "read") {
         return p.userpermission?.read;

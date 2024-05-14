@@ -3,20 +3,64 @@ import { Route, Routes } from "react-router-dom";
 // import { CSpinner } from "@coreui/react";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
-import CreateServiceItems from "../views/Administration/clinic service/serviceItems/CreateServiceItems";
-import FieldConfig from "../views/Administration/field config/FieldConfig";
-import FieldConfigList from "../views/Administration/field config/FieldConfigList";
-import CreditCompany from "../views/Administration/credit company/CreditCompany";
-import CreditCompanyList from "../views/Administration/credit company/CreditCompanyList";
-import RegisterCreditCompany from "../views/Administration/credit company/RegisterCreditCompany";
-import Schedule from "../views/Scheduling/Schedule";
-import StaffWorkingHour from "../views/Scheduling/StaffWorkingHour";
-import DutyManagement from "../views/Scheduling/DutyManagement";
-import AddStaffWorkHourForEmployee from "../views/Scheduling/AddStaffWorkHourForEmployee";
-import CreditCompanyDetail from "../views/Administration/credit company/CreditCompanyDetail";
-import CreateNewWeekProgram from "../views/Scheduling/duty/CreateNewWeekProgram";
-import Appointment from "../views/appointment/Appointment";
-import AppointmentList from "../views/appointment/AppointmentList";
+const CreateServiceItems = React.lazy(() =>
+  import(
+    "../views/Administration/clinic service/serviceItems/CreateServiceItems"
+  )
+);
+const FieldConfig = React.lazy(() =>
+  import("../views/Administration/field config/FieldConfig")
+);
+const FieldConfigList = React.lazy(() =>
+  import("../views/Administration/field config/FieldConfigList")
+);
+const CreditCompany = React.lazy(() =>
+  import("../views/Administration/credit company/CreditCompany")
+);
+const CreditCompanyList = React.lazy(() =>
+  import("../views/Administration/credit company/CreditCompanyList")
+);
+const RegisterCreditCompany = React.lazy(() =>
+  import("../views/Administration/credit company/RegisterCreditCompany")
+);
+const Schedule = React.lazy(() => import("../views/Scheduling/Schedule"));
+const StaffWorkingHour = React.lazy(() =>
+  import("../views/Scheduling/StaffWorkingHour")
+);
+const DutyManagement = React.lazy(() =>
+  import("../views/Scheduling/DutyManagement")
+);
+const AddStaffWorkHourForEmployee = React.lazy(() =>
+  import("../views/Scheduling/AddStaffWorkHourForEmployee")
+);
+const CreditCompanyDetail = React.lazy(() =>
+  import("../views/Administration/credit company/CreditCompanyDetail")
+);
+const CreateNewWeekProgram = React.lazy(() =>
+  import("../views/Scheduling/duty/CreateNewWeekProgram")
+);
+const Appointment = React.lazy(() =>
+  import("../views/appointment/Appointment")
+);
+const AppointmentList = React.lazy(() =>
+  import("../views/appointment/AppointmentList")
+);
+const ChangePassword = React.lazy(() =>
+  import("../views/pages/ChangePassword")
+);
+const PatientVisit = React.lazy(() =>
+  import("../views/patient visit/PatientVisit")
+);
+const PatientVisitList = React.lazy(() =>
+  import("../views/patient visit/PatientVisitList")
+);
+const ViewUpcomingVisitDetail = React.lazy(() =>
+  import("../views/patient visit/upcoming/ViewUpcomingVisitDetail")
+);
+
+// jhglbjvjh
+
+//kjhkjhbliu
 const Role = React.lazy(() => import("../views/Administration/Role/Role"));
 const RoleList = React.lazy(() =>
   import("../views/Administration/Role/RoleList")
@@ -72,9 +116,9 @@ const CreateImagingService = React.lazy(() =>
     "../views/Administration/clinic service/new service/CreateImagingService"
   )
 );
-const ChangePassword = React.lazy(() =>
-  import("../views/profile/ChangePassword")
-);
+// const ChangePassword = React.lazy(() =>
+//   import("../views/profile/ChangePassword")
+// );
 const Profile = React.lazy(() => import("../views/profile/Profile"));
 const ClinicServiceList = React.lazy(() =>
   import("../views/Administration/clinic service/ClinicServiceList")
@@ -209,7 +253,12 @@ const AppContent = () => {
               }
             />
           </Route>
-
+          <Route path="/visit" element={<PatientVisit />}>
+            <Route index element={<PatientVisitList />} />
+            <Route path="view" element={<ViewUpcomingVisitDetail />} />
+            {/* <Route path="addpatient" element={<AddpatientToQue />} />
+  <Route path="patientlist" element={<PatientQueList />} /> */}
+          </Route>
           {/* profile */}
           <Route path="profile" element={<Profile />}>
             <Route path="changepassword" element={<ChangePassword />} />

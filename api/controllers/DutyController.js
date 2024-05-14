@@ -13,24 +13,76 @@ module.exports = DutyController = {
     const thisWeekDutyProgram = await db.DutyProgram.findAll({
       where: {
         weekStartDate: {
-          [Op.lte]: endOfWeek,
+          [Op.gte]: endOfWeek,
         },
-        weekEndDate: {
-          [Op.gte]: startOfWeek,
-        },
+        // weekEndDate: {
+        //   [Op.gte]: startOfWeek,
+        // },
       },
     });
     res.json(thisWeekDutyProgram);
   }),
+  getDutyPrograms: asyncHandler(async (req, res) => {
+    const today = new Date();
+    // const startOfWeek = new Date(today);
+    // startOfWeek.setDate(today.getDate() - ((today.getDay() + 6) % 7) + 1); // Set to the first day of the week (Monday)
+    // const endOfWeek = new Date(today);
+    // endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to the last day of the week (Sunday)
+    // console.log(startOfWeek);
+    const thisWeekDutyProgram = await db.DutyProgram.findAll({
+      where: {
+        weekStartDate: {
+          [Op.gte]: startOfWeek(new Date(), { weekStartsOn: 1 }),
+        },
+        // weekEndDate: {
+        //   [Op.gte]: startOfWeek,
+        // },
+      },
+      include: [
+        {
+          model: db.DutyAssignment,
+          as: "dutyAssignments",
+          include: [
+            {
+              model: db.Employee,
+              as: "employee",
+              attributes: ["id", "firstName", "middleName", "lastName"],
+            },
+          ],
+        },
+      ],
+    });
+    res.json(thisWeekDutyProgram);
+  }),
+  getDutyProgramById: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const dutyProgram = await db.DutyProgram.findByPk(id, {
+      include: [
+        {
+          model: db.DutyAssignment,
+          as: "dutyAssignments",
+          include: [
+            {
+              model: db.Employee,
+              as: "employee",
+              attributes: ["id", "firstName", "middleName", "lastName"],
+            },
+          ],
+        },
+      ],
+    });
+    res.json(dutyProgram);
+  }),
   createDutyprogram: asyncHandler(async (req, res) => {
     const { weekStartDate, weekEndDate } = req.body;
+    console.log(req.body);
     const startOfWeek = new Date(weekStartDate);
     startOfWeek.setDate(
       startOfWeek.getDate() - ((startOfWeek.getDay() + 6) % 7) + 1
     ); // Set to the first day of the week (Monday)
     const endOfWeek = new Date(weekEndDate);
     endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to the last day of the week (Sunday)
-    const weekNumber = getWeek(date, { weekStartsOn: 1 });
+    const weekNumber = getWeek(startOfWeek, { weekStartsOn: 1 });
     const existingDutyProgram = await db.DutyProgram.findOne({
       where: {
         weekStartDate: {
@@ -52,12 +104,14 @@ module.exports = DutyController = {
       weekEndDate,
       duty_week: weekNumber,
       year: new Date(weekStartDate).getFullYear(),
+      status:
+        weekNumber === getWeek(new Date(), { weekStartsOn: 1 }) ? true : false,
     });
     res.status(201).json(dutyProgram);
   }),
   assignDutyToEmployee: asyncHandler(async (req, res) => {
     const { duty_id, employee_id, duty_date } = req.body;
-    const duty = await db.Duty.findOne({
+    const duty = await db.DutyProgram.findOne({
       where: {
         id: duty_id,
       },
@@ -71,8 +125,21 @@ module.exports = DutyController = {
       res.status(400);
       throw new Error("Invalid Duty or Employee");
     }
+    const ExistAssignments = await db.DutyAssignment.findOne({
+      where: {
+        dutyprogram_id: duty_id,
+        employee_id,
+        duty_date,
+      },
+    });
+    if (ExistAssignments) {
+      res.status(400);
+      throw new Error(
+        `${employee.firstName} ${employee.middleName} already assigned for ${duty_date} day duty `
+      );
+    }
     const dutyAssignment = await db.DutyAssignment.create({
-      duty_id,
+      dutyprogram_id: duty_id,
       employee_id,
       duty_date,
     });
