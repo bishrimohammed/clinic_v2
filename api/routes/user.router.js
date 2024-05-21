@@ -2,11 +2,12 @@ const express = require("express");
 const UserController = require("../controllers/User.Controller.js");
 const { protect } = require("../middleware/authMiddleWare.js");
 const router = express.Router();
-
+router.get("/reset", UserController.resetPassword);
 router.get("/", UserController.getUsers);
 router.get("/search", protect, UserController.getDoctors);
 router.get("/doctors", UserController.getDoctors);
 router.get("/:id", protect, UserController.getUserById);
+
 router.post("/", UserController.registerUser);
 router.post("/login", UserController.loginUser);
 router.post("/doctor/workhours", UserController.addWorkingHour);

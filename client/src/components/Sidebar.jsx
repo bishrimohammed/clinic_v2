@@ -137,7 +137,7 @@ const Sidebar = () => {
               </CNavItem>
             </CNavGroup>
           )}
-          {(currentUser.role?.name === "doctor" ||
+          {/* {(currentUser.role?.name === "doctor" ||
             currentUser.role?.name === "cashier") && (
             <CNavGroup
               idx="que"
@@ -158,19 +158,19 @@ const Sidebar = () => {
                 Assigned list
               </CNavItem>
             </CNavGroup>
-          )}
+          )} */}
           {currentUser.role?.name === "cashier" && (
             <CNavGroup
-              idx="billing"
-              visible={location.pathname.startsWith("billings")}
+              idx="payments"
+              visible={location.pathname.startsWith("payments")}
               toggler={navLink(
-                "Billing",
+                "Payments",
                 // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
                 <MdOutlineMoneyOffCsred className="nav-icon" />
               )}
             >
-              <CNavItem to="/billings/list" component={NavLink}>
-                Invoices
+              <CNavItem to="/payments" component={NavLink}>
+                Outstanding Payments
               </CNavItem>
 
               {/* <CNavItem to="/billings/prices" component={NavLink}>
@@ -265,33 +265,37 @@ const Sidebar = () => {
               Report
             </CNavItem>
           )}
-          <CNavGroup
-            idx="appointment"
-            visible={location.pathname.startsWith("Configurations")}
-            toggler={navLink(
-              "Appointment",
-              // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
-              <FaRegCalendarCheck className="nav-icon" />
-            )}
-          >
-            <CNavItem to="/appointment" component={NavLink}>
-              Appointment List
-            </CNavItem>
-          </CNavGroup>
+          {hasPermission("appointment", "read") && (
+            <CNavGroup
+              idx="appointment"
+              visible={location.pathname.startsWith("Configurations")}
+              toggler={navLink(
+                "Appointment",
+                // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
+                <FaRegCalendarCheck className="nav-icon" />
+              )}
+            >
+              <CNavItem to="/appointment" component={NavLink}>
+                Appointment List
+              </CNavItem>
+            </CNavGroup>
+          )}
 
-          <CNavGroup
-            idx="patientvisit"
-            visible={location.pathname.startsWith("visit")}
-            toggler={navLink(
-              "Patient Visits",
-              // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
-              <FaRegCalendarCheck className="nav-icon" />
-            )}
-          >
-            <CNavItem to="/visit" component={NavLink}>
-              Visits
-            </CNavItem>
-          </CNavGroup>
+          {hasPermission("visit", "read") && (
+            <CNavGroup
+              idx="patientvisit"
+              visible={location.pathname.startsWith("visit")}
+              toggler={navLink(
+                "Patient Visits",
+                // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
+                <FaRegCalendarCheck className="nav-icon" />
+              )}
+            >
+              <CNavItem to="/visit" component={NavLink}>
+                Visits
+              </CNavItem>
+            </CNavGroup>
+          )}
         </SimpleBar>
       </CSidebarNav>
     </CSidebar>

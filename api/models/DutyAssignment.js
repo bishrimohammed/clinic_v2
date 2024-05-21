@@ -27,6 +27,6 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  DutyAssignment.sync({ alter: true, force: false });
+  DutyAssignment.sync({ alter: false, force: false });
   return DutyAssignment;
 };

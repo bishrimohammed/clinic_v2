@@ -309,7 +309,7 @@ const UserController = {
   }),
   changePassword: asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { password, newPassword } = req.body;
+    const { password } = req.body;
     const user = await db.User.findOne({
       where: {
         id: id,
@@ -360,6 +360,21 @@ const UserController = {
       // user,
       // address: user.address,
     });
+  }),
+  resetPassword: asyncHandler(async (req, res) => {
+    const username = "user-0003";
+    const user = await db.User.findOne({
+      where: {
+        username: username,
+      },
+    });
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+    user.password = "123456";
+    await user.save();
+    res.status(200).json({ msg: "success" });
   }),
 };
 

@@ -35,6 +35,20 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: false,
     },
+    blood_type: {
+      type: DataTypes.ENUM,
+      allowNull: true,
+      values: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+    },
+    nationality: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    has_HIV: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+    },
     phone: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -45,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
               where: {
                 id: { [Op.ne]: this.id },
                 phone: this.phone,
+                has_phone: true,
               },
             });
             if (patient) {
@@ -107,6 +122,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    guardian_relationship: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
     empoyeeId_url: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -117,6 +137,6 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  Patient.sync({ force: false, alter: false });
+  Patient.sync({ force: false, alter: true });
   return Patient;
 };

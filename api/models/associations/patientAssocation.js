@@ -36,4 +36,29 @@ module.exports.patientAssocation = (db) => {
     foreignKey: "doctor_id",
     as: "doctor",
   });
+
+  db.Patient.hasMany(db.FamilyHistory, {
+    foreignKey: "patient_id",
+    as: "familyHistories",
+  });
+  db.Patient.hasMany(db.SocialHistory, {
+    foreignKey: "patient_id",
+    as: "socialHistories",
+  });
+  db.Patient.hasMany(db.Allergy, {
+    foreignKey: "patient_id",
+    as: "allergies",
+  });
+  db.Allergy.belongsTo(db.User, {
+    foreignKey: "created_by",
+    as: "createdBy",
+  });
+  db.FamilyHistory.belongsTo(db.User, {
+    foreignKey: "created_by",
+    as: "createdBy",
+  });
+  db.SocialHistory.belongsTo(db.User, {
+    foreignKey: "created_by",
+    as: "createdBy",
+  });
 };

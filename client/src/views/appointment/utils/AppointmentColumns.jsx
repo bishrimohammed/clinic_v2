@@ -1,5 +1,6 @@
 import { Badge } from "react-bootstrap";
 import { createColumnHelper } from "@tanstack/react-table";
+import { format, parse } from "date-fns";
 const columHelper = createColumnHelper();
 export const AppointmentColumns = [
   {
@@ -15,11 +16,13 @@ export const AppointmentColumns = [
           " " +
           row.patient.middleName +
           " " +
-          row.lastName
-        : row.patient_name,
+          row?.patient.lastName
+        : // ? row?.lastName
+          // : null
+          row.patient_name,
   },
   {
-    header: "Doctor",
+    header: "Assigned Doctor",
     accessorFn: (row) =>
       row.doctor.employee.firstName +
       " " +
@@ -30,6 +33,12 @@ export const AppointmentColumns = [
   {
     header: "Date",
     accessorFn: (row) => row.appointment_date,
+  },
+
+  {
+    header: "Time",
+    accessorFn: (row) =>
+      format(parse(row.appointment_time, "HH:mm:ss", new Date()), "h:mm a"),
   },
   columHelper.accessor("status", {
     cell: (s) => {

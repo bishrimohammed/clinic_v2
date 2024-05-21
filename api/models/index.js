@@ -17,6 +17,7 @@ const {
   creditCompanyAssociation,
   dutyAssociation,
   patientAssocation,
+  paymentAssociation,
 } = require("./associations/index.js");
 // const { medicalRecordDetailAssocations } = require("./associations/medicalRecordDetailAssocations.js");
 
@@ -82,6 +83,9 @@ db.Woreda = require("./address/Woreda.js")(sequelize, DataTypes);
 // patient
 
 db.Patient = require("./Patient.js")(sequelize, DataTypes);
+db.Allergy = require("./patient/Allergy.js")(sequelize, DataTypes);
+db.FamilyHistory = require("./patient/FamilyHistory.js")(sequelize, DataTypes);
+db.SocialHistory = require("./patient/SocialHistory.js")(sequelize, DataTypes);
 db.Appointment = require("./Appointment.js")(sequelize, DataTypes);
 db.PatientAssignment = require("./PatientAssignment.js")(sequelize, DataTypes);
 db.VisitType = require("./visitType.js")(sequelize, DataTypes);
@@ -132,12 +136,10 @@ db.CreditPatientAttachment = require("./creditPatientAttachment.js")(
 db.DutyProgram = require("./DutyProgram.js")(sequelize, DataTypes);
 db.DutyAssignment = require("./DutyAssignment.js")(sequelize, DataTypes);
 
-// db.PatientDetail = require("./patient/PatientDetail.js")(sequelize, DataTypes);
-// db.Appointment = require("./patient/Appointment.js")(sequelize, DataTypes);
-// db.AppointmentDetail = require("./patient/AppointmentDetail.js")(
-//   sequelize,
-//   DataTypes
-// );
+// billing
+
+db.MedicalBilling = require("./MedicalBilling.js")(sequelize, DataTypes);
+db.Payment = require("./Payment.js")(sequelize, DataTypes);
 
 db.sequelize.sync({ force: false, alter: false }).then(() => {
   console.log("yes re-sync done!");
@@ -153,6 +155,7 @@ clinicServiceAssociation(db);
 creditCompanyAssociation(db);
 dutyAssociation(db);
 patientAssocation(db);
+paymentAssociation(db);
 
 db.ClinicProfile.belongsTo(db.Address, {
   foreignKey: "address_id",

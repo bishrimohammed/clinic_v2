@@ -3,10 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useAddPatient } from "../hooks/useAddPatient";
-
 import { patientSchema } from "../utils/patientSchema";
 
-import TextInput from "../../../components/inputs/TextInput";
 import { useGetWoredas } from "../../../hooks/useGetWoredas";
 import { useGetRegions } from "../../../hooks/useGetRegions";
 import { useGetCities } from "../../../hooks/useGetCities";
@@ -16,19 +14,41 @@ import CalculateBirthDateModal from "../components/CalculateBirthDateModal";
 
 import { useGetActiveCreditCompanys } from "../hooks/companyHooks/useGetActiveCreditCompanys";
 import { useUpdatePatient } from "../hooks/patientHooks/useUpdatePatient";
+import Axiosinstance from "../../../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
+import { nationalityList } from "../utils/Nationality";
+
+// import { generatePatientID } from "../utils/generatePatientID";
+// const getPatientId = await generatePatientID();
 const PatientForm = ({ patient }) => {
-  console.log(patient?.id);
-  // console.log(woredas.data);
+  console.log(patient);
+  // const PateintUniqueId = useCallback(
+  //   () => generatePatientID().then((res) => res),
+  //   []
+  // );
+  const [patientID, setPatientID] = useState("");
+  // const PateintUniqueId = generatePatientID().then((res) => {
+  //   console.log(res);
+  //   return res;
+  // });
+  useEffect(() => {
+    // generate patient id
+    generatePatientID().then((res) => {
+      setPatientID(res);
+    });
+  }, []);
+  // console.log(PateintUniqueId);
   const { mutateAsync, isPending } = useAddPatient();
   const updateMutation = useUpdatePatient();
   const { data: companies } = useGetActiveCreditCompanys();
 
   const [showCalculateBD, setShowCalculateBD] = useState(false);
-  const [showNextForm, setShowNextForm] = useState(false);
+  // const [showNextForm, setShowNextForm] = useState(false);
   const { data: woredas } = useGetWoredas();
   const { data: regions } = useGetRegions();
   const { data: cities } = useGetCities();
   const { data: subcities } = useGetSubCities();
+
   const {
     register,
     formState: { errors },
@@ -36,6 +56,7 @@ const PatientForm = ({ patient }) => {
     watch,
     setValue,
     getValues,
+    clearErrors,
   } = useForm({
     defaultValues: patient
       ? {
@@ -49,6 +70,9 @@ const PatientForm = ({ patient }) => {
           occupation: patient.occupation,
           marital_status: patient.marital_status,
           guardian_name: patient.guardian_name,
+          guardian_relationship: patient.guardian_relationship,
+          blood_type: patient.blood_type,
+          nationality: patient.nationality,
 
           address: {
             id: patient.address_id,
@@ -82,20 +106,28 @@ const PatientForm = ({ patient }) => {
             firstName: patient ? patient?.emergencyContact?.firstName : "",
             middleName: patient ? patient?.emergencyContact?.middleName : "",
             lastName: patient ? patient?.emergencyContact?.lastName : "",
-            relation: patient
-              ? ["Spouse", "Father", "Mother"].includes(
-                  patient?.emergencyContact?.relationship
-                )
-                ? patient?.emergencyContact?.relationship
-                : "Other"
-              : "",
+            relation: [
+              "Spouse",
+              "Father",
+              "Mother",
+              "Brother",
+              "Sister",
+            ].includes(patient?.emergencyContact?.relationship)
+              ? patient?.emergencyContact?.relationship
+              : "Other",
             phone: patient ? patient?.emergencyContact?.phone : "",
             the_same_address_as_patient:
               patient &&
               patient.address_id === patient.emergencyContact?.address?.id,
-            other_relation: patient
-              ? patient?.emergencyContact?.relationship
-              : "",
+            other_relation: [
+              "Spouse",
+              "Father",
+              "Mother",
+              "Brother",
+              "Sister",
+            ].includes(patient?.emergencyContact?.relationship)
+              ? ""
+              : patient?.emergencyContact?.relationship,
             region_id: patient
               ? patient?.emergencyContact?.address?.woreda?.SubCity?.city
                   ?.region?.id
@@ -117,7 +149,7 @@ const PatientForm = ({ patient }) => {
     resolver: yupResolver(patientSchema),
   });
 
-  console.log(getValues("is_credit"));
+  // console.log(getValues("is_credit"));
 
   // setValue("birth_date", new Date().toISOString().substring(0, 10));
 
@@ -126,7 +158,7 @@ const PatientForm = ({ patient }) => {
   const isNewBornWatcher = watch("is_new_born");
   const hasPhoneWatcher = watch("has_phone");
   // const marital_statusWatcher = watch("marital_status");
-  console.log("is credit " + isCredit);
+  // console.log("is credit " + isCredit);
   const theSameAddressASPatient = watch(
     "emergency.the_same_address_as_patient"
   );
@@ -158,9 +190,10 @@ const PatientForm = ({ patient }) => {
   // const age = calulateBirthDatefromAge(20);
   // console.log(age);
   const submitHandler = async (data) => {
-    // console.log(data);
+    console.log(data);
     // return;
     const patientData = {
+      patient_id: patient ? patient.card_number : patientID,
       firstName: data.firstName,
       middleName: data.middleName,
       lastName: data.lastName,
@@ -171,11 +204,15 @@ const PatientForm = ({ patient }) => {
       marital_status: data.marital_status,
       occupation: data.occupation,
       guardian_name: data.guardian_name,
+      guardian_relationship: data.guardian_relationship,
       is_credit: data.is_credit,
       is_new: data.is_new,
       manual_card_id: data.manual_card_id,
+      blood_type: data.blood_type,
+      nationality: data.nationality,
     };
     console.log(patientData);
+    // return;
     const formData = new FormData();
     formData.append("patient", JSON.stringify(patientData));
     formData.append("address", JSON.stringify(data.address));
@@ -206,7 +243,7 @@ const PatientForm = ({ patient }) => {
   // console.log(companies);
   const CompanyAgreementList = isCredit ? (
     <Form.Group className="">
-      <Form.Label className="text-nowrap">company agreement</Form.Label>
+      <Form.Label className="text-nowrap">Company Name</Form.Label>
       <Form.Select
         {...register("company_id", {
           onChange: (e) => {
@@ -306,7 +343,11 @@ const PatientForm = ({ patient }) => {
       <>
         <Col md={4} sm={12} className="mb-2">
           <Form.Group className="mb-3">
-            <Form.Label>Region</Form.Label>
+            <div className="d-flex align-items-center gap-1">
+              <Form.Label>Region</Form.Label>
+              <span className="text-danger fw-bold">*</span>
+            </div>
+
             <Form.Select
               // ref={roleref}
               {...register("emergency.region_id", {
@@ -337,7 +378,11 @@ const PatientForm = ({ patient }) => {
         </Col>
         <Col md={4} sm={12} className="mb-2">
           <Form.Group className="">
-            <Form.Label>City</Form.Label>
+            <div className="d-flex align-items-center gap-1">
+              <Form.Label>City</Form.Label>
+              <span className="text-danger fw-bold">*</span>
+            </div>
+
             <Form.Select
               // ref={roleref}
               {...register("emergency.city_id", {
@@ -367,7 +412,11 @@ const PatientForm = ({ patient }) => {
         </Col>
         <Col md={4} sm={12} className="mb-2">
           <Form.Group className="">
-            <Form.Label>Subcity</Form.Label>
+            <div className="d-flex align-items-center gap-1">
+              <Form.Label>Subcity</Form.Label>
+              <span className="text-danger fw-bold">*</span>
+            </div>
+
             <Form.Select
               {...register("emergency.subcity_id", {
                 onChange: () => {
@@ -412,7 +461,10 @@ const PatientForm = ({ patient }) => {
         </Col>
         <Col md={4} sm={12} className="mb-2">
           <Form.Group>
-            <Form.Label>Woreda</Form.Label>
+            <div className="d-flex align-items-center gap-1">
+              <Form.Label>Woreda</Form.Label>
+              <span className="text-danger fw-bold">*</span>
+            </div>
 
             <Form.Select
               {...register("emergency.woreda_id")}
@@ -447,65 +499,153 @@ const PatientForm = ({ patient }) => {
     );
   }
 
-  const showCreditCompanyFormsLogic = () => {
-    let show;
-    if (patient) {
-      if (!isCredit) {
-        show = patient.is_credit;
-      } else {
-        show = isCredit;
-      }
-    } else {
-      show = isCredit;
-    }
-    return show;
-  };
   return (
     <>
       <Form onSubmit={handleSubmit(submitHandler)}>
         {/* {!showNextForm ? ( */}
+        <Row>
+          <Col md={5} sm={12} className="mb-0">
+            <Form.Group className=" mb-3">
+              <Form.Label className="text-nowrap mb-1">
+                Registration Date:{" "}
+              </Form.Label>
+              <Form.Control
+                type="date"
+                disabled={true}
+                defaultValue={new Date().toISOString().substring(0, 10)}
+                // className="w-75"
+                // {...register("registration_date")}
+                // isInvalid={errors.registration_date}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={5} sm={12} className="mb-0">
+            <Form.Group className=" mb-3">
+              <Form.Label className=" text-nowrap mb-1">Patient ID:</Form.Label>
+              <Form.Control
+                type="text"
+                defaultValue={patient ? patient.card_number : patientID}
+                // defaultValue="P-00007"
+                disabled={true}
+                // className="w-75"
+                // value={}
+                {...register("patientId")}
+                // isInvalid={errors.date_of_birth}
+              />
+            </Form.Group>
+          </Col>
+          {/* <Col md={4} sm={12} className="mb-2"></Col> */}
+          <Col md={5} sm={12} className="mb-1">
+            <Form.Group className=" mb-3">
+              <Form.Label className=" text-nowrap mb-1">
+                Patient Type
+              </Form.Label>
+              <Form.Select {...register("is_new")} isInvalid={errors.is_new}>
+                {/* <option value={null}>Select Patient Type</option> */}
+
+                <option value="true">New</option>
+                <option value="false">Existing</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+
+          {getValues("is_new") === "false" || getValues("is_new") === false ? (
+            <Col md={5} sm={12} className="mb-1">
+              <Form.Group className=" mb-3">
+                <Form.Label className=" text-nowrap mb-1">
+                  Manual Card Number:
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register("manual_card_id", {
+                    required: [isNewPatient === "true" ? true : false],
+                  })}
+                  isInvalid={errors.manual_card_id}
+                  // className="w-75"
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors?.manual_card_id?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          ) : null}
+        </Row>
         <div>
           <h6 className="border-bottom border-1 p-1 mb-3 fw-bold">
             Patient Information
           </h6>
           <Row>
             <Col md={4} sm={12} className="mb-2">
-              <TextInput
+              <Form.Group className="mb-3">
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                  {...register("firstName")}
+                  isInvalid={errors.firstName}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors?.firstName?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+              {/* <TextInput
                 label="Name"
                 register={register}
                 name="firstName"
                 errors={errors.firstName}
-              />
+              /> */}
             </Col>
 
             <Col md={4} sm={12} className="mb-2">
-              <TextInput
-                label="Father Name"
+              <Form.Group className="mb-3">
+                <Form.Label> Father's Name</Form.Label>
+                <Form.Control
+                  {...register("middleName")}
+                  isInvalid={errors.middleName}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors?.middleName?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+              {/* <TextInput
+                label="Father's Name"
                 register={register}
                 name="middleName"
                 errors={errors.middleName}
-              />
+              /> */}
             </Col>
 
             <Col md={4} sm={12} className="mb-2">
-              <TextInput
-                label="Grandfather Name"
+              <Form.Group className="mb-3">
+                <Form.Label>Grandfather's Name</Form.Label>
+                <Form.Control
+                  {...register("lastName")}
+                  isInvalid={errors.lastName}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors?.lastName?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+              {/* <TextInput
+                label="Grandfather's Name"
                 register={register}
                 name="lastName"
                 errors={errors.lastName}
-              />
+              /> */}
             </Col>
           </Row>
           <Row>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
-                <Form.Label>Gender</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Sex</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <Form.Select
                   {...register("gender")}
                   isInvalid={errors.gender}
                   aria-label="Default select example"
                 >
-                  <option value="">Select Gender</option>
+                  <option value="">Select Sex</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                 </Form.Select>
@@ -514,53 +654,14 @@ const PatientForm = ({ patient }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
+
             <Col md={4} sm={12} className="mb-2">
               <Form.Group>
-                <Form.Label>Phone</Form.Label>
-                <Form.Control
-                  type="number"
-                  placeholder="09/07********"
-                  {...register("phone")}
-                  isInvalid={errors.phone}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors?.phone?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col md={4} sm={12} className="mb-2">
-              <Form.Group className="mb-3">
-                <Form.Label>has Phone</Form.Label>
-                <Form.Check
-                  type="switch"
-                  {...register("has_phone", {
-                    onChange: (e) => {
-                      if (!e.target.checked) {
-                        setValue("emergency.the_same_address_as_patient", true);
-                      }
-                      // console.log(e);
-                    },
-                  })}
-                ></Form.Check>
-              </Form.Group>
-            </Col>
-            <Col md={4} sm={12} className="mb-2">
-              <Form.Group>
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  {...register("address.email")}
-                  placeholder="example@example.com"
-                  isInvalid={errors.address?.email}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors?.address?.email?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col md={4} sm={12} className="mb-2">
-              <Form.Group>
-                <Form.Label>Date of Birth</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Date of Birth</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <div className="d-flex  gap-1">
                   <div className="w-100">
                     <Form.Control
@@ -584,6 +685,7 @@ const PatientForm = ({ patient }) => {
                     </Form.Control.Feedback>
                   </div>
                   <button
+                    type="button"
                     className="border-0 bg-transparent curserpointer  align-self-start"
                     disabled={isNewBornWatcher}
                   >
@@ -613,52 +715,45 @@ const PatientForm = ({ patient }) => {
             </Col>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
-                <Form.Label className="text-nowrap">Patient Type</Form.Label>
-                <Form.Select {...register("is_new")} isInvalid={errors.is_new}>
-                  {/* <option value={null}>Select Patient Type</option> */}
-
-                  <option value="true">New</option>
-                  <option value="false">Existing</option>
+                <Form.Label>Blood Type</Form.Label>
+                <Form.Select
+                  {...register("blood_type")}
+                  isInvalid={errors.blood_type}
+                >
+                  <option value="">Select Blood Type</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
                 </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.blood_type?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
-
-            {isNewPatient === "false" ? (
-              <Col md={4} sm={12} className="mb-2">
-                <Form.Group className="mb-3">
-                  <Form.Label className="text-nowrap">
-                    Manual Card Number
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    {...register("manual_card_id", {
-                      required: [isNewPatient === "true" ? true : false],
-                    })}
-                    isInvalid={errors.manual_card_id}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors?.manual_card_id?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-            ) : null}
-
             <Col md={4} sm={12} className="mb-2">
-              <Form.Group className="mb-3">
-                <Form.Label className="text-nowrap">Payment way</Form.Label>
-                <Form.Select {...register("is_credit")}>
-                  {/* <option value="">Select Payment way</option> */}
-
-                  <option value={false}>Self Payer</option>
-                  <option value={true}>Credit</option>
-                </Form.Select>
+              <Form.Group>
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  {...register("address.email")}
+                  placeholder="example@example.com"
+                  isInvalid={errors.address?.email}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors?.address?.email?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
                 <Form.Label>Marital Status</Form.Label>
                 <Form.Select {...register("marital_status")}>
-                  <option value="">Select Marital Status</option>
+                  {/* <option value="">Select Marital Status</option> */}
                   <option value="Single">Single</option>
                   <option value="Married">Married</option>
                   <option value="Divorced">Divorced</option>
@@ -678,21 +773,120 @@ const PatientForm = ({ patient }) => {
             </Col>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
-                <Form.Label>Guardian name</Form.Label>
+                <Form.Label>Guardian</Form.Label>
                 <Form.Control
                   type="text"
                   {...register("guardian_name")}
                 ></Form.Control>
               </Form.Group>
             </Col>
+
+            <Col md={4} sm={12} className="mb-2">
+              <Form.Group className="mb-3">
+                {/* <div className="d-flex align-items-center gap-1"> */}
+                <Form.Label>Guardian Relationship</Form.Label>
+                {/* <span className="text-danger fw-bold">*</span> */}
+                {/* </div> */}
+
+                <Form.Control
+                  type="text"
+                  {...register("guardian_relationship")}
+                  isInvalid={errors.guardian_relationship}
+                  aria-label="Default select example"
+                ></Form.Control>
+                <Form.Control.Feedback type="invalid">
+                  {errors?.guardian_relationship?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            {/* Nationality */}
+            <Col md={4} sm={12} className="mb-2">
+              <Form.Group className="mb-3">
+                <Form.Label>Nationality</Form.Label>
+                <Form.Control
+                  list="nationalityList"
+                  type="text"
+                  {...register("nationality")}
+                />
+                <datalist
+                  id="nationalityList"
+                  style={{ height: 50, overflowY: "auto" }}
+                >
+                  {nationalityList.map((nationality) => (
+                    <option key={nationality} value={nationality}>
+                      {nationality}
+                    </option>
+                  ))}
+                </datalist>
+              </Form.Group>
+            </Col>
+            <Col md={4} sm={12} className="mb-2">
+              <Form.Group className="mb-3">
+                <Form.Label className="text-nowrap">Payment Method</Form.Label>
+                <Form.Select {...register("is_credit")}>
+                  {/* <option value="">Select Payment way</option> */}
+
+                  <option value={false}>Self Payer</option>
+                  <option value={true}>Credit</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
           </Row>
           <h6 className="border-bottom border-1 border-black py-2 mb-3 fw-bold">
-            Address Information
+            Patient Address Details
           </h6>
           <Row>
             <Col md={4} sm={12} className="mb-2">
+              <Form.Group>
+                <Form.Label>Phone</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="09/07********"
+                  {...register("phone")}
+                  isInvalid={errors.phone}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors?.phone?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
-                <Form.Label>Region</Form.Label>
+                <Form.Label>Guardian Phone Number</Form.Label>
+                <Form.Check
+                  type="switch"
+                  {...register("has_phone", {
+                    onChange: (e) => {
+                      if (!e.target.checked) {
+                        setValue("emergency.the_same_address_as_patient", true);
+                      }
+                      // console.log(e);
+                    },
+                  })}
+                ></Form.Check>
+              </Form.Group>
+            </Col>
+            <Col md={4} sm={12} className="mb-2">
+              <Form.Group>
+                <Form.Label>Alternative Phone</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="09/07********"
+                  {...register("address.phone_2")}
+                  isInvalid={errors.address?.phone_2}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors?.address?.phone_2?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={4} sm={12} className="mb-2">
+              <Form.Group className="mb-3">
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Region</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <Form.Select
                   {...register("address.region_id")}
                   aria-label="Default select example"
@@ -715,7 +909,11 @@ const PatientForm = ({ patient }) => {
             </Col>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
-                <Form.Label>City</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>City</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <Form.Select
                   // ref={roleref}
                   {...register("address.city_id")}
@@ -741,7 +939,11 @@ const PatientForm = ({ patient }) => {
             </Col>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
-                <Form.Label>Subcity</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Subcity</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <Form.Select
                   // ref={roleref}
                   {...register("address.subcity_id")}
@@ -765,7 +967,10 @@ const PatientForm = ({ patient }) => {
             </Col>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group>
-                <Form.Label>Woreda</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Woreda</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
 
                 <Form.Select
                   {...register("address.woreda_id")}
@@ -780,10 +985,7 @@ const PatientForm = ({ patient }) => {
                       </option>
                     ))}
                 </Form.Select>
-                <Form.Control.Feedback
-                  type="inValid"
-                  className="small text-danger"
-                >
+                <Form.Control.Feedback type="invalid">
                   {errors?.address?.woreda_id?.message}
                 </Form.Control.Feedback>
               </Form.Group>
@@ -806,7 +1008,11 @@ const PatientForm = ({ patient }) => {
           <Row>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group>
-                <Form.Label>Name</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Name</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <Form.Control
                   type="text"
                   {...register("emergency.firstName")}
@@ -820,7 +1026,11 @@ const PatientForm = ({ patient }) => {
 
             <Col md={4} sm={12} className="mb-2">
               <Form.Group>
-                <Form.Label>Father Name</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Father Name</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <Form.Control
                   type="text"
                   {...register("emergency.middleName")}
@@ -833,7 +1043,7 @@ const PatientForm = ({ patient }) => {
             </Col>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group>
-                <Form.Label>Grandfather Name</Form.Label>
+                <Form.Label>Grandfather's Name</Form.Label>
                 <Form.Control
                   type="text"
                   {...register("emergency.lastName")}
@@ -844,18 +1054,24 @@ const PatientForm = ({ patient }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
-                <Form.Label>Relationship</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Relationship</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <Form.Select
+                  type="text"
                   {...register("emergency.relation")}
+                  isInvalid={errors.emergency?.relation}
                   aria-label="Default select example"
                 >
-                  {/* <option>Select role</option> */}
+                  <option value="">Please Select</option>
                   <option value="Father">Father</option>
                   <option value="Mother">Mother</option>
-                  <option value="Spouse">Spouse</option>
+                  <option value="Brother">Brother</option>
+                  <option value="Sister">Sister</option>
                   <option value="Other">Other</option>
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
@@ -882,7 +1098,11 @@ const PatientForm = ({ patient }) => {
             {/* {theSameAddressASEmpl ? ( */}
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="">
-                <Form.Label>Phone Number</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Phone Number</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <Form.Control
                   type="text"
                   {...register("emergency.phone")}
@@ -899,11 +1119,11 @@ const PatientForm = ({ patient }) => {
 
             <Col md={4} sm={12} className="mb-2">
               <Form.Group>
-                <Form.Label>Same Address as Employee</Form.Label>
+                <Form.Label>Same Address as Patient</Form.Label>
                 <Form.Check
                   type="checkbox"
                   // placeholder="09/07********"
-                  disabled={!hasPhoneWatcher}
+                  // disabled={!hasPhoneWatcher}
                   // defaultChecked={!hasPhoneWatcher}
                   // defaultValue={!hasPhoneWatcher}
                   {...register("emergency.the_same_address_as_patient")}
@@ -916,70 +1136,7 @@ const PatientForm = ({ patient }) => {
             </Col>
             {EmergencySection}
           </Row>
-          {/* <h6 className="border-bottom border-1 p-1 mb-3 fw-bold">
-      Patient Type
-    </h6> 
-          <h6 className="border-bottom border-1 border-black py-2 mb-3 fw-bold">
-            Patient Type
-          </h6>*/}
-          {/* <Row>
-            <Col md={4} sm={12}>
-              <Form.Group className="">
-                <Form.Label className="text-nowrap">Patient Type</Form.Label>
-                <Form.Select {...register("is_new")} isInvalid={errors.is_new}>
-                 
-                  <option value="true">New</option>
-                  <option value="false">Existing</option>
-                </Form.Select>
-              </Form.Group>
-            </Col>
-            <Col md={4} sm={12} className="mb-2">
-              {isNewPatient === "false" ? (
-                <Form.Group className="">
-                  <Form.Label className="text-nowrap">
-                    Manual Card Number
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    {...register("manual_card_id", {
-                      required: [isNewPatient === "true" ? true : false],
-                    })}
-                    isInvalid={errors.manual_card_id}
-                  />
-                  <Form.Control.Feedback
-                    type="inValid"
-                    className="small text-danger"
-                  >
-                    {errors?.manual_card_id?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              ) : null}
-            </Col>
-          </Row> 
-          <h6 className="border-bottom border-1 border-black py-2 my-3 fw-bold">
-            Patient payment way
-          </h6>*/}
-
-          {/* <Row>
-            <Col md={4} sm={12}>
-              <Form.Group className="">
-                <Form.Label className="text-nowrap">Payment way</Form.Label>
-                <Form.Select {...register("is_credit")}>
-                 
-
-                  <option value={false}>Self Payer</option>
-                  <option value={true}>Credit</option>
-                </Form.Select>
-              </Form.Group>
-            </Col>
-           
-            <Col md={4} sm={12}>
-         
-            </Col>
-            <Col></Col>
-          </Row> */}
         </div>
-        {/* ) : ( */}
         <>
           {(getValues("is_credit") === true ||
             getValues("is_credit") === "true") && (
@@ -1050,7 +1207,9 @@ const PatientForm = ({ patient }) => {
                 </Col>
                 <Col md={4} sm={12}>
                   <Form.Group className="mb-3">
-                    <Form.Label className="text-nowrap">Letter</Form.Label>
+                    <Form.Label className="text-nowrap">
+                      Support Letter
+                    </Form.Label>
                     <Form.Control
                       type="file"
                       {...register("letter_doc")}
@@ -1070,50 +1229,6 @@ const PatientForm = ({ patient }) => {
         {/* )} */}
         <hr />
         <div className="d-flex gap-2 justify-content-end">
-          {/* {showNextForm ? (
-            <Button type="button" onClick={() => setShowNextForm(false)}>
-              Prev
-            </Button>
-          ) : null}
-          {patient ? (
-            (patient?.is_credit || isCredit === "true") && !showNextForm ? (
-              <Button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowNextForm(true);
-                }}
-              >
-                Next
-              </Button>
-            ) : (
-              <Button
-                variant="primary"
-                // disabled={isPending}
-                //   className="w-100"
-                type="submit"
-                // onClick={(e)=> e.stopPropagation()}
-              >
-                {(isPending || updateMutation.isPending) && (
-                  <Spinner animation="border" size="sm" />
-                )}
-                {patient ? "Update" : "Save"}
-              </Button>
-            )
-          ) : (
-            <Button
-              variant="primary"
-              // disabled={isPending}
-              //   className="w-100"
-              type="submit"
-              // onClick={(e)=> e.stopPropagation()}
-            >
-              {(isPending || updateMutation.isPending) && (
-                <Spinner animation="border" size="sm" />
-              )}
-              {patient ? "Update" : "Save"}
-            </Button>
-          )} */}
           <Button
             variant="primary"
             // disabled={isPending}
@@ -1133,10 +1248,48 @@ const PatientForm = ({ patient }) => {
           show={showCalculateBD}
           handleClose={setShowCalculateBD}
           setValue={setValue}
+          birthDateError={errors.birth_date}
+          clearErrors={clearErrors}
         />
       ) : null}
     </>
   );
 };
+
+async function generatePatientID() {
+  // Retrieve the last used patient ID from your data store (e.g., local storage, database)
+  let lastID = localStorage.getItem("LastPatientID");
+  // console.log(lastID);
+  // Extract the numeric part of the last ID and increment it
+  let nextNumber;
+  if (lastID) {
+    nextNumber = String(parseInt(lastID?.split("-")[1]) + 1).padStart(5, "0");
+
+    return `P-${nextNumber}`;
+  } else {
+    const res = await Axiosinstance.get("patient/lastPatientID");
+    //  .then((res) => {
+    //   console.log(res.data);
+    nextNumber = String(parseInt(res.data?.split("-")[1]) + 1).padStart(5, "0");
+    // });
+    if (!res.data) {
+      localStorage.setItem("LastPatientID", "P-00001");
+      return "P-00001";
+    }
+    localStorage.setItem(
+      "LastPatientID",
+      "P-" + String(parseInt(res.data?.split("-")[1])).padStart(5, "0")
+    );
+    return `P-${nextNumber}`;
+    console.log(nextNumber);
+  }
+  // Combine the prefix and the new number
+  let newID = `P-${nextNumber}`;
+
+  // Store the new last used patient ID
+  // localStorage.setItem('LastPatientID', newID);
+
+  return newID;
+}
 
 export default PatientForm;

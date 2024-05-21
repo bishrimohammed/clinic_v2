@@ -29,8 +29,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     phone: {
       type: DataTypes.STRING,
-      allowNull: true,
       unique: true,
+      allowNull: false,
     },
   });
   EmergencyContact.sync({ alter: false });

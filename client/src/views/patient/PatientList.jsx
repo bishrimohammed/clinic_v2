@@ -32,7 +32,7 @@ const PatientList = () => {
   // console.log(filter);
   return (
     <>
-      <Container className="p-3">
+      <Container className="p-3 mb-5">
         <div className="p-3 bg-hrun-box">
           <div className=" d-flex justify-content-between align-items-center w-100 mb-1">
             <h4 className="d-flex justify-content-center align-items-center mb-0">

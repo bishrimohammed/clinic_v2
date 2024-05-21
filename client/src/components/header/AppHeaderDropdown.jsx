@@ -11,6 +11,7 @@ const AppHeaderDropdown = () => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  // console.log(user);
   return (
     <Dropdown variant="nav-item">
       {/* <Dropdown.Toggle placement="bottom-end"  className="py-0" caret={true}>
@@ -32,7 +33,7 @@ const AppHeaderDropdown = () => {
       </Dropdown.Toggle>
       <Dropdown.Menu className="pt-0" placement="bottom-end">
         <Dropdown.Header className="bg-light fw-semibold py-2">
-          {user.username}
+          {user.name}
         </Dropdown.Header>
         {/* <CDropdownItem href="#">
           <CIcon icon={cilBell} className="me-2" />

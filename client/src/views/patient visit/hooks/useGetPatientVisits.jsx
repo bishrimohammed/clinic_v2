@@ -6,7 +6,10 @@ export const useGetPatientVisits = (query) => {
     queryKey: ["patient visits", query],
     queryFn: async () => {
       return await Axiosinstance.get(`/patientvisits`, { params: query }).then(
-        (res) => res.data
+        (res) => {
+          console.log("fetched patient visits");
+          return res.data;
+        }
       );
     },
     // make stale time 30 minutes

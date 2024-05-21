@@ -16,6 +16,7 @@ import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
 import { TbCalendarCancel } from "react-icons/tb";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaSortDown, FaSortUp } from "react-icons/fa";
+import { hasPermission } from "../../utils/hasPermission";
 
 const PatientVisitTable = ({
   patientVisits,
@@ -78,14 +79,14 @@ const PatientVisitTable = ({
         </Button>
       </div>
       <div className="d-flex justify-content-between gap-2 align-items-center w-100 mb-1 mt-2">
-        {/* {hasPermission("Appoitment", "create") && ( */}
-        <Button
-          className="btn btn-primary ms-auto"
-          onClick={() => setShowAddPatientVisitModal(true)}
-        >
-          + Add Visit
-        </Button>
-        {/* )} */}
+        {hasPermission("visit", "create") && (
+          <Button
+            className="btn btn-primary ms-auto"
+            onClick={() => setShowAddPatientVisitModal(true)}
+          >
+            + Add Visit
+          </Button>
+        )}
       </div>
       <Table
         striped

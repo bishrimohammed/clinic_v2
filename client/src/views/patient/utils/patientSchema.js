@@ -5,27 +5,34 @@ export const patientSchema = yup.object().shape({
   firstName: yup
     .string()
     .transform((value) => value.trim())
-    .required("Name is required"),
+    .required("Patient name is required"),
   middleName: yup
     .string()
     .transform((value) => value.trim())
     .required("Father Name is required"),
   lastName: yup.string().transform((value) => value.trim()),
-  gender: yup.string().required("Gender is required"),
+  gender: yup.string().required("Sex is required"),
   is_new_born: yup.boolean(),
+  blood_type: yup.string(),
+  nationality: yup.string(),
   marital_status: yup.string(),
   // other_marital_status: yup.string()
   guardian_name: yup.string().transform((value) => value.trim()),
+  guardian_relationship: yup.string().transform((value) => value.trim()),
   occupation: yup.string().transform((value) => value.trim()),
   has_phone: yup.boolean(),
-  phone: yup.string().when("has_phone", ([has_phone], schema) => {
-    if (has_phone) {
-      return schema
-        .matches(/^(09|07)\d{8}$/, "Phone number is invalid")
-        .required("Phone is required");
-    }
-    return schema;
-  }),
+  phone: yup
+    .string()
+    .matches(/^(09|07)\d{8}$/, "Phone number is invalid")
+    .required("Phone is required"),
+  // .when("has_phone", ([has_phone], schema) => {
+  //   if (has_phone) {
+  //     return schema
+  //       .matches(/^(09|07)\d{8}$/, "Phone number is invalid")
+  //       .required("Phone is required");
+  //   }
+  //   return schema;
+  // }),
 
   birth_date: yup
     .date()
@@ -85,8 +92,14 @@ export const patientSchema = yup.object().shape({
     // validate phone number start with 09 or 07 it must me 10 digit
     phone_2: yup
       .string()
-      // .matches(/^(09|07)?\d{8}$/, "Phone number is invalid")
-      .nullable(),
+      .test("phone_2", "Phone number is invalid", (value) => {
+        if (value === null || value === undefined || value === "") {
+          return true; // Allow null or empty values
+        }
+        return /^(07|09)\d{8}$/.test(value);
+      }),
+    // .matches(/^(09|07)?\d{8}$/, "Phone number is invalid")
+    // .nullable(),
   }),
   emergency: yup.object().shape({
     firstName: yup
@@ -170,9 +183,7 @@ export const patientSchema = yup.object().shape({
   isUpdate: yup.boolean().default(false),
   company_id: yup.string().when("is_credit", ([is_credit], schema) => {
     if (is_credit) {
-      return schema.required(
-        "Company must be provided when payment way is credit"
-      );
+      return schema.required("Company name is required");
     }
     return schema.nullable();
   }),
@@ -186,8 +197,8 @@ export const patientSchema = yup.object().shape({
     .mixed()
     .when(["is_credit", "isUpdate"], ([is_credit, isUpdate], schema) => {
       // console.log(f);
-      console.log(is_credit);
-      console.log(isUpdate);
+      // console.log(is_credit);
+      // console.log(isUpdate);
       if (is_credit && !isUpdate) {
         return schema.test(
           "conditionalRequired",

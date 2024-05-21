@@ -45,6 +45,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    symptom_notes: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    mode_of_arrival: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     stage: {
       type: DataTypes.ENUM,
       allowNull: true,
@@ -53,6 +61,10 @@ module.exports = (sequelize, DataTypes) => {
         "Waiting for triage",
         "Waiting for examiner",
         "Performing triage",
+        "Admitted",
+        "Performing consultation",
+        "Waiting for payment",
+        "Waiting for lab",
       ],
     },
     status: {

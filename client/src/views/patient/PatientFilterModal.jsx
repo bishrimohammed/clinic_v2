@@ -75,7 +75,7 @@ const PatientFilterModal = ({ show, handleClose, filter, setFilter }) => {
   return (
     <Modal show={show} onHide={() => handleClose(false)}>
       <Modal.Header closeButton>
-        <Modal.Title>Modal heading</Modal.Title>
+        <Modal.Title>Filter Patient</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
@@ -90,7 +90,7 @@ const PatientFilterModal = ({ show, handleClose, filter, setFilter }) => {
             </Form.Control>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Gender</Form.Label>
+            <Form.Label>Sex</Form.Label>
             <Form.Control as="select" ref={genderRef}>
               {gender.map((item) => (
                 <option key={item.value} value={item.value}>
@@ -101,7 +101,7 @@ const PatientFilterModal = ({ show, handleClose, filter, setFilter }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Payment Way</Form.Label>
+            <Form.Label>Payment Method</Form.Label>
             <Form.Control as="select" ref={paymentWayRef}>
               {paymentWay.map((item) => (
                 <option key={item.value} value={item.value}>

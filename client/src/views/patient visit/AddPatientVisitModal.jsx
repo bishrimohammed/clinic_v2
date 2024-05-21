@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -25,6 +25,12 @@ const visitSchema = yup.object().shape({
     .transform((value) => value.trim())
     .required("Visit reason is required"),
   type: yup.string().required("Visit Type is required"),
+  mode_of_arrival: yup.string().when("type", ([type], schema) => {
+    if (type === "Emergency") {
+      return schema.required("Mode of arrival is required");
+    }
+    return schema.nullable();
+  }),
 });
 const AddPatientVisitModal = ({ show, handleClose }) => {
   const { data: doctors } = useGetDoctors();
@@ -39,6 +45,9 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
     clearErrors,
   } = useForm({
     resolver: yupResolver(visitSchema),
+    defaultValues: {
+      date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+    },
     // defaultValues: {
     //   username: "",
     //   password: "",
@@ -47,7 +56,36 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
   const { mutateAsync, isPending } = useAddPatientVisit();
   const [errorState, setErrorState] = useState("");
   const visitDateWatcher = watch("date");
-  //   console.log(patients);
+  const vistiTypeWatcher = watch("type");
+  // console.log(visitDateWatcher);
+  const DoctorList = useMemo(() => {
+    if (visitDateWatcher) {
+      const weekdayNumber = new Date(visitDateWatcher).getDay();
+      const weekday = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      // console.log(visitDateWatcher.substring(11, 16) + ":00");
+      // console.log(weekday[weekdayNumber]);
+      return doctors?.filter((doctor) => {
+        return doctor?.schedules?.find(
+          (availability) =>
+            availability.day_of_week === weekday[weekdayNumber] &&
+            availability.start_time <=
+              visitDateWatcher.substring(11, 16) + ":00" &&
+            availability.end_time >= visitDateWatcher.substring(11, 16) + ":00"
+        );
+      });
+    } else {
+      return [];
+    }
+  }, [visitDateWatcher]);
+  // console.log(DoctorList);
   const submitHandler = (data) => {
     mutateAsync(data)
       .then((res) => {
@@ -78,6 +116,7 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                 <Form.Label>Patient</Form.Label>
                 <Form.Select
                   {...register("patient_id")}
+                  defaultValue={new Date().toISOString().slice(0, 16)}
                   isInvalid={errors.patient_id}
                   aria-label="Default select example"
                 >
@@ -94,27 +133,7 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-            <Col md={4} sm={12} className="mb-2">
-              <Form.Group className="mb-3">
-                <Form.Label>Doctor</Form.Label>
-                <Form.Select
-                  {...register("doctor_id")}
-                  isInvalid={errors.doctor_id}
-                  aria-label="Default select example"
-                >
-                  <option value="">Select Doctor</option>
-                  {doctors?.map((doctor, index) => (
-                    <option key={doctor.id} value={doctor.id}>
-                      {doctor.employee.firstName} {doctor.employee.middleName}{" "}
-                      {doctor.employee.lastName}
-                    </option>
-                  ))}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.doctor_id?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
+
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
                 <Form.Label>Visit Date</Form.Label>
@@ -141,11 +160,33 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                       }
                     },
                   })}
+                  // defaultValue={new Date().toISOString().substring(0, 16)}
                   isInvalid={errors.date}
                   min={new Date().toISOString().substring(0, 16)}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.date?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={4} sm={12} className="mb-2">
+              <Form.Group className="mb-3">
+                <Form.Label>Assigned Doctor</Form.Label>
+                <Form.Select
+                  {...register("doctor_id")}
+                  isInvalid={errors.doctor_id}
+                  aria-label="Default select example"
+                >
+                  <option value="">Select Doctor</option>
+                  {DoctorList?.map((doctor, index) => (
+                    <option key={doctor.id} value={doctor.id}>
+                      {doctor.employee.firstName} {doctor.employee.middleName}{" "}
+                      {doctor.employee.lastName}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.doctor_id?.message}
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
@@ -169,6 +210,41 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
+            {vistiTypeWatcher === "Emergency" && (
+              <Col md={4} sm={12} className="mb-2">
+                <Form.Group className="mb-3">
+                  <Form.Label>Mode of Arrival</Form.Label>
+                  <Form.Select
+                    {...register("mode_of_arrival")}
+                    isInvalid={errors.mode_of_arrival}
+                    aria-label="Default select example"
+                  >
+                    {/* Ambulance, Private car, Public car and Walking */}
+                    <option value="">Please Select</option>
+                    <option value="Ambulance">Ambulance</option>
+                    <option value="Private car">Private car</option>
+                    <option value="Public car">Public car</option>
+                    <option value="Walking">Walking</option>
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.mode_of_arrival?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            )}
+            {/* <Col md={4} sm={12} className="mb-2">
+              <Form.Group className="mb-3">
+                <Form.Label>Mode of Arrival</Form.Label>
+                <Form.Control
+                  {...register("mode_of_arrival")}
+                  isInvalid={errors.mode_of_arrival}
+                  aria-label="Default select example"
+                ></Form.Control>
+                <Form.Control.Feedback type="invalid">
+                  {errors.mode_of_arrival?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col> */}
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
                 <Form.Label>Visit Reason</Form.Label>
@@ -188,7 +264,7 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
               Close
             </Button>
             <Button type="submit" variant="primary">
-              Save Changes
+              Save
             </Button>
           </Modal.Footer>
         </Form>

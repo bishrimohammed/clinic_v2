@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import Axiosinstance from "../../../api/axiosInstance";
 
-export const useGetDraftPayments = () => {
+export const useGetOutStandingPayments = () => {
   return useQuery({
-    queryKey: ["Draft payments"],
+    queryKey: ["OutStanding payments"],
     queryFn: async () =>
-      Axiosinstance.get(`/bill/draft`).then((res) => res.data),
+      Axiosinstance.get(`/payments/outstanding`).then((res) => res.data),
     staleTime: 5 * 60 * 60 * 1000,
   });
 };

@@ -5,11 +5,12 @@ import { Link } from "react-router-dom";
 import { format } from "date-fns";
 
 const AllHistoryOverview = ({ medicalRecords }) => {
+  console.log(medicalRecords);
   // console.log("AllHistoryOverview re");
-  console.log(medicalRecords.medicalRecordDetails);
-  medicalRecords.medicalRecordDetails?.map((detail) => {
-    console.log(detail);
-  });
+  // console.log(medicalRecords.medicalRecordDetails);
+  // medicalRecords.medicalRecordDetails?.map((detail) => {
+  //   console.log(detail);
+  // });
   return (
     <Accordion defaultActiveKey="0">
       {medicalRecords.map((history, index) => (

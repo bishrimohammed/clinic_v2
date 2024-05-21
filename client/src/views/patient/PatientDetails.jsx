@@ -1,16 +1,18 @@
 //import { Button } from "@coreui/coreui";
 import React, { useState } from "react";
 import { Container, Spinner, Tab, Tabs } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import useGetPatient from "./hooks/useGetPatient";
 import PatientInfo from "./patient detail over view/PatientInfo";
 import AllHistoryOverview from "./patient detail over view/AllHistoryOverview";
 import AllLaboratoryOverview from "./patient detail over view/AllLaboratoryOverview";
 import AllImagingStudiesOverview from "./patient detail over view/AllImagingStudiesOverview";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 const PatientDetails = () => {
   const [key, setKey] = useState("active");
+  const navigate = useNavigate();
   const { id } = useParams();
   const { data: patient, error, isPending, isError } = useGetPatient(id);
   // console.log(patient);
@@ -20,8 +22,17 @@ const PatientDetails = () => {
     <>
       <Container className="p-2 mb-5">
         <div className="p-3 bg-hrun-box hrunboxshadow">
-          {" "}
-          <div className="py-3 px-1 bg-hrun-box hrunboxshadow">
+          <div className=" d-flex gap-3 align-items-center">
+            <IoMdArrowRoundBack
+              className="cursorpointer"
+              size={22}
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate(-1)}
+            />
+            <h4>View Patient Visit Detail</h4>
+          </div>{" "}
+          <hr />
+          <>
             <div style={{ gap: 5 }} className="d-flex flex-column">
               <PatientInfo patient={patient} />
               <div
@@ -77,7 +88,7 @@ const PatientDetails = () => {
                 </Tabs>
               </div>
             </div>
-          </div>
+          </>
         </div>
       </Container>
     </>

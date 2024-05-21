@@ -1,20 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Container, Spinner, Tab, Table, Tabs } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useGetDraftPayments } from "./hooks/useGetDraftPayments";
+import { useGetOutStandingPayments } from "./hooks/useGetDraftPayments";
+import OutStandingBillListTable from "./OutStandingBillListTable";
 
 const Billings = () => {
   const navigate = useNavigate();
 
-  const { data: bills, isPending } = useGetDraftPayments();
-
-  if (isPending) return <Spinner animation="grow" />;
+  const { data: bills, isPending, refetch } = useGetOutStandingPayments();
+  console.log(bills);
+  const billings = useMemo(() => bills || [], [bills]);
+  // if (isPending) return <Spinner animation="grow" />;
   return (
     <>
       <Tabs defaultActiveKey="home" id="controlled-tab-example">
-        <Tab eventKey="home" title="Drafts">
+        <Tab eventKey="home" title="Pending Payments">
           <hr className="mt-0" />
-          <Table striped bordered>
+          <OutStandingBillListTable
+            billings={billings}
+            isPending={isPending}
+            refetch={refetch}
+          />
+          {/* <Table striped bordered>
             <thead>
               <tr>
                 <th>Bill Number</th>
@@ -42,7 +49,6 @@ const Billings = () => {
                     <td>{bill._id}</td>
                     <td>{bill.createdAt}</td>
                     <td>{bill.patient.name}</td>
-                    {/* <td>{history.labrequest.requestBy.username}</td> */}
 
                     <td>{bill.paymentStatus}</td>
                     <td>{bill.totalAmount}</td>
@@ -52,7 +58,7 @@ const Billings = () => {
 
               <tr></tr>
             </tbody>
-          </Table>
+          </Table> */}
         </Tab>
         <Tab eventKey="profile" title="Paid">
           paid

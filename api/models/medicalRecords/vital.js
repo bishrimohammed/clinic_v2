@@ -25,6 +25,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   });
-  Vital.sync({ alter: true });
+  Vital.sync({ alter: false });
   return Vital;
 };

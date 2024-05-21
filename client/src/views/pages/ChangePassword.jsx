@@ -74,7 +74,7 @@ const ChangePassword = () => {
     },
     onSuccess: (data) => {
       toast.success("Password updated successfully");
-      dispatch(setlogin(data));
+      dispatch(setlogin(data.data));
       navigate("/");
     },
     onError: (error) => {

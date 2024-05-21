@@ -120,6 +120,7 @@ module.exports.AppointementController = {
       res.status(400);
       throw new Error("Doctor is not available at this time");
     }
+    console.log(req.body);
     const appointment = await db.Appointment.findByPk(id);
     if (!appointment) {
       res.status(404);

@@ -3,6 +3,9 @@ import { Route, Routes } from "react-router-dom";
 // import { CSpinner } from "@coreui/react";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
+import ViewBillDetails from "../views/Bill/ViewBillDetails";
+import DoctorAssignedPatientVisits from "../views/patient visit/DoctorAssignedPatientVisits";
+import ConsultationPage from "../views/patient/consultation/ConsultationPage";
 const CreateServiceItems = React.lazy(() =>
   import(
     "../views/Administration/clinic service/serviceItems/CreateServiceItems"
@@ -229,6 +232,7 @@ const Addprescription = React.lazy(() =>
 
 const AppContent = () => {
   const currentUser = useSelector((state) => state.auth.user);
+  console.log(currentUser);
   // console.log("content");
   return (
     <>
@@ -254,7 +258,16 @@ const AppContent = () => {
             />
           </Route>
           <Route path="/visit" element={<PatientVisit />}>
-            <Route index element={<PatientVisitList />} />
+            <Route
+              index
+              element={
+                currentUser?.role?.name?.toLowerCase() === "doctor" ? (
+                  <DoctorAssignedPatientVisits />
+                ) : (
+                  <PatientVisitList />
+                )
+              }
+            />
             <Route path="view" element={<ViewUpcomingVisitDetail />} />
             {/* <Route path="addpatient" element={<AddpatientToQue />} />
   <Route path="patientlist" element={<PatientQueList />} /> */}
@@ -275,10 +288,7 @@ const AppContent = () => {
             <Route path="assign/:id" element={<AssignPatient />} />
             <Route path="view/:id" element={<PatientDetails />} />
 
-            <Route
-              path="history/:historyId"
-              element={<PatientHistoryDetailsC />}
-            >
+            <Route path="history/:historyId" element={<ConsultationPage />}>
               <Route index element={<HistoryOverview />} />
               <Route path="note" element={<PatientNote />} />
               <Route path="investigation" element={<Investigation />} />
@@ -312,9 +322,10 @@ const AppContent = () => {
             <Route index element={<ImagingRequested />} />
             <Route path="completed" element={<ImagingCompleted />} />
           </Route>
-          <Route path="billings" element={<Billing />}>
+          <Route path="payments" element={<Billing />}>
             <Route index element={<Billings />} />
-            <Route path="list" element={<Billings />} />
+            {/* <Route path="list" element={<Billings />} /> */}
+            <Route path="detail" element={<ViewBillDetails />} />
           </Route>
 
           <Route path="administrations" element={<ClinicService />}>

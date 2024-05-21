@@ -4,17 +4,17 @@ import { useGetPatient } from "./hooks/patientHooks/useGetPatient";
 
 const ViewPatientModal = ({ show, handleClose, patient }) => {
   const { data, error, isPending } = useGetPatient(patient.id);
-  console.log(error);
-  console.log(patient);
-  console.log(data);
+  // console.log(error);
+  // console.log(patient);
+  // console.log(data);
   return (
     <Modal size="lg" show={show} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>View Patient Detail</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <h6 className="border-bottom pt-1 pb-2 ps-2 mx-3 mb-3 ">
-          Employee Information
+        <h6 className="border-bottom border-dark border-1  fw-bolder pt-1 pb-2 ps-2 mx-3 mb-3 ">
+          Patient Information
         </h6>{" "}
         <Row className="px-3">
           <Col sm={6} className="px-4">
@@ -24,7 +24,7 @@ const ViewPatientModal = ({ show, handleClose, patient }) => {
             </p>
           </Col>
           <Col sm={6} className="px-4">
-            <p className="mb-0 text-muted fw-bold">Card Number</p>
+            <p className="mb-0 text-muted fw-bold">Patient Id</p>
             <p className="small">{data?.card_number}</p>
           </Col>
           <Col sm={6} className="px-4">
@@ -117,35 +117,35 @@ const ViewPatientModal = ({ show, handleClose, patient }) => {
                   )}
                 </p>
               </Col>
-              <h6 className="border-bottom pt-1 pb-2 ps-2 mx-3 mb-3 ">
-                Home Address
+              <h6 className="border-bottom border-dark border-1 fw-bolder pt-1 pb-2 ps-2 ms-3 mb-3 ">
+                Patient Home Address Information
               </h6>
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">Region</p>
+                <p className="mb-0 text-muted fw-bold">Region</p>
                 <p className="small">
                   {data?.address?.woreda?.SubCity?.city?.region?.name}
                 </p>
               </Col>
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">City</p>
+                <p className="mb-0 text-muted fw-bold">City</p>
                 <p className="small ">
                   {data?.address?.woreda?.SubCity?.city?.name}
                 </p>
               </Col>
 
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">Subcity</p>
+                <p className="mb-0 text-muted fw-bold">Subcity</p>
                 <p className="small">
                   {data?.address?.woreda?.SubCity?.subCity_name}
                 </p>
               </Col>
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">Woreda</p>
+                <p className="mb-0 text-muted fw-bold">Woreda</p>
                 <p className="small ">{data?.address?.woreda?.name}</p>
               </Col>
 
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">House Number</p>
+                <p className="mb-0 text-muted fw-bold">House Number</p>
                 <p className="small mb-0">
                   {data?.address?.house_number ? (
                     data?.address?.house_number
@@ -155,7 +155,7 @@ const ViewPatientModal = ({ show, handleClose, patient }) => {
                 </p>
               </Col>
               <Col sm={6} className="px-4">
-                {/* <p className="mb-0 text-muted">House Number</p>
+                {/* <p className="mb-0 text-muted fw-bold">House Number</p>
               <p className="small mb-0">
                 {data?.address?.house_number ? (
                   employee.address?.house_number
@@ -170,16 +170,16 @@ const ViewPatientModal = ({ show, handleClose, patient }) => {
               </h6>
 
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">Name</p>
+                <p className="mb-0 text-muted fw-bold">Name</p>
                 <p className="small">{data?.emergencyContact?.firstName}</p>
               </Col>
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">Father Name</p>
+                <p className="mb-0 text-muted fw-bold">Father Name</p>
                 <p className="small">{data?.emergencyContact?.middleName}</p>
               </Col>
 
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">Grandfather Name</p>
+                <p className="mb-0 text-muted fw-bold">Grandfather Name</p>
                 <p className="small">
                   {data?.emergencyContact?.lastName ? (
                     data?.emergencyContact?.lastName
@@ -189,12 +189,14 @@ const ViewPatientModal = ({ show, handleClose, patient }) => {
                 </p>
               </Col>
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">Relationship</p>
+                <p className="mb-0 text-muted fw-bold">Relationship</p>
                 <p className="small">{data?.emergencyContact?.relationship}</p>
               </Col>
 
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">Same Address as Patient</p>
+                <p className="mb-0 text-muted fw-bold">
+                  Same Address as Patient
+                </p>
                 <p className="small">
                   {data?.address_id === data?.emergencyContact.address.id
                     ? "Yes"
@@ -202,14 +204,14 @@ const ViewPatientModal = ({ show, handleClose, patient }) => {
                 </p>
               </Col>
               <Col sm={6} className="px-4">
-                <p className="mb-0 text-muted">Phone</p>
+                <p className="mb-0 text-muted fw-bold">Phone</p>
                 <p className="small">{data?.emergencyContact.phone}</p>
               </Col>
 
               {data?.address_id !== data?.emergencyContact.address.id && (
                 <>
                   <Col sm={6} className="px-4">
-                    <p className="mb-0 text-muted">Region</p>
+                    <p className="mb-0 text-muted fw-bold">Region</p>
                     <p className="small">
                       {
                         data?.emergencyContact.address?.woreda?.SubCity?.city
@@ -218,7 +220,7 @@ const ViewPatientModal = ({ show, handleClose, patient }) => {
                     </p>
                   </Col>
                   <Col sm={6} className="px-4">
-                    <p className="mb-0 text-muted">City</p>
+                    <p className="mb-0 text-muted fw-bold">City</p>
                     <p className="small ">
                       {
                         data?.emergencyContact.address?.woreda?.SubCity?.city
@@ -228,7 +230,7 @@ const ViewPatientModal = ({ show, handleClose, patient }) => {
                   </Col>
 
                   <Col sm={6} className="px-4">
-                    <p className="mb-0 text-muted">Subcity</p>
+                    <p className="mb-0 text-muted fw-bold">Subcity</p>
                     <p className="small">
                       {
                         data?.emergencyContact.address?.woreda?.SubCity
@@ -237,13 +239,13 @@ const ViewPatientModal = ({ show, handleClose, patient }) => {
                     </p>
                   </Col>
                   <Col sm={6} className="px-4">
-                    <p className="mb-0 text-muted">Woreda</p>
+                    <p className="mb-0 text-muted fw-bold">Woreda</p>
                     <p className="small ">
                       {data?.emergencyContact.address?.woreda?.name}
                     </p>
                   </Col>
                   <Col sm={6} className="px-4">
-                    <p className="mb-0 text-muted">House Nember</p>
+                    <p className="mb-0 text-muted fw-bold">House Nember</p>
                     <p className="small mb-0">
                       {data?.emergencyContact.address?.house_number ? (
                         data?.emergencyContact.address.house_number

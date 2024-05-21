@@ -6,7 +6,7 @@ import { AxiosHeaders } from "../../../api/useAxiosHeaders";
 export const useAddPatientVisit = () => {
   const queryClient = useQueryClient();
   const { headers } = AxiosHeaders();
-  console.log(headers);
+  // console.log(headers);
   return useMutation({
     mutationFn: async (data) => {
       return await Axiosinstance.post(`/patientvisits`, data, { headers });

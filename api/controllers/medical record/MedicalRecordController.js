@@ -477,11 +477,27 @@ module.exports = MedicalRecordController = {
 
   // @desc add vital sign
   addVitalSign: asyncHandler(async (req, res) => {
-    // const { vitals } = req.body;
+    const { vitals, symptom } = req.body;
     const today = new Date();
-    const vitals = req.body;
+    // const vitals = req.body;
     // console.log(req.body);
+    // return;
     console.log(vitals);
+    const patientVisit = await db.PatientAssignment.findOne({
+      where: {
+        medicalRecord_id: req.params.id,
+      },
+    });
+    console.log(patientVisit);
+    if (!patientVisit) {
+      res.status(404);
+      throw new Error("Patient assignment not found");
+    }
+    patientVisit.symptom_notes = patientVisit.symptom_notes
+      ? patientVisit.symptom_notes + "\n" + symptom
+      : symptom;
+    patientVisit.stage = "Waiting for examiner";
+    await patientVisit.save();
     const VitalSigns = vitals.map((v) => {
       return {
         ...v,

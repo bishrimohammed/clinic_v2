@@ -20,14 +20,88 @@ module.exports = PatientVisitController = {
     if (req.query.visitType) {
       where.visit_type = req.query.visitType;
     }
-    console.log(where);
+    // console.log(where);
     const visits = await db.PatientAssignment.findAll({
       where: where,
       include: [
         {
           model: db.Patient,
           as: "patient",
-          attributes: ["id", "firstName", "lastName", "middleName"],
+          attributes: [
+            "id",
+            "firstName",
+            "lastName",
+            "middleName",
+            "card_number",
+          ],
+        },
+        {
+          model: db.User,
+          as: "doctor",
+          include: {
+            model: db.Employee,
+            as: "employee",
+            attributes: ["id", "firstName", "middleName", "lastName"],
+          },
+          attributes: ["id"],
+        },
+      ],
+      order: [["assignment_date", "DESC"]],
+    });
+    res.json(visits);
+  }),
+  getUpcomingPatientVisitByDoctorId: asyncHandler(async (req, res) => {
+    let where = {};
+    if (req.query.status) {
+      if (req.query.status === "false") {
+        where.status = false;
+      } else if (req.query.status === "true") {
+        where.status = true;
+      }
+    }
+    if (req.query.stage) {
+      where.stage = req.query.stage;
+    }
+    if (req.query.visitType) {
+      where.visit_type = req.query.visitType;
+    }
+    // const today = (where.assignment_date = {
+    //   [Op.gte]: new Date().toISOString().substring(0, 10),
+    // });
+    // where.visit_time = { [Op.gte]: format(new Date(), "HH:mm:ss") };
+    // console.log(where);
+    const visits = await db.PatientAssignment.findAll({
+      where: {
+        ...where,
+        doctor_id: req.user.id,
+        [Op.or]: [
+          {
+            assignment_date: new Date().toISOString().substring(0, 10),
+            visit_time: {
+              [Op.gte]: format(new Date(), "HH:mm:ss"),
+            },
+          },
+          {
+            assignment_date: {
+              [Op.gt]: new Date().toISOString().substring(0, 10),
+            },
+          },
+        ],
+      },
+      // where: where,
+      include: [
+        {
+          model: db.Patient,
+          as: "patient",
+          attributes: [
+            "id",
+            "firstName",
+            "lastName",
+            "middleName",
+            "card_number",
+            "birth_date",
+            "gender",
+          ],
         },
         {
           model: db.User,
@@ -43,9 +117,54 @@ module.exports = PatientVisitController = {
     });
     res.json(visits);
   }),
-  getPatientVisit: asyncHandler(async (req, res) => {}),
+  getPreviousPatientVisitByDoctorId: asyncHandler(async (req, res) => {
+    let where = {};
+    if (req.query.status) {
+      if (req.query.status === "false") {
+        where.status = false;
+      } else if (req.query.status === "true") {
+        where.status = true;
+      }
+    }
+    if (req.query.stage) {
+      where.stage = req.query.stage;
+    }
+    if (req.query.visitType) {
+      where.visit_type = req.query.visitType;
+    }
+    // console.log(where);
+    const visits = await db.PatientAssignment.findAll({
+      where: { ...where, doctor_id: req.user.id },
+      include: [
+        {
+          model: db.Patient,
+          as: "patient",
+          attributes: [
+            "id",
+            "firstName",
+            "lastName",
+            "middleName",
+            "card_number",
+          ],
+        },
+        {
+          model: db.User,
+          as: "doctor",
+          include: {
+            model: db.Employee,
+            as: "employee",
+            attributes: ["id", "firstName", "middleName", "lastName"],
+          },
+          attributes: ["id"],
+        },
+      ],
+      order: [["assignment_date", "DESC"]],
+    });
+    res.json(visits);
+  }),
   createPatientVisit: asyncHandler(async (req, res) => {
-    const { patient_id, doctor_id, date, reason, type } = req.body;
+    const { patient_id, doctor_id, date, reason, type, mode_of_arrival } =
+      req.body;
     // console.log(req.body);
     // console.log(req.user);
     const lastMedicalRecord = await db.MedicalRecord.findAll({
@@ -87,11 +206,27 @@ module.exports = PatientVisitController = {
       assignment_date: date,
       visit_time: new Date(date).toISOString().substring(11, 16),
       visit_type: type,
+      mode_of_arrival: type === "Emergency" ? mode_of_arrival : null,
       reason,
       medicalRecord_id: medicalRecord.id,
       stage: stage,
       created_by: req?.user?.id,
     });
+    if (stage === "Waiting for service fee") {
+      const medicalBilling = await db.MedicalBilling.create({
+        medical_record_id: medicalRecord.id,
+        patient_id,
+        visit_id: patientVisit.id,
+      });
+      if (!medicalBilling) {
+        res.status(500);
+        throw new Error("unable to create MedicalBilling");
+      }
+      const payment = await db.Payment.create({
+        medical_record_id: medicalBilling.id,
+        item_id: 1,
+      });
+    }
     res.status(201).json(patientVisit);
   }),
   updatePatientVisit: asyncHandler(async (req, res) => {}),
@@ -206,6 +341,17 @@ module.exports = PatientVisitController = {
       throw new Error("Patient visit not found");
     }
     visit.stage = "Waiting for examiner";
+    await visit.save();
+    res.json(visit);
+  }),
+  admitVisit: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const visit = await db.PatientAssignment.findByPk(id);
+    if (!visit) {
+      res.status(404);
+      throw new Error("Patient visit not found");
+    }
+    visit.stage = "Admitted";
     await visit.save();
     res.json(visit);
   }),

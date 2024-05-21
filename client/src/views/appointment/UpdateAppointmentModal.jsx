@@ -1,10 +1,12 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useUpdateAppointment } from "./hooks/useUpdateAppointment";
 import { useGetDoctors } from "../Scheduling/hooks/useGetDoctors";
 import * as yup from "yup";
+import { useGetPatientForSelect } from "../patient/hooks/patientHooks/useGetPatientForSelect";
+import { format } from "date-fns";
 
 const appointmentSchema = yup.object().shape({
   patient_id: yup.string(),
@@ -24,7 +26,13 @@ const appointmentSchema = yup.object().shape({
   patient_name: yup
     .string()
     .transform((value) => value.trim())
-    .required("Patient name is required"),
+    .when("patient_id", ([patient_id], schema) => {
+      if (!patient_id) {
+        return schema.required("Patient name is required");
+      }
+      return schema.nullable();
+    }),
+  // .required("Patient name is required"),
   reason: yup
     .string()
     .transform((value) => value.trim())
@@ -33,6 +41,7 @@ const appointmentSchema = yup.object().shape({
 });
 const UpdateAppointmentModal = ({ show, handleClose, appointment }) => {
   const { data: doctors } = useGetDoctors();
+  const { data: patients } = useGetPatientForSelect();
   // console.log(appointment);
   const [errorState, setErrorState] = useState("");
   const { mutateAsync } = useUpdateAppointment();
@@ -45,16 +54,20 @@ const UpdateAppointmentModal = ({ show, handleClose, appointment }) => {
     watch,
   } = useForm({
     defaultValues: {
+      patient_id: appointment.patient
+        ? `${appointment?.patient?.id}. ${appointment?.patient?.firstName} ${appointment?.patient?.middleName} ${appointment?.patient?.lastName}`
+        : undefined,
       patient_name: appointment.patient_name,
       doctor_id: appointment.doctor_id,
       date: appointment.appointment_date,
       time: appointment.appointment_time,
       reason: appointment.reason,
-      type: appointment.type,
+      type: appointment.appointment_type,
     },
     resolver: yupResolver(appointmentSchema),
   });
   const appointmentDateWatcher = watch("date");
+  const appointmentTimeWatcher = watch("time");
   useEffect(() => {
     if (errorState) {
       const timeoutId = setTimeout(() => {
@@ -65,12 +78,45 @@ const UpdateAppointmentModal = ({ show, handleClose, appointment }) => {
       return () => clearTimeout(timeoutId);
     }
   }, [errorState]);
-
+  const DoctorList = useMemo(() => {
+    if (appointmentDateWatcher && appointmentTimeWatcher) {
+      const weekdayNumber = new Date(appointmentDateWatcher).getDay();
+      const weekday = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      console.log(weekday[weekdayNumber]);
+      return doctors?.filter((doctor) => {
+        return doctor?.schedules?.find(
+          (availability) =>
+            availability.day_of_week === weekday[weekdayNumber] &&
+            availability.start_time <= appointmentTimeWatcher &&
+            availability.end_time >= appointmentTimeWatcher
+        );
+      });
+    } else {
+      return [];
+    }
+  }, [appointmentDateWatcher, appointmentTimeWatcher]);
   // console.log(appointmentDateWatcher);
   const submitHandler = (data) => {
     console.log(data);
+    // return;
     const Data = {
-      formData: data,
+      formData: {
+        type: data.type,
+        reason: data.reason,
+        patient_id: data.patient_id ? data.patient_id.split(".")[0] : null,
+        patient_name: data.patient_name,
+        time: data.time,
+        date: data.date,
+        doctor_id: data.doctor_id,
+      },
       appointmentId: appointment.id,
     };
     mutateAsync(Data)
@@ -98,6 +144,35 @@ const UpdateAppointmentModal = ({ show, handleClose, appointment }) => {
         )}
         <Form onSubmit={handleSubmit(submitHandler)}>
           <Row>
+            <Col md={4} sm={12} className="mb-2">
+              <Form.Group>
+                <Form.Label>Select Patient Name</Form.Label>
+                <Form.Control
+                  list="patients"
+                  // as="select"
+                  {...register("patient_id")}
+                  // isInvalid={errors.patient_id}
+                >
+                  {/* <option value="">Select Patient</option>
+                  {patients?.map((patient, index) => (
+                    <option key={patient.id} value={patient.id}>
+                      {patient.firstName}
+                    </option>
+                  ))} */}
+                </Form.Control>
+                <datalist id="patients">
+                  {patients?.map((patient, index) => (
+                    <option
+                      key={patient.id}
+                      value={`${patient.id}. ${patient.firstName} ${patient.middleName} ${patient.lastName}`}
+                    >
+                      {/* {patient.firstName} {patient.middleName}{" "}
+                      {patient.lastName} */}
+                    </option>
+                  ))}
+                </datalist>
+              </Form.Group>
+            </Col>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-md-3 mb-1">
                 <Form.Label>Patient Name</Form.Label>
@@ -135,7 +210,7 @@ const UpdateAppointmentModal = ({ show, handleClose, appointment }) => {
                   //   min={new Date().toISOString().slice(11, 16)}
                   {...register("time", {
                     onChange: (e) => {
-                      console.log(e.target.value);
+                      // console.log(e.target.value);
                       if (!appointmentDateWatcher) {
                         if (e.target.value < format(new Date(), "HH:mm")) {
                           setError("time", {
@@ -182,13 +257,13 @@ const UpdateAppointmentModal = ({ show, handleClose, appointment }) => {
             </Col>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-md-3 mb-1">
-                <Form.Label>Doctor</Form.Label>
+                <Form.Label>Assigned Doctor</Form.Label>
                 <Form.Select
                   {...register("doctor_id")}
                   isInvalid={errors.doctor_id}
                 >
                   <option value="">Please Select</option>
-                  {doctors?.map((doctor, index) => (
+                  {DoctorList?.map((doctor, index) => (
                     <option key={index} value={doctor.id}>
                       {doctor.employee.firstName} {doctor.employee.middleName}{" "}
                       {doctor.employee.lastName}

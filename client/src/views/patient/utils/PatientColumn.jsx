@@ -13,12 +13,45 @@ export const patientColumns = [
       row.firstName + " " + row.middleName + " " + row.lastName,
   },
   {
-    header: "Gender",
+    header: "Sex",
+
     accessorFn: (row) => row.gender.charAt(0).toUpperCase(),
   },
+  // {
+  //   header: "Phone",
+  //   accessorFn: (row) =>
+  //     row.has_phone ? row.phone : <span className="textdanger">---</span>,
+  // },
+  columnHelper.accessor(
+    "phone",
+
+    {
+      header: "Phone",
+      cell: (s) => {
+        // console.log(url);
+        return s.getValue() ? (
+          <span
+          // style={{ borderRadius: 15, padding: "0.2rem 0.5rem", fontSize: 14 }}
+          // className=" text-white bg-success   d-inline-flex align-items-center justify-content-center"
+          >
+            {s.getValue()}
+          </span>
+        ) : (
+          <span
+            // style={{ borderRadius: 15, padding: "0.2rem 0.5rem", fontSize: 14 }}
+            className=" text-danger "
+          >
+            ____
+          </span>
+        );
+      },
+    }
+  ),
   {
-    header: "Phone",
-    accessorFn: (row) => (row.has_phone ? row.phone : row.address.phone_1),
+    header: "Registation Date",
+    enableGlobalFilter: false,
+    enableSorting: false,
+    accessorFn: (row) => row.createdAt.substring(0, 10),
   },
   {
     header: "Age",
@@ -27,24 +60,31 @@ export const patientColumns = [
       return differenceInYears(new Date(), row.birth_date) + " Years";
     },
   },
-  columnHelper.accessor("status", {
-    cell: (s) => {
-      // console.log(url);
-      return s.getValue() == true ? (
-        <span
-          style={{ borderRadius: 15, padding: "0.2rem 0.5rem", fontSize: 14 }}
-          className=" text-white bg-success   d-inline-flex align-items-center justify-content-center"
-        >
-          active
-        </span>
-      ) : (
-        <span
-          style={{ borderRadius: 15, padding: "0.2rem 0.5rem", fontSize: 14 }}
-          className=" text-white bg-danger d-inline-flex align-items-center justify-content-center"
-        >
-          inactive
-        </span>
-      );
-    },
-  }),
+  columnHelper.accessor(
+    "status",
+
+    {
+      header: "Status",
+      enableGlobalFilter: false,
+      enableSorting: false,
+      cell: (s) => {
+        // console.log(url);
+        return s.getValue() == true ? (
+          <span
+            style={{ borderRadius: 15, padding: "0.2rem 0.5rem", fontSize: 14 }}
+            className=" text-white bg-success   d-inline-flex align-items-center justify-content-center"
+          >
+            active
+          </span>
+        ) : (
+          <span
+            style={{ borderRadius: 15, padding: "0.2rem 0.5rem", fontSize: 14 }}
+            className=" text-white bg-danger d-inline-flex align-items-center justify-content-center"
+          >
+            inactive
+          </span>
+        );
+      },
+    }
+  ),
 ];

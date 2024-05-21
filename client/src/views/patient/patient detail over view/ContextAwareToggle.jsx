@@ -10,7 +10,7 @@ export const ContextAwareToggle = ({ children, eventKey, callback }) => {
     eventKey,
     () => callback && callback(eventKey)
   );
-  console.log(" ContextAwareToggle re ");
+  // console.log(" ContextAwareToggle re ");
   const isCurrentEventKey = activeEventKey === eventKey;
 
   return (

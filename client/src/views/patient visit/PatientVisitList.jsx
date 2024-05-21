@@ -36,11 +36,14 @@ const PatientVisitList = () => {
       <Tabs
         id="controlled-tab-example"
         // activeKey={key}
-        defaultActiveKey="previous visit"
+        defaultActiveKey="Today Visits"
         // onSelect={(k) => setKey(k)}
         className="mb-3"
       >
-        <Tab eventKey="previous visit" title="Previous Visit">
+        <Tab eventKey="Today Visits" title="Today’s Visits">
+          <UpcomingPatientVisitTable />
+        </Tab>
+        <Tab eventKey="previous visit" title="Previous Visits">
           <PatientVisitTable
             patientVisits={visits}
             setShowAddPatientVisitModal={setShowAddPatientVisitModal}
@@ -51,9 +54,6 @@ const PatientVisitList = () => {
               setShowTransferredPatientVisitModal
             }
           />
-        </Tab>
-        <Tab eventKey="Upcoming Visits" title="Upcoming Visits">
-          <UpcomingPatientVisitTable />
         </Tab>
       </Tabs>
 

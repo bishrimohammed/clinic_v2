@@ -31,6 +31,8 @@ const creditCompanyRoute = require("./routes/CreditCompany.router.js");
 const dutyRoute = require("./routes/Duty.router.js");
 
 const patientVisitRoute = require("./routes/patientVisit.router.js");
+
+const BillingRoute = require("./routes/Billing.route.js");
 const { notFound, errorHandler } = require("./middleware/errorMiddleWare.js");
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -87,6 +89,8 @@ app.use("/api/v1/dutyprogram", dutyRoute);
 app.use("/api/v1/appointment", AppointmentRoute);
 
 app.use("/api/v1/patientvisits", patientVisitRoute);
+
+app.use("/api/v1/payments", BillingRoute);
 // app.use("/api/v1/upload", upload.single("file"), (req, res) => {
 //   const file = req.file;
 //   if (!file) {

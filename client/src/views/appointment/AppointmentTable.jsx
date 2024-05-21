@@ -18,6 +18,7 @@ import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
 
 import { FaSortDown, FaSortUp } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { hasPermission } from "../../utils/hasPermission";
 
 const AppointmentTable = ({
   appointments,
@@ -80,14 +81,14 @@ const AppointmentTable = ({
         </Button>
       </div>
       <div className="d-flex justify-content-between gap-2 align-items-center w-100 mb-1 mt-2">
-        {/* {hasPermission("Appoitment", "create") && ( */}
-        <Button
-          className="btn btn-primary ms-auto"
-          onClick={() => setShowAddAppointmentModal(true)}
-        >
-          + Add Appointment
-        </Button>
-        {/* )} */}
+        {hasPermission("Appointment", "create") && (
+          <Button
+            className="btn btn-primary ms-auto"
+            onClick={() => setShowAddAppointmentModal(true)}
+          >
+            + Add Appointment
+          </Button>
+        )}
       </div>
 
       <Table
@@ -214,12 +215,12 @@ const AppointmentTable = ({
                           <BsThreeDotsVertical />
                         </span>
                       </Dropdown.Toggle>
-
+                      {/* {(rowEl.original.status === "upcoming") & 7} */}
                       <Dropdown.Menu style={{ zIndex: 55 }}>
                         <Dropdown.Item
                           className="d-flex gap-2 align-items-center"
                           role="button"
-                          disabled={!rowEl.original.status}
+                          disabled={rowEl.original.status !== "upcoming"}
                           style={{ zIndex: "50" }}
                           onClick={(event) => {
                             event.stopPropagation();
@@ -237,6 +238,7 @@ const AppointmentTable = ({
                         <Dropdown.Item
                           className="d-flex gap-2 align-items-center"
                           role="button"
+                          disabled={rowEl.original.status === "cancelled"}
                           onClick={(event) => {
                             event.stopPropagation();
                             setShowCancleAppointmentModal({
@@ -252,20 +254,21 @@ const AppointmentTable = ({
                         >
                           <TbCalendarCancel color="red" /> Cancel
                         </Dropdown.Item>
-
-                        <Dropdown.Item
-                          role="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setShowDeleteAppointmentModal({
-                              isShow: true,
-                              appointmentId: rowEl.original.id,
-                            });
-                          }}
-                          className="d-flex gap-2 align-items-center"
-                        >
-                          <RiDeleteBin6Line color="red" /> Delete
-                        </Dropdown.Item>
+                        {hasPermission("Appointment", "create") && (
+                          <Dropdown.Item
+                            role="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setShowDeleteAppointmentModal({
+                                isShow: true,
+                                appointmentId: rowEl.original.id,
+                              });
+                            }}
+                            className="d-flex gap-2 align-items-center"
+                          >
+                            <RiDeleteBin6Line color="red" /> Delete
+                          </Dropdown.Item>
+                        )}
                       </Dropdown.Menu>
                     </Dropdown>
                   </td>

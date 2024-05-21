@@ -1,26 +1,25 @@
-import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import TextInput from "../../components/inputs/TextInput";
-// import NumberInput from "../../components/inputs/NumberInput";
-import { useAddPatient } from "./hooks/useAddPatient";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import Axiosinstance from "../../api/axiosInstance";
-import { patientSchema } from "./utils/patientSchema";
 import PatientForm from "./forms/PatientForm";
+import { IoMdArrowRoundBack } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 // import { patientSchema } from "../../utils/Schemas";
 const NewPatient = () => {
+  const navigate = useNavigate();
   return (
     <Container className="p-3 mb-4">
       <div className="p-3 bg-hrun-box hrunboxshadow">
-        <div className="mb-2">
-          <h4> Patient Registration</h4>
+        <div className=" p-2  d-flex gap-3 align-items-center">
+          <IoMdArrowRoundBack
+            className="cursorpointer"
+            size={22}
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate(-1)}
+          />
+          <h5 className="mb-0"> Patient Registration</h5>
         </div>
         <hr className="mt-1" />
+
         <PatientForm />
         {/* <Form onSubmit={handleSubmit(submitHandler)}>
           <h6 className="border-bottom border-1 p-1 mb-3 fw-bold">

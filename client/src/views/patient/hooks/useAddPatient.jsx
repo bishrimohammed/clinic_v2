@@ -13,8 +13,8 @@ export const useAddPatient = () => {
     mutationFn: async (data) => {
       return Axiosinstance.post("/patient", data, { headers });
     },
-    onSuccess: async (response) => {
-      const { data } = response;
+    onSuccess: async (data, variables) => {
+      // const { data } = response;
       //console.log(data);
       queryClient.invalidateQueries({
         queryKey: [
@@ -22,6 +22,8 @@ export const useAddPatient = () => {
           { is_new: "", is_credit: "", gender: "", status: "" },
         ],
       });
+      console.log(data);
+      localStorage.setItem("LastPatientId", data.card_number);
       toast.success("Registered succeessfully");
       navigate("/patients");
       // navigate("/patients/patientlist");

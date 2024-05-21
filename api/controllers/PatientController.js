@@ -51,12 +51,19 @@ module.exports = PatientController = {
         "has_phone",
         "phone",
         "status",
+        "createdAt",
       ],
     });
     // console.log(patients);
     res.status(200).json(patients);
   }),
   getPatients: expressAsyncHandler(async (req, res) => {}),
+  getLastPatientId: expressAsyncHandler(async (req, res) => {
+    const lastPatient = await db.Patient.findOne({
+      order: [["id", "DESC"]],
+    });
+    res.status(200).json(lastPatient.card_number);
+  }),
   getPatientNameList: expressAsyncHandler(async (req, res) => {
     // console.log("\n\nkjaduig\n\n");
     const patients = await db.Patient.findAll({
@@ -212,6 +219,18 @@ module.exports = PatientController = {
             },
           ],
         },
+        {
+          model: db.Allergy,
+          as: "allergies",
+        },
+        {
+          model: db.FamilyHistory,
+          as: "familyHistories",
+        },
+        {
+          model: db.SocialHistory,
+          as: "socialHistories",
+        },
       ],
     });
     if (!patient) {
@@ -251,6 +270,31 @@ module.exports = PatientController = {
     // patient.hello = "kjhljhgkut";
     res.json(Patient);
   }),
+  getPatientGeneralInforamtion: expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    console.log("\n\ngetPatientGeneralInforamtion\n\n");
+    const patient = await db.Patient.findOne({
+      where: {
+        id: id,
+      },
+      include: [
+        {
+          model: db.Allergy,
+          as: "allergies",
+        },
+        {
+          model: db.FamilyHistory,
+          as: "familyHistories",
+        },
+        {
+          model: db.SocialHistory,
+          as: "socialHistories",
+        },
+      ],
+    });
+    // console.log(patient);
+    res.json(patient);
+  }),
   createPatient: expressAsyncHandler(async (req, res) => {
     const { patient, address, emergency, company_id, employeeId } = req.body;
     // console.log(req.body);
@@ -263,6 +307,7 @@ module.exports = PatientController = {
       const patient = await db.Patient.findOne({
         where: {
           phone: patientParsed.phone,
+          has_phone: true,
         },
       });
       if (patient) {
@@ -284,6 +329,7 @@ module.exports = PatientController = {
     //   throw new Error("Either phone number or email has already exists");
     // }
     let newAddress;
+    let EmergencyContactAddress;
     if (patientParsed.is_credit) {
       const employee = await db.CompanyEmployee.findOne({
         where: {
@@ -297,9 +343,7 @@ module.exports = PatientController = {
       addressID = employee.address_id;
     } else {
       newAddress = await db.Address.create({
-        phone_1: patientParsed.has_phone
-          ? patientParsed.phone
-          : emergencyParsed.phone,
+        phone_1: patientParsed.phone,
         phone_2: addressParsed.phone_2 ? addressParsed.phone_2 : null,
         street: addressParsed.street,
         house_number: addressParsed.house_number
@@ -309,13 +353,20 @@ module.exports = PatientController = {
         woreda_id: addressParsed.woreda_id,
       });
       addressID = newAddress.id;
+      // EmergencyContactAddress = newAddress.id;
     }
+    // if (
+    //   patientParsed.phone === emergencyParsed.phone &&
+    //   (!emergencyParsed.the_same_address_as_patient ||
+    //     emergencyParsed.the_same_address_as_patient)
+    // ) {
+    //   EmergencyContactAddress = addressID;
+    // }
 
-    let EmergencyContactAddress;
     if (!emergencyParsed.the_same_address_as_patient) {
-      if (!patientParsed.is_credit) {
-        await newAddress?.destroy();
-      }
+      // if (!patientParsed.is_credit) {
+      //   await newAddress?.destroy();
+      // }
       EmergencyContactAddress = await db.Address.create({
         phone_1: emergencyParsed.phone,
         phone_2: emergencyParsed.phone_2 ? emergencyParsed.phone_2 : null,
@@ -340,6 +391,12 @@ module.exports = PatientController = {
         ? addressID
         : EmergencyContactAddress.id,
     });
+    if (!EmergencyContact) {
+      await EmergencyContactAddress?.destroy();
+      await newAddress?.destroy();
+      res.status(400);
+      throw new Error("Emergency Contact not created");
+    }
     // console.log(addressID);
 
     const newPatient = await db.Patient.create({
@@ -351,15 +408,18 @@ module.exports = PatientController = {
         : EmergencyContactAddress.id,
       gender: patientParsed.gender,
       has_phone: patientParsed.has_phone,
-      phone: patientParsed.has_phone ? patientParsed.phone : null,
+      phone: patientParsed.phone,
       birth_date: patientParsed.birth_date,
       is_credit: patientParsed.is_credit,
       is_new: patientParsed.is_new,
+      blood_type: patientParsed.blood_type,
+      nationality: patientParsed.nationality,
       manual_card_id: !patientParsed.is_new
         ? patientParsed?.manual_card_id
         : null,
       marital_status: patientParsed.marital_status,
       guardian_name: patientParsed.guardian_name,
+      guardian_relationship: patientParsed.guardian_relationship,
       occupation: patientParsed.occupation,
       company_id: patientParsed.is_credit ? company_id : null,
       emergence_contact_id: EmergencyContact.id,
@@ -367,37 +427,72 @@ module.exports = PatientController = {
         patientParsed.is_credit &&
         "uploads/" + req.files["employeeId_doc"][0]?.filename,
     });
-    const paddedCardNumber = getPaddedName(newPatient.id, 5, "P");
-    newPatient.card_number = paddedCardNumber;
+    // const paddedCardNumber = getPaddedName(newPatient.id, 5, "P");
+    const PatientIdExists = await db.Patient.findOne({
+      where: {
+        card_number: patientParsed.patient_id,
+      },
+    });
+    let patientId;
+    if (PatientIdExists) {
+      patientId = getPaddedName(newPatient.id, 5, "P");
+    } else {
+      patientId = patientParsed.patient_id;
+    }
+    newPatient.card_number = patientId;
     await newPatient.save();
     if (!newPatient) {
       emergencyParsed.the_same_address_as_patient
         ? await newAddress.destroy()
         : await EmergencyContactAddress.destroy();
+      await EmergencyContact.destroy();
       res.status(400);
       throw new Error("Failed to create patient");
     }
-    const activeAgreenent = await db.CreditAgreement.findOne({
-      where: {
-        company_id: company_id,
-        status: true,
-      },
-    });
-    if (!activeAgreenent) {
-      res.status(400);
-      throw new Error("Company doesn't have active agreement");
-    }
-    const newCreditPatient = await db.CreditPatient.create({
-      patient_id: newPatient.id,
-      employee_id: employeeId,
-      agreement_id: activeAgreenent.id,
-    });
-    if (patientParsed.is_credit && req.files["letter_doc"]) {
-      await db.CreditPatientAttachment.create({
-        creditPatient_id: newCreditPatient.id,
-        letter_doc: "uploads/" + req.files["letter_doc"][0].filename,
+    if (patientParsed.is_credit) {
+      const activeAgreenent = await db.CreditAgreement.findOne({
+        where: {
+          company_id: company_id,
+          status: true,
+        },
       });
+      if (!activeAgreenent) {
+        res.status(400);
+        throw new Error("Company doesn't have active agreement");
+      }
+      const newCreditPatient = await db.CreditPatient.create({
+        patient_id: newPatient.id,
+        employee_id: employeeId,
+        agreement_id: activeAgreenent.id,
+      });
+      if (patientParsed.is_credit && req.files["letter_doc"]) {
+        await db.CreditPatientAttachment.create({
+          creditPatient_id: newCreditPatient.id,
+          letter_doc: "uploads/" + req.files["letter_doc"][0].filename,
+        });
+      }
     }
+    // const activeAgreenent = await db.CreditAgreement.findOne({
+    //   where: {
+    //     company_id: company_id,
+    //     status: true,
+    //   },
+    // });
+    // if (!activeAgreenent) {
+    //   res.status(400);
+    //   throw new Error("Company doesn't have active agreement");
+    // }
+    // const newCreditPatient = await db.CreditPatient.create({
+    //   patient_id: newPatient.id,
+    //   employee_id: employeeId,
+    //   agreement_id: activeAgreenent.id,
+    // });
+    // if (patientParsed.is_credit && req.files["letter_doc"]) {
+    //   await db.CreditPatientAttachment.create({
+    //     creditPatient_id: newCreditPatient.id,
+    //     letter_doc: "uploads/" + req.files["letter_doc"][0].filename,
+    //   });
+    // }
     res.status(201).json(newPatient);
   }),
   updatePatient: expressAsyncHandler(async (req, res) => {
@@ -424,8 +519,8 @@ module.exports = PatientController = {
       res.status(404);
       throw new Error("Emergency contact not found");
     }
-    console.log(ExistingPatient?.dataValues);
-    console.log(ExistingEmergencyContact?.dataValues);
+    // console.log(ExistingPatient?.dataValues);
+    // console.log(ExistingEmergencyContact?.dataValues);
 
     if (
       ExistingPatient.address_id === ExistingEmergencyContact.address_id &&
@@ -503,10 +598,7 @@ module.exports = PatientController = {
 
       await db.Address.update(
         {
-          phone_1: patientParsed.has_phone
-            ? patientParsed.phone
-            : emergencyParsed.phone,
-
+          phone_1: patientParsed.phone,
           phone_2: addressParsed.phone_2 ? addressParsed.phone_2 : null,
           street: addressParsed.street,
           house_number: addressParsed.house_number
@@ -527,7 +619,7 @@ module.exports = PatientController = {
         },
       });
     }
-    console.log(typeof patientParsed.is_credit);
+    // console.log(typeof patientParsed.is_credit);
     if (
       ExistingEmergencyContact.address_id === ExistingPatient.address_id &&
       emergencyParsed.the_same_address_as_patient
@@ -535,9 +627,7 @@ module.exports = PatientController = {
       console.log("from the same address to the same");
       await db.Address.update(
         {
-          phone_1: patientParsed.has_phone
-            ? patientParsed.phone
-            : emergencyParsed.phone,
+          phone_1: patientParsed.phone,
           phone_2: null,
           street: patientParsed.street,
           house_number: patientParsed.house_number
@@ -594,7 +684,7 @@ module.exports = PatientController = {
         }
       );
     }
-    console.log(req.files["employeeId_doc"]);
+    // console.log(req.files["employeeId_doc"]);
     // if (ExistingPatient.is_credit && !patientParsed.is_credit) {
     //   console.log("patient is credit and now is not");
     //   await db.CreditPatient.update(
@@ -649,9 +739,8 @@ module.exports = PatientController = {
     ExistingPatient.lastName = patientParsed.lastName;
     ExistingPatient.gender = patientParsed.gender;
     ExistingPatient.has_phone = patientParsed.has_phone;
-    ExistingPatient.phone = patientParsed.has_phone
-      ? patientParsed.phone
-      : null;
+    ExistingPatient.phone = patientParsed.phone;
+
     ExistingPatient.birth_date = patientParsed.birth_date;
     ExistingPatient.is_credit = patientParsed.is_credit;
     ExistingPatient.is_new = patientParsed.is_new;
@@ -660,6 +749,9 @@ module.exports = PatientController = {
       : "";
     ExistingPatient.marital_status = patientParsed.marital_status;
     ExistingPatient.guardian_name = patientParsed.guardian_name;
+    ExistingPatient.guardian_relationship = patientParsed.guardian_relationship;
+    ExistingPatient.blood_type = patientParsed.blood_type;
+    ExistingPatient.nationality = patientParsed.nationality;
     ExistingPatient.occupation = patientParsed.occupation;
     ExistingPatient.empoyeeId_url = req.files["empoyeeId_doc"]
       ? "uploads/" + req.files["empoyeeId_doc"][0].filename
@@ -699,4 +791,57 @@ module.exports = PatientController = {
     res.json({ message: "Patient deactivated successfully" });
   }),
   deletePatient: expressAsyncHandler(async (req, res) => {}),
+  addPatientAllergy: expressAsyncHandler(async (req, res) => {
+    const { severity, allergy_type, reaction_details } = req.body;
+    const patient = await db.Patient.findByPk(req.params.id);
+    if (!patient) {
+      res.status(400);
+      throw new Error("Patient doesn't exist");
+    }
+    await db.Allergy.create({
+      patient_id: patient.id,
+      severity: severity,
+      allergy_type: allergy_type,
+      reaction_details: reaction_details,
+      created_by: req.user.id,
+    });
+    // patient.allergies = req.body.allergies;
+    // await patient.save();
+    res.status(201).json({ message: "Patient allergies added successfully" });
+  }),
+  addPatientFamilyHistory: expressAsyncHandler(async (req, res) => {
+    const { medical_condition, relationship } = req.body;
+    const patient = await db.Patient.findByPk(req.params.id);
+    if (!patient) {
+      res.status(400);
+      throw new Error("Patient doesn't exist");
+    }
+    await db.FamilyHistory.create({
+      patient_id: patient.id,
+      medical_condition: medical_condition,
+      relationship: relationship,
+      created_by: req.user.id,
+    });
+    // patient.family_history = req.body.family_history;
+    // await patient.save();
+    res
+      .status(201)
+      .json({ message: "Patient family history added successfully" });
+  }),
+  addPatientSocialHistory: expressAsyncHandler(async (req, res) => {
+    const { tobacco_use, alcohol_use } = req.body;
+    const patient = await db.Patient.findByPk(req.params.id);
+    if (!patient) {
+      res.status(400);
+      throw new Error("Patient doesn't exist");
+    }
+    await db.SocialHistory.create({
+      patient_id: patient.id,
+      tobacco_use: tobacco_use,
+      alcohol_use: alcohol_use,
+    });
+    // patient.social_history = req.body.social_history;
+    // await patient.save();
+    res.json({ message: "Patient social history added successfully" });
+  }),
 };

@@ -34,16 +34,16 @@ const UpdatePatient = () => {
   return (
     <Container className="p-3 mb-5">
       <div className="p-3  bg-hrun-box hrunboxshadow">
-        <div className="mb-4 d-flex gap-3 align-items-center">
+        <div className=" p-2  d-flex gap-3 align-items-center">
           <IoMdArrowRoundBack
             className="cursorpointer"
             size={22}
             style={{ cursor: "pointer" }}
             onClick={() => navigate(-1)}
           />
-          <h4>Update Patient Information</h4>
+          <h5>Update Patient Information</h5>
         </div>
-
+        <hr className="mt-1" />
         <PatientForm patient={data} />
         {/* <Form onSubmit={handleSubmit(handleUpdate)}>
           <Row>

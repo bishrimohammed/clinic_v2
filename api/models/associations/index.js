@@ -10,6 +10,7 @@ const { clinicServiceAssociation } = require("./clinicServiceAssociation.js");
 const { creditCompanyAssociation } = require("./creditCompanyAssociation.js");
 const { dutyAssociation } = require("./dutyAssociation.js");
 const { patientAssocation } = require("./patientAssocation.js");
+const { paymentAssociation } = require("./paymentAssociation.js");
 module.exports = {
   MedicalRecordAssociation,
   MedicalRecordDetailAssocations,
@@ -21,4 +22,5 @@ module.exports = {
   creditCompanyAssociation,
   dutyAssociation,
   patientAssocation,
+  paymentAssociation,
 };
