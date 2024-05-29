@@ -86,7 +86,7 @@ const AppointmentTable = ({
             className="btn btn-primary ms-auto"
             onClick={() => setShowAddAppointmentModal(true)}
           >
-            + Add Appointment
+            +Add Appointment
           </Button>
         )}
       </div>

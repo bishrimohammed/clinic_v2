@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Axiosinstance from "../../../api/axiosInstance";
 import { AxiosHeaders } from "../../../api/useAxiosHeaders";
+import { toast } from "react-toastify";
 
 export const useAddPatientVisit = () => {
   const queryClient = useQueryClient();
@@ -15,6 +16,10 @@ export const useAddPatientVisit = () => {
       queryClient.invalidateQueries({
         queryKey: ["patient visits"],
       });
+      toast.success("Patient visits successfully");
+    },
+    onError: (error) => {
+      toast.error(error.response.data.message);
     },
   });
 };

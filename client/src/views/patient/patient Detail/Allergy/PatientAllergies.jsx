@@ -22,7 +22,7 @@ const PatientAllergies = ({ allergies, patientId }) => {
 
         <div className="allergies-list small">
           {allergies?.map((allergy, index) => (
-            <span>
+            <span key={allergy.id}>
               {allergy.allergy_type}
               {index !== allergies.length - 1 ? ", " : null}
             </span>

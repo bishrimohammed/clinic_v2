@@ -57,12 +57,6 @@ const PatientVisitList = () => {
         </Tab>
       </Tabs>
 
-      {showAddPatientVisitModal && (
-        <AddPatientVisitModal
-          show={showAddPatientVisitModal}
-          handleClose={() => setShowAddPatientVisitModal(false)}
-        />
-      )}
       {showFilterVisitModal && (
         <FilterVisitModal
           show={showFilterVisitModal}

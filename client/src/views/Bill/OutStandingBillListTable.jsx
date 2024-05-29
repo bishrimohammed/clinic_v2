@@ -200,7 +200,7 @@ const OutStandingBillListTable = ({ billings, isPending, refetch }) => {
                       onToggle={(event) => handleToggleDropdown(null, event)}
                       show={openDropdownIndex === rowEl.original.id}
                     >
-                      <Dropdown.Toggle
+                      {/* <Dropdown.Toggle
                         caret="false"
                         className="employee-dropdown px-3 border-0"
                         style={{ backgroundColor: "transparent" }}
@@ -216,7 +216,7 @@ const OutStandingBillListTable = ({ billings, isPending, refetch }) => {
                         >
                           <BsThreeDotsVertical />
                         </span>
-                      </Dropdown.Toggle>
+                      </Dropdown.Toggle> */}
 
                       {/* <Dropdown.Menu style={{ zIndex: 55 }}>
                         <Dropdown.Item

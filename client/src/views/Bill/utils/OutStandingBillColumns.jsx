@@ -36,7 +36,7 @@ export const OutStandingBillColumns = [
       ),
   },
   {
-    header: "Sta",
+    header: "Visit Type",
     accessorFn: (row) => row.medicalRecord.visit.visit_type,
   },
   columnHelper.accessor("medicalRecord.visit.stage", {

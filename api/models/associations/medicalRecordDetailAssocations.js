@@ -13,4 +13,12 @@ module.exports.MedicalRecordDetailAssocations = (db) => {
     foreignKey: "doctor_id",
     as: "doctor",
   });
+  db.PhysicalExamination.belongsTo(db.PhysicalExaminationField, {
+    foreignKey: "physical_ExaminationField_id",
+    as: "physicalExaminationField",
+  });
+  db.PhysicalExamination.belongsTo(db.User, {
+    foreignKey: "examiner_id",
+    as: "examiner",
+  });
 };

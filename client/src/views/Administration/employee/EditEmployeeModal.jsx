@@ -412,7 +412,7 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
               </Col>
               <Col md={4} sm={12}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Employee Photo</Form.Label>
+                  <Form.Label>Employee ID</Form.Label>
                   <div className="d-flex align-items-center justify-content-between gap-2 ">
                     <Form.Control
                       {...register("photo")}

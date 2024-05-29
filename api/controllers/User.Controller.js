@@ -243,7 +243,7 @@ const UserController = {
     //   res.status(200).json(updatedUser);
     // })
     res.json({ msg: "success" });
-    console.log(updatedUser);
+    // console.log(updatedUser);
   }),
   addWorkingHour: asyncHandler(async (req, res) => {
     // const { id } = req.params;

@@ -103,7 +103,7 @@ const EditClinicInfo = () => {
     isPending: ispending,
     error,
   } = useGetClinicInformation();
-  console.log(state);
+  // console.log(state);
   const { data: woredas } = useGetWoredas();
   // const { state } = useLocation();
   // console.log(state);
@@ -126,6 +126,7 @@ const EditClinicInfo = () => {
     handleSubmit,
     getValues,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -182,6 +183,18 @@ const EditClinicInfo = () => {
   };
   if (isPending) return null;
   console.log(errors);
+  const ApplyToAllHandler = () => {
+    const { clinc_working_hours } = getValues();
+    const startTime = clinc_working_hours[0].start_time;
+    const endTime = clinc_working_hours[0].end_time;
+    clinc_working_hours.forEach((work_hour, index) => {
+      if (index !== 0) {
+        setValue(`clinc_working_hours[${index}].start_time`, startTime);
+        setValue(`clinc_working_hours[${index}].end_time`, endTime);
+      }
+    });
+    // console.log(clinc_working_hours);
+  };
   return (
     <Container className="p-3  mb-5">
       {/* <h1>Edit Clinic Profile</h1> */}
@@ -512,7 +525,22 @@ const EditClinicInfo = () => {
           <Row>
             {state?.clinicWorkingHours?.map((d, index) => (
               <Col key={index} md={6} sm={12} className="mb-2">
-                <Form.Label className="fw-bold">{d.day_of_week}</Form.Label>
+                <div className="d-flex align-items-center gap-3">
+                  {" "}
+                  <Form.Label className="fw-bold">{d.day_of_week}</Form.Label>
+                  {d.day_of_week === "Monday" && (
+                    <Form.Check
+                      type="switch"
+                      label="Apply To All"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          ApplyToAllHandler();
+                        }
+                      }}
+                    />
+                  )}
+                </div>
+
                 <Row>
                   <input
                     type="text"

@@ -1,14 +1,14 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { format } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
-import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useGetDoctors } from "../Scheduling/hooks/useGetDoctors";
 import { useAddAppointment } from "./hooks/useAddAppointment";
 import { useGetPatientForSelect } from "../patient/hooks/patientHooks/useGetPatientForSelect";
 const appointmentSchema = yup.object().shape({
-  patient_id: yup.string(),
+  // patient_id: yup.string(),
   doctor_id: yup.string().required("Doctor is required"),
   date: yup
     .date()
@@ -25,13 +25,13 @@ const appointmentSchema = yup.object().shape({
   patient_name: yup
     .string()
     .transform((value) => value.trim())
-    .when("patient_id", ([patient_id], schema) => {
-      if (!patient_id) {
-        return schema.required("Patient name is required");
-      }
-      return schema.nullable();
-    }),
-  // .required("Patient name is required"),
+    // .when("patient_id", ([patient_id], schema) => {
+    //   if (!patient_id) {
+    //     return schema.required("Patient name is required");
+    //   }
+    //   return schema.nullable();
+    // }),
+    .required("Patient name is required"),
   reason: yup
     .string()
     .transform((value) => value.trim())
@@ -42,7 +42,7 @@ const AddAppointmentModal = ({ show, handleClose }) => {
   const { data: doctors } = useGetDoctors();
   const { data: patients } = useGetPatientForSelect();
   // console.log(doc tors);
-  const { mutateAsync } = useAddAppointment();
+  const { mutateAsync, isPending } = useAddAppointment();
   const {
     register,
     formState: { errors },
@@ -82,7 +82,7 @@ const AddAppointmentModal = ({ show, handleClose }) => {
         "Friday",
         "Saturday",
       ];
-      console.log(weekday[weekdayNumber]);
+      // console.log(weekday[weekdayNumber]);
       return doctors?.filter((doctor) => {
         return doctor?.schedules?.find(
           (availability) =>
@@ -97,11 +97,10 @@ const AddAppointmentModal = ({ show, handleClose }) => {
   }, [appointmentDateWatcher, appointmentTimeWatcher]);
   // console.log(DoctorList);
   const submitHandler = (data) => {
-    // console.log(data);
     const Data = {
       type: data.type,
       reason: data.reason,
-      patient_id: data.patient_id ? data.patient_id.split(".")[0] : null,
+      patient_id: null,
       patient_name: data.patient_name,
       time: data.time,
       date: data.date,
@@ -138,11 +137,12 @@ const AddAppointmentModal = ({ show, handleClose }) => {
           <Row>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group>
-                <Form.Label>Select Patient Name</Form.Label>
+                <Form.Label>Patient Name</Form.Label>
                 <Form.Control
                   list="patients"
                   // as="select"
-                  {...register("patient_id")}
+                  {...register("patient_name")}
+                  isInvalid={errors.patient_name}
                   // isInvalid={errors.patient_id}
                 >
                   {/* <option value="">Select Patient</option>
@@ -152,11 +152,14 @@ const AddAppointmentModal = ({ show, handleClose }) => {
                     </option>
                   ))} */}
                 </Form.Control>
+                <Form.Control.Feedback type="invalid">
+                  {errors.patient_name?.message}
+                </Form.Control.Feedback>
                 <datalist id="patients">
                   {patients?.map((patient, index) => (
                     <option
                       key={patient.id}
-                      value={`${patient.id}. ${patient.firstName} ${patient.middleName} ${patient.lastName}`}
+                      value={`${patient.firstName} ${patient.middleName} ${patient.lastName}`}
                     >
                       {/* {patient.firstName} {patient.middleName}{" "}
                       {patient.lastName} */}
@@ -165,7 +168,7 @@ const AddAppointmentModal = ({ show, handleClose }) => {
                 </datalist>
               </Form.Group>
             </Col>
-            <Col md={4} sm={12} className="mb-2">
+            {/* <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-md-3 mb-1">
                 <Form.Label>Patient Name</Form.Label>
                 <Form.Control
@@ -178,7 +181,7 @@ const AddAppointmentModal = ({ show, handleClose }) => {
                   {errors.patient_name?.message}
                 </Form.Control.Feedback>
               </Form.Group>
-            </Col>
+            </Col> */}
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-md-3 mb-1">
                 <Form.Label>Appointment Date</Form.Label>
@@ -302,7 +305,8 @@ const AddAppointmentModal = ({ show, handleClose }) => {
             <Button type="button" variant="secondary" onClick={handleClose}>
               Close
             </Button>
-            <Button type="submit" variant="primary">
+            <Button disabled={isPending} type="submit" variant="primary">
+              {isPending && <Spinner size="sm" />}
               Save
             </Button>
           </Modal.Footer>

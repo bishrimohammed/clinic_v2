@@ -1,0 +1,7 @@
+.accordion-header {
+}
+
+.accordion-button::after {
+  /* position: absolute; */
+  /* left: 30%; */
+}

@@ -223,7 +223,7 @@ module.exports = PatientVisitController = {
         throw new Error("unable to create MedicalBilling");
       }
       const payment = await db.Payment.create({
-        medical_record_id: medicalBilling.id,
+        medical_billing_id: medicalBilling.id,
         item_id: 1,
       });
     }

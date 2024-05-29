@@ -14,7 +14,7 @@ export const useEditEmployee = () => {
       // console.log(data);
       queryClient.invalidateQueries({
         queryKey: ["Employees", { gender: "", position: [], status: "" }],
-        exact: true,
+        // exact: true,
       });
       toast.success("Employee updated successfully");
     },

@@ -41,13 +41,40 @@ const CalculateBirthDateModal = ({
     resolver: yupResolver(Schema),
   });
   const calculate = (data) => {
-    const today = new Date();
-    const birthYear = today.getFullYear() - parseInt(Math.abs(data.age));
+    // const today = new Date();
+    // const birthYear = today.getFullYear() - parseInt(Math.abs(data.age));
 
-    const birthDate = new Date(birthYear, data.month - 1, data.day + 1);
+    // const birthDate = new Date(birthYear, data.month - 1, data.day + 1);
 
+    let currentDate = new Date();
+
+    // Calculate the birth year
+    let birthYear = currentDate.getFullYear() - data.age;
+
+    // Calculate the birth month
+    let birthMonth = currentDate.getMonth() + 1 - data.month;
+    if (birthMonth <= 0) {
+      birthMonth += 12;
+      birthYear--;
+    }
+
+    // Calculate the birth day
+    let birthDay = currentDate.getDate() - data.day;
+    if (birthDay <= 0) {
+      const monthDays = new Date(birthYear, birthMonth, 0).getDate();
+      birthDay += monthDays;
+      birthMonth--;
+      if (birthMonth <= 0) {
+        birthMonth += 12;
+        birthYear--;
+      }
+    }
+    const BD = new Date(birthYear, birthMonth - 1, birthDay)
+      .toISOString()
+      .substring(0, 10);
     // return;
-    setValue("birth_date", birthDate.toISOString().substring(0, 10));
+    setValue("birth_date", BD.substring(0, 10));
+    // setValue("birth_date", birthDate.toISOString().substring(0, 10));
     if (birthDateError) {
       clearErrors("birth_date");
     }

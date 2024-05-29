@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     plan: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     assassement: {
       type: DataTypes.STRING,
@@ -26,12 +26,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    notes: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
       defaultValue: true,
     },
   });
-  MedicalRecordDetail.sync({ force: false, alter: false });
+  MedicalRecordDetail.sync({ force: false, alter: true });
   return MedicalRecordDetail;
 };

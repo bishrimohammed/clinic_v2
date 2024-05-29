@@ -23,7 +23,32 @@ router.get(
   MedicalRecordController.getMedicalRecordDetailById
 );
 router.get("/:id/investigation", MedicalRecordController.getInvestigation);
+router.get(
+  "/:id/get_chief_complaint",
+  protect,
+  MedicalRecordController.get_ChiefComplaint
+);
+router.get(
+  "/:id/get_physical_examination",
+  protect,
+  MedicalRecordController.get_physical_examination
+);
 
+router.get(
+  "/:id/get_diagnosis",
+  protect,
+  MedicalRecordController.get_Diagnosis
+);
+router.get(
+  "/:id/internal_prescription",
+  protect,
+  MedicalRecordController.getMedicalRecord_Internal_Prescription
+);
+router.get(
+  "/:id/external_prescription",
+  protect,
+  MedicalRecordController.get_External_MedicalRecord_Prescription
+);
 router.post(
   "/:id/createMedicationRecordDetail",
   protect,
@@ -35,10 +60,49 @@ router.post(
   MedicalRecordController.addInvestigation
 );
 router.post(
+  "/:id/add_chief_complaint",
+  protect,
+  MedicalRecordController.add_ChiefComplaint
+);
+router.post(
+  "/:id/add_physical_examination",
+  protect,
+  MedicalRecordController.add_physical_examination
+);
+router.post(
+  "/:id/add_diagnosis",
+  protect,
+  MedicalRecordController.add_Diagnosis
+);
+router.post(
   "/:id/addInvestigationResult",
   protect,
   MedicalRecordController.addInvestigationResult
 );
+
 router.post("/:id/addVitalSign", protect, MedicalRecordController.addVitalSign);
+router.post(
+  "/:id/add-prescription",
+  protect,
+  MedicalRecordController.addPrescription
+);
+
+router.post(
+  "/:id/add_external_prescription",
+  protect,
+  MedicalRecordController.add_External_MedicalRecord_Prescription
+);
+
+router.patch(
+  "/diagnosis/:diagnosis_id/confirm",
+  protect,
+  MedicalRecordController.confirm_Diagnosis
+);
+
+router.patch(
+  "/diagnosis/:diagnosis_id/rule_out",
+  protect,
+  MedicalRecordController.Ruled_out_Diagnosis
+);
 
 module.exports = router;

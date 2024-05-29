@@ -17,6 +17,7 @@ import { useUpdateUser } from "./hooks/useUpdateUser";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useGetPermissions } from "../Administration/Role/hooks/useGetPermissions";
 import { generatePassword } from "./utils/generatePassword";
+import { IoMdArrowRoundBack } from "react-icons/io";
 const schema = yup.object().shape({
   employeeId: yup.string().required("Employee is required"),
   // email: yup.string().email("invalid email").required("Email is required"),
@@ -222,11 +223,20 @@ const UpdateUser = () => {
   // console.log(errors);
   return (
     <Container className="p-3">
-      <div className="mb-4">
-        <h4>Update User</h4>
+      <div className="p-2 d-flex gap-3 align-items-center">
+        <IoMdArrowRoundBack
+          className="cursorpointer"
+          size={22}
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate(-1)}
+        />
+        <h5 className="mb-0"> Update User Account</h5>
       </div>
-      <hr />
-      <Form onSubmit={handleSubmit(submitHandler)}>
+      {/* <div className="mb-4">
+        <h4>Update User</h4>
+      </div> */}
+      <hr className="mt-1" />
+      <Form onSubmit={handleSubmit(submitHandler)} className="px-2">
         <Row>
           <Col md={4} sm={6} className="mb-2">
             <Form.Group>
@@ -337,8 +347,11 @@ const UpdateUser = () => {
             </Form.Group>
           </Col>
         </Row>
-        <p className="my-3 fs-5">Permissions</p>
-        <Table striped bordered hover responsive className="mt-3">
+        <p className="fs-5 fw-bold ">
+          {" "}
+          <span className="border-bottom pb-1">Permissions</span>{" "}
+        </p>
+        <Table striped bordered hover responsive className="mt-1">
           <thead>
             <tr>
               <th>Permission</th>

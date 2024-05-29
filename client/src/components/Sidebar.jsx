@@ -110,11 +110,11 @@ const Sidebar = () => {
                 <GiMedicalThermometer className="nav-icon" />
               )}
             >
-              <CNavItem to="/lab/" component={NavLink}>
-                Requested
+              <CNavItem to="/lab" component={NavLink}>
+                Pending Lab
               </CNavItem>
               <CNavItem to="/lab/completed" component={NavLink}>
-                Completed
+                Completed Lab
               </CNavItem>
             </CNavGroup>
           )}

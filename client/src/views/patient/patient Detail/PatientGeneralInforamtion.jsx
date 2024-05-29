@@ -6,7 +6,7 @@ import PatientFamilyHistory from "./family history/PatientFamilyHistory";
 import PatientSocialHistory from "./social history/PatientSocialHistory";
 import { differenceInYears } from "date-fns";
 const PatientGeneralInforamtion = ({ patient }) => {
-  console.log(patient);
+  // console.log(patient);
   return (
     <React.Fragment>
       <p className="mb-1 small">

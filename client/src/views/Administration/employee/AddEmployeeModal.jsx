@@ -356,7 +356,7 @@ const AddEmployeeModal = ({ show, handleClose }) => {
               </Col>
               <Col md={4} sm={12}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Profile Photo</Form.Label>
+                  <Form.Label>Employee ID</Form.Label>
                   <Form.Control
                     {...register("photo")}
                     type="file"

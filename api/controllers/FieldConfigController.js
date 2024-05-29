@@ -19,6 +19,14 @@ module.exports = FieldConfigController = {
     });
     res.status(200).json(fields);
   }),
+  getActivePhysicalExaminationFields: asynHandler(async (req, res) => {
+    const fields = await db.PhysicalExaminationField.findAll({
+      where: {
+        status: true,
+      },
+    });
+    res.status(200).json(fields);
+  }),
   enableVitalSignField: asynHandler(async (req, res) => {
     const { id } = req.params;
     const fieldExist = await db.VitalSignField.findByPk(id);

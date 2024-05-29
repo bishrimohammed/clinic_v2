@@ -21,7 +21,7 @@ const PatientFamilyHistory = ({ familyHistories, patientId }) => {
 
         <div className="allergies-list small fs-9 py-1">
           {familyHistories?.map((condition, index) => (
-            <span>
+            <span key={index + condition.id}>
               {condition.medical_condition}
               {index !== familyHistories.length - 1 ? ", " : null}
             </span>

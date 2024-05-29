@@ -7,9 +7,11 @@ const DashbordWidget = ({ logo, title, amount, borderColor }) => {
     <div
       style={{
         // borderColor: "red", /* `${borderColor} ` */
+        minWidth: "170px",
+        boxShadow: "1px 1px 5px 2px rgba(0,0,0,0.1)",
         borderLeft: `4px solid ${borderColor}`,
       }}
-      className="boxshadow  bg-white   d-flex py-2  px-3"
+      className="  bg-white   d-flex justify-content-center align-items-center py-2  px-3"
     >
       <div className="d-flex flex-column align-items-center gap-1 px-2">
         {/* <FaAccessibleIcon size={70} className="text-danger" /> */}
@@ -22,7 +24,10 @@ const DashbordWidget = ({ logo, title, amount, borderColor }) => {
             {amount}
           </h3>
 
-          <p style={{ color: "#b2b5c0", fontSize: 19 }} className="fw-500 mb-0">
+          <p
+            style={{ color: "#b2b5c0", fontSize: 19 }}
+            className="fw-500 text-nowrap mb-0"
+          >
             {title}
           </p>
         </div>

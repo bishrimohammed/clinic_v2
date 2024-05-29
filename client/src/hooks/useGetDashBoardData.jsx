@@ -1,14 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+
 import Axiosinstance from "../api/axiosInstance";
 import { AxiosHeaders } from "../api/useAxiosHeaders";
 
 export const useGetDashBoardData = () => {
-  const header = AxiosHeaders();
+  const { headers } = AxiosHeaders();
   return useQuery({
-    queryKey: ["useImagingServiveType"],
+    queryKey: ["dadhboard data"],
     queryFn: async () =>
-      Axiosinstance.get("/dashboard/", { ...header }).then((res) => res.data),
-    staleTime: 20 * 60 * 1000,
+      Axiosinstance.get("/dashboard", { headers }).then((res) => res.data),
+    refetchOnWindowFocus: true,
+    // staleTime: 20 * 60 * 1000,
   });
 };

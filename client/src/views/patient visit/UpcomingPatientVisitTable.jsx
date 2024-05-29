@@ -22,6 +22,8 @@ import SearchInput from "../../components/inputs/SearchInput";
 import FilterUpcomingVisitModal from "./upcoming/FilterUpcomingVisitModal";
 import ConfirmTraigeModal from "./upcoming/ConfirmTraigeModal";
 import { useNavigate } from "react-router-dom";
+import { hasPermission } from "../../utils/hasPermission";
+import AddPatientVisitModal from "./AddPatientVisitModal";
 
 const UpcomingPatientVisitTable = () => {
   const [search, setSearch] = useState("");
@@ -69,6 +71,8 @@ const UpcomingPatientVisitTable = () => {
     patientVisitId: null,
     action: "",
   });
+  const [showAddPatientVisitModal, setShowAddPatientVisitModal] =
+    useState(false);
   const navigate = useNavigate();
   return (
     <>
@@ -89,7 +93,16 @@ const UpcomingPatientVisitTable = () => {
           Reset
         </Button>
       </div>
-
+      <div className="d-flex justify-content-between gap-2 align-items-center w-100 mb-1 mt-2">
+        {hasPermission("visit", "create") && (
+          <Button
+            className="btn btn-primary ms-auto"
+            onClick={() => setShowAddPatientVisitModal(true)}
+          >
+            +Add Visit
+          </Button>
+        )}
+      </div>
       <Table
         striped
         bordered
@@ -217,7 +230,7 @@ const UpcomingPatientVisitTable = () => {
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu style={{ zIndex: 55 }}>
-                        {rowEl.original.stage === "Waiting for triage" ? (
+                        {rowEl.original.stage === "Waiting for examiner" ? (
                           <Dropdown.Item
                             className="d-flex gap-2 align-items-center"
                             role="button"
@@ -388,6 +401,12 @@ const UpcomingPatientVisitTable = () => {
           }
           visitId={showConfirmTraigeModal.patientVisitId}
           action={showConfirmTraigeModal.action}
+        />
+      )}
+      {showAddPatientVisitModal && (
+        <AddPatientVisitModal
+          show={showAddPatientVisitModal}
+          handleClose={() => setShowAddPatientVisitModal(false)}
         />
       )}
     </>

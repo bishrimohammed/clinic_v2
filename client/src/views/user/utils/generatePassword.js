@@ -7,6 +7,6 @@ export function generatePassword(length) {
     const randomIndex = Math.floor(Math.random() * charset.length);
     password += charset[randomIndex];
   }
-  console.log(password);
+  // console.log(password);
   return password;
 }

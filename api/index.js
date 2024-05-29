@@ -37,6 +37,11 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleWare.js");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const upload = require("./config/multerConfig.js");
+const {
+  InventoryRoute,
+  InvestigationRoute,
+  DashbordDataRoute,
+} = require("./routes/index.js");
 const app = express();
 
 // const Role = require("./models/Role.js");
@@ -52,6 +57,7 @@ app.use(
 );
 // app.use(upload.any());
 app.use(cors({ origin: "*" }));
+app.use("/api/v1/dashboard", DashbordDataRoute);
 app.use("/api/v1/user", userRoute);
 
 app.use("/api/v1/patient", patientRoute);
@@ -91,6 +97,8 @@ app.use("/api/v1/appointment", AppointmentRoute);
 app.use("/api/v1/patientvisits", patientVisitRoute);
 
 app.use("/api/v1/payments", BillingRoute);
+app.use("/api/v1/inventory", InventoryRoute);
+app.use("/api/v1/investigation", InvestigationRoute);
 // app.use("/api/v1/upload", upload.single("file"), (req, res) => {
 //   const file = req.file;
 //   if (!file) {

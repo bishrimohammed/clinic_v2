@@ -1,28 +1,16 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import {
-  Button,
-  Col,
-  Form,
-  Row,
-  Container,
-  Spinner,
-  Table,
-} from "react-bootstrap";
-import { useAddUser } from "./hooks/useAddUser";
-import { set, useForm, useWatch } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+import React, { useState } from "react";
+import { Container, Spinner } from "react-bootstrap";
+// import { useAddUser } from "./hooks/useAddUser";
+// import { set, useForm, useWatch } from "react-hook-form";
+// import * as yup from "yup";
+// import { yupResolver } from "@hookform/resolvers/yup";
 import { useGetEmplooyeDoesNotHaveAccount } from "./hooks/useGetEmplooyeDoesNotHaveAccount";
 import { useGetRoles } from "../hooks/useGetRoles";
 // import { generatePassword } from "./utils/generatePassword";
 import { useGetPermissions } from "../Administration/Role/hooks/useGetPermissions";
 import PermissionList from "./PermissionList";
+import { IoMdArrowRoundBack } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 
 const AddUser = () => {
   // const { mutate, mutateAsync, isPending } = useAddUser();
@@ -55,6 +43,7 @@ const AddUser = () => {
   //   resolver: yupResolver(schema),
   // });
   const [defaultPermissions, setDefaultPermissions] = useState([]);
+  const navigate = useNavigate();
   // const handleRoleChange = (e) => {
   //   console.log("saklcnldskjcb DVHKSJJJJJJJJJJJJJJJJJJJ");
   //   const selectedRoleId = parseInt(e.target.value);
@@ -281,6 +270,16 @@ const AddUser = () => {
 
   return (
     <Container className="p-3">
+      <div className="p-2 d-flex gap-3 align-items-center">
+        <IoMdArrowRoundBack
+          className="cursorpointer"
+          size={22}
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate(-1)}
+        />
+        <h5 className="mb-0"> Update User Account</h5>
+      </div>
+      <hr className="mt-1" />
       <PermissionList
         permissions={permissions}
         defaultPermissions={defaultPermissions}

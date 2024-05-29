@@ -75,7 +75,7 @@ module.exports = DutyController = {
   }),
   createDutyprogram: asyncHandler(async (req, res) => {
     const { weekStartDate, weekEndDate } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     const startOfWeek = new Date(weekStartDate);
     startOfWeek.setDate(
       startOfWeek.getDate() - ((startOfWeek.getDay() + 6) % 7) + 1
@@ -93,7 +93,7 @@ module.exports = DutyController = {
         },
       },
     });
-
+    // console.log(existingDutyProgram);
     if (existingDutyProgram) {
       res.status(400);
       // message: "A DutyProgram already exists for the specified week."

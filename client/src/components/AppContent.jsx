@@ -158,6 +158,9 @@ const ImagingCompleted = React.lazy(() =>
 );
 //React.lazy(() => import(" "));
 const AdminDashboard = React.lazy(() => import("./dashboard/AdminDashboard"));
+const GeneralDashboard = React.lazy(() =>
+  import("./dashboard/GeneralDashboard")
+);
 const Dashboard = React.lazy(() => import("./dashboard/Dashboard"));
 //import AdminDashboard from "./dashboard/AdminDashboard";
 const DoctorDashboard = React.lazy(() => import("./dashboard/DoctorDashboard"));
@@ -215,9 +218,10 @@ const LabRequestedList = React.lazy(() =>
 const LabCompletedList = React.lazy(() =>
   import("../views/lab/LabCompletedList")
 );
-const AddLabResult = React.lazy(() =>
-  import("../views/patient/History/logic/AddLabResult")
-);
+// const AddLabResult = React.lazy(() =>
+//   import("../views/patient/History/logic/AddLabResult")
+// );
+const AddLabResult = React.lazy(() => import("../views/lab/AddLabResult"));
 const ViewLabResult = React.lazy(() =>
   import("../views/patient/History/logic/ViewLabResult")
 );
@@ -232,7 +236,7 @@ const Addprescription = React.lazy(() =>
 
 const AppContent = () => {
   const currentUser = useSelector((state) => state.auth.user);
-  console.log(currentUser);
+  // console.log(currentUser);
   // console.log("content");
   return (
     <>
@@ -243,17 +247,18 @@ const AppContent = () => {
               index
               element={
                 // <CashierDashboard />
-                currentUser.role === "admin" ? (
-                  <AdminDashboard />
-                ) : currentUser.role === "doctor" ? (
-                  <DoctorDashboard />
-                ) : currentUser.role === "cashier" ? (
-                  <CashierDashboard />
-                ) : currentUser.role === "laboratorian" ? (
-                  <LaboratorianDashboard />
-                ) : (
-                  <div />
-                )
+                // currentUser.role === "admin" ? (
+                //   <AdminDashboard />
+                // ) : currentUser.role === "doctor" ? (
+                //   <DoctorDashboard />
+                // ) : currentUser.role === "cashier" ? (
+                //   <CashierDashboard />
+                // ) : currentUser.role === "laboratorian" ? (
+                //   <LaboratorianDashboard />
+                // ) : (
+                //   <div />
+                // )
+                <GeneralDashboard />
               }
             />
           </Route>
@@ -317,6 +322,7 @@ const AppContent = () => {
           <Route path="lab" element={<Lab />}>
             <Route index element={<LabRequestedList />} />
             <Route path="completed" element={<LabCompletedList />} />
+            <Route path="addresult" element={<AddLabResult />} />
           </Route>
           <Route path="imaging" element={<Imaging />}>
             <Route index element={<ImagingRequested />} />

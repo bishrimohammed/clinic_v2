@@ -18,6 +18,7 @@ const {
   dutyAssociation,
   patientAssocation,
   paymentAssociation,
+  prescriptionAssociation,
 } = require("./associations/index.js");
 // const { medicalRecordDetailAssocations } = require("./associations/medicalRecordDetailAssocations.js");
 
@@ -90,6 +91,7 @@ db.Appointment = require("./Appointment.js")(sequelize, DataTypes);
 db.PatientAssignment = require("./PatientAssignment.js")(sequelize, DataTypes);
 db.VisitType = require("./visitType.js")(sequelize, DataTypes);
 db.MedicalRecord = require("./MedicalRecord.js")(sequelize, DataTypes);
+db.Diagnosis = require("./medicalRecords/Diagnosis.js")(sequelize, DataTypes);
 db.MedicalRecordDetail = require("./MedicalRecordDetail.js")(
   sequelize,
   DataTypes
@@ -141,9 +143,16 @@ db.DutyAssignment = require("./DutyAssignment.js")(sequelize, DataTypes);
 db.MedicalBilling = require("./MedicalBilling.js")(sequelize, DataTypes);
 db.Payment = require("./Payment.js")(sequelize, DataTypes);
 
-db.sequelize.sync({ force: false, alter: false }).then(() => {
-  console.log("yes re-sync done!");
-});
+// db.sequelize.sync({ force: false, alter: false }).then(() => {
+//   console.log("yes re-sync done!");
+// });
+
+db.Medicine = require("./Medicine.js")(sequelize, DataTypes);
+db.Prescription = require("./Prescription.js")(sequelize, DataTypes);
+db.PrescribedMedicine = require("./PrescribedMedicine.js")(
+  sequelize,
+  DataTypes
+);
 patientAssignmentSAssociation(db);
 MedicalRecordAssociation(db);
 MedicalRecordDetailAssocations(db);
@@ -156,6 +165,7 @@ creditCompanyAssociation(db);
 dutyAssociation(db);
 patientAssocation(db);
 paymentAssociation(db);
+prescriptionAssociation(db);
 
 db.ClinicProfile.belongsTo(db.Address, {
   foreignKey: "address_id",

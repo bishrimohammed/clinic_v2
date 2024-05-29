@@ -24,6 +24,7 @@ import FilterVisitModal from "../FilterVisitModal";
 const DoctorAssignedUpcomingVisitTable = () => {
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState([]);
+  // const preLoadData = usePreL
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
@@ -250,6 +251,12 @@ const DoctorAssignedUpcomingVisitTable = () => {
                               event.stopPropagation();
                               // setData_to_be_Edited(rowEl.original);
                               // handleShowEdit();
+                              navigate(
+                                `/patients/history/${rowEl.original.medicalRecord_id}`,
+                                {
+                                  state: rowEl.original,
+                                }
+                              );
                             }}
                           >
                             <RiEditLine /> Continue Consultation

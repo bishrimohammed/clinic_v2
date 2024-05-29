@@ -79,6 +79,6 @@ module.exports = (sequelize, DataTypes) => {
   //     as: "patient",
   //   });
   // };
-  patientAssignment.sync({ force: false, alter: true });
+  patientAssignment.sync({ force: false, alter: false });
   return patientAssignment;
 };

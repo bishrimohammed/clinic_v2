@@ -116,7 +116,7 @@ module.exports.clinicServiceController = {
     if (req.query.status) {
       where.status = Boolean(req.query.status);
     }
-    if (req.query.price !== "") {
+    if (req.query.price) {
       if (req.query.price === "500+") {
         where.price = {
           [Op.gte]: 500,
@@ -633,5 +633,21 @@ module.exports.clinicServiceController = {
       }
     );
     res.json(serviceItem);
+  }),
+  getLaboratoryService: asyncHandler(async (req, res) => {
+    const labcategories = await db.LabTestProfile.findAll({
+      include: [
+        {
+          model: db.PanelUnderpanel,
+          as: "underPanels",
+        },
+        {
+          model: db.ServiceItem,
+          as: "serviceItem",
+          attributes: ["id", "service_name", "serviceCategory_id"],
+        },
+      ],
+    });
+    res.json(labcategories);
   }),
 };

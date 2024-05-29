@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 const Billing = () => {
   return (
-    <Container className="p-3 ">
+    <Container className="p-3 mb-5">
       <div className="p-3  bg-hrun-box hrunboxshadow">
         <Outlet />
       </div>

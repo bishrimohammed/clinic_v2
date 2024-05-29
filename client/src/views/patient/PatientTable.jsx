@@ -89,7 +89,7 @@ const PatientTable = ({
       <div className="d-flex justify-content-between gap-2 align-items-center w-100 mb-1 mt-2">
         {hasPermission("patient", "create") && (
           <Link to="/patients/newpatient" className="btn btn-primary ms-auto">
-            Add Patient
+            + Add Patient
           </Link>
         )}
       </div>

@@ -43,11 +43,11 @@ export const PatientVisitColumn = [
           style={{
             borderRadius: 15,
             padding: "0.2rem 0.5rem",
-            fontSize: 14,
-            fontWeight: 500,
-            color: "blueviolet",
+            fontSize: 13,
+
+            backgroundColor: "blue",
           }}
-          // className=" text-white bg-success   d-inline-flex align-items-center justify-content-center"
+          className=" text-white   d-inline-flex align-items-center justify-content-center"
         >
           {s.getValue()}
         </span>

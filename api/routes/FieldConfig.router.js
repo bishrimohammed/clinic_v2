@@ -12,6 +12,10 @@ router.get(
   "/vitalsignFields/active",
   FieldConfigController.getActiveVitalSignFields
 );
+router.get(
+  "/physicalExaminationFields/active",
+  FieldConfigController.getActivePhysicalExaminationFields
+);
 router.patch(
   "/vitalsignField/:id/enable",
   FieldConfigController.enableVitalSignField

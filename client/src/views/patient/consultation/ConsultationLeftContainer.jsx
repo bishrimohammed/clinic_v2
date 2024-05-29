@@ -3,6 +3,9 @@ import { Button, Tab, Tabs } from "react-bootstrap";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import ChiefComplaint from "./ChiefComplaint";
+import PhysicalExaminationTab from "./PhysicalExaminationTab";
+import TreatmentTab from "./TreatmentTab";
+import PlanTab from "./PlanTab";
 
 const ConsultationLeftContainer = () => {
   const navigate = useNavigate();
@@ -48,7 +51,7 @@ const ConsultationLeftContainer = () => {
           </Button>
         </div>
       </div>
-      <hr />
+      {/* <hr /> */}
       <Tabs
         defaultActiveKey="Symptoms"
         id="uncontrolled-tab-example"
@@ -60,13 +63,13 @@ const ConsultationLeftContainer = () => {
           <ChiefComplaint />
         </Tab>
         <Tab eventKey="Examination" title="Examination">
-          Tab content for Profile
+          <PhysicalExaminationTab />
         </Tab>
         <Tab eventKey="Treatment" title="Treatment">
-          Tab content for Treatment
+          <TreatmentTab />
         </Tab>
         <Tab eventKey="Plan" title="Plan">
-          Tab content for Plan
+          <PlanTab />
         </Tab>
       </Tabs>
     </div>

@@ -11,8 +11,8 @@ export const useAddEmployee = () => {
     onSuccess: async (data) => {
       toast.success("Employee added successfully");
       queryClient.invalidateQueries({
-        queryKey: ["Employees"],
-        exact: true,
+        queryKey: ["Employees", { gender: "", position: [], status: "" }],
+        // exact: true,
       });
     },
     // onError: async (error) => {

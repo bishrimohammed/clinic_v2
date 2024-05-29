@@ -79,6 +79,7 @@ const PermissionList = ({
     setValue,
     reset,
     setError,
+    getValues,
   } = useForm({
     defaultValues: {
       employeeId: "",
@@ -89,6 +90,42 @@ const PermissionList = ({
     },
     resolver: yupResolver(schema),
   });
+  const watchPermissions = useWatch({ control, name: "permissions" });
+  const roleWatcher = useWatch({ control, name: "role" });
+  useEffect(() => {
+    // console.log(getValues("permissions"));
+    const permissions = getValues("permissions");
+    // console.log(permissions);
+    permissions.forEach((permission, index) => {
+      // console.log(permission);
+      const defaultPermission = defaultPermissions.find(
+        (defaultPermission) =>
+          defaultPermission.permission_id === parseInt(permission.permissionId)
+      );
+      if (defaultPermission) {
+        setValue(`permissions.${index}.create`, defaultPermission.create);
+        setValue(`permissions.${index}.read`, defaultPermission.read);
+        setValue(`permissions.${index}.update`, defaultPermission.update);
+        setValue(`permissions.${index}.delete`, defaultPermission.delete);
+        setValue(
+          `permissions.${index}.admin`,
+          defaultPermission.read &&
+            defaultPermission.update &&
+            defaultPermission.delete &&
+            defaultPermission.create
+        );
+      } else {
+        setValue(`permissions.${index}.create`, false);
+        setValue(`permissions.${index}.read`, false);
+        setValue(`permissions.${index}.update`, false);
+        setValue(`permissions.${index}.delete`, false);
+        setValue(`permissions.${index}.admin`, false);
+      }
+      // console.log(defaultPermission);
+      // console.log(index);
+    });
+  }, [roleWatcher]);
+
   const handleRoleChange = (e) => {
     // console.log("saklcnldskjcb DVHKSJJJJJJJJJJJJJJJJJJJ");
     const selectedRoleId = parseInt(e.target.value);
@@ -117,11 +154,10 @@ const PermissionList = ({
   };
   //   console.log(defaultPermissions);
   const resetPermissions = () => {
-    console.log("mmmmmmmmmmmmmmmmmm");
+    // console.log("mmmmmmmmmmmmmmmmmm");
     setDefaultPermissions([]);
   };
-  const watchPermissions = useWatch({ control, name: "permissions" });
-  const roleWatcher = useWatch({ control, name: "role" });
+
   // useEffect(() => {
   //   setValue("permissions", []);
   // }, [roleWatcher]);
@@ -238,6 +274,7 @@ const PermissionList = ({
   // setValue("permissions", [{}]);
   const submitHandler = (data) => {
     // console.log(data);
+    // return;
     const selectedPermissions = data.permissions.filter(
       (p) => p.create || p.read || p.update || p.delete
     );
@@ -249,8 +286,8 @@ const PermissionList = ({
       role: data.role,
       permissions: selectedPermissions,
     };
-    // console.log(user);
-    // return;
+    console.log(user);
+    return;
     // // mutate(user);
     // return;
     mutateAsync(user)
@@ -294,7 +331,7 @@ const PermissionList = ({
     // return employee?.username;
   };
   return (
-    <Form onSubmit={handleSubmit(submitHandler)}>
+    <Form onSubmit={handleSubmit(submitHandler)} className="px-3">
       <Row>
         <Col md={4} sm={6} className="mb-2">
           <Form.Group>
@@ -357,7 +394,7 @@ const PermissionList = ({
               // ref={roleref}
               {...register("role", {
                 onChange: (e) => {
-                  resetPermissions();
+                  // resetPermissions();
                   handleRoleChange(e);
                 },
               })}
@@ -378,7 +415,11 @@ const PermissionList = ({
           </Form.Group>
         </Col>
       </Row>
-      <Table striped bordered hover responsive className="mt-3">
+      <p className="fs-5 fw-bold ">
+        {" "}
+        <span className="border-bottom pb-1">Permissions</span>{" "}
+      </p>
+      <Table striped bordered hover responsive className="mt-1">
         <thead>
           <tr>
             <th>Permission</th>

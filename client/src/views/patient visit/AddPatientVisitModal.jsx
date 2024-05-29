@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React, { useMemo, useState } from "react";
-import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { Alert, Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useGetDoctors } from "../Scheduling/hooks/useGetDoctors";
@@ -263,7 +263,8 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
-            <Button type="submit" variant="primary">
+            <Button disabled={isPending} type="submit" variant="primary">
+              {isPending && <Spinner size="sm" animation="border" />}
               Save
             </Button>
           </Modal.Footer>
