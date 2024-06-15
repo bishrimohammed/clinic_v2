@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../models");
 const getClinicInformation = require("../helpers/getClinicInformation");
+// const { default: AddAdvancedPayment } = require("../../client/src/views/Bill/AddAdvancedPayment");
 module.exports = BillingController = {
   getOutStandingBillings: asyncHandler(async (req, res) => {
     const {} = req.query;
@@ -43,6 +44,7 @@ module.exports = BillingController = {
             "birth_date",
             "is_credit",
             "status",
+            "patient_type",
           ],
         },
         {
@@ -126,6 +128,61 @@ module.exports = BillingController = {
       ],
     });
     res.json(payments);
+  }),
+  AddAdvancedPayment: asyncHandler(async (req, res) => {
+    const { billingId } = req.params;
+    const { amount, description } = req.body;
+    console.log(req.body);
+    console.log(billingId);
+    const billing = await db.MedicalBilling.findByPk(billingId);
+    if (!billing) {
+      res.status(400);
+      throw new Error("Billing doesn't exist");
+    }
+    const previouslyOpenAdvancedPayment = await db.AdvancedPayment.findOne({
+      where: {
+        medical_billing_id: billingId,
+        status: "Open",
+      },
+    });
+    const newAdvancedPayment = await db.AdvancedPayment.create({
+      medical_billing_id: billingId,
+      amount_paid: amount,
+      cashier_id: req.user.id,
+      description: description,
+      status: "Open",
+    });
+    if (previouslyOpenAdvancedPayment) {
+      newAdvancedPayment.amount_remaining_from_previous_payment =
+        previouslyOpenAdvancedPayment.remaining_amount;
+      newAdvancedPayment.total_amount =
+        parseFloat(newAdvancedPayment.amount_paid) +
+        parseFloat(previouslyOpenAdvancedPayment.remaining_amount);
+      newAdvancedPayment.remaining_amount =
+        parseFloat(newAdvancedPayment.amount_paid) +
+        parseFloat(previouslyOpenAdvancedPayment.remaining_amount);
+
+      previouslyOpenAdvancedPayment.status = "Closed";
+      previouslyOpenAdvancedPayment.remaining_amount = 0.0;
+      await previouslyOpenAdvancedPayment.save();
+    } else {
+      newAdvancedPayment.amount_remaining_from_previous_payment = 0.0;
+      newAdvancedPayment.total_amount = parseFloat(
+        newAdvancedPayment.amount_paid
+      );
+      newAdvancedPayment.remaining_amount = parseFloat(
+        newAdvancedPayment.amount_paid
+      );
+    }
+    await newAdvancedPayment.save();
+    billing.has_advanced_payment = true;
+    billing.is_advanced_payment_amount_completed = false;
+    await billing.save();
+    await db.PatientAssignment.update(
+      { stage: "Admitted" },
+      { where: { id: billing.visit_id } }
+    );
+    res.status(201).json({ msg: "Advanced Payment Added Successfully" });
   }),
   takePayment: asyncHandler(async (req, res) => {
     const { paymentAmount, paymentId } = req.body;

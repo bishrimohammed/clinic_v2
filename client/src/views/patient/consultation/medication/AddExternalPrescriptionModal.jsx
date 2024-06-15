@@ -24,6 +24,11 @@ const ExternalMedicationSchema = yup.object().shape({
         .string()
         .transform((value) => value.trim())
         .required("Frequency is required"),
+      duration: yup
+        .number()
+        .positive()
+        .min(0, "Duration must be greater than 0")
+        .required(),
       start_date: yup.date().required("Start date is required"),
       notes: yup.string().transform((value) => value.trim()),
     })
@@ -90,7 +95,7 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
                 <th>Dosage</th>
                 <th>Frequency</th>
                 <th>Start Date</th>
-                <th>note</th>
+                <th>Duration </th>
                 <th>
                   <button
                     type="button"
@@ -100,6 +105,7 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
                         drug_name: "",
                         dosage: "",
                         frequency: "",
+                        duration: "",
                         start_date: new Date().toISOString().substring(0, 10),
                         notes: "",
                       })
@@ -134,7 +140,7 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
                     <Form.Control
                       type="text"
                       {...register(`rows.${index}.dosage`)}
-                      placeholder="dosage"
+                      // placeholder="dosage"
                       isInvalid={!!errors.rows?.[index]?.dosage}
 
                       // defaultValue={item.email}
@@ -144,7 +150,7 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
                     <Form.Control
                       // type="tel"
                       {...register(`rows.${index}.frequency`)}
-                      placeholder="frequency"
+                      // placeholder="frequency"
                       isInvalid={!!errors.rows?.[index]?.frequency}
                     />
                   </td>
@@ -159,8 +165,9 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
                   </td>
                   <td>
                     <Form.Control
-                      type="text"
-                      {...register(`rows.${index}.notes`)}
+                      type="number"
+                      {...register(`rows.${index}.duration`)}
+                      isInvalid={!!errors.rows?.[index]?.duration}
                     />
                   </td>
                   <td>

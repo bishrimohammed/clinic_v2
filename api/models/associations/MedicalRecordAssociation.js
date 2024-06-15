@@ -19,6 +19,10 @@ module.exports.MedicalRecordAssociation = (db) => {
     foreignKey: "medicalRecord_id",
     as: "vitals",
   });
+  db.MedicalRecord.hasMany(db.ProgressNote, {
+    foreignKey: "medical_record_id",
+    as: "progressNotes",
+  });
   db.MedicalRecord.hasOne(db.InvestigationOrder, {
     foreignKey: "medicalRecord_id",
     as: "investigationOrder",
@@ -27,13 +31,21 @@ module.exports.MedicalRecordAssociation = (db) => {
   //   foreignKey: "medicalRecord_id",
   //   as: "vitals",
   // });
-  db.Vital.belongsTo(db.VitalSignField, {
+  db.VitalResult.belongsTo(db.VitalSignField, {
     foreignKey: "vitalSignField_id",
     as: "vitalSignField",
   });
   db.Vital.belongsTo(db.User, {
     foreignKey: "examiner_id",
     as: "examiner",
+  });
+  db.Vital.hasMany(db.VitalResult, {
+    foreignKey: "vital_id",
+    as: "vitalResults",
+  });
+  db.VitalResult.belongsTo(db.Vital, {
+    foreignKey: "vital_id",
+    as: "vital",
   });
   db.MedicalRecord.hasMany(db.Diagnosis, {
     foreignKey: "medical_record_id",
@@ -46,5 +58,17 @@ module.exports.MedicalRecordAssociation = (db) => {
   db.Diagnosis.belongsTo(db.User, {
     foreignKey: "doctor_id",
     as: "doctor",
+  });
+  db.ProgressNote.belongsTo(db.User, {
+    foreignKey: "doctor_id",
+    as: "doctor",
+  });
+  db.ProgressNote.hasOne(db.PhysicalExamination, {
+    foreignKey: "progressNote_id",
+    as: "physicalExamination",
+  });
+  db.ProgressNote.hasOne(db.Vital, {
+    foreignKey: "vital_id",
+    as: "vital",
   });
 };

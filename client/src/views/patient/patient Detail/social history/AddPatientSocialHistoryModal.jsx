@@ -61,7 +61,7 @@ const AddPatientSocialHistoryModal = ({ show, handleClose, patientId }) => {
             >
               {/* smoker, Former smoker, Non-smoker */}
               <option value={""}>Please Select</option>
-              <option value="Smoker">Smoker</option>
+              <option value="Current smoker">Smoker</option>
               <option value="Former smoker">Former Smoker</option>
               <option value="Non-smoker">Non-smoker</option>
             </Form.Select>

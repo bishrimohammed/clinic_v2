@@ -17,8 +17,7 @@ export const useAddLabOrder = () => {
     },
     onSuccess: async (data, variables) => {
       const { data: resData } = data;
-      console.log(variables);
-      console.log(variables.historyId);
+
       queryClient.invalidateQueries({
         queryKey: [
           "Medical Record",

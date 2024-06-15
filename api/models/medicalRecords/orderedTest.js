@@ -1,5 +1,5 @@
-const db = require("..");
-const { sequelize } = require("..");
+// const db = require("..");
+// const { sequelize } = require("..");
 
 module.exports = (sequelize, DataTypes) => {
   const OrderedTest = sequelize.define("orderedtest", {
@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+      allowNull: false,
     },
     investigationOrder_id: {
       type: DataTypes.INTEGER,
@@ -61,6 +62,6 @@ module.exports = (sequelize, DataTypes) => {
       values: ["pending", "completed"],
     },
   });
-  OrderedTest.sync({ force: false, alter: false });
+  OrderedTest.sync({ force: false, alter: true });
   return OrderedTest;
 };

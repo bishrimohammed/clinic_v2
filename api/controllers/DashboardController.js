@@ -127,7 +127,7 @@ module.exports = DashboardController = {
         // appointment_date: {
         //   [Op.gte]: new Date(),
         // },
-        ...where,
+        // ...where,
         status: "upcoming",
       },
       include: [

@@ -24,7 +24,10 @@ const PatientGeneralInforamtion = ({ patient }) => {
       />
       <PatientCurrentMedication />
 
-      <PatientPastMedicalHistory />
+      <PatientPastMedicalHistory
+        patientId={patient?.id}
+        pastMedicalHistories={patient?.pastMedicalHistories}
+      />
 
       <PatientFamilyHistory
         familyHistories={patient?.familyHistories}

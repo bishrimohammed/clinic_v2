@@ -52,6 +52,53 @@ const UserController = {
     // const region = await db.Region.findAll({ include: ["cities"] });
     res.json(users);
   }),
+  getActiveUsers: asyncHandler(async (req, res) => {
+    const users = await User.findAll({
+      where: { status: true },
+      attributes: { exclude: ["password"] },
+      include: [
+        // {
+        //   model: db.Role,
+        //   as: "role",
+        //   attributes: ["name"],
+        //   include: [
+        //     {
+        //       model: db.Permission,
+        //       as: "permissions",
+        //       // attributes: ["name"],
+        //     },
+        //   ],
+        // },
+        {
+          model: db.Employee,
+          as: "employee",
+          // attributes: ["name"],
+          // include: [
+          //   {
+          //     model: db.Address,
+          //     as: "address",
+          //     // attributes: ["name"],
+          //   },
+          // ],
+          attributes: ["id", "firstName", "lastName", "middleName"],
+        },
+        // {
+        //   model: db.Permission,
+        //   as: "userPermissions",
+        // },
+      ],
+    });
+    // const user = await User.findAll({
+    //   include: [
+    //     {
+    //       model: db.Permission,
+    //       as: "userPermissions",
+    //     },
+    //   ],
+    // });
+    // const region = await db.Region.findAll({ include: ["cities"] });
+    res.json(users);
+  }),
   getDoctors: asyncHandler(async (req, res) => {
     const { query } = req.query;
     console.log(req.user);

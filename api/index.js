@@ -41,6 +41,9 @@ const {
   InventoryRoute,
   InvestigationRoute,
   DashbordDataRoute,
+  MedicalRecordConsultaionRoute,
+  progressNoteRoute,
+  ApprovalSettingRoute,
 } = require("./routes/index.js");
 const app = express();
 
@@ -73,6 +76,9 @@ app.use("/api/v1/visittype", visitTypeRoute);
 app.use("/api/v1/assignpatient", assignPatientRoute);
 
 app.use("/api/v1/medicalrecords", medicalRecordRoute);
+app.use("/api/v1/progressnotes", progressNoteRoute);
+
+app.use("/api/v1/medicalrecord-consultaion", MedicalRecordConsultaionRoute);
 
 app.use("/api/v1/service", serviceRoute);
 
@@ -99,6 +105,8 @@ app.use("/api/v1/patientvisits", patientVisitRoute);
 app.use("/api/v1/payments", BillingRoute);
 app.use("/api/v1/inventory", InventoryRoute);
 app.use("/api/v1/investigation", InvestigationRoute);
+
+app.use("/api/v1/approval-settings", ApprovalSettingRoute);
 // app.use("/api/v1/upload", upload.single("file"), (req, res) => {
 //   const file = req.file;
 //   if (!file) {

@@ -238,25 +238,64 @@ module.exports = MedicalRecordController = {
       },
     });
     console.log(medicalRecord);
-    const physicalExamination = await db.PhysicalExamination.findAll({
+    const physicalExamination = await db.PhysicalExamination.findOne({
       where: {
         medicalRecordDetail_id: medicalRecord.id,
         examiner_id: req.user.id,
       },
-      include: {
-        model: db.PhysicalExaminationField,
-        as: "physicalExaminationField",
-      },
+      include: [
+        {
+          model: db.physicalExaminationResult,
+          as: "physicalExaminationResults",
+        },
+        {
+          model: db.User,
+          as: "examiner",
+          include: [
+            {
+              model: db.Employee,
+              as: "employee",
+              attributes: ["id", "firstName", "middleName", "lastName"],
+            },
+          ],
+          attributes: ["id"],
+        },
+      ],
     });
+    console.log(physicalExamination);
     const vital = await db.Vital.findAll({
       where: {
         medicalRecord_id: id,
         examiner_id: req.user.id,
       },
+      include: [
+        {
+          model: db.VitalResult,
+          as: "vitalResults",
+          // include: [
+          //   {
+          //     model: db.VitalSignField,
+          //     as: "vitalResultFields",
+          //   },
+          // ]
+        },
+        {
+          model: db.User,
+          as: "examiner",
+          include: [
+            {
+              model: db.Employee,
+              as: "employee",
+              attributes: ["id", "firstName", "middleName", "lastName"],
+            },
+          ],
+          attributes: ["id"],
+        },
+      ],
     });
     res.status(200).json({
       physicalExamination,
-      vital,
+      // vital,
     });
   }),
   add_physical_examination: asyncHandler(async (req, res) => {
@@ -416,7 +455,7 @@ module.exports = MedicalRecordController = {
   // @access  Private
   addInvestigation: asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { investigations, clinical_finding, underPanels } = req.body;
+    const { investigations, clinical_finding, underPanels, plan } = req.body;
     // console.log(req.body);
     // return;
     const medicalRecord = await db.MedicalRecord.findByPk(id);
@@ -460,7 +499,6 @@ module.exports = MedicalRecordController = {
           reported_by: null,
           comment: "",
           result: "",
-          is,
         });
       })
     );
@@ -763,12 +801,12 @@ module.exports = MedicalRecordController = {
 
   // @desc add vital sign
   addVitalSign: asyncHandler(async (req, res) => {
-    const { vitals, symptom } = req.body;
+    const { vitals, symptom, visit_type } = req.body;
     const today = new Date();
     // const vitals = req.body;
     // console.log(req.body);
     // return;
-    console.log(vitals);
+    // console.log(vitals);
     const patientVisit = await db.PatientAssignment.findOne({
       where: {
         medicalRecord_id: req.params.id,
@@ -783,6 +821,7 @@ module.exports = MedicalRecordController = {
       ? patientVisit.symptom_notes + "\n" + symptom
       : symptom;
     patientVisit.stage = "Waiting for examiner";
+    patientVisit.visit_type = visit_type;
     await patientVisit.save();
     const VitalSigns = vitals.map((v) => {
       return {
@@ -802,6 +841,7 @@ module.exports = MedicalRecordController = {
   addPrescription: asyncHandler(async (req, res) => {
     const { id } = req.params;
     console.log(req.body);
+    // return;
     const prescription = req.body;
     const medicalRecord = await getMedicalRecordById(id);
     const prescriptionExist = await getMedicalRecordPrescription(id);
@@ -835,7 +875,7 @@ module.exports = MedicalRecordController = {
           medicine_id: prescription.medicine_id,
           dosage: prescription.dosage,
           frequency: prescription.frequency,
-          // duration: prescription.duration,
+          duration: prescription.duration,
           // notes: prescription.notes,
           is_internal: true,
           start_date: prescription.start_date,
@@ -933,7 +973,7 @@ module.exports = MedicalRecordController = {
     }
     let prescriptionID;
     if (!prescriptionExist) {
-      console.log("\nPrescription\n");
+      // console.log("\nPrescription\n");
       const prescription = await db.Prescription.create({
         medical_record_id: id,
         patient_id: medicalRecord.patient_id,
@@ -953,7 +993,7 @@ module.exports = MedicalRecordController = {
           dosage: prescription.dosage,
           frequency: prescription.frequency,
           drug_name: prescription.drug_name,
-          // duration: prescription.duration,
+          duration: prescription.duration,
           // notes: prescription.notes,
           is_internal: false,
           start_date: prescription.start_date,

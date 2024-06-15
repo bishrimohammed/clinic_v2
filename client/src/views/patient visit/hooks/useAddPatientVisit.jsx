@@ -14,7 +14,10 @@ export const useAddPatientVisit = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["patient visits"],
+        queryKey: [
+          "UpcomingPatientVisit",
+          { stage: "", status: "", vistiType: "" },
+        ],
       });
       toast.success("Patient visits successfully");
     },

@@ -27,7 +27,7 @@ const ChiefComplaintSchema = yup.object().shape({
     .required("History of Present Illness is required"),
   note: yup.string().transform((value) => value.trim()),
 });
-const ChiefComplaint = () => {
+const ChiefComplaint = React.forwardRef((props, ref) => {
   const { state } = useLocation();
   // console.log(state);
   const { data, isPending: fetchingCheifComplaint } = useGetChiefComplaint(
@@ -50,6 +50,8 @@ const ChiefComplaint = () => {
     formState: { errors },
     handleSubmit,
     control,
+    getValues,
+    reset,
   } = useForm({
     resolver: yupResolver(ChiefComplaintSchema),
     defaultValues: {
@@ -60,19 +62,21 @@ const ChiefComplaint = () => {
   });
   const { mutateAsync, isPending } = useAddChiefComplaint();
   const submitHandler = (Data) => {
-    console.log(Data);
+    // console.log(Data);
     const chiefComplaint = Data.chief_complaint
       .map((item) => item.value)
       .join(", ");
-    console.log(chiefComplaint);
+    // console.log(chiefComplaint);
     const formData = {
       chief_complaint: chiefComplaint,
       HPI: Data.HPI,
       note: Data.note,
     };
+    // console.log(formData);
+    // return;
     mutateAsync({ formData, medicalRecordId: state.medicalRecord_id }).then(
       (res) => {
-        console.log(res);
+        // console.log(res);
         if (res.status === 200 && data) {
           toast.success("Chief Complaint added successfully");
         } else {
@@ -83,6 +87,11 @@ const ChiefComplaint = () => {
     // join chiefComplaint array into a string ,
     // const chiefComplaint = data.chief_complaint.join(", ");
   };
+
+  React.useImperativeHandle(ref, () => ({
+    getSaveForLaterData: () => getValues(),
+    resetData: () => reset(),
+  }));
   // console.log(errors);
   // const handleCreateOption = (inputValue) => {
   //   return {
@@ -95,7 +104,7 @@ const ChiefComplaint = () => {
     <div className="mt-4">
       <Form className="px-3" onSubmit={handleSubmit(submitHandler)}>
         <Row>
-          <Col md={6} sm={12}>
+          <Col sm={12}>
             <Form.Group className="mb-3">
               <Form.Label>Chief Complaint</Form.Label>
 
@@ -123,13 +132,6 @@ const ChiefComplaint = () => {
                   />
                 )}
               />
-              {/* <Form.Control
-                {...register("chief_complaint", {
-                  required: "Chief Complaint is required",
-                })}
-                multiple
-                list="chiefComplaintOptions"
-              /> */}
 
               {errors.chief_complaint && (
                 <span className="small text-danger">
@@ -139,7 +141,7 @@ const ChiefComplaint = () => {
             </Form.Group>
           </Col>
           {/* <Col md={6} sm={12}></Col> */}
-          <Col md={6} sm={12}>
+          <Col sm={12}>
             <Form.Group className="mb-3">
               <Form.Label>History of Present Illness</Form.Label>
               <Form.Control
@@ -147,6 +149,7 @@ const ChiefComplaint = () => {
                 defaultValue={data?.hpi}
                 as="textarea"
                 isInvalid={errors.HPI}
+                style={{ minHeight: "100px" }}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.HPI?.message}
@@ -154,17 +157,17 @@ const ChiefComplaint = () => {
             </Form.Group>
           </Col>
           <Col md={6} sm={12}>
-            <Form.Group className="mb-3">
+            {/* <Form.Group className="mb-3">
               <Form.Label>Additional notes</Form.Label>
               <Form.Control
                 defaultValue={data?.notes}
                 {...register("note")}
                 type="text"
               />
-            </Form.Group>
+            </Form.Group> */}
           </Col>
         </Row>
-        <div className=" d-flex justify-content-end gap-2">
+        <div className=" d-flex justify-content-end gap-2 mt-2">
           {/* <Button
             variant="danger"
             // disabled={
@@ -196,6 +199,6 @@ const ChiefComplaint = () => {
       </Form>
     </div>
   );
-};
+});
 
 export default ChiefComplaint;

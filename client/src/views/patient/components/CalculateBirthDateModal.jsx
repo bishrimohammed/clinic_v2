@@ -9,7 +9,7 @@ const Schema = yup.object().shape({
     .number()
     .transform((value) => {
       if (isNaN(value)) {
-        return 1;
+        return 0;
       }
       return value;
     })
@@ -19,7 +19,7 @@ const Schema = yup.object().shape({
     .number()
     .transform((value) => {
       if (isNaN(value)) {
-        return 1;
+        return 0;
       }
       return value;
     })
@@ -52,6 +52,8 @@ const CalculateBirthDateModal = ({
     let birthYear = currentDate.getFullYear() - data.age;
 
     // Calculate the birth month
+    // console.log(currentDate.getMonth());
+    // console.log(data.month);
     let birthMonth = currentDate.getMonth() + 1 - data.month;
     if (birthMonth <= 0) {
       birthMonth += 12;
@@ -60,7 +62,8 @@ const CalculateBirthDateModal = ({
 
     // Calculate the birth day
     let birthDay = currentDate.getDate() - data.day;
-    if (birthDay <= 0) {
+    console.log(birthDay);
+    if (birthDay < 0) {
       const monthDays = new Date(birthYear, birthMonth, 0).getDate();
       birthDay += monthDays;
       birthMonth--;
@@ -69,7 +72,7 @@ const CalculateBirthDateModal = ({
         birthYear--;
       }
     }
-    const BD = new Date(birthYear, birthMonth - 1, birthDay)
+    const BD = new Date(birthYear, birthMonth - 1, birthDay + 1)
       .toISOString()
       .substring(0, 10);
     // return;

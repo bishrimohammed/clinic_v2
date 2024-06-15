@@ -6,27 +6,35 @@ import * as yup from "yup";
 import { useGetMedicines } from "../../hooks/consultationHooks/medication/useGetMedicines";
 import { useAddprescription } from "../../hooks/consultationHooks/medication/useAddprescription";
 import { useLocation } from "react-router-dom";
-
+import { FaMinus } from "react-icons/fa6";
 const InternalMedicationSchema = yup.object().shape({
-  rows: yup.array().of(
-    yup.object().shape({
-      medicine_id: yup
-        .string()
-        .transform((value) => value.trim())
-        .required("Medicine is required"),
-      medicineID: yup.string(),
-      dosage: yup
-        .string()
-        .transform((value) => value.trim())
-        .required("Dosage is required"),
-      frequency: yup
-        .string()
-        .transform((value) => value.trim())
-        .required("Frequency is required"),
-      start_date: yup.date().required("Start date is required"),
-      notes: yup.string().transform((value) => value.trim()),
-    })
-  ),
+  rows: yup
+    .array()
+    .of(
+      yup.object().shape({
+        medicine_id: yup
+          .string()
+          .transform((value) => value.trim())
+          .required("Medicine is required"),
+        medicineID: yup.string(),
+        dosage: yup
+          .string()
+          .transform((value) => value.trim())
+          .required("Dosage is required"),
+        frequency: yup
+          .string()
+          .transform((value) => value.trim())
+          .required("Frequency is required"),
+        duration: yup
+          .number()
+          .positive()
+          .min(0, "Duration must be greater than 0")
+          .required(),
+        start_date: yup.date().required("Start date is required"),
+        notes: yup.string().transform((value) => value.trim()),
+      })
+    )
+    .required("At least one medicine is required"),
 });
 
 const AddInternalMedicationModal = ({ show, handleClose }) => {
@@ -70,10 +78,12 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
       return {
         medicine_id: medicines.find((m) => m.id === parseInt(medicineId))
           ?.service_item_id,
+        duration: "",
 
         dosage: medicine.dosage,
         frequency: medicine.frequency,
         start_date: medicine.start_date,
+        duration: medicine.duration,
         notes: medicine.notes,
       };
     });
@@ -96,18 +106,18 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit(submitHandler)}>
-          <Table responsive striped>
+          <Table responsive striped hover size="sm">
             <thead>
               <tr>
                 <td>#</td>
-                <th>Drug </th>
+                <th className="text-nowrap">Drug Name</th>
                 <th>
                   <span style={{ opacity: 0 }}>ergagrtshsfgbsrh</span>{" "}
                 </th>
                 <th>Dosage</th>
                 <th>Frequency</th>
                 <th>Start Date</th>
-                <th>note</th>
+                <th>Duration</th>
                 <th>
                   <button
                     type="button"
@@ -117,12 +127,12 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
                         medicine_id: "",
                         dosage: "",
                         frequency: "",
-                        start_date: "",
-                        notes: "",
+                        start_date: new Date().toISOString().substring(0, 10),
+                        duration: "",
                       })
                     }
                   >
-                    Add
+                    +Add
                   </button>
                 </th>
               </tr>
@@ -132,41 +142,8 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
                 <tr key={item.id}>
                   <td>{index + 1}</td>
                   <td colSpan={2}>
-                    {/* <Controller
-                      control={control}
-                      name=""
-                      render={({ field }) => (
-                        <CreatableSelect
-                          {...field}
-                          name={`rows[${index}].medicine_id`}
-                          placeholder="drug name"
-                          // formatCreateLabel={handleCreateOption}
-                          options={medicinesOptions}
-                          // defaultValue={chiefs}
-                          styles={{
-                            control: (baseStyles, state) => ({
-                              ...baseStyles,
-                              borderColor: errors.chief_complaint
-                                ? "red"
-                                : state.isFocused
-                                ? "white"
-                                : "grey",
-                              zIndex: 10,
-                            }),
-                          }}
-                        />
-                      )}
-                    /> */}
-                    {/* <Form.Control
-                      // type="text"
-                      placeholder="medicine"
-                      list="medicines"
-                      {...register(`rows.${index}.medicine_id`)}
-                      isInvalid={errors.rows?.[index]?.medicine_id}
-                      // defaultValue={item.name}
-                    ></Form.Control> */}
                     <Form.Control
-                      placeholder="medicine"
+                      // placeholder="medicine"
                       list="medicines"
                       {...register(`rows.${index}.medicine_id`)}
                       isInvalid={errors.rows?.[index]?.medicine_id}
@@ -186,25 +163,12 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
                         </option>
                       ))}
                     </datalist>
-                    {/* <input
-                      type="hidden"
-                      {...register(`rows.${index}.medicineID`)}
-                      value={
-                        watch(`rows.${index}.medicine_id`)
-                          ? data?.find(
-                              (medicine) =>
-                                medicine?.medicineServiceItem?.service_name ==
-                                watch(`rows.${index}.medicine_id`)
-                            )?.service_item_id || ""
-                          : undefined
-                      }
-                    /> */}
                   </td>
                   <td>
                     <Form.Control
                       type="text"
                       {...register(`rows.${index}.dosage`)}
-                      placeholder="dosage"
+                      // placeholder="dosage"
                       isInvalid={!!errors.rows?.[index]?.dosage}
 
                       // defaultValue={item.email}
@@ -214,7 +178,7 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
                     <Form.Control
                       // type="tel"
                       {...register(`rows.${index}.frequency`)}
-                      placeholder="frequency"
+                      // placeholder="frequency"
                       isInvalid={!!errors.rows?.[index]?.frequency}
                     />
                   </td>
@@ -222,23 +186,25 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
                     <Form.Control
                       type="date"
                       min={new Date().toISOString().substring(0, 10)}
+                      defaultValue={new Date().toISOString().substring(0, 10)}
                       {...register(`rows.${index}.start_date`)}
                       isInvalid={!!errors.rows?.[index]?.start_date}
                     />
                   </td>
                   <td>
                     <Form.Control
-                      type="text"
-                      {...register(`rows.${index}.notes`)}
+                      type="number"
+                      {...register(`rows.${index}.duration`)}
+                      isInvalid={!!errors.rows?.[index]?.duration}
                     />
                   </td>
                   <td>
                     <button
-                      className="btn btn-danger py-1"
+                      className="btn fs-5 p-0"
                       type="button"
                       onClick={() => remove(index)}
                     >
-                      Delete
+                      <FaMinus color="red" />
                     </button>
                   </td>
                 </tr>
@@ -295,7 +261,7 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
               </Form.Group>
             </Col>
           </Row> */}
-          <Modal.Footer>
+          <Modal.Footer className="p-0">
             <button
               type="button"
               className="btn btn-secondary"

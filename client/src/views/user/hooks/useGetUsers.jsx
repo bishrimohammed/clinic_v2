@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-
 import Axiosinstance from "../../../api/axiosInstance";
 import { AxiosHeaders } from "../../../api/useAxiosHeaders";
 

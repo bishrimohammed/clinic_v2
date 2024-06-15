@@ -197,6 +197,9 @@ const Sidebar = () => {
               <CNavItem to="/user/account" component={NavLink}>
                 Account Management
               </CNavItem>
+              <CNavItem to="/approvalsetting" component={NavLink}>
+                Approval Setting
+              </CNavItem>
             </CNavGroup>
           )}
           {currentUser.role?.name === "admin" && (

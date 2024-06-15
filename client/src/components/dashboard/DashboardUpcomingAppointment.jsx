@@ -30,8 +30,14 @@ const DashboardUpcomingAppointment = () => {
             >
               {/* {employee.firstName.split("")[0].toUpperCase() +
                         employee.middleName.split("")[0].toUpperCase()} */}
-              {appointment?.patient_name.split(" ")[0].charAt(0).toUpperCase()}
-              {appointment?.patient_name.split(" ")[1].charAt(0).toUpperCase()}
+              {appointment?.patient_name
+                ?.split(" ")[0]
+                ?.charAt(0)
+                ?.toUpperCase()}
+              {appointment?.patient_name
+                ?.split(" ")[1]
+                ?.charAt(0)
+                ?.toUpperCase()}
             </div>
             <div className="d-flex flex-column  justify-content-center align-items-start">
               <h6 style={{ fontSize: 15 }} className=" mb-0">

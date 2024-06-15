@@ -204,7 +204,7 @@ module.exports = PatientVisitController = {
       patient_id,
       doctor_id,
       assignment_date: date,
-      visit_time: new Date(date).toISOString().substring(11, 16),
+      visit_time: date.substring(11, 16),
       visit_type: type,
       mode_of_arrival: type === "Emergency" ? mode_of_arrival : null,
       reason,
@@ -294,6 +294,7 @@ module.exports = PatientVisitController = {
           attributes: ["id"],
         },
       ],
+      order: [["visit_type", "DESC"]],
     });
     res.json(visits);
   }),

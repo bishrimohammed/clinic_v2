@@ -178,7 +178,13 @@ const UpcomingPatientVisitTable = () => {
                     //   isShow: true,
                     //   appointment: rowEl.original,
                     // });
-                    navigate("view", { state: rowEl.original });
+                    console.log(rowEl.original.stage);
+                    if (
+                      rowEl.original.stage === "Waiting for triage" ||
+                      rowEl.original.stage === "Performing triage"
+                    ) {
+                      navigate("view", { state: rowEl.original });
+                    }
                   }}
                 >
                   {rowEl.getVisibleCells().map((cellEl, index) => {
@@ -230,7 +236,7 @@ const UpcomingPatientVisitTable = () => {
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu style={{ zIndex: 55 }}>
-                        {rowEl.original.stage === "Waiting for examiner" ? (
+                        {rowEl.original.stage === "Waiting for triage" ? (
                           <Dropdown.Item
                             className="d-flex gap-2 align-items-center"
                             role="button"

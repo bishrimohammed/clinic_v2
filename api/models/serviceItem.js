@@ -1,7 +1,3 @@
-// service item sequilize model. it contain service name, price , service_category id , unit_id, status
-
-// const { DataTypes } = require("sequelize");
-const { sequelize } = require(".");
 
 module.exports = (sequelize, DataTypes) => {
   const ServiceItem = sequelize.define("serviceitem", {

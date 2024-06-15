@@ -33,7 +33,7 @@ const physicalExaminationSchema = yup.object().shape({
     })
   ),
 });
-const PhysicalExaminationTab = () => {
+const PhysicalExaminationTab = React.forwardRef((props, ref) => {
   const { data: PhysicalExaminationFields } =
     useGetAcvtivePhysicalExamination();
   const { data: VitalSignFields } = useGetActiveVitalSignFields();
@@ -45,6 +45,8 @@ const PhysicalExaminationTab = () => {
     register,
     formState: { errors },
     handleSubmit,
+    getValues,
+    reset,
   } = useForm({
     resolver: yupResolver(physicalExaminationSchema),
     mode: "onBlur",
@@ -55,6 +57,10 @@ const PhysicalExaminationTab = () => {
     //   vitals: VitalSignFields,
     // },
   });
+  React.useImperativeHandle(ref, () => ({
+    getSaveForLaterData: () => getValues(),
+    resetData: () => reset(),
+  }));
   const submitHandler = (data) => {
     console.log(data);
     mutateAsync({
@@ -74,6 +80,7 @@ const PhysicalExaminationTab = () => {
     const vital = data?.vital.find((vital) => vital.vitalSignField_id === id);
     return vital?.result;
   };
+
   return (
     <div>
       <Form onSubmit={handleSubmit(submitHandler)} className="px-4">
@@ -101,7 +108,7 @@ const PhysicalExaminationTab = () => {
                   type="text"
                   {...register(`physicalExaminations[${index}].value`)}
                   //   placeholder={field.name}
-                  defaultValue={getPhysicalExaminationDefaultValue(field.id)}
+                  // defaultValue={getPhysicalExaminationDefaultValue(field.id)}
                   isInvalid={errors?.physicalExaminations?.[index]?.value}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -134,7 +141,7 @@ const PhysicalExaminationTab = () => {
                   {...register(`vitals[${index}].value`)}
                   //   placeholder={field.name}
                   isInvalid={errors?.vitals?.[index]?.value}
-                  defaultValue={getVitalDefaultValue(field.id)}
+                  // defaultValue={getVitalDefaultValue(field.id)}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors?.vitals?.[index]?.value?.message}
@@ -159,6 +166,6 @@ const PhysicalExaminationTab = () => {
       </Form>
     </div>
   );
-};
+});
 
 export default PhysicalExaminationTab;

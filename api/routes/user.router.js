@@ -4,6 +4,8 @@ const { protect } = require("../middleware/authMiddleWare.js");
 const router = express.Router();
 router.get("/reset", UserController.resetPassword);
 router.get("/", UserController.getUsers);
+router.get("/active", UserController.getActiveUsers);
+
 router.get("/search", protect, UserController.getDoctors);
 router.get("/doctors", UserController.getDoctors);
 router.get("/:id", protect, UserController.getUserById);

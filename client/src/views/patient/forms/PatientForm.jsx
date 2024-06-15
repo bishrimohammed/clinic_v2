@@ -33,9 +33,52 @@ const PatientForm = ({ patient }) => {
   // });
   useEffect(() => {
     // generate patient id
-    generatePatientID().then((res) => {
-      setPatientID(res);
-    });
+    const generatePatientID = async () => {
+      // Retrieve the last used patient ID from your data store (e.g., local storage, database)
+      let lastID = localStorage.getItem("LastPatientID");
+      // console.log(lastID);
+      // Extract the numeric part of the last ID and increment it
+      let nextNumber;
+      if (lastID) {
+        nextNumber = String(parseInt(lastID?.split("-")[1]) + 1).padStart(
+          5,
+          "0"
+        );
+
+        return `P-${nextNumber}`;
+      } else {
+        const res = await Axiosinstance.get("patient/lastPatientID");
+        //  .then((res) => {
+        //   console.log(res.data);
+        nextNumber = String(parseInt(res.data?.split("-")[1]) + 1).padStart(
+          5,
+          "0"
+        );
+        // });
+        if (!res.data) {
+          localStorage.setItem("LastPatientID", "P-00001");
+          return "P-00001";
+        }
+        localStorage.setItem(
+          "LastPatientID",
+          "P-" + String(parseInt(res.data?.split("-")[1])).padStart(5, "0")
+        );
+        return `P-${nextNumber}`;
+        console.log(nextNumber);
+      }
+      // Combine the prefix and the new number
+      let newID = `P-${nextNumber}`;
+
+      // Store the new last used patient ID
+      // localStorage.setItem('LastPatientID', newID);
+
+      return newID;
+    };
+    generatePatientID();
+    // .then((res) => {
+    //   console.log(res);
+    //   setPatientID(res);
+    // });
   }, []);
   // console.log(PateintUniqueId);
   const { mutateAsync, isPending } = useAddPatient();
@@ -149,6 +192,67 @@ const PatientForm = ({ patient }) => {
     resolver: yupResolver(patientSchema),
   });
 
+  useEffect(() => {
+    // generate patient id
+    const generatePatientID = async () => {
+      // Retrieve the last used patient ID from your data store (e.g., local storage, database)
+      if (patient) {
+        setValue("patientId", patient.card_number);
+      } else {
+        let lastID = localStorage.getItem("LastPatientID");
+        // console.log(lastID);
+        // Extract the numeric part of the last ID and increment it
+        let nextNumber;
+        if (lastID) {
+          nextNumber = String(parseInt(lastID?.split("-")[1]) + 1).padStart(
+            5,
+            "0"
+          );
+
+          setValue("patientId", `P-${nextNumber}`);
+        } else {
+          const res = await Axiosinstance.get("patient/lastPatientID");
+          //  .then((res) => {
+          //   console.log(res.data);
+          // console.log(res);
+          nextNumber = String(parseInt(res.data?.split("-")[1]) + 1).padStart(
+            5,
+            "0"
+          );
+          // console.log(nextNumber);
+          // });
+          if (!res.data) {
+            localStorage.setItem("LastPatientID", "P-00000");
+            // return "P-00001";
+            setValue("patientId", "P-00001");
+          } else {
+            localStorage.setItem(
+              "LastPatientID",
+              "P-" + String(parseInt(res.data?.split("-")[1])).padStart(5, "0")
+            );
+            console.log(`P-${nextNumber}`);
+            setValue("patientId", `P-${nextNumber}`);
+          }
+
+          // console.log(nextNumber);
+        }
+      }
+
+      // Combine the prefix and the new number
+      // let newID = `P-${nextNumber}`;
+
+      // Store the new last used patient ID
+      // localStorage.setItem('LastPatientID', newID);
+
+      // return newID;
+      // setValue("patientId", newID);
+    };
+    generatePatientID();
+    // .then((res) => {
+    //   console.log(res);
+    //   setPatientID(res);
+    // });
+  }, []);
   // console.log(getValues("is_credit"));
 
   // setValue("birth_date", new Date().toISOString().substring(0, 10));
@@ -524,7 +628,7 @@ const PatientForm = ({ patient }) => {
               <Form.Label className=" text-nowrap mb-1">Patient ID:</Form.Label>
               <Form.Control
                 type="text"
-                defaultValue={patient ? patient.card_number : patientID}
+                // defaultValue={patient ? patient.card_number : patientID}
                 // defaultValue="P-00007"
                 disabled={true}
                 // className="w-75"
@@ -577,7 +681,10 @@ const PatientForm = ({ patient }) => {
           <Row>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
-                <Form.Label>Name</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Name</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
                 <Form.Control
                   {...register("firstName")}
                   isInvalid={errors.firstName}
@@ -596,7 +703,11 @@ const PatientForm = ({ patient }) => {
 
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
-                <Form.Label> Father's Name</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label> Father's Name</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <Form.Control
                   {...register("middleName")}
                   isInvalid={errors.middleName}
@@ -822,7 +933,13 @@ const PatientForm = ({ patient }) => {
             </Col>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group className="mb-3">
-                <Form.Label className="text-nowrap">Payment Method</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label className="text-nowrap">
+                    Payment Method
+                  </Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
+
                 <Form.Select {...register("is_credit")}>
                   {/* <option value="">Select Payment way</option> */}
 
@@ -838,7 +955,10 @@ const PatientForm = ({ patient }) => {
           <Row>
             <Col md={4} sm={12} className="mb-2">
               <Form.Group>
-                <Form.Label>Phone</Form.Label>
+                <div className="d-flex align-items-center gap-1">
+                  <Form.Label>Phone</Form.Label>
+                  <span className="text-danger fw-bold">*</span>
+                </div>
                 <Form.Control
                   type="number"
                   placeholder="09/07********"
@@ -1082,7 +1202,11 @@ const PatientForm = ({ patient }) => {
             {realationwacher === "Other" && (
               <Col md={4} sm={12} className="mb-2">
                 <Form.Group className="mb-3">
-                  <Form.Label>Relationship Type</Form.Label>
+                  <div className="d-flex align-items-center gap-1">
+                    <Form.Label>Relationship Type</Form.Label>
+                    <span className="text-danger fw-bold">*</span>
+                  </div>
+
                   <Form.Control
                     {...register("emergency.other_relation")}
                     aria-label="Default select example"
@@ -1256,40 +1380,40 @@ const PatientForm = ({ patient }) => {
   );
 };
 
-async function generatePatientID() {
-  // Retrieve the last used patient ID from your data store (e.g., local storage, database)
-  let lastID = localStorage.getItem("LastPatientID");
-  // console.log(lastID);
-  // Extract the numeric part of the last ID and increment it
-  let nextNumber;
-  if (lastID) {
-    nextNumber = String(parseInt(lastID?.split("-")[1]) + 1).padStart(5, "0");
+// async function generatePatientID() {
+//   // Retrieve the last used patient ID from your data store (e.g., local storage, database)
+//   let lastID = localStorage.getItem("LastPatientID");
+//   // console.log(lastID);
+//   // Extract the numeric part of the last ID and increment it
+//   let nextNumber;
+//   if (lastID) {
+//     nextNumber = String(parseInt(lastID?.split("-")[1]) + 1).padStart(5, "0");
 
-    return `P-${nextNumber}`;
-  } else {
-    const res = await Axiosinstance.get("patient/lastPatientID");
-    //  .then((res) => {
-    //   console.log(res.data);
-    nextNumber = String(parseInt(res.data?.split("-")[1]) + 1).padStart(5, "0");
-    // });
-    if (!res.data) {
-      localStorage.setItem("LastPatientID", "P-00001");
-      return "P-00001";
-    }
-    localStorage.setItem(
-      "LastPatientID",
-      "P-" + String(parseInt(res.data?.split("-")[1])).padStart(5, "0")
-    );
-    return `P-${nextNumber}`;
-    console.log(nextNumber);
-  }
-  // Combine the prefix and the new number
-  let newID = `P-${nextNumber}`;
+//     return `P-${nextNumber}`;
+//   } else {
+//     const res = await Axiosinstance.get("patient/lastPatientID");
+//     //  .then((res) => {
+//     //   console.log(res.data);
+//     nextNumber = String(parseInt(res.data?.split("-")[1]) + 1).padStart(5, "0");
+//     // });
+//     if (!res.data) {
+//       localStorage.setItem("LastPatientID", "P-00001");
+//       return "P-00001";
+//     }
+//     localStorage.setItem(
+//       "LastPatientID",
+//       "P-" + String(parseInt(res.data?.split("-")[1])).padStart(5, "0")
+//     );
+//     return `P-${nextNumber}`;
+//     console.log(nextNumber);
+//   }
+//   // Combine the prefix and the new number
+//   let newID = `P-${nextNumber}`;
 
-  // Store the new last used patient ID
-  // localStorage.setItem('LastPatientID', newID);
+//   // Store the new last used patient ID
+//   // localStorage.setItem('LastPatientID', newID);
 
-  return newID;
-}
+//   return newID;
+// }
 
 export default PatientForm;

@@ -13,6 +13,11 @@ router.get(
 );
 
 router.post("/take-payment", protect, BillingController.takePayment);
+router.post(
+  "/:billingId/add-advanced-payment",
+  protect,
+  BillingController.AddAdvancedPayment
+);
 
 router.patch("/:id/void", protect, BillingController.voidPayment);
 

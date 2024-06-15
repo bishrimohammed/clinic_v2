@@ -110,7 +110,6 @@ const AddClinicInfo = () => {
     register,
     handleSubmit,
     getValues,
-
     watch,
     formState: { errors },
   } = useForm({

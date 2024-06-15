@@ -14,7 +14,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AddVitalSignModal from "../AddVitalSignModal";
 import { useGetActiveVitalSignFields } from "../hooks/useGetActiveVitalSignFields";
 import { useForm } from "react-hook-form";
-import { FaCirclePlus } from "react-icons/fa6";
+// import { FaCirclePlus } from "react-icons/fa6";
 // import PatientAllergies from "../../patient/patient Detail/Allergy/PatientAllergies";
 // import PatientFamilyHistory from "../../patient/patient Detail/family history/PatientFamilyHistory";
 // import PatientAllergies from "../../patient/patient Detail/Allergy/PatientAllergies";
@@ -31,6 +31,7 @@ import { useGetPatient } from "../../patient/hooks/patientHooks/useGetPatient";
 import { useGetPatientGeneralInfo } from "../../patient/hooks/patientHooks/useGetPatientGeneralInfo";
 const traigeSchema = yup.object().shape({
   symptom: yup.string(),
+  visit_type: yup.string(),
   vitals: yup.array().of(
     yup.object().shape({
       vitalId: yup.number(),
@@ -50,7 +51,7 @@ const ViewUpcomingVisitDetail = () => {
   const defaultValue = JSON.parse(
     localStorage.getItem(`medical_${state.medicalRecord_id}`)
   );
-  console.log(state);
+  // console.log(state);
   const {
     register,
     formState: { errors },
@@ -81,8 +82,8 @@ const ViewUpcomingVisitDetail = () => {
         // medicalRecord_id: state.id,
       };
     });
-
-    mutateAsync({ vitals, symptom: data.symptom })
+    // return;
+    mutateAsync({ vitals, symptom: data.symptom, visit_type: data.visit_type })
       .then((res) => {
         console.log(res);
         if (res.status === 201) {
@@ -112,72 +113,6 @@ const ViewUpcomingVisitDetail = () => {
   };
   return (
     <div>
-      {/* <h1>ViewUpcomingVisitDetail</h1> */}
-
-      {/* <div className="d-flex justify-content-end mb-3">
-        <Button
-          className="me-md-3"
-          onClick={() => setShowAddVitalSignModal(true)}
-        >
-          + Add Vital Sign
-        </Button>
-      </div> */}
-      {/* <Row className="px-3">
-        <Col md={4} sm={12} className="px-4 d-flex ">
-          <p className="mb-0 text-muted fw-bold">Patient Name : </p>
-          <p className="ms-2 mb-0">
-            {state.patient?.firstName} {state.patient?.middleName}{" "}
-            {state.patient?.lastName}
-          </p>
-        </Col>
-        <Col md={4} sm={12} className="d-flex px-4">
-          <p className="mb-0 text-muted fw-bold">Card Number: </p>
-          <p className="ms-2 ">{state.patient.card_number}</p>
-        </Col>
-        <Col md={4} sm={12} className="d-flex px-4">
-          <p className="mb-0 text-muted fw-bold">Age: </p>
-          <p className="ms-2 ">
-            {differenceInYears(new Date(), state.patient?.birth_date)} Years old
-          </p>
-        </Col>
-        <Col md={4} sm={12} className="d-flex px-4">
-          <p className="mb-0 text-muted fw-bold">Gender: </p>
-          <p className="ms-2 ">{state.patient?.gender}</p>
-        </Col>
-        <Col md={4} sm={12} className="d-flex px-4">
-          <p className="mb-0 text-muted fw-bold">Examiner: </p>
-          <p className="ms-2 ">
-            {state.doctor?.employee?.firstName}{" "}
-            {state.doctor?.employee?.middleName}{" "}
-            {state.doctor?.employee?.lastName}
-          </p>
-        </Col>
-        <Col md={4} sm={12} className="d-flex px-4">
-          <p className="mb-0 text-muted fw-bold">Visit Date: </p>
-          <p className="ms-2 ">{state.assignment_date}</p>
-        </Col>
-        <Col md={4} sm={12} className="d-flex px-4">
-          <p className="mb-0 text-muted fw-bold">Visit Time: </p>
-          <p className="ms-2 ">{state.visit_time}</p>
-        </Col>
-        <Col md={4} sm={12} className="d-flex px-4">
-          <p className="mb-0 text-muted fw-bold">Visit Type: </p>
-          <p className="ms-2 ">{state.visit_type}</p>
-        </Col>
-
-        <Col md={4} sm={12} className="d-flex px-4">
-          <p className="mb-0 text-muted fw-bold">Status: </p>
-          <p className="ms-2 ">{state.status ? "Active" : "Inactive"}</p>
-        </Col>
-        <Col md={4} sm={12} className="d-flex px-4">
-          <p className="mb-0 text-muted fw-bold">Stage:</p>
-          <p className="ms-2 ">{state.stage}</p>
-        </Col>
-        <Col md={6} sm={12} className="d-flex px-4">
-          <p className="mb-0 text-muted fw-bold">Reason: </p>
-          <p className="ms-2 ">{state.reason}</p>
-        </Col>
-      </Row> */}
       <Container className="triage-page">
         <div className="mb-2 border-bottom py-2 mb-1 d-flex gap-3 align-items-center">
           <IoMdArrowRoundBack
@@ -186,7 +121,7 @@ const ViewUpcomingVisitDetail = () => {
             style={{ cursor: "pointer" }}
             onClick={() => navigate(-1)}
           />
-          <h4>View Patient Visit Detail</h4>
+          <h4>Add Traige for this visit</h4>
         </div>
         <div className="d-flex gap-3">
           <div style={{ flex: 75 }} className="left ">
@@ -267,15 +202,34 @@ const ViewUpcomingVisitDetail = () => {
                     {errors?.chiefComplaint?.message}
                   </Form.Control.Feedback>
                 </Form.Group> */}
-                <Form.Group className="mb-3">
+                {/* <Form.Group className="mb-3">
                   <Form.Label>Symptom Notes </Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Symptom notes"
                     {...register("symptom")}
+                    hidden
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors?.symptom?.message}
+                  </Form.Control.Feedback>
+                </Form.Group> */}
+                <h5 className="border-bottom p-2 mb-2">Change Visit Type</h5>
+                <Form.Group className="mb-3">
+                  <Form.Label>Visit Type</Form.Label>
+                  <Form.Select
+                    type="text"
+                    {...register("visit_type")}
+                    defaultValue={state.visit_type}
+                  >
+                    <option value="">Please Select</option>
+                    <option value="Consultation">Consultation</option>
+                    <option value="Follow-up">Follow-up</option>
+                    <option value="Emergency">Emergency</option>
+                    <option value="Routine">Routine Check-up</option>
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors?.visit_type?.message}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Row>

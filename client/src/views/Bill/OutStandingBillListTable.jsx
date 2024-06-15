@@ -19,8 +19,14 @@ import { hasPermission } from "../../utils/hasPermission";
 import { LuFilter } from "react-icons/lu";
 import SearchInput from "../../components/inputs/SearchInput";
 import { useNavigate } from "react-router-dom";
+import AddAdvancedPaymentButton from "./AddAdvancedPaymentButton";
 
-const OutStandingBillListTable = ({ billings, isPending, refetch }) => {
+const OutStandingBillListTable = ({
+  billings,
+  isPending,
+  refetch,
+  isRefetching,
+}) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState([]);
@@ -75,12 +81,23 @@ const OutStandingBillListTable = ({ billings, isPending, refetch }) => {
       </div>
       <div className="d-flex justify-content-end gap-2 align-items-center w-100 mb-1 mt-2">
         <button
-          disabled={isPending}
+          disabled={isRefetching}
           onClick={refetch}
           type="button"
           className="btn btn-success d-flex align-items-center gap-2 "
         >
-          <IoReloadOutline />
+          {/* <IoReloadOutline /> */}
+          {isRefetching ? (
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+              role="status"
+              aria-hidden="true"
+            />
+          ) : (
+            <IoReloadOutline />
+          )}
           Reload
         </button>
         {hasPermission("visit", "create") && (
@@ -190,6 +207,17 @@ const OutStandingBillListTable = ({ billings, isPending, refetch }) => {
                       }
                     }
                   >
+                    {rowEl.original.has_advanced_payment && (
+                      <AddAdvancedPaymentButton
+                        billId={rowEl.original.id}
+                        patient={rowEl.original.patient}
+                        visit_stage={rowEl.original.medicalRecord.visit.stage}
+                        is_advanced_payment_amount_completed={
+                          rowEl.original.is_advanced_payment_amount_completed
+                        }
+                      />
+                    )}
+
                     <Dropdown
                       id={rowEl.original.id + "dropdown"}
                       autoClose="outside"

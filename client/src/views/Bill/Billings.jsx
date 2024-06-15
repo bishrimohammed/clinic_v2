@@ -7,7 +7,12 @@ import OutStandingBillListTable from "./OutStandingBillListTable";
 const Billings = () => {
   const navigate = useNavigate();
 
-  const { data: bills, isPending, refetch } = useGetOutStandingPayments();
+  const {
+    data: bills,
+    isPending,
+    refetch,
+    isRefetching,
+  } = useGetOutStandingPayments();
   console.log(bills);
   const billings = useMemo(() => bills || [], [bills]);
   // if (isPending) return <Spinner animation="grow" />;
@@ -20,6 +25,7 @@ const Billings = () => {
             billings={billings}
             isPending={isPending}
             refetch={refetch}
+            isRefetching={isRefetching}
           />
           {/* <Table striped bordered>
             <thead>

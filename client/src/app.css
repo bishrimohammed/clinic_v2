@@ -158,6 +158,26 @@ input:focus {
   user-select: none;
 }
 
-.nav-item.nav-link {
+/* .nav-item.nav-link {
   padding-left: 0;
+} */
+
+/* .progressTab .nav-link {
+  background-color: #f1f1f1 !important;
+} */
+
+.progressTab .nav-link.active {
+  background-color: #fff !important;
 }
+
+/* .progressTab .nav-link {
+  color: #333 !important;
+} */
+
+.progressTab .nav-link.active {
+  color: rgb(144, 7, 182) !important;
+  /* color: rgb(117, 91, 180) !important; */
+}
+/* .progress-note-tab-container {
+  scrollbar-width: none;
+} */

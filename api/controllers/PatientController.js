@@ -53,6 +53,7 @@ module.exports = PatientController = {
         "status",
         "createdAt",
       ],
+      order: [["createdAt", "DESC"]],
     });
     // console.log(patients);
     res.status(200).json(patients);
@@ -63,6 +64,7 @@ module.exports = PatientController = {
       order: [["id", "DESC"]],
     });
     res.status(200).json(lastPatient.card_number);
+    // res.status(200).json(null);
   }),
   getPatientNameList: expressAsyncHandler(async (req, res) => {
     // console.log("\n\nkjaduig\n\n");
@@ -272,7 +274,7 @@ module.exports = PatientController = {
   }),
   getPatientGeneralInforamtion: expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log("\n\ngetPatientGeneralInforamtion\n\n");
+    // console.log("\n\ngetPatientGeneralInforamtion\n\n");
     const patient = await db.Patient.findOne({
       where: {
         id: id,
@@ -289,6 +291,10 @@ module.exports = PatientController = {
         {
           model: db.SocialHistory,
           as: "socialHistories",
+        },
+        {
+          model: db.PastMedicalHistory,
+          as: "pastMedicalHistories",
         },
       ],
     });
@@ -831,6 +837,8 @@ module.exports = PatientController = {
   addPatientSocialHistory: expressAsyncHandler(async (req, res) => {
     const { tobacco_use, alcohol_use } = req.body;
     const patient = await db.Patient.findByPk(req.params.id);
+    // console.log(req.body);
+    // return;
     if (!patient) {
       res.status(400);
       throw new Error("Patient doesn't exist");
@@ -839,9 +847,27 @@ module.exports = PatientController = {
       patient_id: patient.id,
       tobacco_use: tobacco_use,
       alcohol_use: alcohol_use,
+      created_by: req.user.id,
     });
     // patient.social_history = req.body.social_history;
     // await patient.save();
     res.json({ message: "Patient social history added successfully" });
+  }),
+  addPatientPastMedicalHistory: expressAsyncHandler(async (req, res) => {
+    const { medical_condition, treatment } = req.body;
+    const patient = await db.Patient.findByPk(req.params.id);
+    if (!patient) {
+      res.status(400);
+      throw new Error("Patient doesn't exist");
+    }
+    await db.PastMedicalHistory.create({
+      patient_id: patient.id,
+      medical_condition,
+      treatment,
+      created_by: req.user.id,
+    });
+    res
+      .status(201)
+      .json({ message: "Patient past medical history added successfully" });
   }),
 };

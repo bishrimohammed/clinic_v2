@@ -1,5 +1,3 @@
-const { sequelize } = require("..");
-
 // vital signs sequilize model
 module.exports = (sequelize, DataTypes) => {
   const Vital = sequelize.define("vital", {
@@ -11,20 +9,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    result: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     taken_date: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: new Date(),
     },
-    vitalSignField_id: {
+    progrssNote_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
   });
-  Vital.sync({ alter: false });
+  Vital.sync({ alter: true });
   return Vital;
 };

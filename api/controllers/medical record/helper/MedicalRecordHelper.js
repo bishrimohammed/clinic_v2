@@ -26,7 +26,88 @@ module.exports = MedicalRecordHelper = {
         });
         medicalBilling_Id = MedicalRecord.id;
       }
-
+      if (MedicalBillingExist?.has_advanced_payment) {
+        const serviceItems = await db.ServiceItem.findAll({
+          where: {
+            id: items,
+          },
+        });
+        const openAdvancedPayment = await db.AdvancedPayment.findOne({
+          where: {
+            medical_billing_id: medicalBilling_Id,
+          },
+        });
+        const totalPrice = serviceItems?.reduce(
+          (sum, item) => sum + item.price,
+          0
+        );
+        if (openAdvancedPayment.remaining_amount < totalPrice) {
+          await Promise.all(
+            items.map(async (medinice_id) => {
+              return await db.Payment.create({
+                medical_billing_id: medicalBilling_Id,
+                item_id: medinice_id,
+              });
+            })
+          )
+            .then(async (payments) => {
+              await visit.update({
+                stage: "Waiting for payment",
+              });
+              console.log(payments);
+              return "payment created successfully";
+            })
+            .catch((err) => {
+              console.log(err);
+              return "payment not created";
+            });
+        } else {
+          openAdvancedPayment.remaining_amount -= totalPrice;
+          await openAdvancedPayment.save();
+          await Promise.all(
+            items.map(async (medinice_id) => {
+              return await db.Payment.create({
+                medical_billing_id: medicalBilling_Id,
+                item_id: medinice_id,
+                cashier_id: openAdvancedPayment.cashier_id,
+                payment_date: new Date(),
+                status: "Paid",
+              });
+            })
+          )
+            .then(async (payments) => {
+              // await visit.update({
+              //   stage: "Waiting for payment",
+              // });
+              // console.log(payments);
+              return "payment created successfully";
+            })
+            .catch((err) => {
+              console.log(err);
+              return "payment not created";
+            });
+        }
+      } else {
+        await Promise.all(
+          items.map(async (medinice_id) => {
+            return await db.Payment.create({
+              medical_billing_id: medicalBilling_Id,
+              item_id: medinice_id,
+            });
+          })
+        )
+          .then(async (payments) => {
+            await visit.update({
+              stage: "Waiting for payment",
+            });
+            // console.log(payments);
+            return "payment created successfully";
+          })
+          .catch((err) => {
+            console.log(err);
+            return "payment not created";
+          });
+      }
       await Promise.all(
         items.map(async (medinice_id) => {
           return await db.Payment.create({

@@ -61,4 +61,12 @@ module.exports.patientAssocation = (db) => {
     foreignKey: "created_by",
     as: "createdBy",
   });
+  db.Patient.hasMany(db.PastMedicalHistory, {
+    foreignKey: "patient_id",
+    as: "pastMedicalHistories",
+  });
+  db.PastMedicalHistory.belongsTo(db.User, {
+    foreignKey: "created_by",
+    as: "createdBy",
+  });
 };

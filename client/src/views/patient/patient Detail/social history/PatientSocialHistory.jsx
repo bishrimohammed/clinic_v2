@@ -5,6 +5,7 @@ import AddPatientSocialHistoryModal from "./AddPatientSocialHistoryModal";
 const PatientSocialHistory = ({ socialHistories, patientId }) => {
   const [showAddSocialHistoryModal, setShowAddSocialHistoryModal] =
     useState(false);
+  console.log(socialHistories);
   return (
     <>
       <div className="social-history-section mb-2">
@@ -20,7 +21,12 @@ const PatientSocialHistory = ({ socialHistories, patientId }) => {
         </div>
 
         <div className="allergies-list small fs-9 py-1">
-          <span>smoke, </span>
+          {socialHistories?.map((condition, index) => (
+            <span key={index + condition.id}>
+              {condition.tobacco_use}
+              {index !== socialHistories.length - 1 ? ", " : null}
+            </span>
+          ))}
         </div>
       </div>
       {showAddSocialHistoryModal && (

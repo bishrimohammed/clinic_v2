@@ -27,7 +27,7 @@ const DashboardDoctorWorkingHour = () => {
               </td>
               <td colSpan={2}>
                 {doctor?.schedules.map((schedule, index) => (
-                  <div>
+                  <div key={schedule.id} className="d-flex gap-2">
                     {index + 1}.{" "}
                     {format(
                       parse(schedule.start_time, "HH:mm:ss", new Date()),

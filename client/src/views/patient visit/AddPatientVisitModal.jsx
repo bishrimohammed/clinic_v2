@@ -87,6 +87,8 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
   }, [visitDateWatcher]);
   // console.log(DoctorList);
   const submitHandler = (data) => {
+    console.log(data);
+    // return;
     mutateAsync(data)
       .then((res) => {
         if (res.status === 201) {
@@ -145,7 +147,7 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                       const dateTime = e.target.value;
                       const date = dateTime.substring(0, 10);
                       const time = dateTime.substring(11, 16);
-                      console.log(time);
+                      // console.log(time);
                       if (
                         date === new Date().toISOString().substring(0, 10) &&
                         time < format(new Date(), "HH:mm")

@@ -27,6 +27,11 @@ router.post(
   protect,
   PatientController.addPatientSocialHistory
 );
+router.post(
+  "/:id/add_past_medical_history",
+  protect,
+  PatientController.addPatientPastMedicalHistory
+);
 router.put(
   "/:id",
   upload.fields([{ name: "employeeId_doc" }, { name: "letter_doc" }]),

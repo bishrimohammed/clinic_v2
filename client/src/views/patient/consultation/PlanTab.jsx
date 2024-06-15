@@ -7,48 +7,131 @@ import { useLocation } from "react-router-dom";
 import { OrderedLabInvestigationTable } from "./plan/OrderedLabInvestigationTable";
 import FollowUpVisit from "./plan/FollowUpVisit";
 import Refer from "./plan/Refer";
-const PlanTab = () => {
+import * as yup from "yup";
+
+import { useFieldArray, useForm } from "react-hook-form";
+import Lab from "./plan/Lab";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { FaCirclePlus } from "react-icons/fa6";
+import { useGetLaboratory } from "../History/investigation/hooks/useGetLaboratory";
+const planSchema = yup.object().shape({
+  plan: yup.string().required(),
+  selectedLabs: yup.array().of(yup.number()),
+  indirectlySelectedLabs: yup.array().of(yup.number()),
+  follow_up_visit: yup.object().shape({
+    due_date: yup.date(),
+    note: yup.string(),
+  }),
+  referral_notes: yup.array().of(yup.string()),
+  sick_notes: yup.array().of(yup.string()),
+  is_labrequest: yup.boolean(),
+  is_follow_up_visit: yup.boolean(),
+  is_refer: yup.boolean(),
+  is_sick_note: yup.boolean(),
+});
+const PlanTab = React.forwardRef((props, ref) => {
   const { state } = useLocation();
   const { data: lab_investigation, error } = useOrdered_Lab_Investigations(
     state.medicalRecord_id
   );
-  console.log(lab_investigation);
+  const { data: laboratoryTests } = useGetLaboratory();
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    getValues,
+    setValue,
+    watch,
+    control,
+    reset,
+  } = useForm({
+    resolver: yupResolver(planSchema),
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "referral_notes",
+  });
+  const {
+    fields: Sick_notes_Fields,
+    append: appendSick_notes,
+    remove: removeSick_notes,
+  } = useFieldArray({
+    control,
+    name: "sick_notes",
+  });
+  // setValue("selectedLabs",)
+  // setValue("indirectlySelectedLabs")
+  // console.log(lab_investigation);
   // const [showAddLabModal, setShowLabModal] = useState(false);
-  const [showLabAccordion, setShowLabAccordion] = useState(false);
-  const [showFollowUpAccordion, setShowFollowUpAccordion] = useState(false);
-  const [showRefer, setShowRefer] = useState(false);
+  // const [showLabAccordion, setShowLabAccordion] = useState(false);
+  // const [showFollowUpAccordion, setShowFollowUpAccordion] = useState(false);
+  // const [showRefer, setShowRefer] = useState(false);
   // const [showSickNote, setShowSickNote] = useState(false);
 
-  const foloowUpRef = useRef(false);
+  // const foloowUpRef = useRef(false);
   // console.log(labRef.current.value);
+  React.useImperativeHandle(ref, () => ({
+    getSaveForLaterData: () => getValues(),
+    resetData: () => reset(),
+  }));
+  const submitHandler = async (data) => {
+    console.log(data);
+    const investigations = data?.selectedLabs.map((t) => {
+      const lab = laboratoryTests.find((lab) => lab.id === t);
+      // console.log(lab);
+      return lab?.labTest_id;
+    });
+    const underPanels = data?.indirectlySelectedLabs.map((t) => {
+      const lab = laboratoryTests.find((lab) => lab.id === t);
+      // console.log(lab);
+      return lab?.labTest_id;
+    });
+    console.log(investigations);
+    console.log(underPanels);
+  };
+  console.log(errors);
   return (
     <div>
-      <Accordion flush defaultActiveKey="0" className="mt-2">
-        <Accordion.Item eventKey="0">
-          <Accordion.Header className="w-25 border-bottom">
-            Out Come
-          </Accordion.Header>
-          <Accordion.Body className="pb-1">
-            <Form className="d-flex justify-content-between">
-              <Form.Group className="mb-3 ">
-                {/* <Form.Label>Out Come</Form.Label> */}
+      <Form onSubmit={handleSubmit(submitHandler)} className="">
+        <Form.Group className="mb-3">
+          {/* <input type="hidden" {...register("selectedLabs")} /> */}
+          <Form.Label>Plan Note</Form.Label>
+          <Form.Control
+            as="textarea"
+            {...register("plan")}
+            placeholder="Plan"
+          />
+          {errors.plan && (
+            <span className="text-danger">{errors.plan.message}</span>
+          )}
+        </Form.Group>
+        <Accordion flush defaultActiveKey="0" className="mt-2">
+          <Accordion.Item eventKey="0">
+            <Accordion.Header className="w-25 border-bottom">
+              Out Come
+            </Accordion.Header>
+            <Accordion.Body className="pb-1 d-flex justify-content-between">
+              {/* <Form.Group className="mb-3 ">
+                
                 <Form.Check
                   type="checkbox"
-                  onChange={(e) => {
-                    console.log();
-                    setShowLabAccordion(e.target.checked);
-                  }}
+                  {...register("is_labrequest")}
+                  // onChange={(e) => {
+                  //   console.log();
+                  //   setShowLabAccordion(e.target.checked);
+                  // }}
                   label="Lab Requests"
                   placeholder="Out Come"
                 />
-              </Form.Group>
+              </Form.Group> */}
               <Form.Group className="mb-3">
                 <Form.Check
                   type="checkbox"
-                  onChange={(e) => {
-                    console.log();
-                    setShowFollowUpAccordion(e.target.checked);
-                  }}
+                  // onChange={(e) => {
+                  //   console.log();
+                  //   setShowFollowUpAccordion(e.target.checked);
+                  // }}
+                  {...register("is_follow_up_visit")}
                   label="Follow Up Visit"
                   // placeholder="Out Come"
                 />
@@ -56,10 +139,11 @@ const PlanTab = () => {
               <Form.Group className="mb-3">
                 <Form.Check
                   type="checkbox"
-                  onChange={(e) => {
-                    console.log();
-                    setShowRefer(e.target.checked);
-                  }}
+                  // onChange={(e) => {
+                  //   console.log();
+                  //   setShowRefer(e.target.checked);
+                  // }}
+                  {...register("is_refer")}
                   label="Refer"
                   // placeholder="Out Come"
                 />
@@ -67,88 +151,168 @@ const PlanTab = () => {
               <Form.Group className="mb-1">
                 <Form.Check
                   type="checkbox"
-                  onChange={(e) => {
-                    console.log();
-                    setShowSickNote(e.target.checked);
-                  }}
+                  {...register("is_sick_note")}
+                  // onChange={(e) => {
+                  //   console.log();
+                  //   setShowSickNote(e.target.checked);
+                  // }}
                   label="Sick Note"
                   // placeholder="Out Come"
                 />
               </Form.Group>
-            </Form>
-          </Accordion.Body>
-        </Accordion.Item>
-      </Accordion>
-      {showLabAccordion && (
-        <Accordion flush defaultActiveKey="lab" className="mt-2">
-          <Accordion.Item eventKey="lab">
-            <Accordion.Header style={{ zIndex: 1 }} className="border-bottom">
-              Lab Requests
-              {/* <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  alert("jhgvjhh");
-                }}
-                style={{ zIndex: 99 }}
-                className="ms-5 px-3"
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
+        {/* {watch("is_labrequest") && (
+          <Accordion flush defaultActiveKey="lab" className="my-2">
+            <Accordion.Item eventKey="lab">
+              <Accordion.Header
+                style={{ zIndex: 1 }}
+                className="border border-2 border-gredient"
               >
-                jhjh
-              </button> */}
-            </Accordion.Header>
-            <Accordion.Body className="p-0">
-              <OrderedLabInvestigationTable
-                investigations={lab_investigation?.orderedTest}
-              />
-            </Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-      )}
-      {showFollowUpAccordion && (
-        <Accordion defaultActiveKey="0">
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>Follow Up Visit</Accordion.Header>
-            <Accordion.Body>
-              <FollowUpVisit />
-            </Accordion.Body>
-          </Accordion.Item>
-          {/* <Accordion.Item eventKey="1">
-            <Accordion.Header>Accordion Item #2</Accordion.Header>
-            <Accordion.Body>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </Accordion.Body>
-          </Accordion.Item> */}
-        </Accordion>
-      )}
-      {showRefer && (
-        <Accordion defaultActiveKey="0">
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>Refer</Accordion.Header>
-            <Accordion.Body>
-              <Refer />
-            </Accordion.Body>
-          </Accordion.Item>
-          {/* <Accordion.Item eventKey="1">
-            <Accordion.Header>Accordion Item #2</Accordion.Header>
-            <Accordion.Body>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </Accordion.Body>
-          </Accordion.Item> */}
-        </Accordion>
-      )}
+                Lab Requests
+                
+              </Accordion.Header>
+              <Accordion.Body className="p-0">
+                
+                <Lab setValue={setValue} />
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+        )} */}
+        {watch("is_follow_up_visit") && (
+          <Accordion flush defaultActiveKey="0">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header className="border border-2 border-gredient">
+                Follow Up Visit
+              </Accordion.Header>
+              <Accordion.Body>
+                <FollowUpVisit />
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+        )}
+        {watch("is_refer") && (
+          <Accordion defaultActiveKey="0">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Refer</Accordion.Header>
+              <Accordion.Body>
+                {/* <Refer /> */}
+                <div className="d-flex justify-content-end"></div>
+                <Form.Group>
+                  <div className="d-flex justify-content-end mb-2">
+                    <button
+                      onClick={() => {
+                        append("");
+                      }}
+                      type="button"
+                      className="border-0 bg-transparent gap-1 d-flex align-items-center"
+                    >
+                      <FaCirclePlus /> Add Refer
+                    </button>
+                    {/* <button
+                      onClick={() => {
+                        append("");
+                      }}
+                      type="button"
+                      className="border-0 bg-transparent"
+                    >
+                      <FaCirclePlus />
+                    </button> */}
+                  </div>
+                  {fields.map((field, index) => (
+                    <Form.Group key={field.id} className="mb-3 d-flex gap-5">
+                      <Form.Control
+                        type="text"
+                        {...register(`referral_notes[${index}]`)}
+                        placeholder="Referral Notes"
+                      />
+                      {/* {errors.referral_notes && (
+                        <span className="text-danger">
+                          {errors.referral_notes.message}
+                        </span>
+                      )} */}
+                      <button
+                        className="btn btn-danger py-1"
+                        type="button"
+                        onClick={() => remove(index)}
+                      >
+                        Remove
+                      </button>
+                    </Form.Group>
+                  ))}
+                  {/* <Form.Control
+                    as="textarea"
+                    {...register("referral_notes")}
+                    placeholder="Referral Notes"
+                  />
+                  {errors.referral_notes && (
+                    <span className="text-danger">
+                      {errors.referral_notes.message}
+                    </span>
+                  )} */}
+                </Form.Group>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+        )}
+
+        {watch("is_sick_note") && (
+          <Accordion defaultActiveKey="0">
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>Sick Note</Accordion.Header>
+              <Accordion.Body>
+                {/* <Refer /> */}
+                <div className="d-flex justify-content-end"></div>
+                <Form.Group className="mb-3">
+                  <Form.Label className="d-flex justify-content-end mb-2">
+                    {/* Sick Notes{" "} */}
+                    <button
+                      onClick={() => {
+                        appendSick_notes("");
+                      }}
+                      type="button"
+                      className="border-0 bg-transparent gap-1 d-flex align-items-center"
+                    >
+                      <FaCirclePlus /> Add Sick Note
+                    </button>
+                  </Form.Label>
+                  {Sick_notes_Fields.map((field, index) => (
+                    <div key={field.id} className="d-flex gap-5 mb-3">
+                      <Form.Control
+                        type="text"
+                        {...register(`sick_notes[${index}]`)}
+                        placeholder="Sick Notes"
+                      />
+                      <button
+                        className="btn btn-danger py-0"
+                        type="button"
+                        onClick={() => removeSick_notes(index)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </Form.Group>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+        )}
+        <div className="d-flex justify-content-end gap-2 mt-2">
+          <Button variant="secondary">Save for Later</Button>
+          <Button
+            variant="primary"
+            type="submit"
+            // onClick={submitHandler}
+            // disabled={selectedTests.length === 0 || isPending}
+          >
+            {/* {isPending && <Spinner animation="border" size="sm" />} */}
+            Save
+          </Button>
+        </div>
+      </Form>
     </div>
   );
-};
+});
 
 export default PlanTab;

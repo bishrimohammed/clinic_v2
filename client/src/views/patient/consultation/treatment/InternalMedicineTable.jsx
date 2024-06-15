@@ -12,7 +12,8 @@ const InternalMedicineTable = () => {
   const { data } = useGet_Internal_MedicalRecordPrescription(
     state.medicalRecord_id
   );
-  // console.log(data);
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  // console.log(currentUser);
   return (
     <>
       <h5 className="d-flex gap-2 mb-3">
@@ -33,6 +34,7 @@ const InternalMedicineTable = () => {
             <th>Drug Name</th>
             <th>Dosage</th>
             <th>Frequency</th>
+            <th>Duration</th>
             <th>Start Date</th>
             <th>Prescriber</th>
             {/* <th>Action</th> */}
@@ -46,8 +48,12 @@ const InternalMedicineTable = () => {
                 <td>{p.medicine?.service_name}</td>
                 <td>{p.dosage}</td>
                 <td>{p.frequency}</td>
+                <td>{p.duration}</td>
                 <td>{new Date(p.start_date).toISOString().substring(0, 10)}</td>
                 <td>
+                  {/* {
+                    p.doctor?.id === currentUser.id ? "You" : p.doctor?.employee?.firstName + " " + p.doctor?.middleName 
+                  } */}
                   {p.doctor?.employee?.firstName}{" "}
                   {p.doctor?.employee?.middleName}{" "}
                   {p.doctor?.employee?.lastName}{" "}

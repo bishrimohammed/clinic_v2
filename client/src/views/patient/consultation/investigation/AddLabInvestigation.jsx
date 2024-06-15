@@ -1,12 +1,4 @@
-import {
-  Button,
-  Col,
-  Form,
-  ListGroup,
-  Modal,
-  Row,
-  Spinner,
-} from "react-bootstrap";
+import { Button, Col, ListGroup, Modal, Row, Spinner } from "react-bootstrap";
 
 import { useRef, useState } from "react";
 import { FaCheck } from "react-icons/fa";
@@ -162,10 +154,10 @@ const AddLabInvestigation = ({ show, handleClose }) => {
   };
 
   const submitHandler = () => {
-    if (remarkref.current.value === "") {
-      toast.error(" clinical finding empty");
-      return;
-    }
+    // if (remarkref.current.value === "") {
+    //   toast.error(" clinical finding empty");
+    //   return;
+    // }
     const investigations = selectedTests.map((t) => {
       const lab = laboratoryTests.find((lab) => lab.id === t);
       // console.log(lab);
@@ -183,14 +175,15 @@ const AddLabInvestigation = ({ show, handleClose }) => {
     const formData = {
       investigations: investigations,
       underPanels,
-      clinical_finding: remarkref.current.value,
+      // clinical_finding: remarkref.current.value,
     };
     mutateAsync({ formData, medicalRecord_id: state.medicalRecord_id }).then(
       (resData) => {
+        console.log(resData);
         if (resData.status === 201) {
           setSelectedTests([]);
           // setIndirecSselectedTests([]);
-          remarkref.current.value = "";
+          // remarkref.current.value = "";
           handleClose();
         }
       }
@@ -256,7 +249,7 @@ const AddLabInvestigation = ({ show, handleClose }) => {
             <Col sm={7} md={9} className="pe-0">
               <>
                 {" "}
-                <Form className="d-flex flex-column " style={{ width: "85%" }}>
+                {/* <Form className="d-flex flex-column " style={{ width: "85%" }}>
                   <Form.Group>
                     <Form.Label>Clinical Findings</Form.Label>
                     <Form.Control
@@ -267,7 +260,7 @@ const AddLabInvestigation = ({ show, handleClose }) => {
                       className="border-2 "
                     />
                   </Form.Group>
-                </Form>
+                </Form> */}
                 {PanelsTests?.length !== 0 && (
                   <div className="my-2">
                     <h6>Panels Tests: </h6>{" "}

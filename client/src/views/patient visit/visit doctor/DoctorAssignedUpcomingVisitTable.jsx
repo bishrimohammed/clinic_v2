@@ -240,8 +240,9 @@ const DoctorAssignedUpcomingVisitTable = () => {
                             <RiEditLine /> Start Consultation
                           </Dropdown.Item>
                         ) : null}
-                        {rowEl.original.stage !== "Waiting for examiner" &&
-                        rowEl.original.stage !== "Admitted" ? (
+                        {/* {rowEl.original.stage !== "Waiting for examiner" &&
+                        rowEl.original.stage !== "Admitted" ? ( */}
+                        {rowEl.original.stage !== "Waiting for examiner" ? (
                           <Dropdown.Item
                             className="d-flex gap-2 align-items-center"
                             role="button"
@@ -340,7 +341,8 @@ const DoctorAssignedUpcomingVisitTable = () => {
             })}
         </tbody>
       </Table>
-      <PaginationComponent tableInstance={tableInstance} />
+      {!isPending && <PaginationComponent tableInstance={tableInstance} />}
+
       {showAdmitModal.isShow && (
         <AdmitVisitModal
           show={showAdmitModal.isShow}

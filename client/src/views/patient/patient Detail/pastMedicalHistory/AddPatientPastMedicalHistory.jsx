@@ -1,16 +1,18 @@
 import React from "react";
-import { Form, Modal } from "react-bootstrap";
+import { Form, Modal, Spinner } from "react-bootstrap";
 // import { Form } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 // import { usePatientSocialHistory } from "../../hooks/patientHooks/usePatientSocialHistory";
 // import { Form } from "react-router-dom";
 import * as yup from "yup";
+import { useAddPatientPastMedicalHistory } from "../../hooks/patientHooks/useAddPatientPastMedicalHistory";
 const pastMedicalHistorySchema = yup.object().shape({
   medical_condition: yup.string().required("Medical Condition is required"),
   treatment: yup.string().required("Treatment is required"),
 });
 const AddPatientPastMedicalHistory = ({ show, handleClose, patientId }) => {
+  const { mutateAsync, isPending } = useAddPatientPastMedicalHistory();
   const {
     register,
     formState: { errors },
@@ -18,7 +20,21 @@ const AddPatientPastMedicalHistory = ({ show, handleClose, patientId }) => {
   } = useForm({
     resolver: yupResolver(pastMedicalHistorySchema),
   });
-  const submitHandler = (data) => {};
+  const submitHandler = (data) => {
+    console.log(data);
+    const Data = {
+      formData: {
+        medical_condition: data.medical_condition,
+        treatment: data.treatment,
+      },
+      patientId: patientId,
+    };
+    mutateAsync(Data).then((res) => {
+      if (res.status === 201) {
+        handleClose();
+      }
+    });
+  };
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -69,7 +85,9 @@ const AddPatientPastMedicalHistory = ({ show, handleClose, patientId }) => {
               type="submit"
               className="btn btn-primary"
               // onClick={handleClose}
+              disabled={isPending}
             >
+              {isPending && <Spinner size="sm" />}
               Save
             </button>
           </div>

@@ -13,14 +13,19 @@ module.exports.paymentAssociation = (db) => {
     foreignKey: "visit_id",
     as: "visit",
   });
-  db.Payment.belongsTo(db.MedicalBilling, {
-    foreignKey: "medical_billing_id",
-    as: "bill",
-  });
   db.MedicalBilling.hasMany(db.Payment, {
     foreignKey: "medical_billing_id",
     as: "payments",
   });
+  db.MedicalBilling.hasMany(db.AdvancedPayment, {
+    foreignKey: "medical_billing_id",
+    as: "advancedPayments",
+  });
+  db.Payment.belongsTo(db.MedicalBilling, {
+    foreignKey: "medical_billing_id",
+    as: "bill",
+  });
+
   db.Payment.belongsTo(db.ServiceItem, {
     foreignKey: "item_id",
     as: "item",
@@ -29,5 +34,13 @@ module.exports.paymentAssociation = (db) => {
   db.Payment.belongsTo(db.User, {
     foreignKey: "cashier_id",
     as: "cashier",
+  });
+  db.AdvancedPayment.belongsTo(db.User, {
+    foreignKey: "cashier_id",
+    as: "cashier",
+  });
+  db.AdvancedPayment.belongsTo(db.User, {
+    foreignKey: "medical_billing_id",
+    as: "bill",
   });
 };

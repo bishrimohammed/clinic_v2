@@ -3,9 +3,15 @@ import { Route, Routes } from "react-router-dom";
 // import { CSpinner } from "@coreui/react";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
-import ViewBillDetails from "../views/Bill/ViewBillDetails";
-import DoctorAssignedPatientVisits from "../views/patient visit/DoctorAssignedPatientVisits";
-import ConsultationPage from "../views/patient/consultation/ConsultationPage";
+const ViewBillDetails = React.lazy(() =>
+  import("../views/Bill/ViewBillDetails")
+);
+const DoctorAssignedPatientVisits = React.lazy(() =>
+  import("../views/patient visit/DoctorAssignedPatientVisits")
+);
+const ConsultationPage = React.lazy(() =>
+  import("../views/patient/consultation/ConsultationPage")
+);
 const CreateServiceItems = React.lazy(() =>
   import(
     "../views/Administration/clinic service/serviceItems/CreateServiceItems"
@@ -233,7 +239,13 @@ const BillDetails = React.lazy(() =>
 const Addprescription = React.lazy(() =>
   import("../views/patient/History/logic/Addprescription")
 );
+const ApprovalSetting = React.lazy(() =>
+  import("../views/Administration/ApprovalSetting/ApprovalSetting")
+);
 
+const ApprovalSettingContanier = React.lazy(() =>
+  import("../views/Administration/ApprovalSetting/ApprovalSettingContanier")
+);
 const AppContent = () => {
   const currentUser = useSelector((state) => state.auth.user);
   // console.log(currentUser);
@@ -313,6 +325,10 @@ const AppContent = () => {
               <Route path="billdetail" element={<BillDetails />} />
               <Route path="medication" element={<Addprescription />} />
             </Route>
+          </Route>
+
+          <Route path="/approvalsetting" element={<ApprovalSetting />}>
+            <Route index element={<ApprovalSettingContanier />} />
           </Route>
 
           <Route path="patientque" element={<PatientQue />}>

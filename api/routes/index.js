@@ -9,6 +9,9 @@ const AppointmentRoute = require("./Appointment.router.js");
 const visitTypeRoute = require("./visitType.router.js");
 const assignPatientRoute = require("./PatientAssignment.router.js");
 const medicalRecordRoute = require("./MedicalRecord.router.js");
+const MedicalRecordConsultaionRoute = require("./MedicalRecordConsultaion.router.js");
+const progressNoteRoute = require("./progressNote.router.js");
+
 const serviceRoute = require("./cilicService.router.js");
 const unitsRoute = require("./unit.router.js");
 const clinicprofileRoute = require("./ClinicProfile.router.js");
@@ -29,6 +32,7 @@ const InventoryRoute = require("./Inventory.router.js");
 
 const InvestigationRoute = require("./Investigation.route.js");
 const DashbordDataRoute = require("./DashboardData.route.js");
+const ApprovalSettingRoute = require("./ApprovalSetting.route.js"); //
 
 module.exports = {
   userRoute,
@@ -55,4 +59,7 @@ module.exports = {
   InventoryRoute,
   InvestigationRoute,
   DashbordDataRoute,
+  MedicalRecordConsultaionRoute,
+  progressNoteRoute,
+  ApprovalSettingRoute,
 };

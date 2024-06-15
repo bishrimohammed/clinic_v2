@@ -25,7 +25,7 @@ const ExternalMedicineTable = () => {
         >
           <FaPlusCircle size={18} className="text-primary " />
         </button>
-      </h5>{" "}
+      </h5>
       <Table responsive striped bordered>
         <thead>
           <tr>

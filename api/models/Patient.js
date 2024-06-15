@@ -96,7 +96,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
-
     address_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -130,6 +129,12 @@ module.exports = (sequelize, DataTypes) => {
     empoyeeId_url: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    patient_type: {
+      type: DataTypes.ENUM,
+      values: ["inpatient", "outpatient"],
+      allowNull: true,
+      defaultValue: "outpatient",
     },
     status: {
       type: DataTypes.BOOLEAN,

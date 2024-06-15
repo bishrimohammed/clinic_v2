@@ -19,11 +19,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-
     date: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: new Date(),
+    },
+    has_advanced_payment: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    is_advanced_payment_amount_completed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
     },
     status: {
       type: DataTypes.STRING,
@@ -31,6 +38,6 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
     },
   });
-  MedicalBilling.sync({ alter: false });
+  MedicalBilling.sync({ alter: true });
   return MedicalBilling;
 };
