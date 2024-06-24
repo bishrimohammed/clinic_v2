@@ -32,7 +32,9 @@ const InventoryRoute = require("./Inventory.router.js");
 
 const InvestigationRoute = require("./Investigation.route.js");
 const DashbordDataRoute = require("./DashboardData.route.js");
-const ApprovalSettingRoute = require("./ApprovalSetting.route.js"); //
+const ApprovalSettingRoute = require("./ApprovalSetting.route.js");
+
+const TemporarySavedDataRoute = require("./TemporarySavedData.route.js");
 
 module.exports = {
   userRoute,
@@ -62,4 +64,5 @@ module.exports = {
   MedicalRecordConsultaionRoute,
   progressNoteRoute,
   ApprovalSettingRoute,
+  TemporarySavedDataRoute,
 };

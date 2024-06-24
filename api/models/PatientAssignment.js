@@ -65,6 +65,8 @@ module.exports = (sequelize, DataTypes) => {
         "Performing consultation",
         "Waiting for payment",
         "Waiting for lab",
+        "Waiting for doctor",
+        "Done",
       ],
     },
     status: {

@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.get("/", PermissionController.getPermissions);
 
+router.get("/active", PermissionController.getActivePermissions);
+
 router.post("/", PermissionController.createPermission);
 
 router.put("/:id", PermissionController.updatePermission);

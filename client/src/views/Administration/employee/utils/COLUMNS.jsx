@@ -3,6 +3,8 @@ import { Image } from "react-bootstrap";
 import { differenceInYears } from "date-fns";
 
 import { Host_URL } from "../../../../utils/getHost_URL";
+import { RxCross1 } from "react-icons/rx";
+import { FaCheck } from "react-icons/fa";
 
 const columnHelper = createColumnHelper();
 
@@ -109,7 +111,19 @@ export const COLUMNS = [
     header: "Start Date",
     accessorKey: "date_of_hire",
   },
+  columnHelper.accessor("digital_signature", {
+    header: "Signature",
+    enableSorting: false,
+    cell: (row) => {
+      return row.getValue() ? (
+        <FaCheck className="me-1" color="green" />
+      ) : (
+        <RxCross1 color="red" size={20} />
+      );
+    },
+  }),
   columnHelper.accessor("status", {
+    enableSorting: false,
     cell: (s) => {
       // console.log(url);
       return s.getValue() == true ? (

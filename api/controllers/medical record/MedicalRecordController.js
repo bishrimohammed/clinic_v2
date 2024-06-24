@@ -4,7 +4,10 @@ const { getMedicalRecordById } = require("./helper/getMedicalRecordById");
 const {
   getMedicalRecordPrescription,
 } = require("./helper/getMedicalRecordPrescription");
-const MedicalRecordHelper = require("./helper/MedicalRecordHelper");
+const {
+  add_MedicalRecord_medicineItem_to_Billing,
+} = require("./helper/MedicalRecordHelper");
+
 module.exports = MedicalRecordController = {
   // @desc    Get all MedicalRecord
   // @route   GET /api/medicalRecords
@@ -237,7 +240,7 @@ module.exports = MedicalRecordController = {
         doctor_id: req.user.id,
       },
     });
-    console.log(medicalRecord);
+    // console.log(medicalRecord);
     const physicalExamination = await db.PhysicalExamination.findOne({
       where: {
         medicalRecordDetail_id: medicalRecord.id,
@@ -262,7 +265,7 @@ module.exports = MedicalRecordController = {
         },
       ],
     });
-    console.log(physicalExamination);
+    // console.log(physicalExamination);
     const vital = await db.Vital.findAll({
       where: {
         medicalRecord_id: id,
@@ -474,8 +477,8 @@ module.exports = MedicalRecordController = {
     });
     let investiagtionId;
     if (is_Invetigated) {
-      is_Invetigated.clinical_finding =
-        is_Invetigated.clinical_finding + "\n" + clinical_finding;
+      // is_Invetigated.clinical_finding =
+      //   is_Invetigated.clinical_finding + "\n" + clinical_finding;
       is_Invetigated.status = true;
       await is_Invetigated.save();
       investiagtionId = is_Invetigated.id;
@@ -490,7 +493,7 @@ module.exports = MedicalRecordController = {
       }
       investiagtionId = newInvestigation.id;
     }
-    const orderTests = await Promise.all(
+    await Promise.all(
       investigations.map(async (test) => {
         return db.OrderedTest.create({
           serviceItem_id: test,
@@ -503,12 +506,13 @@ module.exports = MedicalRecordController = {
       })
     );
 
-    await MedicalRecordHelper.add_MedicalRecord_medicineItem_to_Billing(
+    add_MedicalRecord_medicineItem_to_Billing(
       medicalRecord.id,
-      investigations
+      investigations,
+      "lab"
     );
 
-    if (underPanels.length > 0) {
+    if (underPanels?.length > 0) {
       await Promise.all(
         underPanels.map((test) => {
           return db.OrderedTest.create({
@@ -523,8 +527,11 @@ module.exports = MedicalRecordController = {
         })
       );
     }
-    is_Invetigated.status = false;
-    await is_Invetigated.save();
+    // if (is_Invetigated) {
+    //   is_Invetigated.status = false;
+    //   await is_Invetigated.save();
+    // }
+
     // console.log(payments);
     res.status(201).json({ msg: "Lab investigation added successfully" });
 
@@ -883,9 +890,10 @@ module.exports = MedicalRecordController = {
       })
     )
       .then(() => {
-        return MedicalRecordHelper.add_MedicalRecord_medicineItem_to_Billing(
+        add_MedicalRecord_medicineItem_to_Billing(
           medicalRecord.id,
-          medicineItemIds
+          medicineItemIds,
+          "prescription"
         );
       })
       .then((payments) => {

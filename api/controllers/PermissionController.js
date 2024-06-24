@@ -7,6 +7,14 @@ module.exports = PermissionController = {
     const permissions = await db.Permission.findAll();
     res.json(permissions);
   }),
+  getActivePermissions: asyncHandler(async (req, res) => {
+    const permissions = await db.Permission.findAll({
+      where: {
+        status: true,
+      },
+    });
+    res.json(permissions);
+  }),
   createPermission: asyncHandler(async (req, res) => {
     const permission = await db.Permission.create(req.body);
     res.status(201).json(permission);

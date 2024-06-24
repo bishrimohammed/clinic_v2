@@ -6,7 +6,7 @@ const {
 const db = require("../../models");
 const MedicalRecordHelper = require("./helper/MedicalRecordHelper");
 const { getMedicalRecordById } = require("./helper/getMedicalRecordById");
-const progressNote = require("../../models/progressNote");
+// const progressNote = require("../../models/progressNote");
 module.exports = progressNoteController = {
   getMedicalRecordProgressNote: asyncHandler(async (req, res) => {
     const { medical_record_id } = req.params;
@@ -50,6 +50,52 @@ module.exports = progressNoteController = {
     // console.log(req.body);
     // console.log(req.params);
     // return;
+    const SavedForLateprogressNote = await db.Temporary_ProgressNote.findOne({
+      where: {
+        medical_record_id: medical_record_id,
+        user_id: req.user.id,
+      },
+    });
+    // console.log(SavedForLateprogressNote);
+    if (SavedForLateprogressNote) {
+      await db.Temporary_VitalSign.destroy({
+        where: {
+          medical_record_id: medical_record_id,
+          user_id: req.user.id,
+          progress_note_id: SavedForLateprogressNote.id,
+        },
+      });
+      await db.Temporary_PhysicalExamination.destroy({
+        where: {
+          medical_record_id: medical_record_id,
+          user_id: req.user.id,
+          progress_note_id: SavedForLateprogressNote.id,
+        },
+      });
+      await db.Temporary_LabInvestigationOrder.destroy({
+        where: {
+          medical_record_id: medical_record_id,
+          user_id: req.user.id,
+          progress_note_id: SavedForLateprogressNote.id,
+        },
+      });
+      await db.Temporary_Diagnosis.destroy({
+        where: {
+          medical_record_id: medical_record_id,
+          user_id: req.user.id,
+          progress_note_id: SavedForLateprogressNote.id,
+        },
+      });
+      await db.Temporary_Prescription.destroy({
+        where: {
+          medical_record_id: medical_record_id,
+          user_id: req.user.id,
+          progress_note_id: SavedForLateprogressNote.id,
+        },
+      });
+      await SavedForLateprogressNote.destroy();
+    }
+
     const MedicaRecordID = parseInt(medical_record_id);
     const medicalRecord = await getMedicalRecordById(MedicaRecordID);
     const prescriptionExist = await getMedicalRecordPrescription(
@@ -59,7 +105,7 @@ module.exports = progressNoteController = {
       res.status(404);
       throw new Error("Medical record not found");
     }
-    console.log(medicalRecord);
+    // console.log(medicalRecord);
     // console.log(req.body);
     const progressNote = await db.ProgressNote.create({
       doctor_id: req.user.id,
@@ -70,7 +116,7 @@ module.exports = progressNoteController = {
       taken_date: new Date(),
     });
     if (investigations.length > 0) {
-      console.log("\nejdgbwjegfv\n");
+      // console.log("\nejdgbwjegfv\n");
       const is_Invetigated = await db.InvestigationOrder.findOne({
         where: {
           medicalRecord_id: medicalRecord.id,
@@ -221,5 +267,27 @@ module.exports = progressNoteController = {
     res.status(201).json({
       msg: "Progress Note added successfully",
     });
+  }),
+  finishProgressNote: asyncHandler(async (req, res) => {
+    const { medical_record_id } = req.params;
+
+    const MedicaRecordID = parseInt(medical_record_id);
+    const medicalRecord = await getMedicalRecordById(MedicaRecordID);
+    if (!medicalRecord) {
+      res.status(404);
+      throw new Error("Medical record not found");
+    }
+    medicalRecord.status = false;
+    await medicalRecord.save();
+    await db.Patient.update(
+      { patient_type: "outpatient" },
+      {
+        where: {
+          id: medicalRecord.patient_id,
+        },
+      }
+    );
+
+    res.status(200).json({ msg: "Patient discharged successfully" });
   }),
 };

@@ -10,6 +10,7 @@ export const Employeeschema = yup.object().shape({
     .required("Father Name is required"),
   lastName: yup.string().transform((value) => value.trim()),
   photo: yup.mixed(),
+  digital_signature: yup.mixed(),
   gender: yup.string().required("Gender is required"),
   position: yup.string().required("Position is required"),
   other_position: yup

@@ -44,6 +44,7 @@ const {
   MedicalRecordConsultaionRoute,
   progressNoteRoute,
   ApprovalSettingRoute,
+  TemporarySavedDataRoute,
 } = require("./routes/index.js");
 const app = express();
 
@@ -107,6 +108,7 @@ app.use("/api/v1/inventory", InventoryRoute);
 app.use("/api/v1/investigation", InvestigationRoute);
 
 app.use("/api/v1/approval-settings", ApprovalSettingRoute);
+app.use("/api/v1/temporarydata", TemporarySavedDataRoute);
 // app.use("/api/v1/upload", upload.single("file"), (req, res) => {
 //   const file = req.file;
 //   if (!file) {

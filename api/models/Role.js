@@ -1,7 +1,3 @@
-const { sequelize } = require(".");
-
-// module.exports = Role;
-
 module.exports = (sequelize, DataTypes) => {
   const Role = sequelize.define("role", {
     id: {
@@ -20,11 +16,6 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: true,
     },
   });
-  // Role.sync({ alter: true });
-  // Role.hasMany(User);
-  // Role.belongsToMany(Permission, {
-  //   through: RolePermission,
-  //   foreignKey: "role_id",
-  // });
+
   return Role;
 };

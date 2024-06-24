@@ -94,4 +94,26 @@ module.exports = ApprovalSettingController = {
     console.log(req.body);
     res.status(201).json(approvalSetting);
   }),
+  activateApprovalSetting: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const approvalSetting = await db.ApprovalSetting.findByPk(id);
+    if (!approvalSetting) {
+      res.status(404);
+      throw new Error("Approval setting not found");
+    }
+    approvalSetting.status = true;
+    await approvalSetting.save();
+    res.status(200).json(approvalSetting);
+  }),
+  deactivateApprovalSetting: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const approvalSetting = await db.ApprovalSetting.findByPk(id);
+    if (!approvalSetting) {
+      res.status(404);
+      throw new Error("Approval setting not found");
+    }
+    approvalSetting.status = false;
+    await approvalSetting.save();
+    res.status(200).json(approvalSetting);
+  }),
 };

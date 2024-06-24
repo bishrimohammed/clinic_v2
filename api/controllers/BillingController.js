@@ -6,11 +6,18 @@ module.exports = BillingController = {
   getOutStandingBillings: asyncHandler(async (req, res) => {
     const {} = req.query;
     let where = {};
-    if (req.query.status) {
-      where.status = req.query.status;
+    if (req.query.visit_date) {
+      where.assignment_date = req.query.visit_date;
+    }
+    if (req.query.stage) {
+      where.stage = req.query.stage;
+    }
+    if (req.query.visit_type) {
+      where.visit_type = req.query.visit_type;
     }
     console.log(where);
     console.log("\n\n bljhbjh\n\n");
+    console.log(req.query);
     const billings = await db.MedicalBilling.findAll({
       include: [
         {
@@ -50,22 +57,38 @@ module.exports = BillingController = {
         {
           model: db.MedicalRecord,
           as: "medicalRecord",
-          include: [
-            {
-              model: db.PatientAssignment,
-              as: "visit",
-              include: {
-                model: db.User,
-                as: "doctor",
-                include: {
-                  model: db.Employee,
-                  as: "employee",
-                  attributes: ["id", "firstName", "middleName", "lastName"],
-                },
-                attributes: ["id"],
-              },
+          // include: [
+          //   {
+          //     model: db.PatientAssignment,
+          //     as: "visit",
+          //     include: {
+          //       model: db.User,
+          //       as: "doctor",
+          //       include: {
+          //         model: db.Employee,
+          //         as: "employee",
+          //         attributes: ["id", "firstName", "middleName", "lastName"],
+          //       },
+          //       attributes: ["id"],
+          //     },
+          //     // where: where,
+          //   },
+          // ],
+        },
+        {
+          model: db.PatientAssignment,
+          as: "visit",
+          include: {
+            model: db.User,
+            as: "doctor",
+            include: {
+              model: db.Employee,
+              as: "employee",
+              attributes: ["id", "firstName", "middleName", "lastName"],
             },
-          ],
+            attributes: ["id"],
+          },
+          where: where,
         },
       ],
     });

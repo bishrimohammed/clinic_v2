@@ -1,5 +1,3 @@
-const { sequelize } = require(".");
-
 module.exports = (sequelize, DataTypes) => {
   const Employee = sequelize.define(
     "employee",
@@ -50,7 +48,15 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-
+      has_digital_signature: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+      },
+      digital_signature: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       status: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
@@ -65,6 +71,6 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true,
     }
   );
-  Employee.sync({ alter: false, force: false });
+  Employee.sync({ alter: true, force: false });
   return Employee;
 };

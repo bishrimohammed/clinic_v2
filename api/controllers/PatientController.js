@@ -323,17 +323,6 @@ module.exports = PatientController = {
     }
     let addressID;
 
-    // const addressExits = await db.Address.findOne({
-    //   // where: { [Op.or]: [{ phone_1: address.phone_1, email: address.email }] },
-    //   where: {
-    //     phone_1: address.phone_1,
-    //   },
-    // });
-    // console.log(addressExits?.dataValues);
-    // if (addressExits && !is_dependent) {
-    //   res.status(401);
-    //   throw new Error("Either phone number or email has already exists");
-    // }
     let newAddress;
     let EmergencyContactAddress;
     if (patientParsed.is_credit) {
@@ -361,13 +350,6 @@ module.exports = PatientController = {
       addressID = newAddress.id;
       // EmergencyContactAddress = newAddress.id;
     }
-    // if (
-    //   patientParsed.phone === emergencyParsed.phone &&
-    //   (!emergencyParsed.the_same_address_as_patient ||
-    //     emergencyParsed.the_same_address_as_patient)
-    // ) {
-    //   EmergencyContactAddress = addressID;
-    // }
 
     if (!emergencyParsed.the_same_address_as_patient) {
       // if (!patientParsed.is_credit) {

@@ -12,5 +12,10 @@ router.post(
   protect,
   progressNoteController.createprogressNote
 );
+router.patch(
+  "/:medical_record_id/finish",
+  protect,
+  progressNoteController.finishProgressNote
+);
 
 module.exports = router;

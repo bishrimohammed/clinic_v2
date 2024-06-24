@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-  const VitalResult = sequelize.define(
-    "vital_result",
+  const TemporaryPrescription = sequelize.define(
+    "temporary_prescription",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -8,25 +8,24 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         allowNull: false,
       },
-      vital_id: {
+      data: {
+        type: DataTypes.JSON,
+        allowNull: false,
+      },
+      progress_note_id: { type: DataTypes.INTEGER, allowNull: true },
+      medical_record_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      vitalSignField_id: {
+      user_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      result: {
-        type: DataTypes.STRING,
         allowNull: false,
       },
     },
     {
-      freezeTableName: true,
       timestamps: false,
-      tableName: "vital_result",
     }
   );
-  VitalResult.sync({ alter: false });
-  return VitalResult;
+  TemporaryPrescription.sync({ alter: false });
+  return TemporaryPrescription;
 };

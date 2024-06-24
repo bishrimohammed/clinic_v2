@@ -227,7 +227,10 @@ module.exports = EmployeeController = {
       gender,
       date_of_birth: format(convertedBirthDate, "yyyy-MM-dd"),
       date_of_hire: format(convertedHireDate, "yyyy-MM-dd"),
-      photo: req.file && "uploads/" + req.file?.filename,
+      photo: req.files["photo"] && "uploads/" + req.files["photo"][0]?.filename,
+      digital_signature:
+        req.files["digital_signature"] &&
+        "uploads/" + req.files["digital_signature"][0]?.filename,
       address_id: newAddress.id,
       emergence_contact_id: EmergencyContact.id,
     });

@@ -27,6 +27,22 @@ module.exports = RoleController = {
     // console.log(roles);
     res.status(200).json(roles);
   }),
+  getActiveRoles: expressAsyncHandler(async (req, res) => {
+    const roles = await db.Role.findAll({
+      where: {
+        status: true,
+      },
+      order: [["name", "ASC"]],
+      include: [
+        {
+          model: db.Permission,
+          as: "permissions",
+          attributes: ["id", "name"],
+        },
+      ],
+    });
+    res.status(200).json(roles);
+  }),
   getRole: expressAsyncHandler(async (req, res) => {
     // console.log(req.params);
     const role = await db.Role.findByPk(req.params.id, {

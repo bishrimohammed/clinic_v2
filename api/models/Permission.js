@@ -1,10 +1,3 @@
-// const { DataTypes, Sequelize } = require("sequelize");
-// const sequelize = require("../config/database.js");
-// const Role = require("./Role.js");
-// const RolePermission = require("./RolePermission.js");
-// // const Role = require("./Role.js");
-
-const { sequelize } = require(".");
 module.exports = (sequelize, DataTypes) => {
   const Permission = sequelize.define("permission", {
     id: {

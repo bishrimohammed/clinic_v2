@@ -4,7 +4,7 @@ module.exports = InvestigationController = {
   getPendingLabRequests: asyncHandler(async (req, res) => {
     const labs = await db.InvestigationOrder.findAll({
       where: {
-        status: false,
+        status: true,
       },
 
       include: [
@@ -84,7 +84,7 @@ module.exports = InvestigationController = {
   getCompletedLabRequests: asyncHandler(async (req, res) => {
     const labs = await db.InvestigationOrder.findAll({
       where: {
-        status: true,
+        status: false,
       },
       include: [
         {
@@ -125,7 +125,7 @@ module.exports = InvestigationController = {
   addLabResult: asyncHandler(async (req, res) => {
     const { results } = req.body;
     const { id } = req.params;
-    console.log(results);
+    // console.log(results);
     await Promise.all(
       results.map(async (value) => {
         return db.OrderedTest.update(
@@ -146,7 +146,7 @@ module.exports = InvestigationController = {
     ).then(async (result) => {
       await db.InvestigationOrder.update(
         {
-          status: true,
+          status: false,
         },
         {
           where: {

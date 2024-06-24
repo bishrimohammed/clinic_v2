@@ -33,6 +33,7 @@ module.exports = PatientVisitController = {
             "lastName",
             "middleName",
             "card_number",
+            "patient_type",
           ],
         },
         {
@@ -101,6 +102,7 @@ module.exports = PatientVisitController = {
             "card_number",
             "birth_date",
             "gender",
+            "patient_type",
           ],
         },
         {
@@ -145,6 +147,7 @@ module.exports = PatientVisitController = {
             "lastName",
             "middleName",
             "card_number",
+            "patient_type",
           ],
         },
         {
@@ -281,6 +284,7 @@ module.exports = PatientVisitController = {
             "card_number",
             "birth_date",
             "gender",
+            "patient_type",
           ],
         },
         {

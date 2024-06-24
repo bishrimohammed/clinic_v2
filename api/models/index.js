@@ -177,6 +177,34 @@ db.ApprovalSettingApprover = require("./ApprovalSettingApprovers.js")(
   DataTypes
 );
 
+// temporary tables
+db.Temporary_ProgressNote =
+  require("./temporaryTables/Temporary_ProgressNote.js")(sequelize, DataTypes);
+db.Temporary_Diagnosis = require("./temporaryTables/Temporary_Diagnosis.js")(
+  sequelize,
+  DataTypes
+);
+
+db.Temporary_LabInvestigationOrder =
+  require("./temporaryTables/Temporary_LabInvestiagtion.js")(
+    sequelize,
+    DataTypes
+  );
+
+db.Temporary_VitalSign = require("./temporaryTables/Temporary_VitalSign.js")(
+  sequelize,
+  DataTypes
+);
+
+db.Temporary_PhysicalExamination =
+  require("./temporaryTables/Temporary_PhysicalExamination.js")(
+    sequelize,
+    DataTypes
+  );
+
+db.Temporary_Prescription =
+  require("./temporaryTables/Temporary_Prescription.js")(sequelize, DataTypes);
+
 patientAssignmentSAssociation(db);
 MedicalRecordAssociation(db);
 MedicalRecordDetailAssocations(db);

@@ -62,6 +62,6 @@ module.exports = (sequelize, DataTypes) => {
       values: ["pending", "completed"],
     },
   });
-  OrderedTest.sync({ force: false, alter: true });
+  OrderedTest.sync({ force: false, alter: false });
   return OrderedTest;
 };

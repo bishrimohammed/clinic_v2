@@ -6,6 +6,7 @@ const RoleController = require("../controllers/RoleController");
 const router = express.Router();
 
 router.get("/", RoleController.getRoles);
+router.get("/active", RoleController.getActiveRoles);
 router.get("/:id", RoleController.getRole);
 
 router.post("/", RoleController.createRole);
