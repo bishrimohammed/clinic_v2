@@ -81,14 +81,16 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           </Button>
         </div>
       </div>
-      <div className="d-flex justify-content-end mt-2">
-        <button
-          onClick={changeVisibleContentHandler}
-          className="btn btn-sm btn-primary"
-        >
-          View Progress Note Page
-        </button>
-      </div>
+      {state.patient.patient_type === "inpatient" ? (
+        <div className="d-flex justify-content-end mt-2">
+          <button
+            onClick={changeVisibleContentHandler}
+            className="btn btn-sm btn-primary"
+          >
+            View Progress Note Page
+          </button>
+        </div>
+      ) : null}
       <Tabs
         defaultActiveKey="Symptoms"
         id="uncontrolled-tab-example"

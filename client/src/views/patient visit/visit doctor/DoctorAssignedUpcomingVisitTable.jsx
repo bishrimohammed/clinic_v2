@@ -154,6 +154,13 @@ const DoctorAssignedUpcomingVisitTable = () => {
               </td>
             </tr>
           )}
+          {!isPending && upcomigPatientVisit?.length === 0 && (
+            <tr>
+              <td className="  align-items-center" colSpan="8">
+                <span className="text-danger fw-bold">No Record</span>
+              </td>
+            </tr>
+          )}
           {!isPending &&
             tableInstance.getRowModel().rows.map((rowEl) => {
               return (
@@ -341,7 +348,10 @@ const DoctorAssignedUpcomingVisitTable = () => {
             })}
         </tbody>
       </Table>
-      {!isPending && <PaginationComponent tableInstance={tableInstance} />}
+
+      {upcomigPatientVisit?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
 
       {showAdmitModal.isShow && (
         <AdmitVisitModal

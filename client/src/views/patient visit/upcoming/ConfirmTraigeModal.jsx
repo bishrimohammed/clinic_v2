@@ -30,7 +30,7 @@ const ConfirmTraigeModal = ({ show, handleClose, visitId, action }) => {
       backdrop="static"
       centered
     >
-      <Modal.Body>{`Are you sure you want to ${action} traige for this visit?`}</Modal.Body>
+      <Modal.Body>{`Are you sure you want to ${action} triage for this visit?`}</Modal.Body>
 
       <div className="d-flex justify-content-end gap-3 p-3">
         <Button variant="secondary" onClick={() => handleClose()}>

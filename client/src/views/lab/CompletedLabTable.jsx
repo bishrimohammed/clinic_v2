@@ -132,6 +132,13 @@ const CompletedLabTable = ({ labs, isPending }) => {
               </td>
             </tr>
           )}
+          {!isPending && labs?.length === 0 && (
+            <tr>
+              <td className="  align-items-center" colSpan="8">
+                <span className="text-danger fw-bold">No Record</span>
+              </td>
+            </tr>
+          )}
           {!isPending &&
             tableInstance.getRowModel().rows.map((rowEl) => {
               return (
@@ -173,7 +180,9 @@ const CompletedLabTable = ({ labs, isPending }) => {
             })}
         </tbody>
       </Table>
-      <PaginationComponent tableInstance={tableInstance} />
+      {labs?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
     </div>
   );
 };

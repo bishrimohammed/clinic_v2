@@ -7,7 +7,7 @@ const AddAdvancedPaymentButton = ({
   visit_stage,
   is_advanced_payment_amount_completed,
 }) => {
-  console.log(visit_stage);
+  // console.log(visit_stage);
   const [showAddAdvancedPaymentModal, setShowAddAdvancedPaymentModal] =
     useState(false);
   return (
@@ -17,7 +17,7 @@ const AddAdvancedPaymentButton = ({
         onClick={() => setShowAddAdvancedPaymentModal(true)}
         disabled={!is_advanced_payment_amount_completed}
       >
-        Add Advanced Payment
+        Process Advance
       </button>
       {showAddAdvancedPaymentModal && (
         <AddAdvancedPayment

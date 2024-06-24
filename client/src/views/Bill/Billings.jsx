@@ -7,25 +7,25 @@ import OutStandingBillListTable from "./OutStandingBillListTable";
 const Billings = () => {
   const navigate = useNavigate();
 
-  const {
-    data: bills,
-    isPending,
-    refetch,
-    isRefetching,
-  } = useGetOutStandingPayments();
-  console.log(bills);
+  // const {
+  //   data: bills,
+  //   isPending,
+  //   refetch,
+  //   isRefetching,
+  // } = useGetOutStandingPayments();
+  // console.log(bills);
   const billings = useMemo(() => bills || [], [bills]);
   // if (isPending) return <Spinner animation="grow" />;
   return (
     <>
-      <Tabs defaultActiveKey="home" id="controlled-tab-example">
-        <Tab eventKey="home" title="Pending Payments">
+      <Tabs defaultActiveKey="Outstanding" id="controlled-tab-example">
+        <Tab eventKey="Outstanding" title="Outstanding">
           <hr className="mt-0" />
           <OutStandingBillListTable
-            billings={billings}
-            isPending={isPending}
-            refetch={refetch}
-            isRefetching={isRefetching}
+          // billings={billings}
+          // isPending={isPending}
+          // refetch={refetch}
+          // isRefetching={isRefetching}
           />
           {/* <Table striped bordered>
             <thead>
@@ -66,8 +66,8 @@ const Billings = () => {
             </tbody>
           </Table> */}
         </Tab>
-        <Tab eventKey="profile" title="Paid">
-          paid
+        <Tab eventKey="ALL" title="ALL">
+          All
         </Tab>
       </Tabs>
     </>

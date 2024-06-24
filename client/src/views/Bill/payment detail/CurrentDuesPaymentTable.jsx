@@ -25,6 +25,7 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import SearchInput from "../../../components/inputs/SearchInput";
 import { LuFilter } from "react-icons/lu";
 import FilterPaymentsModal from "./FilterPaymentsModal";
+import PaginationComponent from "../../../components/PaginationComponent";
 
 const CurrentDuesPaymentTable = ({}) => {
   const { state } = useLocation();
@@ -33,6 +34,7 @@ const CurrentDuesPaymentTable = ({}) => {
     id: state.id,
     filter,
   });
+  console.log(data);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showTakePaymentModal, setShowTakePaymentModal] = useState({
     isShow: false,
@@ -286,6 +288,9 @@ const CurrentDuesPaymentTable = ({}) => {
             })}
         </tbody>
       </Table>
+      {data?.length > 0 && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
       {showTakePaymentModal.isShow && (
         <TakePaymentModal
           show={showTakePaymentModal}

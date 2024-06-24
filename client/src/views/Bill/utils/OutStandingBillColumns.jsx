@@ -19,27 +19,24 @@ export const OutStandingBillColumns = [
   {
     header: "Assigned Doctor",
     accessorFn: (row) =>
-      row.medicalRecord.visit.doctor.employee.firstName +
+      row.visit.doctor.employee.firstName +
       " " +
-      row.medicalRecord.visit.doctor.employee.middleName +
+      row.visit.doctor.employee.middleName +
       " " +
-      row.medicalRecord.visit.doctor.employee.lastName,
+      row.visit.doctor.employee.lastName,
   },
   {
     header: "Visit Date",
     accessorFn: (row) =>
-      row.medicalRecord.visit.assignment_date +
+      row.visit.assignment_date +
       " " +
-      format(
-        parse(row.medicalRecord.visit.visit_time, "HH:mm:ss", new Date()),
-        "h:mm a"
-      ),
+      format(parse(row.visit.visit_time, "HH:mm:ss", new Date()), "h:mm a"),
   },
   {
     header: "Visit Type",
-    accessorFn: (row) => row.medicalRecord.visit.visit_type,
+    accessorFn: (row) => row.visit.visit_type,
   },
-  columnHelper.accessor("medicalRecord.visit.stage", {
+  columnHelper.accessor("visit.stage", {
     header: "Stage",
     enableGlobalFilter: false,
     enableSorting: false,
@@ -50,11 +47,12 @@ export const OutStandingBillColumns = [
           style={{
             borderRadius: 15,
             padding: "0.2rem 0.5rem",
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: 500,
-            color: "blueviolet",
+            backgroundColor: s.getValue() === "done" ? "green" : "yellow",
+            color: s.getValue() === "done" ? "white" : "black",
           }}
-          // className=" text-white bg-success   d-inline-flex align-items-center justify-content-center"
+          className=" text-dark d-inline-flex align-items-center justify-content-center"
         >
           {s.getValue()}
         </span>

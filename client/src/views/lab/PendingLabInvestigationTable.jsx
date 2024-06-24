@@ -15,6 +15,7 @@ import {
 
 import { FaSortDown, FaSortUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import PaginationComponent from "../../components/PaginationComponent";
 
 const PendingLabInvestigationTable = ({ isPending, labs }) => {
   const navigate = useNavigate();
@@ -130,6 +131,13 @@ const PendingLabInvestigationTable = ({ isPending, labs }) => {
               </td>
             </tr>
           )}
+          {!isPending && labs?.length === 0 && (
+            <tr>
+              <td className="  align-items-center" colSpan="8">
+                <span className="text-danger fw-bold">No Record</span>
+              </td>
+            </tr>
+          )}
           {!isPending &&
             tableInstance.getRowModel().rows.map((rowEl) => {
               return (
@@ -166,6 +174,9 @@ const PendingLabInvestigationTable = ({ isPending, labs }) => {
             })}
         </tbody>
       </Table>
+      {labs?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
     </div>
   );
 };

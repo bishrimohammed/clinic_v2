@@ -78,7 +78,6 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
       return {
         medicine_id: medicines.find((m) => m.id === parseInt(medicineId))
           ?.service_item_id,
-        duration: "",
 
         dosage: medicine.dosage,
         frequency: medicine.frequency,

@@ -94,12 +94,13 @@ const progressNoteSchema = yup.object().shape({
   selectedLabs: yup.array().of(yup.number()),
   indirectlySelectedLabs: yup.array().of(yup.number()),
 });
-const ProgressNoteTab = React.forwardRef((props, ref) => {
+const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
   const { data: PhysicalExaminationFields } =
     useGetAcvtivePhysicalExamination();
   const { data: VitalSignFields } = useGetActiveVitalSignFields();
   const { data: medicines } = useGetMedicines();
   const { data: laboratoryTests, error } = useGetLaboratory();
+  // console.log(JSON.parse(savedforLaterData.lab.data).selectedLabs);
   //   const navigate = useNavigate();
   //   getValues("");
   const {
@@ -111,6 +112,25 @@ const ProgressNoteTab = React.forwardRef((props, ref) => {
     setValue,
     control,
   } = useForm({
+    defaultValues: savedforLaterData
+      ? {
+          problemList: savedforLaterData.progressNote.problem_list,
+          currentmanagement: savedforLaterData.progressNote.current_management,
+          plan: savedforLaterData.progressNote.plan,
+          physicalExaminations: JSON.parse(
+            savedforLaterData.physicalExamination.data
+          ),
+          vitals: JSON.parse(savedforLaterData.vital.data),
+          diagnoses: JSON.parse(savedforLaterData.diagnoses.data),
+
+          selectedLabs: JSON.parse(savedforLaterData.lab.data).selectedLabs,
+          indirectlySelectedLabs: JSON.parse(savedforLaterData.lab.data)
+            .indirectlySelectedLabs,
+          internal_prescriptions: JSON.parse(
+            savedforLaterData.prescription.data
+          ),
+        }
+      : undefined,
     resolver: yupResolver(progressNoteSchema),
 
     // reValidateMode: "onChange",
@@ -139,7 +159,7 @@ const ProgressNoteTab = React.forwardRef((props, ref) => {
     getSaveForLaterData: () => getValues(),
     resetData: () => reset(),
   }));
-  //   console.log(errors);
+  console.log(errors);
   //   console.log(medicines);
   const submitHandler = (data) => {
     console.log(data);
@@ -327,7 +347,7 @@ const ProgressNoteTab = React.forwardRef((props, ref) => {
               <h5 className="border-bottom border-dark fw-bold py-2 mb-3">
                 Order Lab Investigation
               </h5>
-              <Lab setValue={setValue} />
+              <Lab setValue={setValue} getValues={getValues} />
             </Accordion.Body>
           </Accordion.Item>
           <Accordion.Item eventKey="2">

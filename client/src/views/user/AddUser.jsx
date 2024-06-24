@@ -5,17 +5,18 @@ import { Container, Spinner } from "react-bootstrap";
 // import * as yup from "yup";
 // import { yupResolver } from "@hookform/resolvers/yup";
 import { useGetEmplooyeDoesNotHaveAccount } from "./hooks/useGetEmplooyeDoesNotHaveAccount";
-import { useGetRoles } from "../hooks/useGetRoles";
+// import { useGetRoles } from "../hooks/useGetRoles";
 // import { generatePassword } from "./utils/generatePassword";
 import { useGetPermissions } from "../Administration/Role/hooks/useGetPermissions";
 import PermissionList from "./PermissionList";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { useGetActiveRole } from "../Administration/Role/hooks/useGetActiveRole";
 
 const AddUser = () => {
   // const { mutate, mutateAsync, isPending } = useAddUser();
   const { data: employees } = useGetEmplooyeDoesNotHaveAccount();
-  const { data: roles, isPending: ispending } = useGetRoles();
+  const { data: roles, isPending: ispending } = useGetActiveRole();
 
   const { data: permissions, isPending: permissionPending } =
     useGetPermissions();
@@ -277,7 +278,7 @@ const AddUser = () => {
           style={{ cursor: "pointer" }}
           onClick={() => navigate(-1)}
         />
-        <h5 className="mb-0"> Update User Account</h5>
+        <h5 className="mb-0">Create User Account</h5>
       </div>
       <hr className="mt-1" />
       <PermissionList

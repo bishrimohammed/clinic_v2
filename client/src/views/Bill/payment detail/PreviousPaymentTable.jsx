@@ -24,7 +24,7 @@ const PreviousPaymentTable = () => {
     paymentId: null,
     item: null,
   });
-  console.log(state);
+  // console.log(state);
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = React.useState({
@@ -248,6 +248,7 @@ const PreviousPaymentTable = () => {
             })}
         </tbody>
       </Table>
+      {}
     </div>
   );
 };

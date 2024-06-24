@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import Axiosinstance from "../../../../api/axiosInstance";
-// import Axiosinstance from "../../../../api/axiosInstance";
 
-export const useGetRoles = (query) => {
+export const useGetActivePermissions = () => {
   return useQuery({
-    queryKey: ["Roles", query],
+    queryKey: ["ActivePermissions"],
     queryFn: async () => {
-      return Axiosinstance.get("/role", { params: query }).then(
+      return await Axiosinstance.get("permissions/active").then(
         (res) => res.data
       );
     },

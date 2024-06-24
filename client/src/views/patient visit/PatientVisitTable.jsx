@@ -17,6 +17,7 @@ import { TbCalendarCancel } from "react-icons/tb";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaSortDown, FaSortUp } from "react-icons/fa";
 import { hasPermission } from "../../utils/hasPermission";
+import PaginationComponent from "../../components/PaginationComponent";
 
 const PatientVisitTable = ({
   patientVisits,
@@ -142,6 +143,13 @@ const PatientVisitTable = ({
               </td>
             </tr>
           )}
+          {!isPending && patientVisits?.length === 0 && (
+            <tr>
+              <td className="  align-items-center" colSpan="8">
+                <span className="text-danger fw-bold">No Record</span>
+              </td>
+            </tr>
+          )}
           {!isPending &&
             tableInstance.getRowModel().rows.map((rowEl) => {
               return (
@@ -263,7 +271,10 @@ const PatientVisitTable = ({
             })}
         </tbody>
       </Table>
-      <div
+      {patientVisits?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
+      {/* <div
         style={{ zIndex: 0 }}
         className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2"
       >
@@ -330,7 +341,7 @@ const PatientVisitTable = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
     </>
   );
 };

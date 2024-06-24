@@ -42,14 +42,17 @@ const DoctorAssignedPreviousVisitTable = () => {
     setOpenDropdownIndex(index === openDropdownIndex ? null : index);
     // setDropdownPosition({ left: event.clientX - 20, top: event.clientY - 200 });
   };
-  const upcomigPatientVisit = useMemo(() => PatientVisit || [], [PatientVisit]);
+  const previousPatientVisit = useMemo(
+    () => PatientVisit || [],
+    [PatientVisit]
+  );
   const debouncedValue = useDebounce(search, 500);
   // const employeeData = useMemo(() => Data, []);
   const columns = useMemo(() => UpcomingPatientVisitColumn, []);
 
   const tableInstance = useReactTable({
     columns: columns,
-    data: upcomigPatientVisit,
+    data: previousPatientVisit,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -150,6 +153,13 @@ const DoctorAssignedPreviousVisitTable = () => {
                 <span>
                   <Spinner animation="border" size="sm" />
                 </span>
+              </td>
+            </tr>
+          )}
+          {!isPending && previousPatientVisit?.length === 0 && (
+            <tr>
+              <td className="  align-items-center" colSpan="8">
+                <span className="text-danger fw-bold">No Record</span>
               </td>
             </tr>
           )}
@@ -301,7 +311,9 @@ const DoctorAssignedPreviousVisitTable = () => {
             })}
         </tbody>
       </Table>
-      <PaginationComponent tableInstance={tableInstance} />
+      {previousPatientVisit?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
     </div>
   );
 };

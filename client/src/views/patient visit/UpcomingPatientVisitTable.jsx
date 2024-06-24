@@ -24,6 +24,7 @@ import ConfirmTraigeModal from "./upcoming/ConfirmTraigeModal";
 import { useNavigate } from "react-router-dom";
 import { hasPermission } from "../../utils/hasPermission";
 import AddPatientVisitModal from "./AddPatientVisitModal";
+import PaginationComponent from "../../components/PaginationComponent";
 
 const UpcomingPatientVisitTable = () => {
   const [search, setSearch] = useState("");
@@ -37,7 +38,11 @@ const UpcomingPatientVisitTable = () => {
     status: "",
     vistiType: "",
   });
-  const { data: PatientVisit, isPending } = useGetUpcomingPatientVisit(filter);
+  const {
+    data: PatientVisit,
+    isPending,
+    isSuccess,
+  } = useGetUpcomingPatientVisit(filter);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   // const [dropdownPosition, setDropdownPosition] = useState({});
   const handleToggleDropdown = (index, event) => {
@@ -166,6 +171,13 @@ const UpcomingPatientVisitTable = () => {
               </td>
             </tr>
           )}
+          {!isPending && upcomigPatientVisit.length === 0 && (
+            <tr>
+              <td className="  align-items-center" colSpan="8">
+                <span className="text-danger fw-bold">No Record</span>
+              </td>
+            </tr>
+          )}
           {!isPending &&
             tableInstance.getRowModel().rows.map((rowEl) => {
               return (
@@ -179,12 +191,17 @@ const UpcomingPatientVisitTable = () => {
                     //   appointment: rowEl.original,
                     // });
                     console.log(rowEl.original.stage);
-                    if (
-                      rowEl.original.stage === "Waiting for triage" ||
-                      rowEl.original.stage === "Performing triage"
-                    ) {
+                    hasPermission("triage", "create") &&
+                      (rowEl.original.stage === "Waiting for triage" ||
+                        rowEl.original.stage === "Performing triage") &&
                       navigate("view", { state: rowEl.original });
-                    }
+
+                    // if (
+                    //   rowEl.original.stage === "Waiting for triage" ||
+                    //   rowEl.original.stage === "Performing triage"
+                    // ) {
+                    //   navigate("view", { state: rowEl.original });
+                    // }
                   }}
                 >
                   {rowEl.getVisibleCells().map((cellEl, index) => {
@@ -253,7 +270,7 @@ const UpcomingPatientVisitTable = () => {
                               });
                             }}
                           >
-                            <RiEditLine /> Start Traige
+                            <RiEditLine /> Start Triage
                           </Dropdown.Item>
                         ) : null}
 
@@ -274,7 +291,7 @@ const UpcomingPatientVisitTable = () => {
                               });
                             }}
                           >
-                            <RiEditLine /> Finish Traige
+                            <RiEditLine /> Finish Triage
                           </Dropdown.Item>
                         ) : null}
                         <Dropdown.Item
@@ -320,7 +337,17 @@ const UpcomingPatientVisitTable = () => {
             })}
         </tbody>
       </Table>
-      <div
+      {
+        upcomigPatientVisit.length > 0 && !isPending && (
+          <PaginationComponent tableInstance={tableInstance} />
+        )
+        // : (
+        //   <div className="d-flex ">
+        //     <span className="text-danger fw-bold">No Active Visit</span>
+        //   </div>
+        // )
+      }
+      {/* <div
         style={{ zIndex: 0 }}
         className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2"
       >
@@ -387,7 +414,7 @@ const UpcomingPatientVisitTable = () => {
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
       {showfilterModal && (
         <FilterUpcomingVisitModal
           show={showfilterModal}

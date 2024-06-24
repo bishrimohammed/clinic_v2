@@ -9,7 +9,6 @@ export const useActivateRole = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["Roles", { status: "" }],
-        exact: true,
       });
 
       toast.success("Role Activated successfully");

@@ -15,8 +15,15 @@ const Lab = ({ setValue, getValues }) => {
   // console.log(laboratoryTests);
   const remarkref = useRef();
 
-  const [selectedTests, setSelectedTests] = useState([]);
-  const [indirecSselectedTests, setIndirecSselectedTests] = useState([]);
+  const [selectedTests, setSelectedTests] = useState(
+    getValues("selectedLabs") ? getValues("selectedLabs") : []
+  );
+  const [indirecSselectedTests, setIndirecSselectedTests] = useState(
+    getValues("indirectlySelectedLabs")
+      ? getValues("indirectlySelectedLabs")
+      : []
+  );
+  // console.log();
   const { state } = useLocation();
   // console.log(state);
   // Add a handler to toggle a test selected state
@@ -39,7 +46,7 @@ const Lab = ({ setValue, getValues }) => {
           //     ? "visibleFill"
           //     : "painted",
           //   opacity: selectedTests.includes(labtest._id) ? 0.5 : 1,
-          cursor: selectedTests.includes(labtest._id) ? "no-drop" : "pointer",
+          cursor: selectedTests?.includes(labtest._id) ? "no-drop" : "pointer",
         }}
         type="button"
         className="bg-gredient text-nowrap width23 border-0  py-2 d-flex justify-content-center align-items-center"

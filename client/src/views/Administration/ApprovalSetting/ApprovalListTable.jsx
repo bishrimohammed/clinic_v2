@@ -236,8 +236,50 @@ const ApprovalListTable = ({
                         >
                           <RiEditLine /> Edit
                         </Dropdown.Item>
-
-                        <Dropdown.Item
+                        {rowEl.original.status ? (
+                          <Dropdown.Item
+                            className="d-flex gap-2 align-items-center"
+                            role="button"
+                            disabled={rowEl.original.status === "cancelled"}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setShowActivateModal({
+                                isShow: true,
+                                approvalSettingId: rowEl.original.id,
+                                action: "Deactivate",
+                              });
+                              // setSelectedEmployee({
+                              //   id: rowEl.original.id,
+                              //   selectedFor: "deactivate",
+                              // });
+                              // setShowDelete(true);
+                            }}
+                          >
+                            <TbCalendarCancel color="red" /> Deactivate
+                          </Dropdown.Item>
+                        ) : (
+                          <Dropdown.Item
+                            className="d-flex gap-2 align-items-center"
+                            role="button"
+                            disabled={rowEl.original.status === "cancelled"}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setShowActivateModal({
+                                isShow: true,
+                                approvalSettingId: rowEl.original.id,
+                                action: "Activate",
+                              });
+                              // setSelectedEmployee({
+                              //   id: rowEl.original.id,
+                              //   selectedFor: "deactivate",
+                              // });
+                              // setShowDelete(true);
+                            }}
+                          >
+                            <TbCalendarCancel color="green" /> Activate
+                          </Dropdown.Item>
+                        )}
+                        {/* <Dropdown.Item
                           className="d-flex gap-2 align-items-center"
                           role="button"
                           disabled={rowEl.original.status === "cancelled"}
@@ -256,7 +298,7 @@ const ApprovalListTable = ({
                           }}
                         >
                           <TbCalendarCancel color="red" /> Deactivate
-                        </Dropdown.Item>
+                        </Dropdown.Item> */}
                         {hasPermission("Appointment", "create") && (
                           <Dropdown.Item
                             role="button"
@@ -301,7 +343,7 @@ const ApprovalListTable = ({
               action: "",
             })
           }
-          appointmentId={showActivateModal.appointmentId}
+          approvaSettingId={showActivateModal.approvalSettingId}
           action={showActivateModal.action}
         />
       )}

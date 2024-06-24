@@ -9,11 +9,11 @@ const DoctorAssignedPatientVisits = () => {
       <Tabs
         id="controlled-tab-example"
         // activeKey={key}
-        defaultActiveKey="Today Visits"
+        defaultActiveKey="Active Visits"
         // onSelect={(k) => setKey(k)}
         className="mb-3"
       >
-        <Tab eventKey="Today Visits" title="Today’s Visits">
+        <Tab eventKey="Active Visits" title="Active Visits">
           {/* <UpcomingPatientVisitTable /> */}
           <DoctorAssignedUpcomingVisitTable />
         </Tab>

@@ -3,6 +3,7 @@ import { Pagination } from "react-bootstrap";
 import PropTypes from "prop-types";
 
 const PaginationComponent = ({ tableInstance }) => {
+  console.log(tableInstance.getState().pagination.pageIndex);
   return (
     <div
       style={{ zIndex: 0 }}

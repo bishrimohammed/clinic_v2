@@ -1,18 +1,33 @@
-import React, { useRef } from "react";
-import { Button, Tab, Tabs } from "react-bootstrap";
+import React, { useRef, useState } from "react";
+import { Button, Spinner, Tab, Tabs } from "react-bootstrap";
 import { IoMdArrowRoundBack } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ProgressNoteTab from "./ProgressNoteTab";
 import ProgressNoteHistoryTab from "./ProgressNoteHistoryTab";
+import ConfirmCancelModal from "./ConfirmCancelModal";
+import { useSaveProgressForLater } from "../hooks/progressNoteHooks/useSaveProgressForLater";
+import { useGetSavedForLaterProgressNote } from "../hooks/progressNoteHooks/useGetSavedForLaterProgressNote";
 
 const ProgressNotePage = ({ changeVisibleContent }) => {
   const navigate = useNavigate();
-  //   const [childData, setChildData] = useState([]);
+
+  const { state } = useLocation();
+  const { data } = useGetSavedForLaterProgressNote(state.medicalRecord_id);
+  // console.log(data);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showFinishProgressNoteModal, setShowFinishProgressNoteModal] =
+    useState(false);
+  const { mutate, isPending } = useSaveProgressForLater();
+
   const progressNoteRef = useRef(null);
 
   const handleSaveForLater = () => {
     const progressNoteData = progressNoteRef.current.getSaveForLaterData();
-
+    const Data = {
+      formData: progressNoteData,
+      medicalRecord_id: state.medicalRecord_id,
+    };
+    mutate(Data);
     console.log(progressNoteData);
   };
   const resetHandler = () => {
@@ -40,28 +55,36 @@ const ProgressNotePage = ({ changeVisibleContent }) => {
         <div className=" d-flex gap-2">
           <Button
             variant="danger"
+            className="btn-sm"
             // disabled={
             //   !localStorage.getItem(`medical_${state.medicalRecord_id}`) ||
             //   isPending
             // }
             // onClick={() => setShowCancelTriageModal(true)}
-            onClick={resetHandler}
+            onClick={() => setShowCancelModal(true)}
           >
             Cancel
           </Button>
           <Button
             // disabled={isPending}
             onClick={handleSaveForLater}
+            // disabled={isPending}
             variant="warning"
+            type="button"
+            className="btn-sm"
           >
+            {isPending && <Spinner size="sm" animation="border" />}
             Save for Later
           </Button>
           <Button
-            form="traigeForm"
+            // form="traigeForm"
             // formTarget="traigeForm"
-            type="submit"
+            className="btn-sm"
+            // type="submit"
             variant="success"
             // disabled={isPending}
+            type="button"
+            // onClick={() => set(true)}
           >
             {/* {isPending && <Spinner size="sm" animation="border" />} */}
             Finish
@@ -79,13 +102,27 @@ const ProgressNotePage = ({ changeVisibleContent }) => {
       >
         <Tab eventKey="Symptoms" title="Progress Note">
           {/* <ChiefComplaint ref={chiefComplaintRef} /> */}
-          <ProgressNoteTab ref={progressNoteRef} />
+          <ProgressNoteTab ref={progressNoteRef} savedforLaterData={data} />
         </Tab>
         <Tab eventKey="Examination" title="History">
           {/* <PhysicalExaminationTab ref={ExaminationRef} /> */}
           <ProgressNoteHistoryTab />
         </Tab>
       </Tabs>
+      {showCancelModal && (
+        <ConfirmCancelModal
+          show={showCancelModal}
+          handleClose={() => setShowCancelModal(false)}
+          resetHandler={resetHandler}
+        />
+      )}
+      {showFinishProgressNoteModal && (
+        <ConfirmCancelModal
+          show={showCancelModal}
+          handleClose={() => setShowCancelModal(false)}
+          resetHandler={resetHandler}
+        />
+      )}
     </div>
   );
 };

@@ -18,6 +18,7 @@ import { FaUserLock } from "react-icons/fa";
 
 import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
 import useDebounce from "../../../../hooks/useDebounce";
+import BulkImportButton from "../bulkImport/BulkImportButton";
 
 const EmployeeTable = ({
   setAddEmployeeModal,
@@ -86,8 +87,9 @@ const EmployeeTable = ({
           Reset
         </Button>
       </div>
-      <div className="d-flex justify-content-between gap-2 align-items-center w-100 mb-1 mt-2">
-        <Button className=" ms-auto " onClick={() => setAddEmployeeModal(true)}>
+      <div className="d-flex justify-content-end gap-2 align-items-center w-100 mb-1 mt-2">
+        <BulkImportButton />
+        <Button className="  btn-sm " onClick={() => setAddEmployeeModal(true)}>
           {"  "}
           +Add Employee
         </Button>

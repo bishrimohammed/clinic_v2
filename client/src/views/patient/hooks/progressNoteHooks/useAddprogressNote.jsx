@@ -25,6 +25,15 @@ export const useAddprogressNote = () => {
           variables.medicalRecordId,
           "Progress Note",
         ],
+        exact: true,
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "Medical Record",
+          variables.medicalRecordId,
+          "Saved for later Progress Note",
+        ],
+        exact: true,
       });
     },
     onError: (err) => {

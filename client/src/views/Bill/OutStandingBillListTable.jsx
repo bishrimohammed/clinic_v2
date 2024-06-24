@@ -9,9 +9,7 @@ import {
 import React, { useMemo, useState } from "react";
 import useDebounce from "../../hooks/useDebounce";
 import { OutStandingBillColumns } from "./utils/OutStandingBillColumns";
-import { TbCalendarCancel } from "react-icons/tb";
-import { RiEditLine } from "react-icons/ri";
-import { BsThreeDotsVertical } from "react-icons/bs";
+
 import { Button, Dropdown, Spinner, Table } from "react-bootstrap";
 import { FaSortDown, FaSortUp } from "react-icons/fa";
 import { IoReloadOutline } from "react-icons/io5";
@@ -20,15 +18,34 @@ import { LuFilter } from "react-icons/lu";
 import SearchInput from "../../components/inputs/SearchInput";
 import { useNavigate } from "react-router-dom";
 import AddAdvancedPaymentButton from "./AddAdvancedPaymentButton";
+import FilterOutStandingBilligModal from "./FilterOutStandingBilligModal";
+import { useGetOutStandingPayments } from "./hooks/useGetDraftPayments";
+import PaginationComponent from "../../components/PaginationComponent";
 
-const OutStandingBillListTable = ({
-  billings,
-  isPending,
-  refetch,
-  isRefetching,
-}) => {
+const OutStandingBillListTable = (
+  {
+    // billings,
+    // isPending,
+    // refetch,
+    // isRefetching,
+  }
+) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState({
+    visit_date: "",
+    visit_type: "",
+    stage: "",
+  });
+  const {
+    data: bills,
+    isPending,
+    refetch,
+    isRefetching,
+  } = useGetOutStandingPayments(filter);
+  // console.log(bills);
+  const billings = useMemo(() => bills || [], [bills]);
+  const [showFilterModal, setShowFilterModal] = useState(false);
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
@@ -64,7 +81,6 @@ const OutStandingBillListTable = ({
     <>
       <div className=" d-flex flex-wrap  gap-2 align-items-center p-1 w-100 mb-1 mt-2">
         <SearchInput searchvalue={search} setSearch={setSearch} />
-
         <Button
           variant="secondary"
           className="d-flex align-items-center gap-1"
@@ -172,6 +188,13 @@ const OutStandingBillListTable = ({
               </td>
             </tr>
           )}
+          {!isPending && billings?.length === 0 && (
+            <tr>
+              <td className="  align-items-center" colSpan="8">
+                <span className="text-danger fw-bold">No Record</span>
+              </td>
+            </tr>
+          )}
           {!isPending &&
             tableInstance.getRowModel().rows.map((rowEl) => {
               return (
@@ -211,7 +234,7 @@ const OutStandingBillListTable = ({
                       <AddAdvancedPaymentButton
                         billId={rowEl.original.id}
                         patient={rowEl.original.patient}
-                        visit_stage={rowEl.original.medicalRecord.visit.stage}
+                        visit_stage={rowEl.original.visit.stage}
                         is_advanced_payment_amount_completed={
                           rowEl.original.is_advanced_payment_amount_completed
                         }
@@ -293,7 +316,10 @@ const OutStandingBillListTable = ({
             })}
         </tbody>
       </Table>
-      <div
+      {billings?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
+      {/* <div
         style={{ zIndex: 0 }}
         className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2"
       >
@@ -360,7 +386,15 @@ const OutStandingBillListTable = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
+      {showFilterModal && (
+        <FilterOutStandingBilligModal
+          show={showFilterModal}
+          handleClose={() => setShowFilterModal(false)}
+          filter={filter}
+          setFilter={setFilter}
+        />
+      )}
     </>
   );
 };
