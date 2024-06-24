@@ -106,7 +106,10 @@ module.exports = ClinicProfileController = {
         card_valid_date,
         website_url,
         // address_id: updatedAddress.id,
-        logo: req.file && "uploads/" + req.file.filename,
+        logo: req.files["logo"] && "uploads/" + req.files["logo"][0]?.filename,
+        clinic_seal:
+          req.files["clinic_seal"] &&
+          "uploads/" + req.files["clinic_seal"][0]?.filename,
         motto,
         clinic_type: clinicType,
         number_of_branch,

@@ -40,7 +40,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     clinic_type: DataTypes.STRING,
     has_triage: DataTypes.BOOLEAN,
+    clinic_seal: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null,
+    },
   });
-  ClinicProfile.sync({ alter: false, force: false });
+  ClinicProfile.sync({ alter: true, force: false });
   return ClinicProfile;
 };

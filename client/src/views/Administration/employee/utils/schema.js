@@ -177,6 +177,8 @@ export const EditEmployeeschema = yup.object().shape({
     .required("Father Name is required"),
   lastName: yup.string().transform((value) => value.trim()),
   photo: yup.mixed(),
+  digital_signature: yup.mixed(),
+
   gender: yup.string().required("Gender is required"),
   position: yup
     .string()
@@ -288,7 +290,8 @@ export const EditEmployeeschema = yup.object().shape({
           return schema.nullable();
         }
       ),
-    house_number: yup.string().transform((value) => value.trim()),
+    house_number: yup.string(),
+
     phone_1: yup.string(),
 
     // validate phone number start with 09 or 07 it must me 10 digit

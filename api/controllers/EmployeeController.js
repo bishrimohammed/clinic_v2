@@ -266,6 +266,10 @@ module.exports = EmployeeController = {
     // console.log(position);
     const DATEOFBIRTH = new Date(date_of_birth).toISOString();
     const DATEOFHIRE = new Date(date_of_hire).toISOString();
+    // photo: req.files["photo"] && "uploads/" + req.files["photo"][0]?.filename,
+    // digital_signature:
+    //   req.files["digital_signature"] &&
+    //   "uploads/" + req.files["digital_signature"][0]?.filename,
 
     const convertedBirthDate = fromZonedTime(DATEOFBIRTH, "Africa/Nairobi");
     const convertedHireDate = fromZonedTime(DATEOFHIRE, "Africa/Nairobi");
@@ -277,9 +281,12 @@ module.exports = EmployeeController = {
     empExist.gender = gender;
     empExist.date_of_birth = format(convertedBirthDate, "yyyy-MM-dd");
     empExist.date_of_hire = format(convertedHireDate, "yyyy-MM-dd");
-    empExist.photo = req.file
-      ? "uploads/" + req.file?.filename
+    empExist.photo = req.files["photo"]
+      ? "uploads/" + req.files["photo"][0]?.filename
       : empExist.photo;
+    empExist.digital_signature = req.files["digital_signature"]
+      ? "uploads/" + req.files["digital_signature"][0]?.filename
+      : empExist.digital_signature;
     await empExist.save();
     const addressExits = await db.Address.findOne({
       where: {
@@ -287,8 +294,8 @@ module.exports = EmployeeController = {
       },
     });
     // console.log(addressExits.id);
-    console.log(format(req.body.date_of_birth, "MM/dd/yyyy"));
-    console.log(req.body);
+    // console.log(format(req.body.date_of_birth, "MM/dd/yyyy"));
+    // console.log(req.body);
     if (addressExits && addressExits.id !== parseInt(address.id)) {
       res.status(400);
       throw new Error("Employee phone number already exists");

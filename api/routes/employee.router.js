@@ -13,7 +13,11 @@ router.post(
   upload.fields([{ name: "photo" }, { name: "digital_signature" }]),
   EmployeeController.createEmployee
 );
-router.put("/:id", upload.single("photo"), EmployeeController.updateEmployee);
+router.put(
+  "/:id",
+  upload.fields([{ name: "photo" }, { name: "digital_signature" }]),
+  EmployeeController.updateEmployee
+);
 router.delete("/:id", EmployeeController.deleteEmployee);
 router.patch("/:id/deactivate", EmployeeController.deactivateEmployee);
 router.patch("/:id/activate", EmployeeController.activateEmployee);

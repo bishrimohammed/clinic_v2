@@ -20,7 +20,7 @@ router.get(
 
 router.post(
   "/",
-  upload.single("logo"),
+  upload.fields([{ name: "logo" }, { name: "clinic_seal" }]),
   ClinicProfileController.createClinicProfile
 );
 
@@ -28,7 +28,7 @@ router.post(
 
 router.put(
   "/:id",
-  upload.single("logo"),
+  upload.fields([{ name: "logo" }, { name: "clinic_seal" }]),
   ClinicProfileController.updateClinicProfile
 );
 

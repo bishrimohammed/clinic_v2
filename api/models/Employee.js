@@ -71,6 +71,6 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true,
     }
   );
-  Employee.sync({ alter: true, force: false });
+  Employee.sync({ alter: false, force: false });
   return Employee;
 };

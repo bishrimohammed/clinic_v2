@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 // import { Button,  } from "react-bootstrap";
 import { yupResolver } from "@hookform/resolvers/yup";
+import "./employee.css";
 // import React from "react";
 import {
   Button,
@@ -27,6 +28,7 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
   const { data: cities } = useGetCities();
   const { data: subcities } = useGetSubCities();
   const { mutateAsync, isPending, error } = useEditEmployee();
+  const [showImage, setShowImage] = useState("");
   console.log(empoyeeData);
   const {
     register,
@@ -56,7 +58,7 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
         subcity_id: empoyeeData.address?.woreda?.SubCity?.id,
         woreda_id: empoyeeData.address?.woreda?.id,
         email: empoyeeData.address?.email || "",
-        house_number: empoyeeData.address?.house_number,
+        house_number: empoyeeData.address?.house_number || "",
       },
       Emergency: {
         id: empoyeeData.emergencyContact.id,
@@ -79,11 +81,12 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
           empoyeeData.emergencyContact.address?.woreda?.SubCity?.city?.id,
         subcity_id: empoyeeData.emergencyContact.address?.woreda?.SubCity?.id,
         woreda_id: empoyeeData.emergencyContact.address?.woreda?.id,
-        house_number: empoyeeData.emergencyContact.address?.house_number,
+        house_number: empoyeeData.emergencyContact.address?.house_number || "",
       },
     },
     resolver: yupResolver(EditEmployeeschema),
   });
+  // const [showImage, setShowImage] = useState(null);
   // console.log(errors);
   const submitHandler = (data) => {
     // console.log(data);
@@ -102,6 +105,7 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
       data.position === "Other" ? data.other_position : ""
     );
     formData.append("photo", data.photo[0]);
+    formData.append("digital_signature", data.digital_signature[0]);
     formData.append("address", JSON.stringify(data.address));
     formData.append("Emergency", JSON.stringify(data.Emergency));
     // console.log(formData);
@@ -111,6 +115,7 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
       }
     });
   };
+  console.log(errors);
   const getMaxYear = (value) => {
     const today = new Date().toISOString().substring(0, 10);
     const date = new Date(today);
@@ -125,7 +130,7 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
   const SubCityAddressWatcher = watch("address.subcity_id");
   const AddressWoredaWacher = watch("address.woreda_id");
   const AddressHouseNumberWatcher = watch("address.house_number");
-  console.log(AddressHouseNumberWatcher);
+  // console.log(AddressHouseNumberWatcher);
   // console.log(woredas.filter((w) => w.id === AddressWoredaWacher)[0]?.name);
   const EmergencyregionWatcher = watch("Emergency.region_id");
   const EmergencycityWatcher = watch("Emergency.city_id");
@@ -345,6 +350,13 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
       </>
     );
   }
+  const changeImageHandler = (img_url) => {
+    if (img_url == showImage) {
+      setShowImage("");
+    } else {
+      setShowImage(String(img_url));
+    }
+  };
   return (
     <Modal size="lg" show={show} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -353,6 +365,23 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
       <Modal.Body>
         <>
           {/* <h4 className="mb-3 p-2"></h4> */}
+          {showImage && (
+            <div className="diplay-image d-flex justify-content-center mb-2 ">
+              <div className="image-container  ">
+                <img
+                  src={Host_URL + showImage}
+                  alt=""
+                  fluid
+                  className="image img-fluid thumbnail"
+                  style={{ objectFit: "cover", objectPosition: "center" }}
+                  // width="1000"
+                  height={200}
+                  width="300"
+                />
+                <span onClick={() => setShowImage("")}>X</span>
+              </div>
+            </div>
+          )}
 
           <Form
             onSubmit={handleSubmit(submitHandler)}
@@ -373,13 +402,13 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
                   errors={errors.middleName}
                   name="middleName"
                   register={register}
-                  label="Father Name"
+                  label="Father's Name"
                 />
               </Col>
 
               <Col md={4} sm={12}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Grandfather Name</Form.Label>
+                  <Form.Label>Grandfather's Name</Form.Label>
                   <Form.Control
                     {...register("lastName")}
                     name="lastName"
@@ -423,9 +452,44 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
                       className="flex-grow-1"
                     />
                     {empoyeeData.photo && (
-                      <div>
+                      <div
+                        onClick={() => changeImageHandler(empoyeeData?.photo)}
+                      >
                         <Image
                           src={Host_URL + empoyeeData?.photo}
+                          /* {previewImage} */ width={30}
+                          height={30}
+                          roundedCircle
+                          // fluid
+                          // className="object-fit"
+                          style={{
+                            objectFit: "cover",
+                            objectPosition: "center",
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </Form.Group>
+              </Col>
+              <Col md={4} sm={12}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Employee Signature</Form.Label>
+                  <div className="d-flex align-items-center justify-content-between gap-2 ">
+                    <Form.Control
+                      {...register("digital_signature")}
+                      type="file"
+                      accept="image/*"
+                      name="digital_signature"
+                    />
+                    {empoyeeData.digital_signature && (
+                      <div
+                        onClick={() =>
+                          changeImageHandler(empoyeeData?.digital_signature)
+                        }
+                      >
+                        <Image
+                          src={Host_URL + empoyeeData?.digital_signature}
                           /* {previewImage} */ width={30}
                           height={30}
                           roundedCircle

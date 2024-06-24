@@ -27,6 +27,7 @@ const schema = yup.object().shape({
     .required("Name is required"),
   // has_triage: yup.boolean().required(""),
   logo: yup.mixed().required("Please select an image file"),
+  clinic_seal: yup.mixed(),
   card_valid_date: yup
     .number()
     .transform((value) => (isNaN(value) ? undefined : value))
@@ -97,6 +98,7 @@ const schema = yup.object().shape({
 });
 const EditClinicInfo = () => {
   const [previewImage, setPreviewImage] = useState(null);
+  const [previewImageSeal, setPreviewImageSeal] = useState(null);
   const { mutate, isPending } = useUpdateClinicProfile();
   const {
     data: state,
@@ -164,6 +166,7 @@ const EditClinicInfo = () => {
     formData.append("name", data.name);
 
     formData.append("logo", data.logo[0]);
+    formData.append("clinic_seal", data.clinic_seal[0]);
     formData.append("card_valid_date", data.card_valid_date);
     formData.append("website_url", data.website_url);
     formData.append("address", JSON.stringify(data.address));
@@ -243,8 +246,51 @@ const EditClinicInfo = () => {
                     isInvalid={errors.logo}
                   />
 
-                  <div className="flex-grow-1 bg-dark">
+                  <div className="flex-grow-1 border p-1">
                     {getValues("logo")?.length === 1 ? (
+                      <Image
+                        src={previewImage}
+                        /* {previewImage} */ width={30}
+                        height={30}
+                        // thumbnail
+                        fluid
+                        thumbnail
+                      />
+                    ) : (
+                      <Image
+                        src={Host_URL + state?.logo}
+                        /* {previewImage} */
+                        width={30}
+                        height={30}
+                        style={{ objectFit: "cover", objectPosition: "center" }}
+                        fluid
+                      />
+                    )}
+                  </div>
+                </div>
+              </Form.Group>
+            </Col>
+            <Col md={4} sm={12} className="mb-2">
+              <Form.Group>
+                <Form.Label>Clinic Seal</Form.Label>
+                <div className="d-flex align-items-center justify-content-between gap-2 p-1">
+                  <Form.Control
+                    type="file"
+                    className="border-1"
+                    accept="image/png, image/jpeg"
+                    // onChange={handleImageChange}
+                    id="clinic_seal"
+                    name="clinic_seal"
+                    // {...register("logo")}
+                    //ref={ref}
+                    {...register("clinic_seal", {
+                      onChange: (e) =>
+                        setPreviewImage(URL.createObjectURL(e.target.files[0])),
+                    })}
+                    isInvalid={errors.clinic_seal}
+                  />
+                  <div className="flex-grow-1 border p-1 ">
+                    {getValues("clinic_seal")?.length === 1 ? (
                       <Image
                         src={previewImage}
                         /* {previewImage} */ width={30}
@@ -254,7 +300,7 @@ const EditClinicInfo = () => {
                       />
                     ) : (
                       <Image
-                        src={Host_URL + state?.logo}
+                        src={Host_URL + state?.clinic_seal}
                         /* {previewImage} */
                         width={30}
                         height={30}
