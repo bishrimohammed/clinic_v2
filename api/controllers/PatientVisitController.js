@@ -188,13 +188,19 @@ module.exports = PatientVisitController = {
         clinic.card_valid_date
       ) {
         stage = "Waiting for service fee";
-      } else if (clinic.has_triage) {
+      } else if (
+        clinic.has_triage ||
+        String(type).toLowerCase() === "emergency"
+      ) {
         stage = "Waiting for triage";
       } else {
         stage = "Waiting for examiner";
       }
     } else {
       stage = "Waiting for service fee";
+    }
+    if (String(type).toLowerCase() === "emergency") {
+      stage = "Waiting for triage";
     }
     const medicalRecord = await db.MedicalRecord.create({
       patient_id,
@@ -215,7 +221,11 @@ module.exports = PatientVisitController = {
       stage: stage,
       created_by: req?.user?.id,
     });
-    if (stage === "Waiting for service fee") {
+
+    if (
+      stage === "Waiting for service fee" ||
+      String(type).toLowerCase() === "emergency"
+    ) {
       const medicalBilling = await db.MedicalBilling.create({
         medical_record_id: medicalRecord.id,
         patient_id,
@@ -352,10 +362,21 @@ module.exports = PatientVisitController = {
   admitVisit: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const visit = await db.PatientAssignment.findByPk(id);
+
     if (!visit) {
       res.status(404);
       throw new Error("Patient visit not found");
     }
+    await db.Patient.update(
+      {
+        patient_type: "inpatient",
+      },
+      {
+        where: {
+          id: visit.patient_id,
+        },
+      }
+    );
     visit.stage = "Admitted";
     await visit.save();
     res.json(visit);

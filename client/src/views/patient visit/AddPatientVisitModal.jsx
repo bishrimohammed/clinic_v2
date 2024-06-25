@@ -20,10 +20,7 @@ const visitSchema = yup.object().shape({
     })
     .required("Date and time is required"),
   // time: yup.string().required("Time is required"),
-  reason: yup
-    .string()
-    .transform((value) => value.trim())
-    .required("Visit reason is required"),
+  reason: yup.string().transform((value) => value.trim()),
   type: yup.string().required("Visit Type is required"),
   mode_of_arrival: yup.string().when("type", ([type], schema) => {
     if (type === "Emergency") {

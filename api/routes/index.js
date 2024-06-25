@@ -5,6 +5,7 @@ const CityRoute = require("./address/city.router.js");
 const SubCityRoute = require("./address/subCity.router.js");
 
 const patientRoute = require("./patient.router.js");
+const AllergyRoute = require("./Allergy.route.js");
 const AppointmentRoute = require("./Appointment.router.js");
 const visitTypeRoute = require("./visitType.router.js");
 const assignPatientRoute = require("./PatientAssignment.router.js");
@@ -65,4 +66,5 @@ module.exports = {
   progressNoteRoute,
   ApprovalSettingRoute,
   TemporarySavedDataRoute,
+  AllergyRoute,
 };

@@ -14,13 +14,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AddVitalSignModal from "../AddVitalSignModal";
 import { useGetActiveVitalSignFields } from "../hooks/useGetActiveVitalSignFields";
 import { useForm } from "react-hook-form";
-// import { FaCirclePlus } from "react-icons/fa6";
-// import PatientAllergies from "../../patient/patient Detail/Allergy/PatientAllergies";
-// import PatientFamilyHistory from "../../patient/patient Detail/family history/PatientFamilyHistory";
-// import PatientAllergies from "../../patient/patient Detail/Allergy/PatientAllergies";
-// import PatientSocialHistory from "../../patient/patient Detail/social history/PatientSocialHistory";
-// import PatientCurrentMedication from "../../patient/patient Detail/current medication/PatientCurrentMedication";
-// import PatientPastMedicalHistory from "../../patient/patient Detail/pastMedicalHistory/PatientPastMedicalHistory";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
@@ -161,7 +154,14 @@ const ViewUpcomingVisitDetail = () => {
                 {data?.map((field, index) => (
                   <Col key={field.id} md={4} sm={12} className="mb-2">
                     <Form.Group className="mb-3">
-                      <Form.Label>{field.name}</Form.Label>
+                      <Form.Label>
+                        {field.name}
+                        {String(field.name).toLowerCase() === "weight"
+                          ? "(Kg)"
+                          : String(field.name).toLowerCase() === "height"
+                          ? "(cm)"
+                          : null}{" "}
+                      </Form.Label>
                       <input
                         type="hidden"
                         {...register(`vitals[${index}].vitalId`)}

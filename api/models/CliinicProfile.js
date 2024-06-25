@@ -46,6 +46,6 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: null,
     },
   });
-  ClinicProfile.sync({ alter: true, force: false });
+  ClinicProfile.sync({ alter: false, force: false });
   return ClinicProfile;
 };

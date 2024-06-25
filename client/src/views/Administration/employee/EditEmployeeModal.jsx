@@ -29,7 +29,7 @@ const EditEmployeeModal = ({ empoyeeData, show, handleClose }) => {
   const { data: subcities } = useGetSubCities();
   const { mutateAsync, isPending, error } = useEditEmployee();
   const [showImage, setShowImage] = useState("");
-  console.log(empoyeeData);
+  // console.log(empoyeeData);
   const {
     register,
     formState: { errors },

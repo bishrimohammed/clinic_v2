@@ -104,9 +104,26 @@ const add_MedicalRecord_medicineItem_to_Billing = asyncHandler(
         })
       )
         .then(async (payments) => {
+          let stage = "";
+          if (String(type).toLowerCase() === "emergency") {
+            stage = "Waiting for triage";
+          }
+          if (
+            String(visit.visit_type).toLowerCase() === "emergency" &&
+            item_name === "lab"
+          ) {
+            stage = "Waiting for lab";
+          } else {
+            stage = "Waiting for payment";
+          }
+
           await visit.update({
-            stage: "Waiting for payment",
+            stage: stage,
           });
+
+          // await visit.update({
+          //   stage: "Waiting for payment",
+          // });
           // console.log(payments);
           return "payment created successfully";
         })

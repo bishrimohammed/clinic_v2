@@ -6,33 +6,33 @@ require("dotenv").config();
 const cors = require("cors");
 const sequelize = require("./config/database.js");
 // const db = require("./models");
-const userRoute = require("./routes/user.router.js");
-const woredaRoute = require("./routes/address/woreda.router.js");
-const RegionRoute = require("./routes/address/region.router.js");
-const CityRoute = require("./routes/address/city.router.js");
-const SubCityRoute = require("./routes/address/subCity.router.js");
+// const userRoute = require("./routes/user.router.js");
+// const woredaRoute = require("./routes/address/woreda.router.js");
+// const RegionRoute = require("./routes/address/region.router.js");
+// const CityRoute = require("./routes/address/city.router.js");
+// const SubCityRoute = require("./routes/address/subCity.router.js");
 
-const patientRoute = require("./routes/patient.router.js");
-const AppointmentRoute = require("./routes/Appointment.router.js");
-const visitTypeRoute = require("./routes/visitType.router.js");
-const assignPatientRoute = require("./routes/PatientAssignment.router.js");
-const medicalRecordRoute = require("./routes/MedicalRecord.router.js");
-const serviceRoute = require("./routes/cilicService.router.js");
-const unitsRoute = require("./routes/unit.router.js");
-const clinicprofileRoute = require("./routes/ClinicProfile.router.js");
-const fieldRoute = require("./routes/FieldConfig.router.js");
-// employye route
-const employeeRoute = require("./routes/employee.router.js");
-// role and permission
-const roleRoute = require("./routes/Role.router.js");
-const permissionsRoute = require("./routes/permission.router.js");
+// const patientRoute = require("./routes/patient.router.js");
+// const AppointmentRoute = require("./routes/Appointment.router.js");
+// const visitTypeRoute = require("./routes/visitType.router.js");
+// const assignPatientRoute = require("./routes/PatientAssignment.router.js");
+// const medicalRecordRoute = require("./routes/MedicalRecord.router.js");
+// const serviceRoute = require("./routes/cilicService.router.js");
+// const unitsRoute = require("./routes/unit.router.js");
+// const clinicprofileRoute = require("./routes/ClinicProfile.router.js");
+// const fieldRoute = require("./routes/FieldConfig.router.js");
+// // employye route
+// const employeeRoute = require("./routes/employee.router.js");
+// // role and permission
+// const roleRoute = require("./routes/Role.router.js");
+// const permissionsRoute = require("./routes/permission.router.js");
 
-const creditCompanyRoute = require("./routes/CreditCompany.router.js");
-const dutyRoute = require("./routes/Duty.router.js");
+// const creditCompanyRoute = require("./routes/CreditCompany.router.js");
+// const dutyRoute = require("./routes/Duty.router.js");
 
-const patientVisitRoute = require("./routes/patientVisit.router.js");
+// const patientVisitRoute = require("./routes/patientVisit.router.js");
 
-const BillingRoute = require("./routes/Billing.route.js");
+// const BillingRoute = require("./routes/Billing.route.js");
 const { notFound, errorHandler } = require("./middleware/errorMiddleWare.js");
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -45,6 +45,28 @@ const {
   progressNoteRoute,
   ApprovalSettingRoute,
   TemporarySavedDataRoute,
+  userRoute,
+  patientRoute,
+  woredaRoute,
+  RegionRoute,
+  CityRoute,
+  SubCityRoute,
+  visitTypeRoute,
+  assignPatientRoute,
+  medicalRecordRoute,
+  serviceRoute,
+  unitsRoute,
+  clinicprofileRoute,
+  employeeRoute,
+  roleRoute,
+  permissionsRoute,
+  fieldRoute,
+  creditCompanyRoute,
+  dutyRoute,
+  AppointmentRoute,
+  BillingRoute,
+  patientVisitRoute,
+  AllergyRoute,
 } = require("./routes/index.js");
 const app = express();
 
@@ -65,6 +87,7 @@ app.use("/api/v1/dashboard", DashbordDataRoute);
 app.use("/api/v1/user", userRoute);
 
 app.use("/api/v1/patient", patientRoute);
+app.use("/api/v1/allergies", AllergyRoute);
 app.use("/api/v1/woreda", woredaRoute);
 app.use("/api/v1/region", RegionRoute);
 

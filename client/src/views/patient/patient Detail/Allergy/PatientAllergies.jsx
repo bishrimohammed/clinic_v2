@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { FaCirclePlus } from "react-icons/fa6";
 import AddAllergyModal from "./AddAllergyModal";
+import PatientAllergyDetails from "./PatientAllergyDetails";
+import { useGetPatientAllergy } from "../../hooks/allergyHooks/useGetPatientAllergy";
 
 const PatientAllergies = ({ allergies, patientId }) => {
   const [showAddAllergyModal, setShowAddAllergyModal] = useState(false);
-  // console.log("reeeee");
+  const { data } = useGetPatientAllergy(patientId);
+  console.log(allergies);
   return (
     <>
       <div className="allergies-section mb-2 mt-2">
@@ -22,18 +25,37 @@ const PatientAllergies = ({ allergies, patientId }) => {
 
         <div className="allergies-list small">
           {allergies?.map((allergy, index) => (
-            <span key={allergy.id}>
-              {allergy.allergy_type}
-              {index !== allergies.length - 1 ? ", " : null}
+            <span
+              key={allergy.id}
+              className={`${
+                String(allergy.severity).toLowerCase() === "severe"
+                  ? "text-danger"
+                  : ""
+              }`}
+            >
+              <div>
+                {" "}
+                {allergy.allergy_type} {`(${allergy.severity})`}{" "}
+              </div>
+              {/* {"\n "}
+              {index !== allergies.length - 1 ? "\n" : null} */}
             </span>
           ))}
         </div>
       </div>
-      {showAddAllergyModal && (
+      {/* {showAddAllergyModal && (
         <AddAllergyModal
           show={showAddAllergyModal}
           handleClose={() => setShowAddAllergyModal(false)}
           patientId={patientId}
+        />
+      )} */}
+      {showAddAllergyModal && (
+        <PatientAllergyDetails
+          show={showAddAllergyModal}
+          handleClose={() => setShowAddAllergyModal(false)}
+          patientId={patientId}
+          allergies={data}
         />
       )}
     </>

@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { hasPermission } from "../../utils/hasPermission";
 import AddPatientVisitModal from "./AddPatientVisitModal";
 import PaginationComponent from "../../components/PaginationComponent";
+import { useStartTraige } from "./hooks/useStartTraige";
 
 const UpcomingPatientVisitTable = () => {
   const [search, setSearch] = useState("");
@@ -38,6 +39,7 @@ const UpcomingPatientVisitTable = () => {
     status: "",
     vistiType: "",
   });
+  const startTraige = useStartTraige();
   const {
     data: PatientVisit,
     isPending,
@@ -183,26 +185,7 @@ const UpcomingPatientVisitTable = () => {
               return (
                 <tr
                   key={rowEl.id}
-                  style={{ cursor: "pointer", zIndex: "-1" }}
-                  onClick={() => {
-                    // setShowViewEmployee(true);
-                    // setShowViewAppointment({
-                    //   isShow: true,
-                    //   appointment: rowEl.original,
-                    // });
-                    console.log(rowEl.original.stage);
-                    hasPermission("triage", "create") &&
-                      (rowEl.original.stage === "Waiting for triage" ||
-                        rowEl.original.stage === "Performing triage") &&
-                      navigate("view", { state: rowEl.original });
-
-                    // if (
-                    //   rowEl.original.stage === "Waiting for triage" ||
-                    //   rowEl.original.stage === "Performing triage"
-                    // ) {
-                    //   navigate("view", { state: rowEl.original });
-                    // }
-                  }}
+                  // style={{ cursor: "pointer", zIndex: "-1" }}
                 >
                   {rowEl.getVisibleCells().map((cellEl, index) => {
                     return (
@@ -263,11 +246,18 @@ const UpcomingPatientVisitTable = () => {
                               event.stopPropagation();
                               // setData_to_be_Edited(rowEl.original);
                               // handleShowEdit();
-                              setShowConfirmTraigeModal({
-                                isShow: true,
-                                patientVisitId: rowEl.original.id,
-                                action: "Start",
-                              });
+                              // setShowConfirmTraigeModal({
+                              //   isShow: true,
+                              //   patientVisitId: rowEl.original.id,
+                              //   action: "Start",
+                              // });
+                              startTraige.mutateAsync(rowEl.original.id);
+                              hasPermission("triage", "create") &&
+                                (rowEl.original.stage ===
+                                  "Waiting for triage" ||
+                                  rowEl.original.stage ===
+                                    "Performing triage") &&
+                                navigate("view", { state: rowEl.original });
                             }}
                           >
                             <RiEditLine /> Start Triage
@@ -275,24 +265,50 @@ const UpcomingPatientVisitTable = () => {
                         ) : null}
 
                         {rowEl.original.stage === "Performing triage" ? (
-                          <Dropdown.Item
-                            className="d-flex gap-2 align-items-center"
-                            role="button"
-                            disabled={!rowEl.original.status}
-                            style={{ zIndex: "50" }}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              // setData_to_be_Edited(rowEl.original);
-                              // handleShowEdit();
-                              setShowConfirmTraigeModal({
-                                isShow: true,
-                                patientVisitId: rowEl.original.id,
-                                action: "Finish",
-                              });
-                            }}
-                          >
-                            <RiEditLine /> Finish Triage
-                          </Dropdown.Item>
+                          <>
+                            <Dropdown.Item
+                              className="d-flex gap-2 align-items-center"
+                              role="button"
+                              disabled={!rowEl.original.status}
+                              style={{ zIndex: "50" }}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                // setData_to_be_Edited(rowEl.original);
+                                // handleShowEdit();
+                                // setShowConfirmTraigeModal({
+                                //   isShow: true,
+                                //   patientVisitId: rowEl.original.id,
+                                //   action: "Start",
+                                // });
+                                hasPermission("triage", "create") &&
+                                  (rowEl.original.stage ===
+                                    "Waiting for triage" ||
+                                    rowEl.original.stage ===
+                                      "Performing triage") &&
+                                  navigate("view", { state: rowEl.original });
+                              }}
+                            >
+                              <RiEditLine /> Continue Triage
+                            </Dropdown.Item>
+                            <Dropdown.Item
+                              className="d-flex gap-2 align-items-center"
+                              role="button"
+                              disabled={!rowEl.original.status}
+                              style={{ zIndex: "50" }}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                // setData_to_be_Edited(rowEl.original);
+                                // handleShowEdit();
+                                setShowConfirmTraigeModal({
+                                  isShow: true,
+                                  patientVisitId: rowEl.original.id,
+                                  action: "Finish",
+                                });
+                              }}
+                            >
+                              <RiEditLine /> Finish Triage
+                            </Dropdown.Item>
+                          </>
                         ) : null}
                         <Dropdown.Item
                           className="d-flex gap-2 align-items-center"

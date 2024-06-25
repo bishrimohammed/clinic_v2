@@ -827,20 +827,35 @@ module.exports = MedicalRecordController = {
     patientVisit.symptom_notes = patientVisit.symptom_notes
       ? patientVisit.symptom_notes + "\n" + symptom
       : symptom;
-    patientVisit.stage = "Waiting for examiner";
+    patientVisit.stage = "Waiting for doctor";
     patientVisit.visit_type = visit_type;
     await patientVisit.save();
-    const VitalSigns = vitals.map((v) => {
-      return {
-        ...v,
-        medicalRecord_id: req.params.id,
-        examiner_id: req.user.id,
-        taken_date: today,
-      };
+    const vital = await db.Vital.create({
+      medicalRecord_id: medicalRecord.id,
+      examiner_id: req.user.id,
+      progrssNote_id: progressNote.id,
     });
+    // const VitalSigns = vitals.map((v) => {
+    //   return db.VitalResult.create({
+    //     vital_id: vital.id,
+    //     vitalSignField_id: v.vitalId,
+    //     result: v.value,
+    //     // progrssNote_id: req.user.id,
+    //   });
+    // });
+    await Promise.all(
+      vitals.map(async (v) => {
+        return db.VitalResult.create({
+          vital_id: vital.id,
+          vitalSignField_id: v.vitalId,
+          result: v.value,
+          // progrssNote_id: req.user.id,
+        });
+      })
+    );
     // console.log(VitalSigns);
     // return;
-    const newVitalSigns = await db.Vital.bulkCreate(VitalSigns);
+    // const newVitalSigns = await db.Vital.bulkCreate(VitalSigns);
     res.status(201).json({ msg: "Vital Signatures added successfully" });
   }),
 
