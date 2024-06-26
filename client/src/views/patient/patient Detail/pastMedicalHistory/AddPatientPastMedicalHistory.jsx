@@ -53,15 +53,7 @@ const AddPatientPastMedicalHistory = ({ show, handleClose, patientId }) => {
               {errors.medical_condition?.message}
             </Form.Control.Feedback>
           </Form.Group>
-          {/* <Form.Group className="mb-3">
-            <Form.Label> Severity</Form.Label>
-            <Form.Select>
-              <option>Select</option>
-              <option>Mild</option>
-              <option>Moderate</option>
-              <option>Severe</option>
-            </Form.Select>
-          </Form.Group> */}
+
           <Form.Group className="mb-3">
             <Form.Label>Treatment </Form.Label>
             <Form.Control

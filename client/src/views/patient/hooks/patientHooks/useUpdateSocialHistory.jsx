@@ -1,24 +1,28 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Axiosinstance from "../../../../api/axiosInstance";
 import { AxiosHeaders } from "../../../../api/useAxiosHeaders";
-import { toast } from "react-toastify";
-export const useAddPatientSocialHistory = () => {
+import Axiosinstance from "../../../../api/axiosInstance";
+
+export const useUpdateSocialHistory = () => {
   const { headers } = AxiosHeaders();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data) => {
-      return Axiosinstance.post(
-        `/patient/${data.patientId}/social-history`,
-        data.newSocialHistory,
+    mutationFn: async (data) => {
+      return await Axiosinstance.put(
+        `/patient/social-history/${data.id}`,
+        data.formData,
         { headers }
       );
     },
     onSuccess: (data, variables) => {
-      // toast.success("Patient social history added successfully");
       queryClient.invalidateQueries({
         queryKey: ["Patient", variables.patientId, "Social History"],
         exact: true,
       });
+    },
+    onError: () => {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["socialhistory"],
+      //   })
     },
   });
 };

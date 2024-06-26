@@ -36,6 +36,7 @@ const DashbordDataRoute = require("./DashboardData.route.js");
 const ApprovalSettingRoute = require("./ApprovalSetting.route.js");
 
 const TemporarySavedDataRoute = require("./TemporarySavedData.route.js");
+const ConditionsAndMedicationRoute = require("./ConditionsAndMedication.route.js");
 
 module.exports = {
   userRoute,
@@ -67,4 +68,5 @@ module.exports = {
   ApprovalSettingRoute,
   TemporarySavedDataRoute,
   AllergyRoute,
+  ConditionsAndMedicationRoute,
 };

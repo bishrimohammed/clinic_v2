@@ -301,6 +301,34 @@ module.exports = PatientController = {
     // console.log(patient);
     res.json(patient);
   }),
+  getFamilyHistory: expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const patient = await db.Patient.findByPk(id);
+    if (!patient) {
+      res.status(404);
+      throw new Error("Patient not found");
+    }
+    const familyHistories = await db.FamilyHistory.findAll({
+      where: {
+        patient_id: patient.id,
+      },
+    });
+    res.json(familyHistories);
+  }),
+  getSocialHistory: expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const patient = await db.Patient.findByPk(id);
+    if (!patient) {
+      res.status(404);
+      throw new Error("Patient not found");
+    }
+    const socialHistories = await db.SocialHistory.findAll({
+      where: {
+        patient_id: patient.id,
+      },
+    });
+    res.json(socialHistories);
+  }),
   createPatient: expressAsyncHandler(async (req, res) => {
     const { patient, address, emergency, company_id, employeeId } = req.body;
     // console.log(req.body);
@@ -816,6 +844,38 @@ module.exports = PatientController = {
       .status(201)
       .json({ message: "Patient family history added successfully" });
   }),
+  updateFamilyhistory: expressAsyncHandler(async (req, res) => {
+    const { medical_condition, relationship } = req.body;
+    const { id } = req.params;
+    const familyHistory = await db.FamilyHistory.findByPk(req.params.id);
+    if (!familyHistory) {
+      res.status(400);
+      throw new Error("Family History doesn't exist");
+    }
+    await familyHistory.update({
+      medical_condition: medical_condition,
+      relationship: relationship,
+    });
+    // patient.family_history = req.body.family_history;
+    // await patient.save();
+    res
+      .status(200)
+      .json({ message: "Patient family history updated successfully" });
+  }),
+  deleteFamilyHistory: expressAsyncHandler(async (req, res) => {
+    const familyHistory = await db.FamilyHistory.findByPk(req.params.id);
+    if (!familyHistory) {
+      res.status(400);
+      throw new Error("Family History doesn't exist");
+    }
+    await familyHistory.destroy();
+    // patient.family_history = req.body.family_history;
+    // await patient.save();
+    res
+      .status(200)
+      .json({ message: "Patient family history deleted successfully" });
+  }),
+
   addPatientSocialHistory: expressAsyncHandler(async (req, res) => {
     const { tobacco_use, alcohol_use } = req.body;
     const patient = await db.Patient.findByPk(req.params.id);
@@ -835,6 +895,38 @@ module.exports = PatientController = {
     // await patient.save();
     res.json({ message: "Patient social history added successfully" });
   }),
+  updateSocialHistory: expressAsyncHandler(async (req, res) => {
+    const { tobacco_use, alcohol_use } = req.body;
+    const { id } = req.params;
+    const socialHistory = await db.SocialHistory.findByPk(req.params.id);
+    if (!socialHistory) {
+      res.status(400);
+      throw new Error("Social History doesn't exist");
+    }
+    await socialHistory.update({
+      tobacco_use: tobacco_use,
+      alcohol_use: alcohol_use,
+    });
+    // patient.social_history = req.body.social_history;
+    // await patient.save();
+    res
+      .status(200)
+      .json({ message: "Patient social history updated successfully" });
+  }),
+  deleteSocialHistory: expressAsyncHandler(async (req, res) => {
+    const socialHistory = await db.SocialHistory.findByPk(req.params.id);
+    if (!socialHistory) {
+      res.status(400);
+      throw new Error("Social History doesn't exist");
+    }
+    await socialHistory.destroy();
+    // patient.social_history = req.body.social_history;
+    // await patient.save();
+    res
+      .status(200)
+      .json({ message: "Patient social history deleted successfully" });
+  }),
+
   addPatientPastMedicalHistory: expressAsyncHandler(async (req, res) => {
     const { medical_condition, treatment } = req.body;
     const patient = await db.Patient.findByPk(req.params.id);

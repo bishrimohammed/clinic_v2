@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaCirclePlus } from "react-icons/fa6";
 import AddPatientPastMedicalHistory from "./AddPatientPastMedicalHistory";
+import ConditionsAndMedications from "./ConditionsAndMedications";
 
 const PatientPastMedicalHistory = ({ patientId, pastMedicalHistories }) => {
   const [showAddPastMedicalHistory, setShowAddPastMedicalHistory] =
@@ -8,7 +9,7 @@ const PatientPastMedicalHistory = ({ patientId, pastMedicalHistories }) => {
   // console.log(pastMedicalHistories);
   return (
     <>
-      <div className="current-medication-section mb-2">
+      {/* <div className="current-medication-section mb-2">
         <div className="d-flex align-items-center">
           {" "}
           <h6 className="mb-0">Past medical history</h6>
@@ -27,8 +28,7 @@ const PatientPastMedicalHistory = ({ patientId, pastMedicalHistories }) => {
               <span>{pastMedicalHistory.medical_condition}</span>
             </div>
           ))}
-          {/* <span>Hypertension </span>
-          <span>Diabetes Type 2 </span> */}
+        
         </div>
       </div>
       {showAddPastMedicalHistory && (
@@ -37,7 +37,8 @@ const PatientPastMedicalHistory = ({ patientId, pastMedicalHistories }) => {
           handleClose={() => setShowAddPastMedicalHistory(false)}
           patientId={patientId}
         />
-      )}
+      )} */}
+      <ConditionsAndMedications />
     </>
   );
 };

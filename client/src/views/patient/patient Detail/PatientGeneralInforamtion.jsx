@@ -5,8 +5,10 @@ import PatientPastMedicalHistory from "./pastMedicalHistory/PatientPastMedicalHi
 import PatientFamilyHistory from "./family history/PatientFamilyHistory";
 import PatientSocialHistory from "./social history/PatientSocialHistory";
 import { differenceInYears } from "date-fns";
-const PatientGeneralInforamtion = ({ patient }) => {
-  // console.log(patient);
+import ConditionsAndMedications from "./pastMedicalHistory/ConditionsAndMedications";
+import HivContainer from "./HIV/HivContainer";
+const PatientGeneralInforamtion = ({ patient, medicalRecordId }) => {
+  console.log(patient);
   return (
     <React.Fragment>
       <p className="mb-1 small">
@@ -22,11 +24,16 @@ const PatientGeneralInforamtion = ({ patient }) => {
         allergies={patient?.allergies}
         patientId={patient?.id}
       />
-      <PatientCurrentMedication />
+      {/* <PatientCurrentMedication /> */}
 
-      <PatientPastMedicalHistory
+      {/* <PatientPastMedicalHistory
         patientId={patient?.id}
         pastMedicalHistories={patient?.pastMedicalHistories}
+      /> */}
+      <ConditionsAndMedications
+        patientId={patient?.id}
+        pastMedicalHistories={patient?.pastMedicalHistories}
+        medicalRecordId={medicalRecordId}
       />
 
       <PatientFamilyHistory
@@ -38,6 +45,7 @@ const PatientGeneralInforamtion = ({ patient }) => {
         socialHistories={patient?.socialHistories}
         patientId={patient?.id}
       />
+      <HivContainer patient={patient} />
     </React.Fragment>
   );
 };

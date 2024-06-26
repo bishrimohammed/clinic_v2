@@ -67,6 +67,7 @@ const {
   BillingRoute,
   patientVisitRoute,
   AllergyRoute,
+  ConditionsAndMedicationRoute,
 } = require("./routes/index.js");
 const app = express();
 
@@ -101,6 +102,7 @@ app.use("/api/v1/assignpatient", assignPatientRoute);
 
 app.use("/api/v1/medicalrecords", medicalRecordRoute);
 app.use("/api/v1/progressnotes", progressNoteRoute);
+app.use("/api/v1/conditions-medication", ConditionsAndMedicationRoute);
 
 app.use("/api/v1/medicalrecord-consultaion", MedicalRecordConsultaionRoute);
 

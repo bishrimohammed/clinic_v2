@@ -37,12 +37,13 @@ const allergySchema = yup.object().shape({
 const PatientAllergyDetails = ({ show, handleClose, allergies, patientId }) => {
   const { state } = useLocation();
   // console.log(state);
-  const [action, setAction] = useState("Save");
-  const [selectedAllergy, setSelectedAllergy] = useState(null);
-  const { data: services } = useGetClinicService();
-  const { data: groups } = useGetServiceGroups(state.id);
-  const [successState, setSuccessState] = useState("");
+
+  // const [selectedAllergy, setSelectedAllergy] = useState(null);
+  // const { data: services } = useGetClinicService();
+  // const { data: groups } = useGetServiceGroups(state.id);
+  // const [successState, setSuccessState] = useState("");
   const [errorState, setErrorState] = useState("");
+  const [action, setAction] = useState("Save");
   const [showForm, setShowForm] = useState(false);
   const [showDeactiveModal, setShowDeactiveModal] = useState({
     // isShow: false,
@@ -76,7 +77,7 @@ const PatientAllergyDetails = ({ show, handleClose, allergies, patientId }) => {
   });
 
   //   console.log(selectedAllergy);
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const submitHandler = (data) => {
     // console.log(data);
     if (action === "Save") {
@@ -175,7 +176,7 @@ const PatientAllergyDetails = ({ show, handleClose, allergies, patientId }) => {
     // }
   };
 
-  console.log(allergies);
+  //   console.log(allergies);
   return (
     <Modal
       style={{ zIndex: 1999 }}

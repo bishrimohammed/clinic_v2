@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import { FaCirclePlus } from "react-icons/fa6";
 import AddPatientSocialHistoryModal from "./AddPatientSocialHistoryModal";
+import { MdRemoveRedEye } from "react-icons/md";
+import { useGetSocialHistory } from "../../hooks/patientHooks/useGetSocialHistory";
 
-const PatientSocialHistory = ({ socialHistories, patientId }) => {
+const PatientSocialHistory = ({
+  socialHistories,
+  patientId,
+  medicalRedordId,
+}) => {
   const [showAddSocialHistoryModal, setShowAddSocialHistoryModal] =
     useState(false);
-  console.log(socialHistories);
+  const { data } = useGetSocialHistory(patientId);
+  // console.log(socialHistories);
   return (
     <>
       <div className="social-history-section mb-2">
@@ -16,7 +23,7 @@ const PatientSocialHistory = ({ socialHistories, patientId }) => {
             className="border-0  bg-transparent"
             onClick={() => setShowAddSocialHistoryModal(true)}
           >
-            <FaCirclePlus />
+            <MdRemoveRedEye size={20} />
           </button>
         </div>
 
@@ -34,6 +41,7 @@ const PatientSocialHistory = ({ socialHistories, patientId }) => {
           handleClose={() => setShowAddSocialHistoryModal(false)}
           show={showAddSocialHistoryModal}
           patientId={patientId}
+          socialHistories={data}
         />
       )}
     </>

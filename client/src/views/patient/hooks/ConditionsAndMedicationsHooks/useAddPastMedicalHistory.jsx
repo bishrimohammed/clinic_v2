@@ -1,22 +1,25 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import Axiosinstance from "../../../../api/axiosInstance";
 import { AxiosHeaders } from "../../../../api/useAxiosHeaders";
-import { toast } from "react-toastify";
-export const useAddPatientFamilyHistory = () => {
-  const { headers } = AxiosHeaders();
+
+export const useAddPastMedicalHistory = () => {
   const queryClient = useQueryClient();
+  const { headers } = AxiosHeaders();
   return useMutation({
     mutationFn: async (data) => {
       return await Axiosinstance.post(
-        `/patient/${data.patientId}/family-history`,
-        data.newFamilyHistory,
-        { headers }
+        `conditions-medication/patient/${data.patientId}/past-medical-history`,
+        data.newPastMedicalHistory,
+        {
+          headers,
+        }
       );
     },
     onSuccess: (data, variables) => {
-      toast.success("Patient family history added successfully");
+      // toast.success("Patient past medical history added successfully");
       queryClient.invalidateQueries({
-        queryKey: ["Patient", variables.patientId, "Family History"],
+        queryKey: ["Patient", variables.patientId, "Past Medical History"],
         exact: true,
       });
     },

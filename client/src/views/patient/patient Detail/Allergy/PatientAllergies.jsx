@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { FaCirclePlus } from "react-icons/fa6";
-import AddAllergyModal from "./AddAllergyModal";
+// import { FaCirclePlus } from "react-icons/fa6";
+// import AddAllergyModal from "./AddAllergyModal";
 import PatientAllergyDetails from "./PatientAllergyDetails";
 import { useGetPatientAllergy } from "../../hooks/allergyHooks/useGetPatientAllergy";
+import { MdRemoveRedEye } from "react-icons/md";
 
 const PatientAllergies = ({ allergies, patientId }) => {
   const [showAddAllergyModal, setShowAddAllergyModal] = useState(false);
   const { data } = useGetPatientAllergy(patientId);
-  console.log(allergies);
+  // console.log(allergies);
   return (
     <>
       <div className="allergies-section mb-2 mt-2">
@@ -19,7 +20,7 @@ const PatientAllergies = ({ allergies, patientId }) => {
             className="border-0 bg-transparent"
             onClick={() => setShowAddAllergyModal(true)}
           >
-            <FaCirclePlus />
+            <MdRemoveRedEye size={20} />
           </button>
         </div>
 

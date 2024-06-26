@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { FaCirclePlus } from "react-icons/fa6";
+// import { FaCirclePlus } from "react-icons/fa6";
 import AddPatientFamilyHistoryModal from "./AddPatientFamilyHistoryModal";
+import { MdRemoveRedEye } from "react-icons/md";
+import { useGetFamilyHistory } from "../../hooks/patientHooks/useGetFamilyHistory";
 
 const PatientFamilyHistory = ({ familyHistories, patientId }) => {
   const [showAddFamilyHistoryModal, setShowAddFamilyHistoryModal] =
     useState(false);
+  const { data } = useGetFamilyHistory(patientId);
   return (
     <>
       <div className="family-history-section mb-2">
@@ -15,26 +18,38 @@ const PatientFamilyHistory = ({ familyHistories, patientId }) => {
             className="border-0  bg-transparent"
             onClick={() => setShowAddFamilyHistoryModal(true)}
           >
-            <FaCirclePlus />
+            <MdRemoveRedEye size={20} />
           </button>
         </div>
-
-        <div className="allergies-list small fs-9 py-1">
-          {familyHistories?.map((condition, index) => (
-            <span key={index + condition.id}>
-              {condition.medical_condition}
-              {index !== familyHistories.length - 1 ? ", " : null}
-            </span>
-          ))}
-          {/* <span>Hypertension, </span>
-          <span>Diabetes Type 2 </span> */}
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {familyHistories?.map((FH, index) => (
+              <tr key={FH.id}>
+                <td>
+                  {FH.medical_condition}({FH.relationship})
+                </td>
+                {/* // <td>{FH.relationship}</td> */}
+              </tr>
+              // <span key={index + condition.id}>
+              //   {condition.medical_condition}
+              //   {index !== familyHistories.length - 1 ? ", " : null}
+              // </span>
+            ))}
+          </tbody>
+        </table>
       </div>
       {showAddFamilyHistoryModal && (
         <AddPatientFamilyHistoryModal
           show={showAddFamilyHistoryModal}
           handleClose={() => setShowAddFamilyHistoryModal(false)}
           patientId={patientId}
+          familyHistories={data}
         />
       )}
     </>

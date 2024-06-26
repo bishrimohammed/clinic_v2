@@ -126,6 +126,12 @@ db.OrderedTest = require("./medicalRecords/orderedTest.js")(
   sequelize,
   DataTypes
 );
+db.DiscontinuedMedication =
+  require("./medicalRecords/DiscontinuedMedication.js")(sequelize, DataTypes);
+db.CurrentMedication = require("./medicalRecords/CurrentMedication.js")(
+  sequelize,
+  DataTypes
+);
 
 /// field config
 
