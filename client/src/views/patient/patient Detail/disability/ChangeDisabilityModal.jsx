@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Form, Modal } from "react-bootstrap";
-import { useUpdateHIVStatus } from "../../hooks/patientHooks/useUpdateHIVStatus";
+import { Alert, Form, Modal, Spinner } from "react-bootstrap";
+import { useUpdateDisability } from "../../hooks/patientHooks/useUpdateDisability";
 import { toast } from "react-toastify";
-const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
-  const { mutateAsync, isPending } = useUpdateHIVStatus();
-  const statusRef = useRef(false);
+
+const ChangeDisabilityModal = ({ show, handleClose, patientId }) => {
+  const { mutateAsync, isPending } = useUpdateDisability();
+  const statusRef = useRef("None");
   //   const [successState, setSuccessState] = useState("");
   const [errorState, setErrorState] = useState("");
   console.log(patientId);
@@ -17,7 +18,7 @@ const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
   const changeHandler = () => {
     console.log(statusRef.current.value);
     mutateAsync({
-      formData: { status: statusRef.current.value },
+      formData: { disability: statusRef.current.value },
       patientId,
     })
       .then((res) => {
@@ -43,7 +44,7 @@ const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Change HIV Status</Modal.Title>
+        <Modal.Title>Change Disability</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {/* {successState && <Alert variant="success">{successState}</Alert>} */}
@@ -54,7 +55,7 @@ const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
         )}
         <Form>
           <Form.Group className="mb-3">
-            <Form.Label>has HIV</Form.Label>
+            <Form.Label>Select Disability</Form.Label>
             <Form.Control as="select" ref={statusRef} defaultValue="false">
               {/* {status.map((item) => (
               <option key={item.value} value={item.value}>
@@ -62,8 +63,11 @@ const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
               </option>
             ))} */}
               {/* <option value="">Please Select</option> */}
-              <option value={true}>Yes</option>
-              <option value={false}>No</option>
+              <option value="None">None</option>
+              <option value="Mobility">Mobility Impairment</option>
+              <option value="Hearing">Hearing Impairment</option>
+              <option value="Visual">Visual Impairment</option>
+              <option value="Speech">Speech Impairment</option>
             </Form.Control>
           </Form.Group>
         </Form>
@@ -72,7 +76,12 @@ const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
         <button className="btn btn-secondary" onClick={handleClose}>
           Cancel
         </button>
-        <button className="btn btn-primary" onClick={changeHandler}>
+        <button
+          className="btn btn-primary"
+          onClick={changeHandler}
+          disabled={isPending}
+        >
+          {isPending && <Spinner size="sm" />}
           Save
         </button>
       </Modal.Footer>
@@ -80,4 +89,4 @@ const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
   );
 };
 
-export default ChangeHIVStatusModal;
+export default ChangeDisabilityModal;

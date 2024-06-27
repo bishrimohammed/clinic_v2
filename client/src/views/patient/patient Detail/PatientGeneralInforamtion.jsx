@@ -7,8 +7,9 @@ import PatientSocialHistory from "./social history/PatientSocialHistory";
 import { differenceInYears } from "date-fns";
 import ConditionsAndMedications from "./pastMedicalHistory/ConditionsAndMedications";
 import HivContainer from "./HIV/HivContainer";
+import Disability from "./disability/Disability";
 const PatientGeneralInforamtion = ({ patient, medicalRecordId }) => {
-  console.log(patient);
+  // console.log(patient);
   return (
     <React.Fragment>
       <p className="mb-1 small">
@@ -46,6 +47,7 @@ const PatientGeneralInforamtion = ({ patient, medicalRecordId }) => {
         patientId={patient?.id}
       />
       <HivContainer patient={patient} />
+      <Disability patientId={patient?.id} />
     </React.Fragment>
   );
 };

@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op, ENUM } = require("sequelize");
 const db = require(".");
 const { sequelize } = require(".");
 
@@ -136,12 +136,18 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: "outpatient",
     },
+    // Mobility Impairment, Hearing Impairment, Visual Impairment, Speech Impairment
+    disability: {
+      type: DataTypes.ENUM,
+      values: ["None", "Mobility", "Hearing", "Visual", "Speech"],
+      defaultValue: "None",
+    },
     status: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
   });
 
-  Patient.sync({ force: false, alter: false });
+  Patient.sync({ force: false, alter: true });
   return Patient;
 };

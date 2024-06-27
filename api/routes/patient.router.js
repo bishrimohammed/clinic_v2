@@ -61,6 +61,9 @@ router.patch("/:id/activate", PatientController.activatePatient);
 
 router.patch("/:id/deactivate", PatientController.deactivatePatient);
 
+router.patch("/:id/hiv", PatientController.updateHivStatus);
+router.patch("/:id/disability", PatientController.updateDisablity);
+
 router.delete(
   "/family-history/:id",
   protect,

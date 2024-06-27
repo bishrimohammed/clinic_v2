@@ -778,6 +778,34 @@ module.exports = PatientController = {
 
     res.status(200).json({ message: "Patient updated successfully" });
   }),
+  updateHivStatus: expressAsyncHandler(async (req, res) => {
+    const { status } = req.body;
+    console.log(status);
+    // return;
+    const patient = await db.Patient.findByPk(req.params.id);
+    if (!patient) {
+      res.status(400);
+      throw new Error("Patient doesn't exist");
+    }
+
+    patient.has_HIV = status;
+    await patient.save();
+    res.json({ message: "Patient HIV status updated successfully" });
+  }),
+  updateDisablity: expressAsyncHandler(async (req, res) => {
+    const { disability } = req.body;
+    // console.log(status);
+    // return;
+
+    const patient = await db.Patient.findByPk(req.params.id);
+    if (!patient) {
+      res.status(400);
+      throw new Error("Patient doesn't exist");
+    }
+    patient.disability = disability;
+    await patient.save();
+    res.json({ message: "Patient disablity updated successfully" });
+  }),
   activatePatient: expressAsyncHandler(async (req, res) => {
     const patient = await db.Patient.findOne({
       where: {
