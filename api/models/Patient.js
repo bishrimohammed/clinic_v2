@@ -148,6 +148,6 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  Patient.sync({ force: false, alter: true });
+  Patient.sync({ force: false, alter: false });
   return Patient;
 };

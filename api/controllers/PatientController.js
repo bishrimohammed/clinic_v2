@@ -118,13 +118,36 @@ module.exports = PatientController = {
     res.json(patient);
   }),
   searchPatient: expressAsyncHandler(async (req, res) => {
-    const { query } = req.query;
-
-    const patients = await db.Patient.findAll({
-      include: ["address"],
-      // order: [["createdAt", "DESC"]],
-      limit: 10,
-    });
+    // const { query } = req.query;
+    console.log(req.query);
+    let where = {};
+    if (req.query.patientId) {
+      where.card_number = { [Op.like]: `%${req.query.patientId}%` };
+    }
+    if (req.query.phone) {
+      where.phone = { [Op.like]: `%${req.query.phone}%` };
+    }
+    if (req.query.patientName) {
+      where.firstName = { [Op.like]: `%${req.query.patientName}%` };
+    }
+    // [Op.like]: `%doctor%`,
+    let patients;
+    if (where.card_number || where.firstName || where.phone) {
+      patients = await db.Patient.findAll({
+        where,
+        limit: 10,
+        attributes: [
+          "id",
+          "firstName",
+          "middleName",
+          "lastName",
+          "card_number",
+          "phone",
+        ],
+      });
+    } else {
+      patients = [];
+    }
 
     res.status(200).json(patients);
   }),

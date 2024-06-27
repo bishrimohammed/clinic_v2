@@ -47,7 +47,7 @@ const PatientGeneralInforamtion = ({ patient, medicalRecordId }) => {
         patientId={patient?.id}
       />
       <HivContainer patient={patient} />
-      <Disability patientId={patient?.id} />
+      <Disability patient={patient} />
     </React.Fragment>
   );
 };

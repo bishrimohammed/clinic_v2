@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ChangeDisabilityModal from "./ChangeDisabilityModal";
 import { MdRemoveRedEye } from "react-icons/md";
 
-const Disability = ({ patientId }) => {
+const Disability = ({ patient }) => {
   const [showChangeStatusModal, setShowChangeStatusModal] = useState(false);
   return (
     <div>
@@ -16,11 +16,12 @@ const Disability = ({ patientId }) => {
           <MdRemoveRedEye size={20} />
         </button>
       </div>
+      <p style={{ fontSize: 14 }}>{patient?.disability}</p>
       {showChangeStatusModal && (
         <ChangeDisabilityModal
           show={showChangeStatusModal}
           handleClose={() => setShowChangeStatusModal(false)}
-          patientId={patientId}
+          patientId={patient.id}
           // status={patient.has_HIV}
         />
       )}
