@@ -12,6 +12,7 @@ module.exports.AppointementController = {
     }
     const appointments = await db.Appointment.findAll({
       where: where,
+      order: [["createdAt", "DESC"]],
       include: [
         {
           model: db.Patient,

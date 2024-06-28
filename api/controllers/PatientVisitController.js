@@ -74,22 +74,23 @@ module.exports = PatientVisitController = {
     const visits = await db.PatientAssignment.findAll({
       where: {
         ...where,
+        status: true,
         doctor_id: req.user.id,
-        [Op.or]: [
-          {
-            assignment_date: new Date().toISOString().substring(0, 10),
-            visit_time: {
-              [Op.gte]: format(new Date(), "HH:mm:ss"),
-            },
-          },
-          {
-            assignment_date: {
-              [Op.gt]: new Date().toISOString().substring(0, 10),
-            },
-          },
-        ],
+        // [Op.or]: [
+        //   {
+        //     assignment_date: new Date().toISOString().substring(0, 10),
+        //     visit_time: {
+        //       [Op.gte]: format(new Date(), "HH:mm:ss"),
+        //     },
+        //   },
+        //   {
+        //     assignment_date: {
+        //       [Op.gt]: new Date().toISOString().substring(0, 10),
+        //     },
+        //   },
+        // ],
       },
-      // where: where,
+      order: [["createdAt", "DESC"]],
       include: [
         {
           model: db.Patient,
@@ -137,6 +138,7 @@ module.exports = PatientVisitController = {
     // console.log(where);
     const visits = await db.PatientAssignment.findAll({
       where: { ...where, doctor_id: req.user.id },
+      // order: [["createdAt", "DESC"]],
       include: [
         {
           model: db.Patient,
@@ -267,19 +269,20 @@ module.exports = PatientVisitController = {
     const visits = await db.PatientAssignment.findAll({
       where: {
         ...where,
-        [Op.or]: [
-          {
-            assignment_date: new Date().toISOString().substring(0, 10),
-            visit_time: {
-              [Op.gte]: format(new Date(), "HH:mm:ss"),
-            },
-          },
-          {
-            assignment_date: {
-              [Op.gt]: new Date().toISOString().substring(0, 10),
-            },
-          },
-        ],
+        status: true,
+        // [Op.or]: [
+        //   {
+        //     assignment_date: new Date().toISOString().substring(0, 10),
+        //     visit_time: {
+        //       [Op.gte]: format(new Date(), "HH:mm:ss"),
+        //     },
+        //   },
+        //   {
+        //     assignment_date: {
+        //       [Op.gt]: new Date().toISOString().substring(0, 10),
+        //     },
+        //   },
+        // ],
       },
       // where: where,
       include: [

@@ -21,7 +21,8 @@ import { IoSearch } from "react-icons/io5";
 import useDebounce from "../../hooks/useDebounce";
 import { useSearchPatient } from "../patient/hooks/patientHooks/useSearchPatient";
 const visitSchema = yup.object().shape({
-  patient_id: yup.string().required("Patient is required"),
+  patient_id: yup.string(),
+  card_Number: yup.string().required("Patient is required"),
   patient_name: yup.string(),
   phone: yup.number(),
   doctor_id: yup.string().required("Doctor is required"),
@@ -75,7 +76,7 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
     },
   });
   // console.log(searchQuery);
-  console.log(errors);
+  // console.log(errors);
   const { mutateAsync, isPending } = useAddPatientVisit();
   const [errorState, setErrorState] = useState("");
   const visitDateWatcher = watch("date");
@@ -151,9 +152,9 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                     <Form.Control
                       type="text"
                       disabled
-                      {...register("patient_id")}
+                      {...register("card_Number")}
                       // defaultValue={new Date().toISOString().slice(0, 16)}
-                      isInvalid={errors.patient_id}
+                      isInvalid={errors.card_Number}
                       aria-label="Default select example"
                     >
                       {/* <option value="">Select Patient</option>
@@ -173,7 +174,7 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                     </button>
                   </div>
                   <span className=" text-danger">
-                    {errors.patient_id?.message}
+                    {errors.card_Number?.message}
                   </span>
                   {/* <Form.Control.Feedback type="invalid">
                     {errors.patient_id?.message}
@@ -308,19 +309,7 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                   </Form.Group>
                 </Col>
               )}
-              {/* <Col md={4} sm={12} className="mb-2">
-              <Form.Group className="mb-3">
-                <Form.Label>Mode of Arrival</Form.Label>
-                <Form.Control
-                  {...register("mode_of_arrival")}
-                  isInvalid={errors.mode_of_arrival}
-                  aria-label="Default select example"
-                ></Form.Control>
-                <Form.Control.Feedback type="invalid">
-                  {errors.mode_of_arrival?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col> */}
+
               <Col md={4} sm={12} className="mb-2">
                 <Form.Group className="mb-3">
                   <Form.Label>Visit Reason</Form.Label>
@@ -429,7 +418,8 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                     key={patient.id}
                     style={{ cursor: "pointer" }}
                     onClick={() => {
-                      setValue("patient_id", patient.card_number);
+                      setValue("patient_id", patient.id);
+                      setValue("card_Number", patient.card_number);
                       setValue(
                         "patient_name",
                         patient.firstName +

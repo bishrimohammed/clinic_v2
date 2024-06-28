@@ -49,10 +49,10 @@ export const OutStandingBillColumns = [
             padding: "0.2rem 0.5rem",
             fontSize: 13,
             fontWeight: 500,
-            backgroundColor: s.getValue() === "done" ? "green" : "yellow",
-            color: s.getValue() === "done" ? "white" : "black",
+            backgroundColor: s.getValue() === "Done" ? "green" : "yellow",
+            color: s.getValue() === "Done" ? "white" : "black",
           }}
-          className=" text-dark d-inline-flex align-items-center justify-content-center"
+          className="d-inline-flex align-items-center justify-content-center"
         >
           {s.getValue()}
         </span>

@@ -53,7 +53,11 @@ module.exports = PatientController = {
         "status",
         "createdAt",
       ],
-      order: [["createdAt", "DESC"]],
+      order: [
+        ["firstName", "ASC"],
+        ["middleName", "ASC"],
+        ["lastName", "ASC"],
+      ],
     });
     // console.log(patients);
     res.status(200).json(patients);

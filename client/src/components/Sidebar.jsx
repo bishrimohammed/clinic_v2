@@ -77,12 +77,13 @@ const Sidebar = () => {
             <MdSpaceDashboard className="nav-icon" />
             Dashboard
           </CNavItem>
-          {hasPermission("Patient", "read") && (
+          {(hasPermission("Patient", "read") ||
+            hasPermission("visit", "read")) && (
             <CNavGroup
               idx="patient"
               visible={location.pathname.startsWith("patients")}
               toggler={navLink(
-                "Patients",
+                "Patient Management",
 
                 <FaKitMedical className="nav-icon" />
                 // </CIcon>
@@ -97,6 +98,11 @@ const Sidebar = () => {
               <CNavItem to="/patients" component={NavLink}>
                 Patient List
               </CNavItem>
+              {hasPermission("visit", "read") && (
+                <CNavItem to="/visit" component={NavLink}>
+                  Patient Visits
+                </CNavItem>
+              )}
             </CNavGroup>
           )}
 
@@ -137,28 +143,7 @@ const Sidebar = () => {
               </CNavItem>
             </CNavGroup>
           )}
-          {/* {(currentUser.role?.name === "doctor" ||
-            currentUser.role?.name === "cashier") && (
-            <CNavGroup
-              idx="que"
-              visible={location.pathname.startsWith("patientque")}
-              toggler={navLink(
-                "Assignments",
-                // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
-                <MdAssignmentTurnedIn className="nav-icon" />
-              )}
-            >
-              {currentUser.role?.name === "cashier" && (
-                <CNavItem to="/patientque/addtoque" component={NavLink}>
-                  Assign to ODP
-                </CNavItem>
-              )}
 
-              <CNavItem to="/patientque/list" component={Link}>
-                Assigned list
-              </CNavItem>
-            </CNavGroup>
-          )} */}
           {currentUser.role?.name === "cashier" && (
             <CNavGroup
               idx="payments"
@@ -284,7 +269,7 @@ const Sidebar = () => {
             </CNavGroup>
           )}
 
-          {hasPermission("visit", "read") && (
+          {/* {hasPermission("visit", "read") && (
             <CNavGroup
               idx="patientvisit"
               visible={location.pathname.startsWith("visit")}
@@ -298,7 +283,7 @@ const Sidebar = () => {
                 Visits
               </CNavItem>
             </CNavGroup>
-          )}
+          )} */}
         </SimpleBar>
       </CSidebarNav>
     </CSidebar>

@@ -41,7 +41,7 @@ const PatientAllergyDetails = ({ show, handleClose, allergies, patientId }) => {
   // const [selectedAllergy, setSelectedAllergy] = useState(null);
   // const { data: services } = useGetClinicService();
   // const { data: groups } = useGetServiceGroups(state.id);
-  // const [successState, setSuccessState] = useState("");
+  const [successState, setSuccessState] = useState("");
   const [errorState, setErrorState] = useState("");
   const [action, setAction] = useState("Save");
   const [showForm, setShowForm] = useState(false);
@@ -184,7 +184,7 @@ const PatientAllergyDetails = ({ show, handleClose, allergies, patientId }) => {
       show={show}
       onHide={() => handleClose(false)}
     >
-      <Modal.Header className="py-1" closeButton>
+      <Modal.Header closeButton>
         <Modal.Title> Allergies</Modal.Title>
       </Modal.Header>
       <Modal.Body className="pt-1">
@@ -196,7 +196,7 @@ const PatientAllergyDetails = ({ show, handleClose, allergies, patientId }) => {
         )}
 
         <Row>
-          <Col md={7}>
+          <Col md={showForm ? 7 : 12}>
             <div className="d-flex justify-content-end w-100  py-1">
               <Button
                 className=" btn-sm "

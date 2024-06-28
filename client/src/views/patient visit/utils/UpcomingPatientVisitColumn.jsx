@@ -46,27 +46,16 @@ export const UpcomingPatientVisitColumn = [
     cell: (s) => {
       // console.log(url);
       return (
-        // <span
-        // style={{
-        //   borderRadius: 15,
-        //   padding: "0.2rem 0.5rem",
-        //   fontSize: 14,
-        //   fontWeight: 500,
-        //   color: "blueviolet",
-        // }}
-        //   // className=" text-white bg-success   d-inline-flex align-items-center justify-content-center"
-        // >
-        //   {s.getValue()}
-        // </span>
         <span
           style={{
             borderRadius: 15,
             padding: "0.2rem 0.5rem",
             fontSize: 13,
-
-            backgroundColor: "blue",
+            fontWeight: 500,
+            backgroundColor: s.getValue() === "Done" ? "green" : "yellow",
+            color: s.getValue() === "Done" ? "white" : "black",
           }}
-          className=" text-white   d-inline-flex align-items-center justify-content-center"
+          className="d-inline-flex align-items-center justify-content-center"
         >
           {s.getValue()}
         </span>

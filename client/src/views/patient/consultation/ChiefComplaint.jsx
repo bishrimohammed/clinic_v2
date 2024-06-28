@@ -195,6 +195,16 @@ const ChiefComplaint = React.forwardRef((props, ref) => {
             {/* {isPending && <Spinner size="sm" animation="border" />} */}
             {data ? "Update" : "Save"}
           </Button>
+          <Button
+            // form="traigeForm"
+            // formTarget="traigeForm"
+            type="button"
+            variant="primary"
+            // disabled={isPending}
+          >
+            {/* {isPending && <Spinner size="sm" animation="border" />} */}
+            Next
+          </Button>
         </div>
       </Form>
     </div>
