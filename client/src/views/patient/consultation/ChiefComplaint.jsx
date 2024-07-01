@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import CreatableSelect from "react-select/creatable";
 import { chiefComplaintOptions } from "../utils/chiefComplaintOptions";
@@ -8,8 +8,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 import { useAddChiefComplaint } from "../hooks/consultationHooks/useAddChiefComplaint";
-import { useGetChiefComplaint } from "../hooks/consultationHooks/useGetChiefComplaint";
+import { useGetMedicalRecordDetial } from "../hooks/consultationHooks/useGetMedicalRecordDetial";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { unlockExam } from "../../../store/consultationSlice";
 const ChiefComplaintSchema = yup.object().shape({
   chief_complaint: yup
     .array()
@@ -30,10 +32,17 @@ const ChiefComplaintSchema = yup.object().shape({
 const ChiefComplaint = React.forwardRef((props, ref) => {
   const { state } = useLocation();
   // console.log(state);
-  const { data, isPending: fetchingCheifComplaint } = useGetChiefComplaint(
+  const { data, isPending: fetchingCheifComplaint } = useGetMedicalRecordDetial(
     state.medicalRecord_id
   );
   // console.log(data);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (data) {
+      // console.log("erkjfbajk");
+      dispatch(unlockExam());
+    }
+  }, [dispatch, data]);
   const chiefs = useMemo(
     () =>
       data?.chief_complaint.split(", ").map((chief) => {
@@ -185,24 +194,24 @@ const ChiefComplaint = React.forwardRef((props, ref) => {
           >
             Save for Later
           </Button> */}
-          <Button
+          {/* <Button
             // form="traigeForm"
             // formTarget="traigeForm"
             type="submit"
             variant="success"
             // disabled={isPending}
           >
-            {/* {isPending && <Spinner size="sm" animation="border" />} */}
+            {isPending && <Spinner size="sm" animation="border" />}
             {data ? "Update" : "Save"}
-          </Button>
+          </Button> */}
           <Button
             // form="traigeForm"
             // formTarget="traigeForm"
-            type="button"
+            type="submit"
             variant="primary"
-            // disabled={isPending}
+            disabled={isPending}
           >
-            {/* {isPending && <Spinner size="sm" animation="border" />} */}
+            {isPending && <Spinner size="sm" animation="border" />}
             Next
           </Button>
         </div>

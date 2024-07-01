@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table";
 import { FaUserLock } from "react-icons/fa";
 
-import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
+import { RiEditLine } from "react-icons/ri";
 import { useMemo, useState } from "react";
 import useDebounce from "../../hooks/useDebounce";
 import { patientColumns } from "./utils/PatientColumn";
@@ -63,6 +63,8 @@ const PatientTable = ({
       sorting,
     },
     onGlobalFilterChange: setSearch,
+    // defaultSortColumn: "Name", // Set the default sort column
+    // defaultSortDirection: "asc",
   });
 
   return (
@@ -131,10 +133,21 @@ const PatientTable = ({
                             columnEl.column.columnDef.header,
                             columnEl.getContext()
                           )}
-                          {{
-                            asc: <FaSortUp />,
-                            desc: <FaSortDown />,
-                          }[columnEl.column.getIsSorted()] ?? null}
+                          {
+                            {
+                              asc: <FaSortUp />,
+                              desc: <FaSortDown />,
+                            }[columnEl.column.getIsSorted()]
+                          }
+                          {/* {columnEl.column.id === "Name" &&
+                            columnEl.column.() && (
+                              <span>
+                                {columnEl.column.getNextSortingOrder() ===
+                                  "asc" && <FaSortUp />}
+                                {columnEl.column.getNextSortingOrder() ===
+                                  "desc" && <FaSortDown />}
+                              </span>
+                            )} */}
                         </div>
                       )}
                     </th>

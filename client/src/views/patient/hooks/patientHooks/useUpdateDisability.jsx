@@ -13,7 +13,7 @@ export const useUpdateDisability = () => {
     onSuccess: (data, variables) => {
       //   toast.success("HIV status updated successfully");
       queryClient.invalidateQueries({
-        queryKey: ["patient general info", variables.patientId],
+        queryKey: ["Patient", variables.patientId],
       });
     },
   });

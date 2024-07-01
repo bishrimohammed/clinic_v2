@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 import AddInternalMedicationModal from "../medication/AddInternalMedicationModal";
 import { FaPlusCircle } from "react-icons/fa";
 import { useGet_Internal_MedicalRecordPrescription } from "../../hooks/consultationHooks/medication/useGet_Internal_MedicalRecordPrescription";
 import { useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { unlockPlan } from "../../../../store/consultationSlice";
 
 const InternalMedicineTable = () => {
   const [showAddInternalMedicationModal, setShowAddInternalMedicationModal] =
@@ -12,6 +14,13 @@ const InternalMedicineTable = () => {
   const { data } = useGet_Internal_MedicalRecordPrescription(
     state.medicalRecord_id
   );
+  console.log(data);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (data) {
+      dispatch(unlockPlan());
+    }
+  }, [dispatch, data]);
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   // console.log(currentUser);
   return (

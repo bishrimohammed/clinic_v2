@@ -48,6 +48,10 @@ module.exports.MedicalRecordAssociation = (db) => {
     foreignKey: "examiner_id",
     as: "examiner",
   });
+  db.Vital.belongsTo(db.MedicalRecord, {
+    foreignKey: "medicalRecord_id",
+    as: "medicalRecord",
+  });
   db.Vital.hasMany(db.VitalResult, {
     foreignKey: "vital_id",
     as: "vitalResults",
@@ -77,7 +81,7 @@ module.exports.MedicalRecordAssociation = (db) => {
     as: "physicalExamination",
   });
   db.ProgressNote.hasOne(db.Vital, {
-    foreignKey: "vital_id",
+    foreignKey: "progressNote_id",
     as: "vital",
   });
   db.CurrentMedication.belongsTo(db.User, {

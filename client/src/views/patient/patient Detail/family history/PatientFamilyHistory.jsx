@@ -8,6 +8,7 @@ const PatientFamilyHistory = ({ familyHistories, patientId }) => {
   const [showAddFamilyHistoryModal, setShowAddFamilyHistoryModal] =
     useState(false);
   const { data } = useGetFamilyHistory(patientId);
+  console.log(patientId);
   return (
     <>
       <div className="family-history-section mb-2">
@@ -29,7 +30,7 @@ const PatientFamilyHistory = ({ familyHistories, patientId }) => {
             </tr>
           </thead>
           <tbody>
-            {familyHistories?.map((FH, index) => (
+            {data?.map((FH, index) => (
               <tr key={FH.id}>
                 <td>
                   {FH.medical_condition}({FH.relationship})

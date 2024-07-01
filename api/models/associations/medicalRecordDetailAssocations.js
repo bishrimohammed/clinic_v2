@@ -7,7 +7,7 @@ module.exports.MedicalRecordDetailAssocations = (db) => {
   });
   db.MedicalRecordDetail.hasMany(db.PhysicalExamination, {
     foreignKey: "medicalRecordDetail_id",
-    as: "physicalExamination",
+    as: "physicalExaminations",
   });
   db.MedicalRecordDetail.belongsTo(db.User, {
     foreignKey: "doctor_id",

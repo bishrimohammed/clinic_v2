@@ -5,7 +5,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
-import { useAddVitalSign } from "./hooks/useAddVitalSign";
+import { useAddTriage } from "./hooks/useAddTriage";
 
 const vitalSignSchema = yup.object().shape({
   vitals: yup.array().of(
@@ -40,7 +40,7 @@ const AddVitalSignModal = ({ show, handleClose }) => {
     //   ],
     // },
   });
-  const { mutateAsync } = useAddVitalSign();
+  const { mutateAsync } = useAddTriage();
   // console.log(data);
   const submitHandler = (data) => {
     // console.log(data);

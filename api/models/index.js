@@ -166,7 +166,7 @@ db.MedicalBilling = require("./MedicalBilling.js")(sequelize, DataTypes);
 db.Payment = require("./Payment.js")(sequelize, DataTypes);
 db.AdvancedPayment = require("./AdvancedPayment.js")(sequelize, DataTypes);
 
-// db.sequelize.sync({ force: false, alter: false }).then(() => {
+// db.sequelize.sync({ force: false, alter: true }).then(() => {
 //   console.log("yes re-sync done!");
 // });
 

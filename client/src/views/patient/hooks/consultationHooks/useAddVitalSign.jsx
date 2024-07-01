@@ -2,22 +2,26 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Axiosinstance from "../../../../api/axiosInstance";
 import { AxiosHeaders } from "../../../../api/useAxiosHeaders";
 import { toast } from "react-toastify";
-export const useAddPatientFamilyHistory = () => {
+
+export const useAddVitalSign = () => {
   const { headers } = AxiosHeaders();
+  // const { state } = useLocation();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data) => {
+      // Add your API call here
+      // Example: return await axios.post('/api/vital-signs', data)
       return await Axiosinstance.post(
-        `/patient/${data.patientId}/family-history`,
-        data.newFamilyHistory,
+        `/medicalrecords/${data.medicalRecordId}/addVitalSign`,
+        data.vitalData,
         { headers }
       );
     },
-    onSuccess: (data, variables) => {
-      // toast.success("Patient family history added successfully");
+    onSuccess: (data, varabiles) => {
+      // Handle successful API call
+      toast.success("Vital sign added successfully!");
       queryClient.invalidateQueries({
-        queryKey: ["Patient", variables.patientId, "Family History"],
-        exact: true,
+        queryKey: ["Medical Record", varabiles.medicalRecordId, "Vital Signs"],
       });
     },
   });

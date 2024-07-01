@@ -22,7 +22,7 @@ export const useAddChiefComplaint = () => {
         queryKey: [
           "Medical Record",
           variables?.medicalRecordId,
-          "ChiefComplaint",
+          "Medical Record Detial",
         ],
       });
     },

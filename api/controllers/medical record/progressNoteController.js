@@ -4,8 +4,11 @@ const {
   getMedicalRecordPrescription,
 } = require("./helper/getMedicalRecordPrescription");
 const db = require("../../models");
-const MedicalRecordHelper = require("./helper/MedicalRecordHelper");
+// const MedicalRecordHelper = require("./helper/MedicalRecordHelper");
 const { getMedicalRecordById } = require("./helper/getMedicalRecordById");
+const {
+  add_MedicalRecord_medicineItem_to_Billing,
+} = require("./helper/MedicalRecordHelper");
 // const progressNote = require("../../models/progressNote");
 module.exports = progressNoteController = {
   getMedicalRecordProgressNote: asyncHandler(async (req, res) => {
@@ -147,9 +150,10 @@ module.exports = progressNoteController = {
           });
         })
       );
-      await MedicalRecordHelper.add_MedicalRecord_medicineItem_to_Billing(
+      await add_MedicalRecord_medicineItem_to_Billing(
         medicalRecord.id,
-        investigations
+        investigations,
+        "lab"
       );
       if (underPanels.length > 0) {
         await Promise.all(
@@ -229,7 +233,7 @@ module.exports = progressNoteController = {
     });
     if (medicalRecordDetail) {
       const physicalExamination = await db.PhysicalExamination.create({
-        medicalRecordDetail_id: medical_record_id,
+        medicalRecordDetail_id: medicalRecordDetail.id,
         examiner_id: req.user.id,
         progressNote_id: progressNote.id,
       });

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Accordion, Button, Form } from "react-bootstrap";
+import { Accordion, Button, Form, Spinner } from "react-bootstrap";
 import AddLabInvestigation from "../History/investigation/AddLabInvestigation";
 import "./plan/plan.css";
 import useOrdered_Lab_Investigations from "../History/investigation/hooks/useOrdered_Lab_Investigations";
@@ -13,28 +13,40 @@ import { useFieldArray, useForm } from "react-hook-form";
 import Lab from "./plan/Lab";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FaCirclePlus } from "react-icons/fa6";
-import { useGetLaboratory } from "../History/investigation/hooks/useGetLaboratory";
+// import { useGetLaboratory } from "../History/investigation/hooks/useGetLaboratory";
+import { useGetMedicalRecordDetial } from "../hooks/consultationHooks/useGetMedicalRecordDetial";
+import { useDispatch } from "react-redux";
+import { unlockFinishButton } from "../../../store/consultationSlice";
+import { useAddPlan } from "../hooks/consultationHooks/useAddPlan";
 const planSchema = yup.object().shape({
   plan: yup.string().required(),
-  selectedLabs: yup.array().of(yup.number()),
-  indirectlySelectedLabs: yup.array().of(yup.number()),
+  // selectedLabs: yup.array().of(yup.number()),
+  // indirectlySelectedLabs: yup.array().of(yup.number()),
   follow_up_visit: yup.object().shape({
     due_date: yup.date(),
     note: yup.string(),
   }),
   referral_notes: yup.array().of(yup.string()),
   sick_notes: yup.array().of(yup.string()),
-  is_labrequest: yup.boolean(),
+  // is_labrequest: yup.boolean(),
   is_follow_up_visit: yup.boolean(),
   is_refer: yup.boolean(),
   is_sick_note: yup.boolean(),
 });
 const PlanTab = React.forwardRef((props, ref) => {
   const { state } = useLocation();
-  const { data: lab_investigation, error } = useOrdered_Lab_Investigations(
+  // console.log(state);
+  const { data, isPending: fetchingCheifComplaint } = useGetMedicalRecordDetial(
     state.medicalRecord_id
   );
-  const { data: laboratoryTests } = useGetLaboratory();
+  const { mutateAsync, isPending } = useAddPlan();
+  // const { data: laboratoryTests } = useGetLaboratory();
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    if (data?.plan) {
+      dispatch(unlockFinishButton());
+    }
+  }, [dispatch, data]);
   const {
     register,
     formState: { errors },
@@ -76,20 +88,24 @@ const PlanTab = React.forwardRef((props, ref) => {
   }));
   const submitHandler = async (data) => {
     console.log(data);
-    const investigations = data?.selectedLabs.map((t) => {
-      const lab = laboratoryTests.find((lab) => lab.id === t);
-      // console.log(lab);
-      return lab?.labTest_id;
-    });
-    const underPanels = data?.indirectlySelectedLabs.map((t) => {
-      const lab = laboratoryTests.find((lab) => lab.id === t);
-      // console.log(lab);
-      return lab?.labTest_id;
-    });
-    console.log(investigations);
-    console.log(underPanels);
+    const formData = {
+      plan: data.plan,
+    };
+    mutateAsync({ formData, medicalRecordId: state.medicalRecord_id });
+    // const investigations = data?.selectedLabs.map((t) => {
+    //   const lab = laboratoryTests.find((lab) => lab.id === t);
+    //   // console.log(lab);
+    //   return lab?.labTest_id;
+    // });
+    // const underPanels = data?.indirectlySelectedLabs.map((t) => {
+    //   const lab = laboratoryTests.find((lab) => lab.id === t);
+    //   // console.log(lab);
+    //   return lab?.labTest_id;
+    // });
+    // console.log(investigations);
+    // console.log(underPanels);
   };
-  console.log(errors);
+  // console.log(errors);
   return (
     <div>
       <Form onSubmit={handleSubmit(submitHandler)} className="">
@@ -111,19 +127,6 @@ const PlanTab = React.forwardRef((props, ref) => {
               Out Come
             </Accordion.Header>
             <Accordion.Body className="pb-1 d-flex justify-content-between">
-              {/* <Form.Group className="mb-3 ">
-                
-                <Form.Check
-                  type="checkbox"
-                  {...register("is_labrequest")}
-                  // onChange={(e) => {
-                  //   console.log();
-                  //   setShowLabAccordion(e.target.checked);
-                  // }}
-                  label="Lab Requests"
-                  placeholder="Out Come"
-                />
-              </Form.Group> */}
               <Form.Group className="mb-3">
                 <Form.Check
                   type="checkbox"
@@ -163,23 +166,7 @@ const PlanTab = React.forwardRef((props, ref) => {
             </Accordion.Body>
           </Accordion.Item>
         </Accordion>
-        {/* {watch("is_labrequest") && (
-          <Accordion flush defaultActiveKey="lab" className="my-2">
-            <Accordion.Item eventKey="lab">
-              <Accordion.Header
-                style={{ zIndex: 1 }}
-                className="border border-2 border-gredient"
-              >
-                Lab Requests
-                
-              </Accordion.Header>
-              <Accordion.Body className="p-0">
-                
-                <Lab setValue={setValue} />
-              </Accordion.Body>
-            </Accordion.Item>
-          </Accordion>
-        )} */}
+
         {watch("is_follow_up_visit") && (
           <Accordion flush defaultActiveKey="0">
             <Accordion.Item eventKey="0">
@@ -299,14 +286,14 @@ const PlanTab = React.forwardRef((props, ref) => {
           </Accordion>
         )}
         <div className="d-flex justify-content-end gap-2 mt-2">
-          <Button variant="secondary">Save for Later</Button>
+          {/* <Button variant="secondary">Save for Later</Button> */}
           <Button
             variant="primary"
             type="submit"
             // onClick={submitHandler}
             // disabled={selectedTests.length === 0 || isPending}
           >
-            {/* {isPending && <Spinner animation="border" size="sm" />} */}
+            {isPending && <Spinner animation="border" size="sm" />}
             Save
           </Button>
         </div>

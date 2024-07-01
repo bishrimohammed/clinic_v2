@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Axiosinstance from "../../../../api/axiosInstance";
 import { AxiosHeaders } from "../../../../api/useAxiosHeaders";
+import { toast } from "react-toastify";
 
 export const useAddPlan = () => {
   const { headers } = AxiosHeaders();
@@ -9,7 +10,7 @@ export const useAddPlan = () => {
     mutationFn: async (data) => {
       return Axiosinstance.post(
         `medicalrecords/${data.medicalRecordId}/add-plan`,
-        data,
+        data.formData,
         { headers }
       ).then((res) => res.data);
     },
@@ -19,12 +20,12 @@ export const useAddPlan = () => {
       queryClient.invalidateQueries({
         queryKey: [
           "Medical Record",
-          variables.medicalRecord_id,
-          "Ordered Lab Investigations",
+          variables.medicalRecordId,
+          "Medical Record Detial",
         ],
         exact: true,
       });
-      toast.success("investigations successfully submited");
+      toast.success("Plan added successfully ");
     },
     onError: (error) => {
       // handle error

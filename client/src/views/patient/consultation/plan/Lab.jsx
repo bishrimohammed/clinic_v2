@@ -46,7 +46,7 @@ const Lab = ({ setValue, getValues }) => {
           //     ? "visibleFill"
           //     : "painted",
           //   opacity: selectedTests.includes(labtest._id) ? 0.5 : 1,
-          cursor: selectedTests?.includes(labtest._id) ? "no-drop" : "pointer",
+          cursor: selectedTests?.includes(labtest.id) ? "no-drop" : "pointer",
         }}
         type="button"
         className="bg-gredient text-nowrap width23 border-0  py-2 d-flex justify-content-center align-items-center"
@@ -60,7 +60,7 @@ const Lab = ({ setValue, getValues }) => {
     ));
 
   const PanelSalect = (test) => {
-    // console.log(test);
+    console.log(test);
     const index = selectedTests.findIndex((t) => t === test.id);
     // console.log();
 

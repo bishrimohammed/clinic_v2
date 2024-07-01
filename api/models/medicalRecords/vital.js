@@ -14,11 +14,15 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: new Date(),
     },
-    progrssNote_id: {
+    progressNote_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+    // vital_id: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: true,
+    // },
   });
-  Vital.sync({ alter: false });
+  Vital.sync({ alter: true });
   return Vital;
 };

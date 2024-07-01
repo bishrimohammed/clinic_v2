@@ -1,7 +1,7 @@
 import React from "react";
 import PatientAllergies from "./Allergy/PatientAllergies";
-import PatientCurrentMedication from "./current medication/PatientCurrentMedication";
-import PatientPastMedicalHistory from "./pastMedicalHistory/PatientPastMedicalHistory";
+// import PatientCurrentMedication from "./current medication/PatientCurrentMedication";
+// import PatientPastMedicalHistory from "./pastMedicalHistory/PatientPastMedicalHistory";
 import PatientFamilyHistory from "./family history/PatientFamilyHistory";
 import PatientSocialHistory from "./social history/PatientSocialHistory";
 import { differenceInYears } from "date-fns";
@@ -22,7 +22,7 @@ const PatientGeneralInforamtion = ({ patient, medicalRecordId }) => {
       <p className="mb-1 small">Sex: {patient?.gender}</p>
 
       <PatientAllergies
-        allergies={patient?.allergies}
+        // allergies={patient?.allergies}
         patientId={patient?.id}
       />
       {/* <PatientCurrentMedication /> */}

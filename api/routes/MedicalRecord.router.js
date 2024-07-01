@@ -33,7 +33,7 @@ router.get(
   protect,
   MedicalRecordController.get_physical_examination
 );
-
+router.get("/:id/vital-signs", protect, MedicalRecordController.getVitalSign);
 router.get(
   "/:id/get_diagnosis",
   protect,
@@ -80,6 +80,7 @@ router.post(
   MedicalRecordController.addInvestigationResult
 );
 
+router.post("/:id/addTriage", protect, MedicalRecordController.addTriage);
 router.post("/:id/addVitalSign", protect, MedicalRecordController.addVitalSign);
 router.post(
   "/:id/add-prescription",
@@ -92,7 +93,7 @@ router.post(
   protect,
   MedicalRecordController.add_External_MedicalRecord_Prescription
 );
-
+router.post("/:id/add-plan", protect, MedicalRecordController.addPlan);
 router.patch(
   "/diagnosis/:diagnosis_id/confirm",
   protect,

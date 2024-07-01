@@ -14,11 +14,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     phone_1: {
       type: DataTypes.STRING,
+
+      allowNull: false,
       unique: {
         args: true,
         msg: "Phone number is taken",
       },
-      allowNull: false,
     },
     phone_2: {
       type: DataTypes.STRING,

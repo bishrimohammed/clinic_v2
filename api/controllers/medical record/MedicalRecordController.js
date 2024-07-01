@@ -63,7 +63,6 @@ module.exports = MedicalRecordController = {
   // @desc    Create a MedicalRecord
   // @route   POST /api/medicalRecords
   // @access  Private
-
   getMedicalRecordDetailById: asyncHandler(async (req, res) => {
     const { id } = req.params;
     // console.log(req.user);
@@ -231,7 +230,24 @@ module.exports = MedicalRecordController = {
     });
     res.status(200).json(medicalRecord);
   }),
-
+  addPlan: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { plan } = req.body;
+    // console.log(req.body);
+    const medicalRecordDetail = await db.MedicalRecordDetail.findOne({
+      where: {
+        medicalRecord_id: id,
+        doctor_id: req.user.id,
+      },
+    });
+    if (!medicalRecordDetail) {
+      res.status(404);
+      throw new Error("Medical Record Detail not found");
+    }
+    medicalRecordDetail.plan = plan;
+    await medicalRecordDetail.save();
+    res.json({ message: "Plan added successfully" });
+  }),
   get_physical_examination: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const medicalRecord = await db.MedicalRecordDetail.findOne({
@@ -241,9 +257,9 @@ module.exports = MedicalRecordController = {
       },
     });
     // console.log(medicalRecord);
-    const physicalExamination = await db.PhysicalExamination.findOne({
+    const physicalExamination = await db.PhysicalExamination.findAll({
       where: {
-        medicalRecordDetail_id: medicalRecord.id,
+        medicalRecordDetail_id: medicalRecord?.id,
         examiner_id: req.user.id,
       },
       include: [
@@ -266,135 +282,185 @@ module.exports = MedicalRecordController = {
       ],
     });
     // console.log(physicalExamination);
-    const vital = await db.Vital.findAll({
-      where: {
-        medicalRecord_id: id,
-        examiner_id: req.user.id,
-      },
-      include: [
-        {
-          model: db.VitalResult,
-          as: "vitalResults",
-          // include: [
-          //   {
-          //     model: db.VitalSignField,
-          //     as: "vitalResultFields",
-          //   },
-          // ]
-        },
-        {
-          model: db.User,
-          as: "examiner",
-          include: [
-            {
-              model: db.Employee,
-              as: "employee",
-              attributes: ["id", "firstName", "middleName", "lastName"],
-            },
-          ],
-          attributes: ["id"],
-        },
-      ],
-    });
-    res.status(200).json({
-      physicalExamination,
+    // const vital = await db.Vital.findAll({
+    //   where: {
+    //     medicalRecord_id: id,
+    //     examiner_id: req.user.id,
+    //   },
+    //   include: [
+    //     {
+    //       model: db.VitalResult,
+    //       as: "vitalResults",
+    //       // include: [
+    //       //   {
+    //       //     model: db.VitalSignField,
+    //       //     as: "vitalResultFields",
+    //       //   },
+    //       // ]
+    //     },
+    //     {
+    //       model: db.User,
+    //       as: "examiner",
+    //       include: [
+    //         {
+    //           model: db.Employee,
+    //           as: "employee",
+    //           attributes: ["id", "firstName", "middleName", "lastName"],
+    //         },
+    //       ],
+    //       attributes: ["id"],
+    //     },
+    //   ],
+    // });
+    res.status(200).json(
+      physicalExamination
       // vital,
-    });
+    );
   }),
   add_physical_examination: asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { physicalExaminations, vitals } = req.body;
+    const {
+      physicalExaminations,
+      vitals,
+      indirectlySelectedLabs: underPanels,
+      selectedLabs: investigations,
+    } = req.body;
     console.log(req.body);
+    // return;
+    const medicalRecord = await db.MedicalRecord.findByPk(id);
+
+    if (!medicalRecord) {
+      res.status(404);
+      throw new Error("MedicalRecord not found");
+    }
     const medicalRecordDetail = await db.MedicalRecordDetail.findOne({
       where: {
         medicalRecord_id: id,
         doctor_id: req.user.id,
       },
     });
-    const physicalExamination = await db.PhysicalExamination.findOne({
-      where: {
-        medicalRecordDetail_id: medicalRecordDetail.id,
-        examiner_id: req.user.id,
-      },
+    const physicalExamination = await db.PhysicalExamination.create({
+      medicalRecordDetail_id: medicalRecordDetail.id,
+      examiner_id: req.user.id,
     });
-    const vital = await db.Vital.findOne({
-      where: {
-        medicalRecord_id: id,
-        examiner_id: req.user.id,
-      },
-    });
+    // const vital = await db.Vital.findOne({
+    //   where: {
+    //     medicalRecord_id: id,
+    //     examiner_id: req.user.id,
+    //   },
+    // });
     //physicalExaminationId
     // value
-    if (physicalExamination) {
-      await Promise.all(
-        physicalExaminations.map(async (physicalExamination) => {
-          await db.PhysicalExamination.update(
-            {
-              value: physicalExamination.value,
-              // examiner_id: req.user.id,
-            },
-            {
-              where: {
-                physical_ExaminationField_id:
-                  physicalExamination.physicalExaminationId,
-                examiner_id: req.user.id,
-                medicalRecordDetail_id: medicalRecordDetail.id,
-              },
-            }
-          );
-        })
-      );
+    // if (physicalExamination) {
+    await Promise.all(
+      physicalExaminations.map(async (Examination) => {
+        return db.physicalExaminationResult.create({
+          // medicalRecordDetail_id: medicalRecordDetail.id,
+          physicalExamination_id: physicalExamination.id,
+          physical_ExaminationField_id: Examination.physicalExaminationId,
+          result: Examination.value,
+          physicalExamination_id: physicalExamination.id,
+          // examiner_id: req.user.id,
+          // progressNote_id: progressNote.id
+        });
+      })
+    );
+    // }
+    const is_Invetigated = await db.InvestigationOrder.findOne({
+      where: {
+        medicalRecord_id: id,
+      },
+    });
+    let investiagtionId;
+    if (is_Invetigated) {
+      // is_Invetigated.clinical_finding =
+      //   is_Invetigated.clinical_finding + "\n" + clinical_finding;
+      is_Invetigated.status = true;
+      await is_Invetigated.save();
+      investiagtionId = is_Invetigated.id;
     } else {
-      await Promise.all(
-        physicalExaminations.map(async (physicalExamination) => {
-          await db.PhysicalExamination.create({
-            medicalRecordDetail_id: medicalRecordDetail.id,
-            physical_ExaminationField_id:
-              physicalExamination.physicalExaminationId,
-            value: physicalExamination.value,
-            examiner_id: req.user.id,
-          });
-        })
-      );
+      const newInvestigation = await db.InvestigationOrder.create({
+        medicalRecord_id: id,
+        // clinical_finding,
+      });
+      if (!newInvestigation) {
+        res.status(500);
+        throw new Error("unable to createInvestigation");
+      }
+      investiagtionId = newInvestigation.id;
     }
+    await Promise.all(
+      investigations.map(async (test) => {
+        return db.OrderedTest.create({
+          serviceItem_id: test,
+          investigationOrder_id: investiagtionId,
+          requested_by: req.user.id,
+          reported_by: null,
+          comment: "",
+          result: "",
+        });
+      })
+    );
 
-    //vitals
-    if (vital) {
+    add_MedicalRecord_medicineItem_to_Billing(
+      medicalRecord.id,
+      investigations,
+      "lab"
+    );
+
+    if (underPanels?.length > 0) {
       await Promise.all(
-        vitals.map(async (vital) => {
-          await db.Vital.update(
-            {
-              result: vital.value,
-              // examiner_id: req.user.id,
-            },
-            {
-              where: {
-                vitalSignField_id: vital.vitalId,
-                examiner_id: req.user.id,
-                medicalRecord_id: id,
-              },
-            }
-          );
-        })
-      );
-    } else {
-      await Promise.all(
-        vitals.map(async (vital) => {
-          await db.Vital.create({
-            medicalRecord_id: id,
-            vitalSignField_id: vital.vitalId,
-            result: vital.value,
-            examiner_id: req.user.id,
+        underPanels.map((test) => {
+          return db.OrderedTest.create({
+            serviceItem_id: test,
+            investigationOrder_id: investiagtionId,
+            requested_by: req.user.id,
+            reported_by: null,
+            comment: "",
+            result: "",
+            is_underpanel: true,
           });
         })
       );
     }
+    //vitals
+    // if (vital) {
+    //   await Promise.all(
+    //     vitals.map(async (vital) => {
+    //       await db.Vital.update(
+    //         {
+    //           result: vital.value,
+    //           // examiner_id: req.user.id,
+    //         },
+    //         {
+    //           where: {
+    //             vitalSignField_id: vital.vitalId,
+    //             examiner_id: req.user.id,
+    //             medicalRecord_id: id,
+    //           },
+    //         }
+    //       );
+    //     })
+    //   );
+    // } else {
+    //   await Promise.all(
+    //     vitals.map(async (vital) => {
+    //       await db.Vital.create({
+    //         medicalRecord_id: id,
+    //         vitalSignField_id: vital.vitalId,
+    //         result: vital.value,
+    //         examiner_id: req.user.id,
+    //       });
+    //     })
+    //   );
+    // }
 
     // console.log(medicalRecordDetail);
-    res.status(200).json({
-      message: physicalExamination
-        ? "Physical Examination update successfully"
-        : "Physical Examination added successfully",
+    res.status(202).json({
+      message:
+        // physicalExamination
+        //   ? "Physical Examination update successfully"        :
+        "Physical Examination added successfully",
     });
   }),
   get_Diagnosis: asyncHandler(async (req, res) => {
@@ -452,7 +518,6 @@ module.exports = MedicalRecordController = {
     });
     res.status(200).json({ message: "Diagnosis ruled out successfully" });
   }),
-
   // @desc    add investigation test a MedicalRecord
   // @route   post /api/medicalRecords/:id/investigation
   // @access  Private
@@ -805,9 +870,8 @@ module.exports = MedicalRecordController = {
     });
     res.json(investigation);
   }),
-
   // @desc add vital sign
-  addVitalSign: asyncHandler(async (req, res) => {
+  addTriage: asyncHandler(async (req, res) => {
     const { vitals, symptom, visit_type } = req.body;
     const today = new Date();
     // const vitals = req.body;
@@ -819,7 +883,7 @@ module.exports = MedicalRecordController = {
         medicalRecord_id: req.params.id,
       },
     });
-    console.log(patientVisit);
+    // console.log(patientVisit);
     if (!patientVisit) {
       res.status(404);
       throw new Error("Patient assignment not found");
@@ -830,10 +894,11 @@ module.exports = MedicalRecordController = {
     patientVisit.stage = "Waiting for doctor";
     patientVisit.visit_type = visit_type;
     await patientVisit.save();
+
     const vital = await db.Vital.create({
-      medicalRecord_id: medicalRecord.id,
+      medicalRecord_id: patientVisit.medicalRecord_id,
       examiner_id: req.user.id,
-      progrssNote_id: progressNote.id,
+      // progrssNote_id: progressNote.id,
     });
     // const VitalSigns = vitals.map((v) => {
     //   return db.VitalResult.create({
@@ -858,7 +923,99 @@ module.exports = MedicalRecordController = {
     // const newVitalSigns = await db.Vital.bulkCreate(VitalSigns);
     res.status(201).json({ msg: "Vital Signatures added successfully" });
   }),
+  addVitalSign: asyncHandler(async (req, res) => {
+    const { vitals } = req.body;
 
+    // const today = new Date();
+    // const vitals = req.body;
+    // console.log(req.body);
+    // return;
+    // console.log(vitals);
+    // const patientVisit = await db.PatientAssignment.findOne({
+    //   where: {
+    //     medicalRecord_id: req.params.id,
+    //   },
+    // });
+    // console.log(patientVisit);
+    // if (!patientVisit) {
+    //   res.status(404);
+    //   throw new Error("Patient assignment not found");
+    // }
+    // patientVisit.symptom_notes = patientVisit.symptom_notes
+    //   ? patientVisit.symptom_notes + "\n" + symptom
+    //   : symptom;
+    // patientVisit.stage = "Waiting for doctor";
+    // patientVisit.visit_type = visit_type;
+    // await patientVisit.save();
+    const medicalRecord = await db.MedicalRecord.findByPk(req.params.id);
+    if (!medicalRecord) {
+      res.status(404);
+      throw new Error("Medical record not found");
+    }
+    const vital = await db.Vital.create({
+      medicalRecord_id: medicalRecord.id,
+      examiner_id: req.user.id,
+      taken_date: Date.now(),
+      // progrssNote_id: progressNote.id,
+    });
+    // const VitalSigns = vitals.map((v) => {
+    //   return db.VitalResult.create({
+    //     vital_id: vital.id,
+    //     vitalSignField_id: v.vitalId,
+    //     result: v.value,
+    //     // progrssNote_id: req.user.id,
+    //   });
+    // });
+    await Promise.all(
+      vitals.map(async (v) => {
+        return db.VitalResult.create({
+          vital_id: vital.id,
+          vitalSignField_id: v.vitalId,
+          result: v.value,
+          // progrssNote_id: req.user.id,
+        });
+      })
+    );
+    // console.log(VitalSigns);
+    // return;
+    // const newVitalSigns = await db.Vital.bulkCreate(VitalSigns);
+    res.status(201).json({ msg: "Vital Signatures added successfully" });
+  }),
+  getVitalSign: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const vital = await db.Vital.findAll({
+      where: {
+        medicalRecord_id: parseInt(id),
+      },
+      include: [
+        {
+          model: db.VitalResult,
+          as: "vitalResults",
+          include: [
+            {
+              model: db.VitalSignField,
+              as: "vitalSignField",
+            },
+          ],
+        },
+        {
+          model: db.User,
+          as: "examiner",
+          include: {
+            model: db.Employee,
+            as: "employee",
+            attributes: ["firstName", "lastName", "middleName"],
+          },
+          attributes: ["id"],
+        },
+      ],
+    });
+    // const medicalRecord = await db.MedicalRecord.findByPk(id, {
+    //   include: ["vitals"],
+    // });
+    // const vital = await db.Vital.findByPk(70);
+    res.json(vital);
+  }),
   // @desc add prescriptions
   addPrescription: asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -929,6 +1086,11 @@ module.exports = MedicalRecordController = {
         medical_record_id: req.params.id,
       },
     });
+    if (!prescription) {
+      res.status(404);
+
+      throw new Error("Medical record not found");
+    }
     const prescribed_medicines = await db.PrescribedMedicine.findAll({
       where: {
         prescription_id: prescription.id,
@@ -955,16 +1117,19 @@ module.exports = MedicalRecordController = {
     });
     res.json(prescribed_medicines);
   }),
-
   get_External_MedicalRecord_Prescription: asyncHandler(async (req, res) => {
     const prescription = await db.Prescription.findOne({
       where: {
         medical_record_id: req.params.id,
       },
     });
+    if (!prescription) {
+      res.status(404);
+      throw new Error("Medical record not found");
+    }
     const prescribed_medicines = await db.PrescribedMedicine.findAll({
       where: {
-        prescription_id: prescription.id,
+        prescription_id: prescription?.id,
         is_internal: false,
       },
       include: [

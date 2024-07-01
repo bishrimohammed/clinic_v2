@@ -72,6 +72,6 @@ module.exports = (sequelize, DataTypes) => {
     //     defaultValue: "cash",
     // },
   });
-  AdvancedPayment.sync({ alter: true });
+  AdvancedPayment.sync({ alter: false });
   return AdvancedPayment;
 };

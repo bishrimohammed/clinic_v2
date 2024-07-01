@@ -8,14 +8,25 @@ import TreatmentTab from "./TreatmentTab";
 import PlanTab from "./PlanTab";
 import InvestigationTab from "./InvestigationTab";
 import { LuLock } from "react-icons/lu";
+import { useSelector } from "react-redux";
 const ConsultationContent = ({ changeVisibleContent }) => {
   const navigate = useNavigate();
+  const examTabLocked = useSelector((state) => state.consultation.examLocked);
+  const treatmentTabLocked = useSelector(
+    (state) => state.consultation.treatmentLocked
+  );
+  const planTabLocked = useSelector((state) => state.consultation.planLocked);
+  const disabledFinishButton = useSelector(
+    (state) => state.consultation.finishButtonDisabled
+  );
+
+  console.log(disabledFinishButton);
   // const [childData, setChildData] = useState([]);
   const chiefComplaintRef = useRef(null);
   const ExaminationRef = useRef(null);
   const PlanRefs = useRef();
   const { state } = useLocation();
-  console.log(state);
+  // console.log(state);
   const handleSaveForLater = () => {
     const chiefComplaintData = chiefComplaintRef.current.getSaveForLaterData();
     const ExaminationData = ExaminationRef.current.getSaveForLaterData();
@@ -74,7 +85,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
             // formTarget="traigeForm"
             type="submit"
             variant="success"
-            // disabled={isPending}
+            disabled={disabledFinishButton}
           >
             {/* {isPending && <Spinner size="sm" animation="border" />} */}
             Finish
@@ -96,7 +107,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
         id="uncontrolled-tab-example"
         className="mb-3 mt-2 border-bottom"
         variant="underline"
-        fill
+        justify
       >
         <Tab
           eventKey="Symptoms"
@@ -105,7 +116,6 @@ const ConsultationContent = ({ changeVisibleContent }) => {
               Symptoms <LuLock className="ms-2" />
             </span>
           }
-          disabled
         >
           <ChiefComplaint ref={chiefComplaintRef} />
         </Tab>
@@ -113,23 +123,24 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           eventKey="Examination"
           title={
             <span className="d-flex align-items-center">
-              Examination <LuLock />
+              Examination <LuLock className="ms-1" />
             </span>
           }
-          disabled
+          disabled={examTabLocked}
         >
           <PhysicalExaminationTab ref={ExaminationRef} />
         </Tab>{" "}
-        <Tab
+        {/* <Tab
           eventKey="InvestigationTab"
           title={
             <span className="d-flex align-items-center">
               Investigation <LuLock />
             </span>
           }
+          disabled={treatmentTabLocked}
         >
           <InvestigationTab />
-        </Tab>
+        </Tab> */}
         <Tab
           eventKey="Treatment"
           title={
@@ -138,6 +149,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
               <LuLock className="ms-1" />
             </span>
           }
+          disabled={treatmentTabLocked}
         >
           <TreatmentTab />
         </Tab>
@@ -149,6 +161,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
               <LuLock className="ms-1" />
             </span>
           }
+          disabled={planTabLocked}
         >
           <PlanTab ref={PlanRefs} />
         </Tab>

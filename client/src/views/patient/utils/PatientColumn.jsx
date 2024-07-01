@@ -11,6 +11,9 @@ export const patientColumns = [
     header: "Name",
     accessorFn: (row) =>
       row.firstName + " " + row.middleName + " " + row.lastName,
+    // defaultSort: "asc",
+    // sortDescFirst: true,
+    // sorted: true,
   },
   {
     header: "Sex",
@@ -51,6 +54,7 @@ export const patientColumns = [
     header: "Registation Date",
     enableGlobalFilter: false,
     enableSorting: false,
+
     accessorFn: (row) => row.createdAt.substring(0, 10),
   },
   {
@@ -67,6 +71,7 @@ export const patientColumns = [
       header: "Status",
       enableGlobalFilter: false,
       enableSorting: false,
+
       cell: (s) => {
         // console.log(url);
         return s.getValue() == true ? (

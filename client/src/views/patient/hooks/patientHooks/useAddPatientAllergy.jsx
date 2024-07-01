@@ -18,6 +18,7 @@ export const useAddPatientAllergy = () => {
     },
     onSuccess: (data, variables) => {
       toast.success("Patient allergy added successfully");
+      console.log(variables);
       queryClient.invalidateQueries({
         queryKey: ["Patient", variables.patientId, "allergies"],
         exact: true,

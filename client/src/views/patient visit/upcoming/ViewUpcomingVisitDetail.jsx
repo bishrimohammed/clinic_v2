@@ -18,7 +18,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
 // import { start } from "@popperjs/core";
-import { useAddVitalSign } from "../hooks/useAddVitalSign";
+import { useAddTriage } from "../hooks/useAddTriage";
 import PatientGeneralInforamtion from "../../patient/patient Detail/PatientGeneralInforamtion";
 import { useGetPatient } from "../../patient/hooks/patientHooks/useGetPatient";
 import { useGetPatientGeneralInfo } from "../../patient/hooks/patientHooks/useGetPatientGeneralInfo";
@@ -40,7 +40,7 @@ const ViewUpcomingVisitDetail = () => {
   const { data: patient } = useGetPatientGeneralInfo(state.patient_id);
   const navigate = useNavigate();
   const { data } = useGetActiveVitalSignFields();
-  const { mutateAsync, isPending } = useAddVitalSign();
+  const { mutateAsync, isPending } = useAddTriage();
   const defaultValue = JSON.parse(
     localStorage.getItem(`medical_${state.medicalRecord_id}`)
   );

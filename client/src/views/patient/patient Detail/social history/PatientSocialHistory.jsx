@@ -28,7 +28,7 @@ const PatientSocialHistory = ({
         </div>
 
         <div className="allergies-list small fs-9 py-1">
-          {socialHistories?.map((condition, index) => (
+          {data?.map((condition, index) => (
             <span key={index + condition.id}>
               {condition.tobacco_use}
               {index !== socialHistories.length - 1 ? ", " : null}

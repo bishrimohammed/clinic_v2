@@ -94,11 +94,10 @@ const PatientAllergyDetails = ({ show, handleClose, allergies, patientId }) => {
         .then((res) => {
           if (res.status === 201) {
             //   handleClose(false);
+            reset();
             setAction("Save");
-            setSelectedAllergy(null);
-            setSuccessState("Service Group Created Successfully");
-          } else {
-            setErrorState(res.data.message);
+            // setSelectedAllergy(null);
+            setSuccessState("Patient allergy added successfully");
           }
         })
         .catch((err) => {
@@ -121,9 +120,10 @@ const PatientAllergyDetails = ({ show, handleClose, allergies, patientId }) => {
         .then((res) => {
           if (res.status === 200) {
             //   handleClose(false);
-            // setAction("Save");
+            setAction("Save");
             // setSelectedAllergy(null);
-            setSuccessState("Updated Successfully");
+            setSuccessState("Patient allergy updated Successfully");
+            reset();
             // reset({ name: "", serviceType: "" });
           }
         })
