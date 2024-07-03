@@ -113,7 +113,7 @@ export const OrderedLabInvestigationTable = ({
         </>
       )}
 
-      {investigations.length > 0 && (
+      {investigations?.length > 0 && (
         <>
           <h6>Ordered Test</h6>
           <Table bordered striped responsive>

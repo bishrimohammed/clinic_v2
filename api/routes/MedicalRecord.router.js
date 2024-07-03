@@ -49,6 +49,12 @@ router.get(
   protect,
   MedicalRecordController.get_External_MedicalRecord_Prescription
 );
+router.get("/:id/sick-note", protect, MedicalRecordController.getSickNote);
+router.get(
+  "/:id/refferal-note",
+  protect,
+  MedicalRecordController.getRefferalNote
+);
 router.post(
   "/:id/createMedicationRecordDetail",
   protect,
@@ -94,6 +100,11 @@ router.post(
   MedicalRecordController.add_External_MedicalRecord_Prescription
 );
 router.post("/:id/add-plan", protect, MedicalRecordController.addPlan);
+router.post(
+  "/:id/sick-leave-note",
+  protect,
+  MedicalRecordController.addSickLeaveNote
+);
 router.patch(
   "/diagnosis/:diagnosis_id/confirm",
   protect,

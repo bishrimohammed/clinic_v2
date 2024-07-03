@@ -97,6 +97,14 @@ db.PatientAssignment = require("./PatientAssignment.js")(sequelize, DataTypes);
 db.VisitType = require("./visitType.js")(sequelize, DataTypes);
 db.MedicalRecord = require("./MedicalRecord.js")(sequelize, DataTypes);
 db.Diagnosis = require("./medicalRecords/Diagnosis.js")(sequelize, DataTypes);
+db.SickLeaveNote = require("./medicalRecords/SickLeaveNote.js")(
+  sequelize,
+  DataTypes
+);
+db.ReferralNote = require("./medicalRecords/ReferralNote.js")(
+  sequelize,
+  DataTypes
+);
 db.MedicalRecordDetail = require("./MedicalRecordDetail.js")(
   sequelize,
   DataTypes

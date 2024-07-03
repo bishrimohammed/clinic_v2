@@ -18,12 +18,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    sick_leave_note_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.ENUM,
       values: ["Suspected", "Confirmed", "Ruled out"],
       defaultValue: "Suspected",
     },
   });
-  Diagnosis.sync({ alter: false });
+  Diagnosis.sync({ alter: true });
   return Diagnosis;
 };

@@ -43,7 +43,7 @@ const PatientVisitList = () => {
         <Tab eventKey="Active Visits" title="Active Visits">
           <UpcomingPatientVisitTable />
         </Tab>
-        <Tab eventKey="previous visit" title="Previous Visits">
+        <Tab eventKey="previous visit" title="All Visits">
           <PatientVisitTable
             patientVisits={visits}
             setShowAddPatientVisitModal={setShowAddPatientVisitModal}

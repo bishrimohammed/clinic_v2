@@ -3,7 +3,19 @@ const asyncHandler = require("express-async-handler");
 module.exports = ClinicProfileController = {
   getClinicProfiles: asyncHandler(async (req, res) => {
     const clinics = await db.ClinicProfile.findAll({
-      include: ["address", "clinicWorkingHours"],
+      // include: ["address", "clinicWorkingHours"],
+      include: [
+        {
+          model: db.Address,
+          as: "address",
+          include: ["woreda"],
+        },
+        {
+          model: db.Schedule,
+          as: "clinicWorkingHours",
+          // attributes: ["day_of_week", "start_time", "end_time"],
+        },
+      ],
     });
     // console.log(clinics);
     const clinic = clinics ? clinics[0] : undefined;

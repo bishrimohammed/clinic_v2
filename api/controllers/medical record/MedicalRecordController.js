@@ -7,6 +7,7 @@ const {
 const {
   add_MedicalRecord_medicineItem_to_Billing,
 } = require("./helper/MedicalRecordHelper");
+const { where } = require("sequelize");
 
 module.exports = MedicalRecordController = {
   // @desc    Get all MedicalRecord
@@ -232,8 +233,9 @@ module.exports = MedicalRecordController = {
   }),
   addPlan: asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { plan } = req.body;
-    // console.log(req.body);
+    const { plan, sickNote, RefferalNote } = req.body;
+    console.log(req.body);
+    // return;
     const medicalRecordDetail = await db.MedicalRecordDetail.findOne({
       where: {
         medicalRecord_id: id,
@@ -246,7 +248,166 @@ module.exports = MedicalRecordController = {
     }
     medicalRecordDetail.plan = plan;
     await medicalRecordDetail.save();
+    const medicalRecord = await db.MedicalRecord.findByPk(req.params.id);
+    if (sickNote) {
+      let sickNoteId;
+      const ExistingSickNote = await db.SickLeaveNote.findOne({
+        where: { medical_record_id: medicalRecord.id },
+      });
+
+      if (ExistingSickNote) {
+        ExistingSickNote.start_date = sickNote.start_date;
+        ExistingSickNote.end_date = sickNote.end_date;
+        ExistingSickNote.date_of_examination = medicalRecord.createdAt;
+        //  ExistingSickNote.note= sickNote,
+        //  ExistingSickNote.examiner_id= req.user.id,
+        await ExistingSickNote.save();
+        sickNoteId = ExistingSickNote.id;
+      } else {
+        const SickNOTE = await db.SickLeaveNote.create({
+          medical_record_id: medicalRecord.id,
+          patient_id: medicalRecord.patient_id,
+          doctor_id: req.user.id,
+          date: Date.now(),
+          start_date: sickNote.start_date,
+          end_date: sickNote.end_date,
+          date_of_examination: medicalRecord.createdAt,
+          // note: sickNote,
+          // examiner_id: req.user.id,
+        });
+        sickNoteId = SickNOTE.id;
+      }
+      await db.Diagnosis.update(
+        {
+          sick_leave_note_id: null,
+        },
+        {
+          where: {
+            medical_record_id: medicalRecord.id,
+          },
+        }
+      );
+      await Promise.all(
+        sickNote.diagnosis?.map((id) => {
+          return db.Diagnosis.update(
+            {
+              sick_leave_note_id: sickNoteId,
+            },
+            { where: { id: id } }
+          );
+        })
+      );
+    }
+    if (RefferalNote) {
+      const ExistingRefferalNote = await db.ReferralNote.findOne({
+        where: {
+          medical_record_id: medicalRecord.id,
+        },
+      });
+      let ReferralId;
+      if (ExistingRefferalNote) {
+        ExistingRefferalNote.reason_for_referral = RefferalNote.reason;
+        ExistingRefferalNote.referral_to = RefferalNote.hostipal_name;
+        ExistingRefferalNote.department = RefferalNote.department_name;
+        ExistingRefferalNote.clinical_finding = RefferalNote.clinical_finding;
+        await ExistingRefferalNote.save();
+        ReferralId = ExistingRefferalNote.id;
+      } else {
+        const referralNote = await db.ReferralNote.create({
+          medical_record_id: medicalRecord.id,
+          patient_id: medicalRecord.patient_id,
+          doctor_id: req.user.id,
+          referral_date: Date.now(),
+          reason_for_referral: RefferalNote.reason,
+          referral_to: RefferalNote.hostipal_name,
+          department: RefferalNote.department_name,
+          clinical_finding: RefferalNote.clinical_finding,
+        });
+        ReferralId = referralNote.id;
+      }
+    }
     res.json({ message: "Plan added successfully" });
+  }),
+  getSickNote: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const medicalRecord = await db.MedicalRecord.findByPk(id);
+
+    if (!medicalRecord) {
+      res.status(404);
+      throw new Error("Medical Record not found");
+    }
+    const sickLeaveNotes = await db.SickLeaveNote.findOne({
+      where: { medical_record_id: id },
+      include: [
+        {
+          model: db.User,
+          as: "doctor",
+          include: [
+            {
+              model: db.Employee,
+              as: "employee",
+              attributes: [
+                "id",
+                "firstName",
+                "middleName",
+                "lastName",
+                "digital_signature",
+              ],
+            },
+          ],
+          attributes: ["id"],
+        },
+        {
+          model: db.Patient,
+          as: "patient",
+        },
+        {
+          model: db.Diagnosis,
+          as: "diagnosis",
+          // through: {
+          //   model: db.SickLeaveNoteDiagnosis,
+          //   as: "sickLeaveNoteDiagnosis",
+          // },
+        },
+      ],
+    });
+    res.json(sickLeaveNotes);
+  }),
+  getRefferalNote: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const medicalRecord = await db.MedicalRecord.findByPk(id);
+    if (!medicalRecord) {
+      res.status(404);
+      throw new Error("Medical Record not found");
+    }
+    const ReferralNote = await db.ReferralNote.findOne({
+      where: { medical_record_id: id },
+      include: [
+        {
+          model: db.User,
+          as: "doctor",
+          include: [
+            {
+              model: db.Employee,
+              as: "employee",
+              attributes: [
+                "id",
+                "firstName",
+                "middleName",
+                "lastName",
+                "digital_signature",
+              ],
+            },
+          ],
+          attributes: ["id"],
+        },
+        {
+          model: db.Patient,
+          as: "patient",
+        },
+      ],
+    });
+    res.json(ReferralNote);
   }),
   get_physical_examination: asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -321,7 +482,7 @@ module.exports = MedicalRecordController = {
     const { id } = req.params;
     const {
       physicalExaminations,
-      vitals,
+
       indirectlySelectedLabs: underPanels,
       selectedLabs: investigations,
     } = req.body;
@@ -1196,5 +1357,38 @@ module.exports = MedicalRecordController = {
         console.log(err);
         res.status(500).json({ msg: "Something went wrong" });
       });
+  }),
+  addSickLeaveNote: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    console.log(req.body);
+    const { diagnosis } = req.body;
+    const medicalRecord = await getMedicalRecordById(id);
+    if (!medicalRecord) {
+      res.status(404);
+      throw new Error("Medical record not found");
+    }
+    const sickLeaveNote = await db.SickLeaveNote.create({
+      medical_record_id: id,
+      doctor_id: req.user.id,
+      // note: req.body.note,
+      patient_id: medicalRecord.patient_id,
+      start_date: req.body.start_date,
+      end_date: req.body.end_date,
+      date: Date.now(),
+      date_of_examination: medicalRecord.createdAt,
+    });
+    await Promise.all(
+      diagnosis.map(async (id) => {
+        return await db.Diagnosis.update(
+          {
+            sick_leave_note_id: sickLeaveNote.id,
+          },
+          {
+            where: id,
+          }
+        );
+      })
+    );
+    res.status(201).json({ msg: "Sick leave note added successfully" });
   }),
 };

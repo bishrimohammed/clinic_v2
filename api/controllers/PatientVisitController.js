@@ -311,7 +311,7 @@ module.exports = PatientVisitController = {
           attributes: ["id"],
         },
       ],
-      order: [["visit_type", "DESC"]],
+      order: [["createdAt", "DESC"]],
     });
     res.json(visits);
   }),

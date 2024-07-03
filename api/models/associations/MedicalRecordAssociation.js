@@ -35,6 +35,14 @@ module.exports.MedicalRecordAssociation = (db) => {
     foreignKey: "medical_record_id",
     as: "discontinuedMedications",
   });
+  db.MedicalRecord.hasOne(db.SickLeaveNote, {
+    foreignKey: "medical_record_id",
+    as: "sickLeaveNotes",
+  });
+  db.MedicalRecord.hasOne(db.ReferralNote, {
+    foreignKey: "medical_record_id",
+    as: "referralNote",
+  });
 
   // db.MedicalRecord.hasMany(db.Vital, {
   //   foreignKey: "medicalRecord_id",
@@ -92,4 +100,32 @@ module.exports.MedicalRecordAssociation = (db) => {
     foreignKey: "created_by",
     as: "createdBy",
   });
+  db.SickLeaveNote.belongsTo(db.User, {
+    foreignKey: "doctor_id",
+    as: "doctor",
+  });
+  db.SickLeaveNote.belongsTo(db.MedicalRecord, {
+    foreignKey: "medical_record_id",
+    as: "medicalRecord",
+  });
+  db.SickLeaveNote.belongsTo(db.Patient, {
+    foreignKey: "patient_id",
+    as: "patient",
+  });
+  db.SickLeaveNote.hasMany(db.Diagnosis, {
+    foreignKey: "sick_leave_note_id",
+    as: "diagnosis",
+  });
+  db.ReferralNote.belongsTo(db.User, {
+    foreignKey: "doctor_id",
+    as: "doctor",
+  });
+  db.ReferralNote.belongsTo(db.Patient, {
+    foreignKey: "patient_id",
+    as: "patient",
+  });
+  // db.RefferalNote.hasMany(db.Diagnosis, {
+  //   foreignKey: "refferal_note_id",
+  //   as: "diagnosis",
+  // });
 };

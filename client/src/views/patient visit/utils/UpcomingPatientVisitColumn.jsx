@@ -52,8 +52,8 @@ export const UpcomingPatientVisitColumn = [
             padding: "0.2rem 0.5rem",
             fontSize: 13,
             fontWeight: 500,
-            backgroundColor: s.getValue() === "Done" ? "green" : "yellow",
-            color: s.getValue() === "Done" ? "white" : "black",
+            backgroundColor: s.getValue() === "Done" ? "green" : "#ffc107",
+            color: s.getValue() === "Done" ? "white" : "white",
           }}
           className="d-inline-flex align-items-center justify-content-center"
         >

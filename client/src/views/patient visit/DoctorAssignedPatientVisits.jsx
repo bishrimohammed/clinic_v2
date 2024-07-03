@@ -17,7 +17,7 @@ const DoctorAssignedPatientVisits = () => {
           {/* <UpcomingPatientVisitTable /> */}
           <DoctorAssignedUpcomingVisitTable />
         </Tab>
-        <Tab eventKey="previous visit" title="Previous Visits">
+        <Tab eventKey="previous visit" title="All Visits">
           <DoctorAssignedPreviousVisitTable />
         </Tab>
       </Tabs>
