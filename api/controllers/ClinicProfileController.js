@@ -199,6 +199,9 @@ module.exports = ClinicProfileController = {
       where: {
         id,
       },
+      // returning: true,
+      individualHooks: true,
+      userId: req.user.id,
     });
     res.status(201).json(deletedClinic);
   }),

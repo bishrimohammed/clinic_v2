@@ -88,6 +88,7 @@ module.exports = (sequelize, DataTypes) => {
             clinic_seal: previousClinicData.clinic_seal,
             operation_type: "U",
             changed_by: options.userId,
+            changed_at: Date.now(),
           });
         },
         beforeDestroy: async (clinicprofile, options) => {

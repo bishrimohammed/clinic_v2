@@ -404,16 +404,19 @@ module.exports = PatientController = {
       }
       addressID = employee.address_id;
     } else {
-      newAddress = await db.Address.create({
-        phone_1: patientParsed.phone,
-        phone_2: addressParsed.phone_2 ? addressParsed.phone_2 : null,
-        street: addressParsed.street,
-        house_number: addressParsed.house_number
-          ? addressParsed.house_number
-          : null,
-        email: addressParsed.email ? addressParsed.email : null,
-        woreda_id: addressParsed.woreda_id,
-      });
+      newAddress = await db.Address.create(
+        {
+          phone_1: patientParsed.phone,
+          phone_2: addressParsed.phone_2 ? addressParsed.phone_2 : null,
+          street: addressParsed.street,
+          house_number: addressParsed.house_number
+            ? addressParsed.house_number
+            : null,
+          email: addressParsed.email ? addressParsed.email : null,
+          woreda_id: addressParsed.woreda_id,
+        },
+        { userId: req.user.id }
+      );
       addressID = newAddress.id;
       // EmergencyContactAddress = newAddress.id;
     }
@@ -422,33 +425,39 @@ module.exports = PatientController = {
       // if (!patientParsed.is_credit) {
       //   await newAddress?.destroy();
       // }
-      EmergencyContactAddress = await db.Address.create({
-        phone_1: emergencyParsed.phone,
-        phone_2: emergencyParsed.phone_2 ? emergencyParsed.phone_2 : null,
-        street: emergencyParsed.street,
-        house_number: emergencyParsed.house_number
-          ? emergencyParsed.house_number
-          : null,
-        email: emergencyParsed.email ? emergencyParsed.email : null,
-        woreda_id: emergencyParsed.woreda_id,
-      });
+      EmergencyContactAddress = await db.Address.create(
+        {
+          phone_1: emergencyParsed.phone,
+          phone_2: emergencyParsed.phone_2 ? emergencyParsed.phone_2 : null,
+          street: emergencyParsed.street,
+          house_number: emergencyParsed.house_number
+            ? emergencyParsed.house_number
+            : null,
+          email: emergencyParsed.email ? emergencyParsed.email : null,
+          woreda_id: emergencyParsed.woreda_id,
+        },
+        { userId: req.user.id }
+      );
     }
-    const EmergencyContact = await db.EmergencyContact.create({
-      firstName: emergencyParsed.firstName,
-      lastName: emergencyParsed.lastName,
-      middleName: emergencyParsed.middleName,
-      phone: emergencyParsed.phone,
-      relationship:
-        emergencyParsed.relation !== "Other"
-          ? emergencyParsed.relation
-          : emergencyParsed.other_relation,
-      address_id: emergencyParsed.the_same_address_as_patient
-        ? addressID
-        : EmergencyContactAddress.id,
-    });
+    const EmergencyContact = await db.EmergencyContact.create(
+      {
+        firstName: emergencyParsed.firstName,
+        lastName: emergencyParsed.lastName,
+        middleName: emergencyParsed.middleName,
+        phone: emergencyParsed.phone,
+        relationship:
+          emergencyParsed.relation !== "Other"
+            ? emergencyParsed.relation
+            : emergencyParsed.other_relation,
+        address_id: emergencyParsed.the_same_address_as_patient
+          ? addressID
+          : EmergencyContactAddress.id,
+      },
+      { userId: req.user.id }
+    );
     if (!EmergencyContact) {
-      await EmergencyContactAddress?.destroy();
-      await newAddress?.destroy();
+      await EmergencyContactAddress?.destroy({ userId: req.user.id });
+      await newAddress?.destroy({ userId: req.user.id });
       res.status(400);
       throw new Error("Emergency Contact not created");
     }
@@ -584,7 +593,7 @@ module.exports = PatientController = {
       ExistingPatient.address_id === ExistingEmergencyContact.address_id &&
       !emergencyParsed.the_same_address_as_patient
     ) {
-      console.log("from the same address to different");
+      // console.log("from the same address to different");
 
       //    await db.Address.destroy({
       //   where: {
@@ -621,6 +630,7 @@ module.exports = PatientController = {
             where: {
               id: ExistingPatient.address_id,
             },
+            userId: req.user.id,
           }
         );
         // patientAddress = newPatientAddress.id;
@@ -636,7 +646,8 @@ module.exports = PatientController = {
             : null,
           email: emergencyParsed.email ? emergencyParsed.email : null,
           woreda_id: emergencyParsed.woreda_id,
-        }
+        },
+        { userId: req.user.id }
         // {
         //   where: {
         //     id: ExistingEmergencyContact.address_id,
@@ -669,12 +680,16 @@ module.exports = PatientController = {
           where: {
             id: ExistingPatient.address_id,
           },
+          individualHooks: true,
+          userId: req.user.id,
         }
       );
       await db.Address.destroy({
         where: {
           id: EmergencyAddressId,
         },
+        individualHooks: true,
+        userId: req.user.id,
       });
     }
     // console.log(typeof patientParsed.is_credit);
@@ -682,7 +697,7 @@ module.exports = PatientController = {
       ExistingEmergencyContact.address_id === ExistingPatient.address_id &&
       emergencyParsed.the_same_address_as_patient
     ) {
-      console.log("from the same address to the same");
+      // console.log("from the same address to the same");
       await db.Address.update(
         {
           phone_1: patientParsed.phone,
@@ -698,6 +713,8 @@ module.exports = PatientController = {
           where: {
             id: ExistingPatient.address_id,
           },
+          individualHooks: true,
+          userId: req.user.id,
         }
       );
     }
@@ -705,7 +722,7 @@ module.exports = PatientController = {
       ExistingEmergencyContact.address_id !== ExistingPatient.address_id &&
       !emergencyParsed.the_same_address_as_patient
     ) {
-      console.log("from different address to different");
+      // console.log("from different address to different");
       await db.Address.update(
         {
           phone_1: patientParsed.phone,
@@ -722,6 +739,8 @@ module.exports = PatientController = {
           where: {
             id: ExistingPatient.address_id,
           },
+          individualHooks: true,
+          userId: req.user.id,
         }
       );
       await db.Address.update(
@@ -739,6 +758,8 @@ module.exports = PatientController = {
           where: {
             id: ExistingEmergencyContact.address_id,
           },
+          individualHooks: true,
+          userId: req.user.id,
         }
       );
     }
@@ -790,7 +811,7 @@ module.exports = PatientController = {
         ? emergencyParsed.relation
         : emergencyParsed.other_relation;
 
-    await ExistingEmergencyContact.save();
+    await ExistingEmergencyContact.save({ userId: req.user.id });
 
     ExistingPatient.firstName = patientParsed.firstName;
     ExistingPatient.middleName = patientParsed.middleName;

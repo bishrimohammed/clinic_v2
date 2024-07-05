@@ -75,6 +75,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  AddressAudit.sync({ alter: true });
+  AddressAudit.sync({ alter: false });
   return AddressAudit;
 };

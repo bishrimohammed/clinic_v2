@@ -232,6 +232,10 @@ db.ClinicProfileAudit = require("./audit/ClinicProfileAudit.js")(
 );
 db.ScheduleAudit = require("./audit/SchedulesAudit.js")(sequelize, DataTypes);
 db.AddressAudit = require("./audit/AddressAudit.js")(sequelize, DataTypes);
+db.EmergencyContactAudit = require("./audit/EmergancyContactAudit.js")(
+  sequelize,
+  DataTypes
+);
 patientAssignmentSAssociation(db);
 MedicalRecordAssociation(db);
 MedicalRecordDetailAssocations(db);

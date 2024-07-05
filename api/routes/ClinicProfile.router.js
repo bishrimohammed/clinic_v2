@@ -11,11 +11,7 @@ router.get("/", ClinicProfileController.getClinicProfiles);
 
 // GET /clinicprofile/:id
 
-router.get(
-  "/:id",
-
-  ClinicProfileController.getClinicProfileById
-);
+router.get("/:id", ClinicProfileController.getClinicProfileById);
 
 // POST /clinicprofile
 
