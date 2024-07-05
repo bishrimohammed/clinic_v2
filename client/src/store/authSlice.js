@@ -13,6 +13,10 @@ const authSlice = createSlice({
       //console.log(userData);
       localStorage.setItem("currentUser", JSON.stringify(actions.payload));
       localStorage.setItem("token", actions.payload.token);
+      localStorage.setItem(
+        "clinicInfo",
+        JSON.stringify(actions.payload.clinicInfo)
+      );
       state.isLoggedIn = true;
       state.user = actions.payload;
     },

@@ -22,6 +22,7 @@ import { useAddTriage } from "../hooks/useAddTriage";
 import PatientGeneralInforamtion from "../../patient/patient Detail/PatientGeneralInforamtion";
 import { useGetPatient } from "../../patient/hooks/patientHooks/useGetPatient";
 import { useGetPatientGeneralInfo } from "../../patient/hooks/patientHooks/useGetPatientGeneralInfo";
+import { getBrandColor } from "../../../utils/getBrandColor";
 const traigeSchema = yup.object().shape({
   symptom: yup.string(),
   visit_type: yup.string(),
@@ -133,6 +134,7 @@ const ViewUpcomingVisitDetail = () => {
                 disabled={isPending}
                 onClick={saveForLaterHandler}
                 variant="warning"
+                className="text-white"
               >
                 Save for Later
               </Button>
@@ -149,7 +151,12 @@ const ViewUpcomingVisitDetail = () => {
             </div>
 
             <Form id="traigeForm" onSubmit={handleSubmit(submitHandler)}>
-              <h5 className="border-bottom p-2">Vital Signs</h5>
+              <h5
+                style={{ color: getBrandColor() }}
+                className="border-bottom p-2"
+              >
+                Vital Signs
+              </h5>
               <Row className="">
                 {data?.map((field, index) => (
                   <Col key={field.id} md={4} sm={12} className="mb-2">
@@ -214,7 +221,12 @@ const ViewUpcomingVisitDetail = () => {
                     {errors?.symptom?.message}
                   </Form.Control.Feedback>
                 </Form.Group> */}
-                <h5 className="border-bottom p-2 mb-2">Change Visit Type</h5>
+                <h5
+                  style={{ color: getBrandColor() }}
+                  className="border-bottom p-2 mb-2"
+                >
+                  Change Visit Type
+                </h5>
                 <Form.Group className="mb-3">
                   <Form.Label>Visit Type</Form.Label>
                   <Form.Select

@@ -3,6 +3,7 @@ import { FaCirclePlus } from "react-icons/fa6";
 import AddPatientSocialHistoryModal from "./AddPatientSocialHistoryModal";
 import { MdRemoveRedEye } from "react-icons/md";
 import { useGetSocialHistory } from "../../hooks/patientHooks/useGetSocialHistory";
+import { getBrandColor } from "../../../../utils/getBrandColor";
 
 const PatientSocialHistory = ({
   socialHistories,
@@ -18,7 +19,9 @@ const PatientSocialHistory = ({
       <div className="social-history-section mb-2">
         <div className="d-flex align-items-center">
           {" "}
-          <h6 className="mb-0">Social history </h6>
+          <h6 style={{ color: getBrandColor() }} className="mb-0">
+            Social history{" "}
+          </h6>
           <button
             className="border-0  bg-transparent"
             onClick={() => setShowAddSocialHistoryModal(true)}

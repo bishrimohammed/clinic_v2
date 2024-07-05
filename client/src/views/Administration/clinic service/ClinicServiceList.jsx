@@ -37,6 +37,7 @@ const ClinicServiceList = () => {
         setShowEditServiceModal={setShowEditServiceModal}
         setShowFilter={setShowFilter}
         setFilter={setFilter}
+        isPending={isPending}
       />
       {showDeactiveModal.isShow && showDeactiveModal.id && (
         <DeactiveServiceModal

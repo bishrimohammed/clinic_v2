@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const ProgressNote = sequelize.define("progress-note", {
+  const ProgressNote = sequelize.define("progress_note", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,

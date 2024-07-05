@@ -11,14 +11,12 @@ import {
   Container,
 } from "react-bootstrap";
 import { useState } from "react";
-
-// import { useAddClinicInfo } from "./hooks/useAddClinicInfo";
-
 import { useGetWoredas } from "../../../hooks/useGetWoredas";
 import { useLocation } from "react-router-dom";
 import { useUpdateClinicProfile } from "./hooks/useUpdateClinicProfile";
 import { Host_URL } from "../../../utils/getHost_URL";
 import { useGetClinicInformation } from "./hooks/useGetClinicInformation";
+import { hasPermission } from "../../../utils/hasPermission";
 
 const schema = yup.object().shape({
   name: yup
@@ -59,7 +57,6 @@ const schema = yup.object().shape({
       // .matches(/^(09|07)?\d{8}$/, "Phone number is invalid")
       .nullable(),
   }),
-
   motto: yup.string().transform((value) => value.trim()),
   clinicType: yup.string(),
   number_of_branch: yup
@@ -95,11 +92,15 @@ const schema = yup.object().shape({
       // .max(yup.ref("start_time")),
     })
   ),
+  is_Fileds_Disabled: yup.boolean().default(true),
 });
 const EditClinicInfo = () => {
   const [previewImage, setPreviewImage] = useState(null);
-  const [previewImageSeal, setPreviewImageSeal] = useState(null);
+  // const [previewImageSeal, setPreviewImageSeal] = useState(null);
   const { mutate, isPending } = useUpdateClinicProfile();
+  // console.log(hasPermission("clinic profile", "update"));
+  // const [disAbleFields, setDisAbleFields] = useState(false);
+
   const {
     data: state,
     isPending: ispending,
@@ -117,7 +118,7 @@ const EditClinicInfo = () => {
     }
     const regex = /:\s([^,]+)/g;
     const matches = value?.match(regex);
-    const addressArray = matches.map((match) => match.split(": ")[1]);
+    const addressArray = matches?.map((match) => match.split(": ")[1]);
     return addressArray;
   };
   // console.log(state);
@@ -132,15 +133,33 @@ const EditClinicInfo = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
+      name: state.name,
       number_of_branch: state?.number_of_branch,
       branch_list: convertStringToArray(state?.branch_addresses),
       has_triage: state?.has_triage,
+      card_valid_date: state?.card_valid_date,
       address: {
         woreda_id: state?.address.woreda_id,
+        phone_1: state?.address.phone_1,
+        street: state?.address.street,
       },
+      is_Fileds_Disabled: false,
+      // clinc_working_hours: state?.clinc_working_hours ? state?.clinc_working_hours.map((workHour,)) : undefined
     },
     resolver: yupResolver(schema),
+    reValidateMode: "onBlur",
+    shouldFocusError: true,
+
+    // shouldFocusError: true,
+    // validateOnBlur: true,
+    // validateOnMount: true,
+    // validateOnChange: true,
+    // validateOnMount: true,
+    // validationSchema: schema,
+    // validateOnMount: true,
   });
+  let disAbleFields = getValues("is_Fileds_Disabled");
+  console.log(errors);
   // console.log("state?.has_triage : " + state?.has_triage);
   // console.log(watch("has_triage"));
   function numberToArray(n) {
@@ -155,7 +174,7 @@ const EditClinicInfo = () => {
   // console.log(state);
 
   const onSubmitHandler = async (data) => {
-    // console.log(data.branch_list);
+    console.log(data);
 
     const branch_address = data.branch_list
       .map((b, index) => `address of brach ${index + 2} : ${b}\n`)
@@ -185,11 +204,12 @@ const EditClinicInfo = () => {
     mutate({ formData, id: state?.id });
   };
   if (isPending) return null;
-  console.log(errors);
+  // console.log(errors);
   const ApplyToAllHandler = () => {
     const { clinc_working_hours } = getValues();
     const startTime = clinc_working_hours[0].start_time;
     const endTime = clinc_working_hours[0].end_time;
+    console.log(endTime);
     clinc_working_hours.forEach((work_hour, index) => {
       if (index !== 0) {
         setValue(`clinc_working_hours[${index}].start_time`, startTime);
@@ -201,12 +221,24 @@ const EditClinicInfo = () => {
   return (
     <Container className="p-3  mb-5">
       {/* <h1>Edit Clinic Profile</h1> */}
+      <div className="d-flex justify-content-end">
+        <Button
+          disabled={!hasPermission("clinic profile", "update")}
+          className="px-4 btn-sm"
+          onClick={() => {
+            // setDisAbleFields(false);
+            setValue("is_Fileds_Disabled", false);
+          }}
+        >
+          Edit
+        </Button>
+      </div>
       <div className=" bg-hrun-box hrunboxshadow">
         <Form
           onSubmit={handleSubmit(onSubmitHandler)}
           encType="multipart/form-data"
         >
-          <h6 className="border-bottom border-1 border-black py-2 mb-3 fw-bold">
+          <h6 className="border-bottom border-1 border-black pb-2 mb-3 fw-bold">
             Basic Information
           </h6>
           <Row>
@@ -215,10 +247,12 @@ const EditClinicInfo = () => {
               <Form.Group controlId="name">
                 <Form.Label>Name</Form.Label>
                 <Form.Control
+                  autoFocus="true"
                   type="text"
                   {...register("name")}
                   isInvalid={errors.name}
                   defaultValue={state?.name}
+                  disabled={disAbleFields}
                 />
 
                 <Form.Control.Feedback type="invalid" className="text-small">
@@ -237,6 +271,7 @@ const EditClinicInfo = () => {
                     // onChange={handleImageChange}
                     id="logo"
                     name="logo"
+                    disabled={disAbleFields}
                     // {...register("logo")}
                     //ref={ref}
                     {...register("logo", {
@@ -281,6 +316,7 @@ const EditClinicInfo = () => {
                     // onChange={handleImageChange}
                     id="clinic_seal"
                     name="clinic_seal"
+                    disabled={disAbleFields}
                     // {...register("logo")}
                     //ref={ref}
                     {...register("clinic_seal", {
@@ -319,6 +355,7 @@ const EditClinicInfo = () => {
                   {...register("clinicType")}
                   defaultValue={state?.clinic_type}
                   isInvalid={errors.clinicType}
+                  disabled={disAbleFields}
                 >
                   <option value="">select type</option>
                   <option value="General">General</option>
@@ -337,6 +374,7 @@ const EditClinicInfo = () => {
                 <Form.Label>Website</Form.Label>
                 <Form.Control
                   type="text"
+                  disabled={disAbleFields}
                   {...register("website_url")}
                   isInvalid={errors.website_url}
                   defaultValue={state?.website_url}
@@ -358,6 +396,7 @@ const EditClinicInfo = () => {
                   isInvalid={errors.brand_color}
                   // defaultValue="#000000"
                   defaultValue={state?.brand_color}
+                  disabled={disAbleFields}
                 />
 
                 <Form.Text className="text-danger">
@@ -370,6 +409,7 @@ const EditClinicInfo = () => {
                 <Form.Label>has Traige</Form.Label>
                 <Form.Check
                   type="checkbox"
+                  disabled={disAbleFields}
                   // label="has trainge"
                   defaultChecked={state?.has_triage}
                   className="w-100"
@@ -388,6 +428,7 @@ const EditClinicInfo = () => {
                   {...register("motto")}
                   isInvalid={errors.motto}
                   defaultValue={state?.motto}
+                  disabled={disAbleFields}
                 />
 
                 <Form.Text className="text-danger">
@@ -404,6 +445,7 @@ const EditClinicInfo = () => {
                   {...register("card_valid_date")}
                   isInvalid={errors.card_valid_date}
                   defaultValue={state?.card_valid_date}
+                  disabled={disAbleFields}
                 />
                 {errors.card_valid_date && (
                   <Form.Text className="text-danger">
@@ -423,6 +465,7 @@ const EditClinicInfo = () => {
                   isInvalid={errors.number_of_branch}
                   defaultValue={state?.number_of_branch}
                   min="1"
+                  disabled={disAbleFields}
                   // max="20"
                 />
 
@@ -444,6 +487,7 @@ const EditClinicInfo = () => {
                         className="w-100"
                         key={field.id} // important to include key with field's id
                         {...register(`branch_list.${index}`)}
+                        disabled={disAbleFields}
                         // isInvalid={errors.number_of_branch}
                       />
                     </Form.Group>
@@ -467,6 +511,7 @@ const EditClinicInfo = () => {
                 <Form.Label>Phone</Form.Label>
                 <Form.Control
                   type="number"
+                  disabled={disAbleFields}
                   placeholder="09/07********"
                   {...register("address.phone_1")}
                   isInvalid={errors.address?.phone_1}
@@ -485,6 +530,7 @@ const EditClinicInfo = () => {
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
+                  disabled={disAbleFields}
                   {...register("address.email", {})}
                   placeholder="example@example.com"
                   isInvalid={errors.address?.email}
@@ -504,6 +550,7 @@ const EditClinicInfo = () => {
                   {...register("address.woreda_id")}
                   isInvalid={errors.address?.woreda_id}
                   defaultValue={state?.address?.woreda_id}
+                  disabled={disAbleFields}
                 >
                   <option value="">Select Woreda</option>
                   {woredas?.map((woreda, index) => (
@@ -527,6 +574,7 @@ const EditClinicInfo = () => {
                   {...register("address.street")}
                   isInvalid={errors.address?.street}
                   defaultValue={state?.address?.street}
+                  disabled={disAbleFields}
                 />
               </Form.Group>
             </Col>
@@ -538,6 +586,7 @@ const EditClinicInfo = () => {
                   {...register("address.house_number")}
                   isInvalid={errors.address?.house_number}
                   defaultValue={state?.address?.house_number}
+                  disabled={disAbleFields}
                 />
               </Form.Group>
             </Col>
@@ -555,6 +604,7 @@ const EditClinicInfo = () => {
                   placeholder="09/07********"
                   isInvalid={errors.address?.phone_2}
                   defaultValue={state?.address?.phone_2}
+                  disabled={disAbleFields}
                 />
                 <Form.Control.Feedback
                   type="inValid"
@@ -583,6 +633,7 @@ const EditClinicInfo = () => {
                           ApplyToAllHandler();
                         }
                       }}
+                      disabled={disAbleFields}
                     />
                   )}
                 </div>
@@ -618,6 +669,7 @@ const EditClinicInfo = () => {
                           errors?.clinc_working_hours?.[index]?.start_time
                         }
                         defaultValue={d.start_time}
+                        disabled={disAbleFields}
                       />
                     </Form.Group>
 
@@ -650,6 +702,7 @@ const EditClinicInfo = () => {
                         }
                         // defaultValue="08:00:00"
                         defaultValue={d.end_time}
+                        disabled={disAbleFields}
                       />
                       <Form.Control.Feedback
                         type="invalid"
@@ -678,12 +731,14 @@ const EditClinicInfo = () => {
               </Col>
             ))}
           </Row>
-          <div className="d-flex justify-content-end mt-2">
-            <Button variant="primary" disabled={isPending} type="submit">
-              {isPending && <Spinner animation="border" size="sm" />}
-              Update
-            </Button>
-          </div>
+          {!disAbleFields && (
+            <div className="d-flex justify-content-end mt-2">
+              <Button variant="primary" disabled={isPending} type="submit">
+                {isPending && <Spinner animation="border" size="sm" />}
+                Update
+              </Button>
+            </div>
+          )}
         </Form>
       </div>
     </Container>

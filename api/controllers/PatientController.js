@@ -132,7 +132,19 @@ module.exports = PatientController = {
       where.phone = { [Op.like]: `%${req.query.phone}%` };
     }
     if (req.query.patientName) {
-      where.firstName = { [Op.like]: `%${req.query.patientName}%` };
+      let name = req.query.patientName.split(" ");
+      if (name.length === 1) {
+        where.firstName = { [Op.like]: `%${name[0]}%` };
+      } else if (name.length === 2) {
+        where.firstName = { [Op.like]: `%${name[0]}%` };
+        where.middleName = { [Op.like]: `%${name[1]}%` };
+      } else if (name.length === 3) {
+        where.firstName = { [Op.like]: `%${name[0]}%` };
+        where.middleName = { [Op.like]: `%${name[1]}%` };
+        where.lastName = { [Op.like]: `%${name[2]}%` };
+      }
+
+      // where.firstName = { [Op.like]: `%${req.query.patientName}%` };
     }
     // [Op.like]: `%doctor%`,
     let patients;
@@ -442,34 +454,37 @@ module.exports = PatientController = {
     }
     // console.log(addressID);
 
-    const newPatient = await db.Patient.create({
-      firstName: patientParsed.firstName,
-      middleName: patientParsed.middleName,
-      lastName: patientParsed.lastName,
-      address_id: emergencyParsed.the_same_address_as_patient
-        ? addressID
-        : EmergencyContactAddress.id,
-      gender: patientParsed.gender,
-      has_phone: patientParsed.has_phone,
-      phone: patientParsed.phone,
-      birth_date: patientParsed.birth_date,
-      is_credit: patientParsed.is_credit,
-      is_new: patientParsed.is_new,
-      blood_type: patientParsed.blood_type,
-      nationality: patientParsed.nationality,
-      manual_card_id: !patientParsed.is_new
-        ? patientParsed?.manual_card_id
-        : null,
-      marital_status: patientParsed.marital_status,
-      guardian_name: patientParsed.guardian_name,
-      guardian_relationship: patientParsed.guardian_relationship,
-      occupation: patientParsed.occupation,
-      company_id: patientParsed.is_credit ? company_id : null,
-      emergence_contact_id: EmergencyContact.id,
-      empoyeeId_url:
-        patientParsed.is_credit &&
-        "uploads/" + req.files["employeeId_doc"][0]?.filename,
-    });
+    const newPatient = await db.Patient.create(
+      {
+        firstName: patientParsed.firstName,
+        middleName: patientParsed.middleName,
+        lastName: patientParsed.lastName,
+        address_id: emergencyParsed.the_same_address_as_patient
+          ? addressID
+          : EmergencyContactAddress.id,
+        gender: patientParsed.gender,
+        has_phone: patientParsed.has_phone,
+        phone: patientParsed.phone,
+        birth_date: patientParsed.birth_date,
+        is_credit: patientParsed.is_credit,
+        is_new: patientParsed.is_new,
+        blood_type: patientParsed.blood_type,
+        nationality: patientParsed.nationality,
+        manual_card_id: !patientParsed.is_new
+          ? patientParsed?.manual_card_id
+          : null,
+        marital_status: patientParsed.marital_status,
+        guardian_name: patientParsed.guardian_name,
+        guardian_relationship: patientParsed.guardian_relationship,
+        occupation: patientParsed.occupation,
+        company_id: patientParsed.is_credit ? company_id : null,
+        emergence_contact_id: EmergencyContact.id,
+        empoyeeId_url: patientParsed.is_credit
+          ? "uploads/" + req.files["employeeId_doc"][0]?.filename
+          : null,
+      },
+      { userId: req.user.id }
+    );
     // const paddedCardNumber = getPaddedName(newPatient.id, 5, "P");
     const PatientIdExists = await db.Patient.findOne({
       where: {
@@ -483,7 +498,7 @@ module.exports = PatientController = {
       patientId = patientParsed.patient_id;
     }
     newPatient.card_number = patientId;
-    await newPatient.save();
+    await newPatient.save({ hooks: false });
     if (!newPatient) {
       emergencyParsed.the_same_address_as_patient
         ? await newAddress.destroy()
@@ -541,7 +556,7 @@ module.exports = PatientController = {
   updatePatient: expressAsyncHandler(async (req, res) => {
     // console.log("\n\nupdatePatient\n\n");
     const { id } = req.params;
-    console.log(req.body);
+    // console.log(req.body);
     // return;
     const { patient, address, emergency, company_id, employeeId } = req.body;
     // console.log(req.body);
@@ -801,7 +816,7 @@ module.exports = PatientController = {
       : ExistingPatient.empoyeeId_url;
     ExistingPatient.company_id = patientParsed.is_credit ? company_id : null;
 
-    await ExistingPatient.save();
+    await ExistingPatient.save({ userId: req.user.id });
 
     res.status(200).json({ message: "Patient updated successfully" });
   }),

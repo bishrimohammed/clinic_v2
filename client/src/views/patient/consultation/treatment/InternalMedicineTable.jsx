@@ -14,10 +14,10 @@ const InternalMedicineTable = () => {
   const { data } = useGet_Internal_MedicalRecordPrescription(
     state.medicalRecord_id
   );
-  console.log(data);
+  // console.log(data);
   const dispatch = useDispatch();
   useEffect(() => {
-    if (data) {
+    if (data?.length > 0) {
       dispatch(unlockPlan());
     }
   }, [dispatch, data]);

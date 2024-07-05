@@ -69,6 +69,8 @@ const {
   AllergyRoute,
   ConditionsAndMedicationRoute,
 } = require("./routes/index.js");
+const db = require("./models/index.js");
+const { Sequelize } = require("sequelize");
 const app = express();
 
 // const Role = require("./models/Role.js");
@@ -134,6 +136,13 @@ app.use("/api/v1/investigation", InvestigationRoute);
 
 app.use("/api/v1/approval-settings", ApprovalSettingRoute);
 app.use("/api/v1/temporarydata", TemporarySavedDataRoute);
+
+app.use("/models", async (req, res) => {
+  // log
+  console.log(db.sequelize.models);
+  const mm = db.sequelize.models;
+  res.json(mm);
+});
 // app.use("/api/v1/upload", upload.single("file"), (req, res) => {
 //   const file = req.file;
 //   if (!file) {

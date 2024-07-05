@@ -323,7 +323,10 @@ const ApprovalListTable = ({
         </tbody>
       </Table>
 
-      {!isPending && <PaginationComponent tableInstance={tableInstance} />}
+      {/* {!isPending && <PaginationComponent tableInstance={tableInstance} />} */}
+      {approval_settings?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
       {showUpdateModal.isShow && (
         <UpdateApprovalSettingModal
           show={showUpdateModal.isShow}

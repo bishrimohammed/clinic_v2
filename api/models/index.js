@@ -219,6 +219,19 @@ db.Temporary_PhysicalExamination =
 db.Temporary_Prescription =
   require("./temporaryTables/Temporary_Prescription.js")(sequelize, DataTypes);
 
+// Audit
+db.PatientAudit = require("./audit/PatientAudit.js")(sequelize, DataTypes);
+db.AppointmentAudit = require("./audit/AppointmentAudit.js")(
+  sequelize,
+  DataTypes
+);
+
+db.ClinicProfileAudit = require("./audit/ClinicProfileAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.ScheduleAudit = require("./audit/SchedulesAudit.js")(sequelize, DataTypes);
+db.AddressAudit = require("./audit/AddressAudit.js")(sequelize, DataTypes);
 patientAssignmentSAssociation(db);
 MedicalRecordAssociation(db);
 MedicalRecordDetailAssocations(db);

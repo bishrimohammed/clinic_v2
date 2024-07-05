@@ -20,6 +20,7 @@ import { Button, Dropdown, Spinner, Table } from "react-bootstrap";
 import SearchInput from "../../components/inputs/SearchInput";
 import { Link, useNavigate } from "react-router-dom";
 import { hasPermission } from "../../utils/hasPermission";
+import PaginationComponent from "../../components/PaginationComponent";
 const PatientTable = ({
   isPending,
   patients,
@@ -283,7 +284,10 @@ const PatientTable = ({
             })}
         </tbody>
       </Table>
-      <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
+      {patients?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
+      {/* <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
         <button
           className="border-0"
           style={{ outline: "none" }}
@@ -347,7 +351,7 @@ const PatientTable = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
     </>
   );
 };

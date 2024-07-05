@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const db = require("../models/");
 const { generateToken } = require("../utils/generateToken.js");
 const { Op, where } = require("sequelize");
+const getClinicInformation = require("../helpers/getClinicInformation.js");
 // const db = require("../models/index.js");
 // const { getPaddedName } = require("../utils/getPaddedName.js");
 const User = db.User;
@@ -212,6 +213,7 @@ const UserController = {
       role,
     } = user;
     const token = generateToken(res, user.id);
+    const clinicInfo = await getClinicInformation(4);
     // console.log(token);
     // const permissions = user.userPermissions;
     res.status(200).json({
@@ -226,6 +228,7 @@ const UserController = {
       token,
       role: role,
       permissions: user.userPermissions,
+      clinicInfo: clinicInfo,
       // user,
       // address: user.address,
     });

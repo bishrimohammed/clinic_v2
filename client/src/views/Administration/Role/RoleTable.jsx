@@ -19,6 +19,7 @@ import useDebounce from "../../../hooks/useDebounce";
 import { LuFilter } from "react-icons/lu";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { CgLockUnlock } from "react-icons/cg";
+import PaginationComponent from "../../../components/PaginationComponent";
 
 const RoleTable = ({
   roles,
@@ -287,7 +288,7 @@ const RoleTable = ({
           })}
         </tbody>
       </Table>
-      <div className="d-flex align-items-center gap-2">
+      {/* <div className="d-flex align-items-center gap-2">
         <button
           className="border-0"
           style={{ outline: "none" }}
@@ -351,7 +352,10 @@ const RoleTable = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
+      {roles?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
     </div>
   );
 };

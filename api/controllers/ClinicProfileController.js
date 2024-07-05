@@ -62,19 +62,22 @@ module.exports = ClinicProfileController = {
       email: addressData.email,
       house_number: addressData.house_number,
     });
-    const clinic = await db.ClinicProfile.create({
-      name,
-      card_valid_date,
-      website_url,
-      address_id: newAddress.id,
-      logo: "uploads/" + req.file.filename,
-      motto,
-      clinic_type: clinicType,
-      number_of_branch,
-      branch_addresses: branch_address,
-      brand_color,
-      has_triage: req.body?.has_triage,
-    });
+    const clinic = await db.ClinicProfile.create(
+      {
+        name,
+        card_valid_date,
+        website_url,
+        address_id: newAddress.id,
+        logo: "uploads/" + req.file.filename,
+        motto,
+        clinic_type: clinicType,
+        number_of_branch,
+        branch_addresses: branch_address,
+        brand_color,
+        has_triage: req.body?.has_triage,
+      },
+      { userId: req.user.id }
+    );
     if (!clinic) {
       await newAddress.destroy();
       res.status(500);
@@ -133,11 +136,13 @@ module.exports = ClinicProfileController = {
         where: {
           id,
         },
-        returning: true,
+        // returning: true,
+        individualHooks: true,
+        userId: req.user.id,
       }
     );
     // console.log(addressData);
-    const updatedAddress = await db.Address.update(
+    await db.Address.update(
       {
         street: addressData.street,
         woreda_id: addressData.woreda_id,
@@ -150,24 +155,39 @@ module.exports = ClinicProfileController = {
         where: {
           id: addressData.id,
         },
+        // returning: true,
+        individualHooks: true,
+        userId: req.user.id,
       }
+      // {
+      //   individualHooks: true,
+      //   userId: req.user.id,
+      //   // hooks: true,
+      // }
     );
     const CliicWorkingHours = JSON.parse(req.body?.clinc_working_hours);
-    // console.log(CliicWorkingHours);
+    console.log(CliicWorkingHours);
     await Promise.all(
       CliicWorkingHours.map(async (workHour) => {
         return await db.Schedule.update(
           {
-            // clinic_id: clinic.id,
-            // day_of_week: workHour.date_of_week,
+            clinic_id: id,
+            day_of_week: workHour.date_of_week,
             start_time: workHour.start_time,
             end_time: workHour.end_time,
+            doctor_id: null,
           },
           {
             where: {
               id: workHour.id,
             },
+            // returning: true,
+            individualHooks: true,
+            userId: req.user.id,
           }
+          // {
+          //   userId: req.user.id,
+          // }
         );
       })
     );

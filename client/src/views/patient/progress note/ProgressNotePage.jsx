@@ -71,7 +71,7 @@ const ProgressNotePage = ({ changeVisibleContent }) => {
             // disabled={isPending}
             variant="warning"
             type="button"
-            className="btn-sm"
+            className="btn-sm text-white"
           >
             {isPending && <Spinner size="sm" animation="border" />}
             Save for Later

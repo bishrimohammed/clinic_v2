@@ -38,6 +38,6 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
     },
   });
-  MedicalBilling.sync({ alter: true });
+  MedicalBilling.sync({ alter: false });
   return MedicalBilling;
 };

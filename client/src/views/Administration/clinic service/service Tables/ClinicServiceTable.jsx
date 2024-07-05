@@ -18,6 +18,7 @@ import SearchInput from "../../../../components/inputs/SearchInput";
 import { CgLockUnlock } from "react-icons/cg";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { LuFilter } from "react-icons/lu";
+import PaginationComponent from "../../../../components/PaginationComponent";
 
 const ClinicServiceTable = ({
   clinicServices,
@@ -25,6 +26,7 @@ const ClinicServiceTable = ({
   setShowEditServiceModal,
   setShowFilter,
   setFilter,
+  isPending,
 }) => {
   //   console.log(clinicServices);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
@@ -292,7 +294,7 @@ const ClinicServiceTable = ({
           })}
         </tbody>
       </Table>
-      <div className="d-flex align-items-center gap-2">
+      {/* <div className="d-flex align-items-center gap-2">
         <button
           className="border-0"
           style={{ outline: "none" }}
@@ -356,7 +358,10 @@ const ClinicServiceTable = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
+      {clinicServices?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
     </div>
   );
 };

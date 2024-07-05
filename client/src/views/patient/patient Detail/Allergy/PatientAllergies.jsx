@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import PatientAllergyDetails from "./PatientAllergyDetails";
 import { useGetPatientAllergy } from "../../hooks/allergyHooks/useGetPatientAllergy";
 import { MdRemoveRedEye } from "react-icons/md";
+import { getBrandColor } from "../../../../utils/getBrandColor";
 
 const PatientAllergies = ({ allergies, patientId }) => {
   const [showAddAllergyModal, setShowAddAllergyModal] = useState(false);
@@ -14,7 +15,9 @@ const PatientAllergies = ({ allergies, patientId }) => {
       <div className="allergies-section mb-2 mt-2">
         <div className="d-flex align-items-center">
           {" "}
-          <h6 className="mb-0">Allergies</h6>
+          <h6 style={{ color: getBrandColor() }} className="mb-0">
+            Allergies
+          </h6>
           <button
             variant="primary"
             className="border-0 bg-transparent"

@@ -17,7 +17,9 @@ export const patientSchema = yup.object().shape({
   nationality: yup.string(),
   marital_status: yup.string(),
   // other_marital_status: yup.string()
-  guardian_name: yup.string().transform((value) => value.trim()),
+  guardian_name: yup
+    .string()
+    .transform((value) => (value ? value.trim() : undefined)),
   guardian_relationship: yup.string().transform((value) => value.trim()),
   occupation: yup.string().transform((value) => value.trim()),
   has_phone: yup.boolean(),

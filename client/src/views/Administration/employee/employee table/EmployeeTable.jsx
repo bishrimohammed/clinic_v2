@@ -19,6 +19,7 @@ import { FaUserLock } from "react-icons/fa";
 import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
 import useDebounce from "../../../../hooks/useDebounce";
 import BulkImportButton from "../bulkImport/BulkImportButton";
+import PaginationComponent from "../../../../components/PaginationComponent";
 
 const EmployeeTable = ({
   setAddEmployeeModal,
@@ -291,7 +292,7 @@ const EmployeeTable = ({
             })}
         </tbody>
       </Table>
-      <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
+      {/* <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
         <button
           className="border-0"
           style={{ outline: "none" }}
@@ -355,7 +356,10 @@ const EmployeeTable = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
+      {Data?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
     </>
   );
 };

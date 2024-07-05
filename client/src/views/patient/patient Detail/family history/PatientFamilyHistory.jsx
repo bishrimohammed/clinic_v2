@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import AddPatientFamilyHistoryModal from "./AddPatientFamilyHistoryModal";
 import { MdRemoveRedEye } from "react-icons/md";
 import { useGetFamilyHistory } from "../../hooks/patientHooks/useGetFamilyHistory";
+import { getBrandColor } from "../../../../utils/getBrandColor";
 
 const PatientFamilyHistory = ({ familyHistories, patientId }) => {
   const [showAddFamilyHistoryModal, setShowAddFamilyHistoryModal] =
@@ -14,7 +15,9 @@ const PatientFamilyHistory = ({ familyHistories, patientId }) => {
       <div className="family-history-section mb-2">
         <div className="d-flex align-items-center">
           {" "}
-          <h6 className="mb-0">Family history </h6>
+          <h6 style={{ color: getBrandColor() }} className="mb-0">
+            Family history{" "}
+          </h6>
           <button
             className="border-0  bg-transparent"
             onClick={() => setShowAddFamilyHistoryModal(true)}

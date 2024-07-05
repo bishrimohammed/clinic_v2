@@ -9,7 +9,10 @@ module.exports.patientAssocation = (db) => {
     foreignKey: "company_id",
     as: "creditCompany",
   });
-
+  db.Patient.hasMany(db.PatientAudit, {
+    foreignKey: "patient_id",
+    as: "audits",
+  });
   db.Patient.belongsTo(db.EmergencyContact, {
     foreignKey: "emergence_contact_id",
     as: "emergencyContact",

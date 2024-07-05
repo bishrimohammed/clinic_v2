@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaCirclePlus } from "react-icons/fa6";
 import AddPatientCurrentMedicationModal from "./AddPatientCurrentMedicationModal";
+import { getBrandColor } from "../../../../utils/getBrandColor";
 
 const PatientCurrentMedication = () => {
   // const [showAddCurrentMedicationModal, showAddCurrentMedicationModal] = useState()
@@ -12,7 +13,9 @@ const PatientCurrentMedication = () => {
       <div className="current-medication-section mb-2">
         <div className="d-flex align-items-center">
           {" "}
-          <h6 className="mb-0">Current Medication</h6>
+          <h6 style={{ color: getBrandColor() }} className="mb-0">
+            Current Medication
+          </h6>
           <button
             variant="primary"
             className="border-0 bg-transparent"

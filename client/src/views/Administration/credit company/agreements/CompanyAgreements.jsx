@@ -13,8 +13,10 @@ import { Host_URL } from "../../../../utils/getHost_URL";
 import { FaLock, FaSortDown, FaSortUp, FaUserLock } from "react-icons/fa6";
 import TerminateAgreementModal from "./TerminateAgreementModal";
 import RenewAgreemnet from "./RenewAgreemnet";
+import PaginationComponent from "../../../../components/PaginationComponent";
 // import RenewAgreemnet from "./RenewAgreemnet";
 const columnHelper = createColumnHelper();
+
 const CompanyAgreements = ({ agreements, isPending }) => {
   // console.log(agreements);
 
@@ -223,7 +225,7 @@ const CompanyAgreements = ({ agreements, isPending }) => {
             })}
         </tbody>
       </Table>
-      <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
+      {/* <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
         <button
           className="border-0"
           style={{ outline: "none" }}
@@ -287,7 +289,10 @@ const CompanyAgreements = ({ agreements, isPending }) => {
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
+      {AgrementData?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
       {showTerminateModal.show && (
         <TerminateAgreementModal
           show={showTerminateModal}

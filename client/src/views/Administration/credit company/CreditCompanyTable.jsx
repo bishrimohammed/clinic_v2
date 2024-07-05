@@ -18,6 +18,7 @@ import SearchInput from "../../../components/inputs/SearchInput";
 import { LuFilter } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
+import PaginationComponent from "../../../components/PaginationComponent";
 
 const CreditCompanyTable = ({
   setShowAddCreditCompanyModal,
@@ -303,7 +304,7 @@ const CreditCompanyTable = ({
             })}
         </tbody>
       </Table>
-      <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
+      {/* <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
         <button
           className="border-0"
           style={{ outline: "none" }}
@@ -367,7 +368,10 @@ const CreditCompanyTable = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
+      {companies?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
     </>
   );
 };

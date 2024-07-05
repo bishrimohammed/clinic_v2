@@ -36,6 +36,6 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: true,
     },
   });
-  MedicalRecordDetail.sync({ force: false, alter: true });
+  MedicalRecordDetail.sync({ force: false, alter: false });
   return MedicalRecordDetail;
 };

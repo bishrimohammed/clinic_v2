@@ -1,6 +1,7 @@
 const express = require("express");
 const ClinicProfileController = require("../controllers/ClinicProfileController");
 const upload = require("../config/multerConfig");
+const { protect } = require("../middleware/authMiddleWare");
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.get(
 
 router.post(
   "/",
+  protect,
   upload.fields([{ name: "logo" }, { name: "clinic_seal" }]),
   ClinicProfileController.createClinicProfile
 );
@@ -29,6 +31,7 @@ router.post(
 router.put(
   "/:id",
   upload.fields([{ name: "logo" }, { name: "clinic_seal" }]),
+  protect,
   ClinicProfileController.updateClinicProfile
 );
 

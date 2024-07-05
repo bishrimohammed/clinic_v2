@@ -19,6 +19,7 @@ import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
 import { FaSortDown, FaSortUp } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { hasPermission } from "../../utils/hasPermission";
+import PaginationComponent from "../../components/PaginationComponent";
 
 const AppointmentTable = ({
   appointments,
@@ -277,7 +278,7 @@ const AppointmentTable = ({
             })}
         </tbody>
       </Table>
-      <div
+      {/* <div
         style={{ zIndex: 0 }}
         className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2"
       >
@@ -344,7 +345,10 @@ const AppointmentTable = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
+      {appointments?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
     </>
   );
 };

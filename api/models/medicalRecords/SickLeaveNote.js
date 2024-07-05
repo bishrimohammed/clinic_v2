@@ -35,6 +35,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   });
-  SickLeaveNote.sync({ alter: true });
+  SickLeaveNote.sync({ alter: false });
   return SickLeaveNote;
 };

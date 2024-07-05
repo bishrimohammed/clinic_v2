@@ -19,6 +19,7 @@ router.get("/search", PatientController.searchPatient);
 router.post(
   "/",
   upload.fields([{ name: "employeeId_doc" }, { name: "letter_doc" }]),
+  protect,
   PatientController.createPatient
 );
 router.post("/:id/allergy", protect, PatientController.addPatientAllergy);
@@ -51,6 +52,7 @@ router.put(
 router.put(
   "/:id",
   upload.fields([{ name: "employeeId_doc" }, { name: "letter_doc" }]),
+  protect,
   PatientController.updatePatient
 );
 // router

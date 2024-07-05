@@ -18,6 +18,7 @@ import { FaSortDown, FaSortUp, FaUserLock } from "react-icons/fa";
 import { CgLockUnlock } from "react-icons/cg";
 import { RiEditLine } from "react-icons/ri";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import PaginationComponent from "../../components/PaginationComponent";
 
 const UserListTable = ({
   users,
@@ -272,7 +273,7 @@ const UserListTable = ({
           })}
         </tbody>
       </Table>
-      <div className="d-flex align-items-center gap-2">
+      {/* <div className="d-flex align-items-center gap-2">
         <button
           className="border-0"
           style={{ outline: "none" }}
@@ -336,7 +337,10 @@ const UserListTable = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
+      {users?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
     </div>
   );
 };

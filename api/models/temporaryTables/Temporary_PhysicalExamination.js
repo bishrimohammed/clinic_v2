@@ -28,6 +28,6 @@ module.exports = (sequelize, DataTypes) => {
       //   },
     }
   );
-  TemporaryPhysicalExamination.sync({ alter: true });
+  TemporaryPhysicalExamination.sync({ alter: false });
   return TemporaryPhysicalExamination;
 };

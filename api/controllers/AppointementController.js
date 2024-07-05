@@ -75,15 +75,18 @@ module.exports.AppointementController = {
       res.status(400);
       throw new Error("Doctor is not available at this time");
     }
-    const appointment = await db.Appointment.create({
-      patient_id: patient_id ? patient_id : null,
-      doctor_id,
-      reason,
-      appointment_date: date,
-      appointment_time: time,
-      patient_name,
-      appointment_type: type,
-    });
+    const appointment = await db.Appointment.create(
+      {
+        patient_id: patient_id ? patient_id : null,
+        doctor_id,
+        reason,
+        appointment_date: date,
+        appointment_time: time,
+        patient_name,
+        appointment_type: type,
+      },
+      { userId: req.user.id }
+    );
     res.status(201).json(appointment);
   }),
   updateAppointment: asyncHandler(async (req, res) => {
@@ -134,7 +137,7 @@ module.exports.AppointementController = {
     appointment.appointment_type = type;
     appointment.reason = reason;
     appointment.doctor_id = doctor_id;
-    await appointment.save();
+    await appointment.save({ userId: req.user.id });
     res.json({ msg: " Appointment Updated successfully" });
   }),
   cancelAppointment: asyncHandler(async (req, res) => {
@@ -146,7 +149,7 @@ module.exports.AppointementController = {
     }
     // console.log(appointment);
     appointment.status = "cancelled";
-    await appointment.save();
+    await appointment.save({ userId: req.user.id });
     res.json({ msg: "Appointment cancelled" });
   }),
   deleteAppointment: asyncHandler(async (req, res) => {
@@ -156,7 +159,7 @@ module.exports.AppointementController = {
       res.status(404);
       throw new Error("Appointment not found");
     }
-    await appointment.destroy();
+    await appointment.destroy({ userId: req.user.id });
     res.json({ msg: "Appointment deleted" });
   }),
 };

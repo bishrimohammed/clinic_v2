@@ -75,7 +75,8 @@ const ConsultationContent = ({ changeVisibleContent }) => {
             // disabled={isPending}
             onClick={handleSaveForLater}
             variant="warning"
-            className="btn-sm"
+            className="btn-sm text-white"
+            // className="text-white"
           >
             Save for Later
           </Button>

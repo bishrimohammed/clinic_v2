@@ -78,7 +78,8 @@ const Sidebar = () => {
             Dashboard
           </CNavItem>
           {(hasPermission("Patient", "read") ||
-            hasPermission("visit", "read")) && (
+            hasPermission("visit", "read") ||
+            hasPermission("appointment", "read")) && (
             <CNavGroup
               idx="patient"
               visible={location.pathname.startsWith("patients")}
@@ -101,6 +102,11 @@ const Sidebar = () => {
               {hasPermission("visit", "read") && (
                 <CNavItem to="/visit" component={NavLink}>
                   Patient Visits
+                </CNavItem>
+              )}
+              {hasPermission("appointment", "read") && (
+                <CNavItem to="/appointment" component={NavLink}>
+                  Appointment List
                 </CNavItem>
               )}
             </CNavGroup>
@@ -173,15 +179,22 @@ const Sidebar = () => {
                 <FaUser className="nav-icon" />
               )}
             >
-              <CNavItem to="/user/employee" component={NavLink}>
-                Employee Management
-              </CNavItem>
-              <CNavItem to="/user/role" component={NavLink}>
-                Role Management
-              </CNavItem>
-              <CNavItem to="/user/account" component={NavLink}>
-                Account Management
-              </CNavItem>
+              {hasPermission("employee", "read") && (
+                <CNavItem to="/user/employee" component={NavLink}>
+                  Employee Management
+                </CNavItem>
+              )}
+              {hasPermission("role", "read") && (
+                <CNavItem to="/user/role" component={NavLink}>
+                  Role Management
+                </CNavItem>
+              )}
+              {hasPermission("user", "read") && (
+                <CNavItem to="/user/account" component={NavLink}>
+                  Account Management
+                </CNavItem>
+              )}
+
               <CNavItem to="/approvalsetting" component={NavLink}>
                 Approval Setting
               </CNavItem>
@@ -198,22 +211,26 @@ const Sidebar = () => {
               )}
             >
               {" "}
-              <CNavItem
-                to="/administrations/services"
-                component={NavLink}
-                className=""
-              >
-                Clinic Services Management
-              </CNavItem>
+              {hasPermission("clinic services", "read") && (
+                <CNavItem
+                  to="/administrations/services"
+                  component={NavLink}
+                  className=""
+                >
+                  Clinic Services Management
+                </CNavItem>
+              )}
               {/* <CNavItem to="/administrations/user" component={NavLink}>
                 Users
               </CNavItem> */}
-              <CNavItem
-                to="/administrations/setting/editclinicinfo"
-                component={NavLink}
-              >
-                Clinic Profile Management
-              </CNavItem>
+              {hasPermission("clinic profile", "read") && (
+                <CNavItem
+                  to="/administrations/setting/editclinicinfo"
+                  component={NavLink}
+                >
+                  Clinic Profile Management
+                </CNavItem>
+              )}
               {/* <CNavItem to="/administrations/employee" component={NavLink}>
                 Employee Management
               </CNavItem>
@@ -253,7 +270,7 @@ const Sidebar = () => {
               Report
             </CNavItem>
           )}
-          {hasPermission("appointment", "read") && (
+          {/* {hasPermission("appointment", "read") && (
             <CNavGroup
               idx="appointment"
               visible={location.pathname.startsWith("Configurations")}
@@ -267,7 +284,7 @@ const Sidebar = () => {
                 Appointment List
               </CNavItem>
             </CNavGroup>
-          )}
+          )} */}
 
           {/* {hasPermission("visit", "read") && (
             <CNavGroup

@@ -105,17 +105,19 @@ const PatientForm = ({ patient }) => {
       ? {
           firstName: patient ? patient.firstName : "",
           middleName: patient ? patient.middleName : "",
-          lastName: patient ? patient.lastName : "",
+          lastName: patient.lastName ? patient.lastName : "",
           gender: patient ? patient.gender : "",
           birth_date: patient ? patient.birth_date : "",
           has_phone: patient ? patient.has_phone : true,
           phone: patient ? (patient.phone ? patient.phone : "") : "",
-          occupation: patient.occupation,
+          occupation: patient.occupation ? patient.occupation : "",
           marital_status: patient.marital_status,
-          guardian_name: patient.guardian_name,
-          guardian_relationship: patient.guardian_relationship,
-          blood_type: patient.blood_type,
-          nationality: patient.nationality,
+          guardian_name: patient.guardian_name ? patient.guardian_name : "",
+          guardian_relationship: patient.guardian_relationship
+            ? patient.guardian_relationship
+            : "",
+          blood_type: patient.blood_type ? patient.blood_type : "",
+          nationality: patient.nationality ? patient.nationality : "",
 
           address: {
             id: patient.address_id,
@@ -295,9 +297,10 @@ const PatientForm = ({ patient }) => {
   // console.log(age);
   const submitHandler = async (data) => {
     console.log(data);
+    console.log(patientID);
     // return;
     const patientData = {
-      patient_id: patient ? patient.card_number : patientID,
+      patient_id: patient ? patient.card_number : data.patientId,
       firstName: data.firstName,
       middleName: data.middleName,
       lastName: data.lastName,
@@ -315,7 +318,7 @@ const PatientForm = ({ patient }) => {
       blood_type: data.blood_type,
       nationality: data.nationality,
     };
-    console.log(patientData);
+    // console.log(patientData);
     // return;
     const formData = new FormData();
     formData.append("patient", JSON.stringify(patientData));

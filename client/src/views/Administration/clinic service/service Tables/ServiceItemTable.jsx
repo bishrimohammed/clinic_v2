@@ -19,9 +19,11 @@ import { CgLockUnlock } from "react-icons/cg";
 import { RiEditLine } from "react-icons/ri";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { LuFilter } from "react-icons/lu";
+import PaginationComponent from "../../../../components/PaginationComponent";
 
 const ServiceItemTable = ({
   items,
+  isPending,
   setShowDeactiveModal,
   setFilter,
   setShowFilter,
@@ -309,7 +311,7 @@ const ServiceItemTable = ({
           })}
         </tbody>
       </Table>
-      <div className="d-flex align-items-center gap-2">
+      {/* <div className="d-flex align-items-center gap-2">
         <button
           className="border-0"
           style={{ outline: "none" }}
@@ -373,7 +375,10 @@ const ServiceItemTable = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
+      {items?.length > 0 && !isPending && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
     </div>
   );
 };

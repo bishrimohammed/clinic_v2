@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const AdvancedPayment = sequelize.define("advanced-payment", {
+  const AdvancedPayment = sequelize.define("advanced_payment", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,

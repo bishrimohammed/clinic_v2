@@ -4,9 +4,10 @@ import { useGetCurrenMedication } from "../../hooks/ConditionsAndMedicationsHook
 import { useGetDiscontinuedMedication } from "../../hooks/ConditionsAndMedicationsHooks/useGetDiscontinuedMedication";
 import { useGetPastMedicalHistory } from "../../hooks/ConditionsAndMedicationsHooks/useGetPastMedicalHistory";
 import { useLocation } from "react-router-dom";
-import { FaCirclePlus } from "react-icons/fa6";
-import { LuEye } from "react-icons/lu";
+// import { FaCirclePlus } from "react-icons/fa6";
+// import { LuEye } from "react-icons/lu";
 import { MdRemoveRedEye } from "react-icons/md";
+import { getBrandColor } from "../../../../utils/getBrandColor";
 const ConditionsAndMedications = ({ patientId, medicalRecordId }) => {
   const { state } = useLocation();
   const [showAddModal, setShowAddModal] = useState(false);
@@ -25,7 +26,9 @@ const ConditionsAndMedications = ({ patientId, medicalRecordId }) => {
       {/* <button onClick={() => setShowAddModal(true)}>Add</button> */}
       <div className="d-flex align-items-center">
         {" "}
-        <h6 className="mb-0">Conditions & Medications</h6>
+        <h6 style={{ color: getBrandColor() }} className="mb-0">
+          Conditions & Medications
+        </h6>
         <button
           variant="primary"
           className="border-0 bg-transparent"
@@ -36,7 +39,7 @@ const ConditionsAndMedications = ({ patientId, medicalRecordId }) => {
       </div>
       <h6 style={{ fontSize: 15 }} className="text-white mt-2">
         <span
-          style={{ backgroundColor: "rgba(0, 0, 0,0.7)" }}
+          style={{ backgroundColor: "rgb(192,192,192)" }}
           className="p-1 mt-2"
         >
           Current condition
@@ -53,7 +56,7 @@ const ConditionsAndMedications = ({ patientId, medicalRecordId }) => {
       {currentmedications?.length === 0 && <p>None</p>}
       <h6 style={{ fontSize: 15 }} className="text-white mt-2">
         <span
-          style={{ backgroundColor: "rgba(0, 0, 0,0.7)" }}
+          style={{ backgroundColor: "rgb(192,192,192)" }}
           className="p-1 mt-2"
         >
           Discontinued medication
@@ -70,7 +73,7 @@ const ConditionsAndMedications = ({ patientId, medicalRecordId }) => {
       {discontinued_medications?.length === 0 && <p>None</p>}
       <h6 style={{ fontSize: 15 }} className="text-white mt-2">
         <span
-          style={{ backgroundColor: "rgba(0, 0, 0,0.7)" }}
+          style={{ backgroundColor: "rgb(192,192,192)" }}
           className="p-1 mt-2"
         >
           Previous conditions

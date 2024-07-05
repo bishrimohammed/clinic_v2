@@ -448,7 +448,7 @@ const AddConditionsAndMedicationsModal = ({
               <div>
                 {" "}
                 <div className="d-flex align-items-center w-100  py-1">
-                  <h6 className="mb-0">Discontinue Medication</h6>
+                  <h6 className="mb-0">Discontinued Medication</h6>
                   <button
                     variant="primary"
                     className="border-0 bg-transparent"

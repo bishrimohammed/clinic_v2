@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Form, Modal } from "react-bootstrap";
+import { Alert, Form, Modal, Spinner } from "react-bootstrap";
 import { useUpdateHIVStatus } from "../../hooks/patientHooks/useUpdateHIVStatus";
 import { toast } from "react-toastify";
-const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
+const ChangeHIVStatusModal = ({ show, handleClose, patientId, status }) => {
   const { mutateAsync, isPending } = useUpdateHIVStatus();
-  const statusRef = useRef(false);
+  // console.log(status);
+  const statusRef = useRef(status);
   //   const [successState, setSuccessState] = useState("");
   const [errorState, setErrorState] = useState("");
-  console.log(patientId);
+  // console.log(patientId);
   useEffect(() => {
     const timer = setTimeout(() => {
       setErrorState("");
@@ -15,13 +16,13 @@ const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
     return () => clearTimeout(timer);
   }, [errorState]);
   const changeHandler = () => {
-    console.log(statusRef.current.value);
+    // console.log(statusRef.current.value);
     mutateAsync({
       formData: { status: statusRef.current.value },
       patientId,
     })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res.status === 200) {
           toast.success(res.data.message);
           handleClose(false);
@@ -55,7 +56,7 @@ const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
         <Form>
           <Form.Group className="mb-3">
             <Form.Label>has HIV</Form.Label>
-            <Form.Control as="select" ref={statusRef} defaultValue="false">
+            <Form.Control as="select" ref={statusRef} defaultValue={status}>
               {/* {status.map((item) => (
               <option key={item.value} value={item.value}>
                 {item.label}
@@ -72,7 +73,12 @@ const ChangeHIVStatusModal = ({ show, handleClose, patientId }) => {
         <button className="btn btn-secondary" onClick={handleClose}>
           Cancel
         </button>
-        <button className="btn btn-primary" onClick={changeHandler}>
+        <button
+          className="btn btn-primary"
+          disabled={isPending}
+          onClick={changeHandler}
+        >
+          {isPending && <Spinner size="sm" />}
           Save
         </button>
       </Modal.Footer>

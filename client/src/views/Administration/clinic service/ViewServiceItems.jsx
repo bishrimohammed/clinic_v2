@@ -39,11 +39,12 @@ const ViewServiceItems = () => {
   });
   const [showServiceGroupModal, setShowServiceGroupModal] = useState(false);
   const items = useMemo(() => data || [], [data, isPending, isFetching]);
-  console.log(showAddServiceItemModal);
+  // console.log(showAddServiceItemModal);
   return (
     <div>
       <ServiceItemTable
         items={items}
+        isPending={isPending}
         setShowDeactiveModal={setShowDeactiveModal}
         setFilter={setFilter}
         setShowFilter={setShowFilter}
