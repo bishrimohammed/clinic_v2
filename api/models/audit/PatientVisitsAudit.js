@@ -11,18 +11,34 @@ module.exports = (sequelize, DataTypes) => {
       patient_visit_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "patientassignments",
+          key: "id",
+        },
       },
       patient_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "patients",
+          key: "id",
+        },
       },
       doctor_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+        },
       },
       medicalRecord_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "medicalrecords",
+          key: "id",
+        },
       },
       visitType_id: {
         type: DataTypes.INTEGER,
@@ -116,9 +132,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       timestamps: false,
-
       freezeTableName: true,
     }
   );
+  PatientVisitAudit.sync({ alter: false, force: false });
   return PatientVisitAudit;
 };

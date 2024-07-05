@@ -15,12 +15,19 @@ module.exports = (sequelize, DataTypes) => {
       patient_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        references: {
+          model: "patients",
+          key: "id",
+        },
       },
       patient_name: DataTypes.STRING,
       doctor_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        validate: {},
+        references: {
+          model: "users",
+          key: "id",
+        },
       },
       appointment_date: {
         type: DataTypes.DATEONLY,

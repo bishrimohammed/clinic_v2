@@ -51,6 +51,6 @@ module.exports = (sequilize, DataTypes) => {
     // },
     // follow_up_status: {
   });
-  ReferralNote.sync({ alter: false });
+  ReferralNote.sync({ alter: false, force: false });
   return ReferralNote;
 };

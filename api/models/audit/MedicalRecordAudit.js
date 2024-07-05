@@ -17,7 +17,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-
       status: {
         type: DataTypes.BOOLEAN,
         allowNull: true,
@@ -56,9 +55,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       timestamps: false,
-
       freezeTableName: true,
     }
   );
+  MedicalRecordAudit.sync({ alert: true, force: true });
   return MedicalRecordAudit;
 };

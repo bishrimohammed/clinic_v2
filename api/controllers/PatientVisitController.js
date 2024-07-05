@@ -204,43 +204,55 @@ module.exports = PatientVisitController = {
     if (String(type).toLowerCase() === "emergency") {
       stage = "Waiting for triage";
     }
-    const medicalRecord = await db.MedicalRecord.create({
-      patient_id,
-    });
+    const medicalRecord = await db.MedicalRecord.create(
+      {
+        patient_id,
+      },
+      { userId: req.user.id }
+    );
     if (!medicalRecord) {
       res.status(400);
       throw new Error("medical record not created");
     }
-    const patientVisit = await db.PatientAssignment.create({
-      patient_id,
-      doctor_id,
-      assignment_date: date,
-      visit_time: date.substring(11, 16),
-      visit_type: type,
-      mode_of_arrival: type === "Emergency" ? mode_of_arrival : null,
-      reason,
-      medicalRecord_id: medicalRecord.id,
-      stage: stage,
-      created_by: req?.user?.id,
-    });
+    const patientVisit = await db.PatientAssignment.create(
+      {
+        patient_id,
+        doctor_id,
+        assignment_date: date,
+        visit_time: date.substring(11, 16),
+        visit_type: type,
+        mode_of_arrival: type === "Emergency" ? mode_of_arrival : null,
+        reason,
+        medicalRecord_id: medicalRecord.id,
+        stage: stage,
+        created_by: req?.user?.id,
+      },
+      { userId: req?.user?.id }
+    );
 
     if (
       stage === "Waiting for service fee" ||
       String(type).toLowerCase() === "emergency"
     ) {
-      const medicalBilling = await db.MedicalBilling.create({
-        medical_record_id: medicalRecord.id,
-        patient_id,
-        visit_id: patientVisit.id,
-      });
+      const medicalBilling = await db.MedicalBilling.create(
+        {
+          medical_record_id: medicalRecord.id,
+          patient_id,
+          visit_id: patientVisit.id,
+        },
+        { userId: req?.user?.id }
+      );
       if (!medicalBilling) {
         res.status(500);
         throw new Error("unable to create MedicalBilling");
       }
-      const payment = await db.Payment.create({
-        medical_billing_id: medicalBilling.id,
-        item_id: 1,
-      });
+      const payment = await db.Payment.create(
+        {
+          medical_billing_id: medicalBilling.id,
+          item_id: 1,
+        },
+        { userId: req?.user?.id }
+      );
     }
     res.status(201).json(patientVisit);
   }),

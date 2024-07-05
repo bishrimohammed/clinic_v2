@@ -99,14 +99,14 @@ const Sidebar = () => {
               <CNavItem to="/patients" component={NavLink}>
                 Patient List
               </CNavItem>
-              {hasPermission("visit", "read") && (
-                <CNavItem to="/visit" component={NavLink}>
-                  Patient Visits
-                </CNavItem>
-              )}
               {hasPermission("appointment", "read") && (
                 <CNavItem to="/appointment" component={NavLink}>
                   Appointment List
+                </CNavItem>
+              )}
+              {hasPermission("visit", "read") && (
+                <CNavItem to="/visit" component={NavLink}>
+                  Patient Visits
                 </CNavItem>
               )}
             </CNavGroup>

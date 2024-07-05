@@ -19,6 +19,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   });
-  DiscontinuedMedication.sync({ alter: false });
+  DiscontinuedMedication.sync({ alter: false, force: false });
   return DiscontinuedMedication;
 };

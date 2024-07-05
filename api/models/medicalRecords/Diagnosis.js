@@ -28,6 +28,6 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: "Suspected",
     },
   });
-  Diagnosis.sync({ alter: false });
+  Diagnosis.sync({ alter: false, force: false });
   return Diagnosis;
 };

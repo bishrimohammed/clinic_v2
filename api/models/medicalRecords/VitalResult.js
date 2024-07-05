@@ -27,6 +27,6 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "vital_result",
     }
   );
-  VitalResult.sync({ alter: false });
+  VitalResult.sync({ alter: false, force: false });
   return VitalResult;
 };

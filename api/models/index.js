@@ -236,6 +236,19 @@ db.EmergencyContactAudit = require("./audit/EmergancyContactAudit.js")(
   sequelize,
   DataTypes
 );
+db.PatientVisitAudit = require("./audit/PatientVisitsAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.MedicalRecordAudit = require("./audit/MedicalRecordAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.MedicalBillingAudit = require("./audit/MedicalBillingsAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.PaymentAudit = require("./audit/PaymentsAudit.js")(sequelize, DataTypes);
 patientAssignmentSAssociation(db);
 MedicalRecordAssociation(db);
 MedicalRecordDetailAssocations(db);

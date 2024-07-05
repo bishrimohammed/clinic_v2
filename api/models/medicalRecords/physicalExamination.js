@@ -29,6 +29,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   });
-  physicalExamination.sync({ alter: false });
+  physicalExamination.sync({ alter: false, force: false });
   return physicalExamination;
 };

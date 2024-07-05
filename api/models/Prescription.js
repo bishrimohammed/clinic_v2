@@ -15,6 +15,6 @@ module.exports = (sequilize, DataTypes) => {
       allowNull: false,
     },
   });
-  Prescription.sync({ alter: false });
+  Prescription.sync({ alter: false, force: false });
   return Prescription;
 };
