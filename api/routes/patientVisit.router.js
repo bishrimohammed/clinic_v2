@@ -21,17 +21,25 @@ router.get(
 router.post("/", protect, PatientVisitController.createPatientVisit);
 
 router.put("/:id", PatientVisitController.updatePatientVisit);
-router.patch("/:id/cancel", PatientVisitController.cancelPatientAssignment);
+router.patch(
+  "/:id/cancel",
+  protect,
+  PatientVisitController.cancelPatientAssignment
+);
 
 router.patch(
   "/:id/transfer",
   protect,
   PatientVisitController.transferPatientVisitToOtherDoctor
 );
-router.patch("/:id/start-traige", PatientVisitController.startTraige);
+router.patch("/:id/start-traige", protect, PatientVisitController.startTraige);
 
-router.patch("/:id/finish-traige", PatientVisitController.finishTraige);
-router.patch("/:id/admit", PatientVisitController.admitVisit);
+router.patch(
+  "/:id/finish-traige",
+  protect,
+  PatientVisitController.finishTraige
+);
+router.patch("/:id/admit", protect, PatientVisitController.admitVisit);
 router.delete("/:id", PatientVisitController.deletePatientVisit);
 
 // router.get('/:id/patient', PatientVisitController.getPatient)

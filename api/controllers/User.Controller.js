@@ -317,12 +317,15 @@ const UserController = {
       res.status(404);
       throw new Error("Sorry, the clinic is not open on this day.");
     }
-    const schedule = await db.Schedule.create({
-      start_time: start_time,
-      end_time: end_time,
-      doctor_id: doctorId,
-      day_of_week: day_of_week,
-    });
+    const schedule = await db.Schedule.create(
+      {
+        start_time: start_time,
+        end_time: end_time,
+        doctor_id: doctorId,
+        day_of_week: day_of_week,
+      },
+      { userId: req.user.id }
+    );
     res.status(201).json({ msg: "success" });
   }),
   updateWorkHour: asyncHandler(async (req, res) => {
@@ -354,7 +357,7 @@ const UserController = {
     schedule.end_time = end_time;
     schedule.doctor_id = doctorId;
     schedule.day_of_week = day_of_week;
-    await schedule.save();
+    await schedule.save({ userId: req.user.id });
     res.json({ msg: "success" });
   }),
   changePassword: asyncHandler(async (req, res) => {

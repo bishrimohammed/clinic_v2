@@ -168,13 +168,16 @@ module.exports = BillingController = {
         status: "Open",
       },
     });
-    const newAdvancedPayment = await db.AdvancedPayment.create({
-      medical_billing_id: billingId,
-      amount_paid: amount,
-      cashier_id: req.user.id,
-      description: description,
-      status: "Open",
-    });
+    const newAdvancedPayment = await db.AdvancedPayment.create(
+      {
+        medical_billing_id: billingId,
+        amount_paid: amount,
+        cashier_id: req.user.id,
+        description: description,
+        status: "Open",
+      },
+      { userId: req.user.id }
+    );
     if (previouslyOpenAdvancedPayment) {
       newAdvancedPayment.amount_remaining_from_previous_payment =
         previouslyOpenAdvancedPayment.remaining_amount;
@@ -187,7 +190,7 @@ module.exports = BillingController = {
 
       previouslyOpenAdvancedPayment.status = "Closed";
       previouslyOpenAdvancedPayment.remaining_amount = 0.0;
-      await previouslyOpenAdvancedPayment.save();
+      await previouslyOpenAdvancedPayment.save({ userId: req.user.id });
     } else {
       newAdvancedPayment.amount_remaining_from_previous_payment = 0.0;
       newAdvancedPayment.total_amount = parseFloat(
@@ -197,13 +200,17 @@ module.exports = BillingController = {
         newAdvancedPayment.amount_paid
       );
     }
-    await newAdvancedPayment.save();
+    await newAdvancedPayment.save({ hooks: false });
     billing.has_advanced_payment = true;
     billing.is_advanced_payment_amount_completed = false;
     await billing.save();
     await db.PatientAssignment.update(
       { stage: "Admitted" },
-      { where: { id: billing.visit_id } }
+      {
+        where: { id: billing.visit_id },
+        individualHooks: true,
+        userId: req.user.id,
+      }
     );
     res.status(201).json({ msg: "Advanced Payment Added Successfully" });
   }),
@@ -221,7 +228,7 @@ module.exports = BillingController = {
     Payment.payment_date = new Date();
     Payment.status = "Paid";
 
-    await Payment.save();
+    await Payment.save({ userId: req.user.id });
     const Item = await db.ServiceItem.findByPk(Payment.item_id);
     if (Item?.service_name === "Registration Fee") {
       const billing = await db.MedicalBilling.findOne({
@@ -246,7 +253,7 @@ module.exports = BillingController = {
       } else {
         visit.stage = "Waiting for examiner";
       }
-      await visit.save();
+      await visit.save({ userId: req.user.id });
     }
     const medicalBilling = await db.MedicalBilling.findByPk(
       Payment.medical_billing_id,
@@ -263,7 +270,7 @@ module.exports = BillingController = {
 
     if (medicalBilling && medicalBilling.payments.length === 0) {
       medicalBilling.status = true;
-      await medicalBilling.save();
+      await medicalBilling.save({ userId: req.user.id });
     }
     // billing.update({
     //   status: true,
@@ -278,7 +285,7 @@ module.exports = BillingController = {
       throw new Error("Payment not found");
     }
     payment.status = "Void";
-    await payment.save();
+    await payment.save({ userId: req.user.id });
     res.status(200).json({ message: "Payment voided" });
   }),
 };

@@ -244,6 +244,33 @@ db.MedicalRecordAudit = require("./audit/MedicalRecordAudit.js")(
   sequelize,
   DataTypes
 );
+db.medicalRecordDetailAudit = require("./audit/MedicalRecordDetailsAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.VitilSignsAudit = require("./audit/VitalSignAudit.js")(sequelize, DataTypes);
+
+db.PhysicalExaminationAudit = require("./audit/PhysicalExaminationAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.InvestigationOrderAudit = require("./audit/InvestigationOrderAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.OrderedTestAudit = require("./audit/OrderedTestAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.DiagnosisAudit = require("./audit/DiagnosisAudit.js")(sequelize, DataTypes);
+db.PrescriptionsAudit = require("./audit/PrescriptionsAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.PrescribedMedicinesAudit = require("./audit/PrescribedMedicinesAudit.js")(
+  sequelize,
+  DataTypes
+);
 db.MedicalBillingAudit = require("./audit/MedicalBillingsAudit.js")(
   sequelize,
   DataTypes

@@ -115,7 +115,7 @@ const ViewUpcomingVisitDetail = () => {
             style={{ cursor: "pointer" }}
             onClick={() => navigate(-1)}
           />
-          <h4>Add Triage for this visit</h4>
+          <h4>Perform Triage</h4>
         </div>
         <div className="d-flex gap-3">
           <div style={{ flex: 75 }} className="left ">

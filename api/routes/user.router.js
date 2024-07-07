@@ -12,10 +12,10 @@ router.get("/:id", protect, UserController.getUserById);
 
 router.post("/", UserController.registerUser);
 router.post("/login", UserController.loginUser);
-router.post("/doctor/workhours", UserController.addWorkingHour);
+router.post("/doctor/workhours", protect, UserController.addWorkingHour);
 router.put("/:id", UserController.updateUser);
 
-router.put("/doctor/:id/workhours", UserController.updateWorkHour);
+router.put("/doctor/:id/workhours", protect, UserController.updateWorkHour);
 router.patch("/:id/activate", UserController.activateUser);
 router.patch("/:id/deactivate", UserController.deactivateUser);
 router.patch("/:id/changepassword", UserController.changePassword);

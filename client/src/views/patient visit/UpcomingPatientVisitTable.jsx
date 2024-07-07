@@ -236,7 +236,8 @@ const UpcomingPatientVisitTable = () => {
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu style={{ zIndex: 55 }}>
-                        {rowEl.original.stage === "Waiting for triage" ? (
+                        {hasPermission("triage", "create") &&
+                        rowEl.original.stage === "Waiting for triage" ? (
                           <Dropdown.Item
                             className="d-flex gap-2 align-items-center"
                             role="button"
@@ -252,11 +253,9 @@ const UpcomingPatientVisitTable = () => {
                               //   action: "Start",
                               // });
                               startTraige.mutateAsync(rowEl.original.id);
-                              hasPermission("triage", "create") &&
-                                (rowEl.original.stage ===
-                                  "Waiting for triage" ||
-                                  rowEl.original.stage ===
-                                    "Performing triage") &&
+
+                              (rowEl.original.stage === "Waiting for triage" ||
+                                rowEl.original.stage === "Performing triage") &&
                                 navigate("view", { state: rowEl.original });
                             }}
                           >
@@ -264,7 +263,8 @@ const UpcomingPatientVisitTable = () => {
                           </Dropdown.Item>
                         ) : null}
 
-                        {rowEl.original.stage === "Performing triage" ? (
+                        {hasPermission("triage", "create") &&
+                        rowEl.original.stage === "Performing triage" ? (
                           <>
                             <Dropdown.Item
                               className="d-flex gap-2 align-items-center"

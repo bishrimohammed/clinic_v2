@@ -14,7 +14,7 @@ const Billings = () => {
   //   isRefetching,
   // } = useGetOutStandingPayments();
   // console.log(bills);
-  const billings = useMemo(() => bills || [], [bills]);
+  // const billings = useMemo(() => bills || [], [bills]);
   // if (isPending) return <Spinner animation="grow" />;
   return (
     <>

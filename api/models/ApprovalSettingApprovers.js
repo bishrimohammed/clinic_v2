@@ -32,6 +32,6 @@ module.exports = (sequelize, DataTypes) => {
       },
     }
   );
-  ApprovalSettingApprover.sync({ alter: true });
+  ApprovalSettingApprover.sync({ alter: false });
   return ApprovalSettingApprover;
 };

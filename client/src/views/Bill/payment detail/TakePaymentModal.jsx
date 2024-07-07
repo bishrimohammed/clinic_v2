@@ -19,7 +19,7 @@ const TakePaymentModal = ({
   paymentId,
   item,
 }) => {
-  //   console.log(item);
+  console.log(visit);
   const { mutateAsync, isPending } = useTakePayment();
   const {
     register,
@@ -121,7 +121,7 @@ const TakePaymentModal = ({
             <Button type="button" variant="secondary" onClick={handleClose}>
               Close
             </Button>
-            <Button type="submit" variant="success">
+            <Button type="submit" disabled={isPending} variant="success">
               Pay
             </Button>
           </Modal.Footer>

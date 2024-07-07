@@ -225,7 +225,7 @@ const DoctorAssignedUpcomingVisitTable = () => {
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu style={{ zIndex: 55 }}>
-                        {rowEl.original.stage === "Waiting for examiner" &&
+                        {rowEl.original.stage === "Waiting for doctor" &&
                         rowEl.original.stage !== "Admitted" ? (
                           <Dropdown.Item
                             className="d-flex gap-2 align-items-center"
@@ -249,7 +249,7 @@ const DoctorAssignedUpcomingVisitTable = () => {
                         ) : null}
                         {/* {rowEl.original.stage !== "Waiting for examiner" &&
                         rowEl.original.stage !== "Admitted" ? ( */}
-                        {rowEl.original.stage !== "Waiting for examiner" ? (
+                        {rowEl.original.stage !== "Waiting for doctor" ? (
                           <Dropdown.Item
                             className="d-flex gap-2 align-items-center"
                             role="button"

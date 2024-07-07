@@ -352,16 +352,16 @@ const AddLabInvestigation = ({ show, handleClose, setValue, getValues }) => {
           </Row>
           <div className="d-flex justify-content-end gap-2 mt-2">
             <Button variant="secondary" type="button" onClick={handleClose}>
-              Close
+              Ok
             </Button>
-            <Button
+            {/* <Button
               variant="primary"
               onClick={submitHandler}
               disabled={selectedTests.length === 0 || isPending}
             >
               {isPending && <Spinner animation="border" size="sm" />}
-              Save
-            </Button>
+              Ok
+            </Button> */}
           </div>
           {/* <div className="d-flex justify-content-end align-self-end mt-2 mb-1">
             <Button

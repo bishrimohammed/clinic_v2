@@ -7,7 +7,7 @@ const {
 const {
   add_MedicalRecord_medicineItem_to_Billing,
 } = require("./helper/MedicalRecordHelper");
-const { where } = require("sequelize");
+// const { where } = require("sequelize");
 
 module.exports = MedicalRecordController = {
   // @desc    Get all MedicalRecord
@@ -187,33 +187,39 @@ module.exports = MedicalRecordController = {
   add_ChiefComplaint: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { chief_complaint, HPI, note } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     const medicalRecord = await db.MedicalRecordDetail.findOne({
       where: {
         medicalRecord_id: id,
         doctor_id: req.user.id,
       },
     });
-    console.log(medicalRecord);
+    // console.log(medicalRecord);
     if (medicalRecord) {
-      await medicalRecord.update({
-        // chief_complaint: medicalRecord.chief_complaint + ", " + chief_complaint,
-        // hpi: medicalRecord.hpi + " \n" + HPI,
-        // note: note,
-        chief_complaint: chief_complaint,
-        hpi: HPI,
-        notes: note,
-      });
+      await medicalRecord.update(
+        {
+          // chief_complaint: medicalRecord.chief_complaint + ", " + chief_complaint,
+          // hpi: medicalRecord.hpi + " \n" + HPI,
+          // note: note,
+          chief_complaint: chief_complaint,
+          hpi: HPI,
+          notes: note,
+        },
+        { userId: req.user.id }
+      );
       res.status(200).json({ message: "Chief Complaint updated successfully" });
     } else {
-      const newMedicalRecordDetail = await db.MedicalRecordDetail.create({
-        medicalRecord_id: id,
+      const newMedicalRecordDetail = await db.MedicalRecordDetail.create(
+        {
+          medicalRecord_id: id,
 
-        chief_complaint: chief_complaint,
-        hpi: HPI,
-        doctor_id: req.user.id,
-        notes: note,
-      });
+          chief_complaint: chief_complaint,
+          hpi: HPI,
+          doctor_id: req.user.id,
+          notes: note,
+        },
+        { userId: req.user.id }
+      );
       if (!newMedicalRecordDetail) {
         res.status(404);
         throw new Error("Chief Complaint not added");
@@ -234,7 +240,7 @@ module.exports = MedicalRecordController = {
   addPlan: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { plan, sickNote, RefferalNote } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     // return;
     const medicalRecordDetail = await db.MedicalRecordDetail.findOne({
       where: {
@@ -247,7 +253,7 @@ module.exports = MedicalRecordController = {
       throw new Error("Medical Record Detail not found");
     }
     medicalRecordDetail.plan = plan;
-    await medicalRecordDetail.save();
+    await medicalRecordDetail.save({ userId: req.user.id });
     const medicalRecord = await db.MedicalRecord.findByPk(req.params.id);
     if (sickNote) {
       let sickNoteId;
@@ -417,6 +423,10 @@ module.exports = MedicalRecordController = {
         doctor_id: req.user.id,
       },
     });
+    if (!medicalRecord) {
+      res.status(404);
+      throw new Error("Medical Record Detail not found");
+    }
     // console.log(medicalRecord);
     const physicalExamination = await db.PhysicalExamination.findAll({
       where: {
@@ -500,10 +510,13 @@ module.exports = MedicalRecordController = {
         doctor_id: req.user.id,
       },
     });
-    const physicalExamination = await db.PhysicalExamination.create({
-      medicalRecordDetail_id: medicalRecordDetail.id,
-      examiner_id: req.user.id,
-    });
+    const physicalExamination = await db.PhysicalExamination.create(
+      {
+        medicalRecordDetail_id: medicalRecordDetail.id,
+        examiner_id: req.user.id,
+      },
+      { userId: req.user.id }
+    );
     // const vital = await db.Vital.findOne({
     //   where: {
     //     medicalRecord_id: id,
@@ -537,13 +550,16 @@ module.exports = MedicalRecordController = {
       // is_Invetigated.clinical_finding =
       //   is_Invetigated.clinical_finding + "\n" + clinical_finding;
       is_Invetigated.status = true;
-      await is_Invetigated.save();
+      await is_Invetigated.save({ hooks: false });
       investiagtionId = is_Invetigated.id;
     } else {
-      const newInvestigation = await db.InvestigationOrder.create({
-        medicalRecord_id: id,
-        // clinical_finding,
-      });
+      const newInvestigation = await db.InvestigationOrder.create(
+        {
+          medicalRecord_id: id,
+          // clinical_finding,
+        },
+        { userId: req.user.id }
+      );
       if (!newInvestigation) {
         res.status(500);
         throw new Error("unable to createInvestigation");
@@ -552,35 +568,42 @@ module.exports = MedicalRecordController = {
     }
     await Promise.all(
       investigations.map(async (test) => {
-        return db.OrderedTest.create({
-          serviceItem_id: test,
-          investigationOrder_id: investiagtionId,
-          requested_by: req.user.id,
-          reported_by: null,
-          comment: "",
-          result: "",
-        });
-      })
-    );
-
-    add_MedicalRecord_medicineItem_to_Billing(
-      medicalRecord.id,
-      investigations,
-      "lab"
-    );
-
-    if (underPanels?.length > 0) {
-      await Promise.all(
-        underPanels.map((test) => {
-          return db.OrderedTest.create({
+        return db.OrderedTest.create(
+          {
             serviceItem_id: test,
             investigationOrder_id: investiagtionId,
             requested_by: req.user.id,
             reported_by: null,
             comment: "",
             result: "",
-            is_underpanel: true,
-          });
+          },
+          { userId: req.user.id }
+        );
+      })
+    );
+
+    await add_MedicalRecord_medicineItem_to_Billing(
+      medicalRecord.id,
+      investigations,
+      "lab",
+      req.user.id
+    );
+
+    if (underPanels?.length > 0) {
+      await Promise.all(
+        underPanels.map((test) => {
+          return db.OrderedTest.create(
+            {
+              serviceItem_id: test,
+              investigationOrder_id: investiagtionId,
+              requested_by: req.user.id,
+              reported_by: null,
+              comment: "",
+              result: "",
+              is_underpanel: true,
+            },
+            { userId: req.user.id }
+          );
         })
       );
     }
@@ -643,11 +666,14 @@ module.exports = MedicalRecordController = {
       res.status(404);
       throw new Error("MedicalRecord not found");
     }
-    const Diagnosis = await db.Diagnosis.create({
-      medical_record_id: id,
-      diagnosis,
-      doctor_id: req.user.id,
-    });
+    const Diagnosis = await db.Diagnosis.create(
+      {
+        medical_record_id: id,
+        diagnosis,
+        doctor_id: req.user.id,
+      },
+      { userId: req.user.id }
+    );
     if (!Diagnosis) {
       res.status(404);
       throw new Error("Diagnosis not added");
@@ -661,9 +687,12 @@ module.exports = MedicalRecordController = {
       res.status(404);
       throw new Error("Diagnosis not found");
     }
-    Diagnosis.update({
-      status: "Confirmed",
-    });
+    Diagnosis.update(
+      {
+        status: "Confirmed",
+      },
+      { userId: req.user.id }
+    );
     res.status(200).json({ message: "Diagnosis confirmed successfully" });
   }),
   Ruled_out_Diagnosis: asyncHandler(async (req, res) => {
@@ -674,9 +703,12 @@ module.exports = MedicalRecordController = {
       throw new Error("Diagnosis not found");
     }
 
-    Diagnosis.update({
-      status: "Ruled out",
-    });
+    Diagnosis.update(
+      {
+        status: "Ruled out",
+      },
+      { userId: req.user.id }
+    );
     res.status(200).json({ message: "Diagnosis ruled out successfully" });
   }),
   // @desc    add investigation test a MedicalRecord
@@ -1034,7 +1066,7 @@ module.exports = MedicalRecordController = {
   // @desc add vital sign
   addTriage: asyncHandler(async (req, res) => {
     const { vitals, symptom, visit_type } = req.body;
-    const today = new Date();
+    // const today = new Date();
     // const vitals = req.body;
     // console.log(req.body);
     // return;
@@ -1054,13 +1086,16 @@ module.exports = MedicalRecordController = {
       : symptom;
     patientVisit.stage = "Waiting for doctor";
     patientVisit.visit_type = visit_type;
-    await patientVisit.save();
+    await patientVisit.save({ userId: req.user.id });
 
-    const vital = await db.Vital.create({
-      medicalRecord_id: patientVisit.medicalRecord_id,
-      examiner_id: req.user.id,
-      // progrssNote_id: progressNote.id,
-    });
+    const vital = await db.Vital.create(
+      {
+        medicalRecord_id: patientVisit.medicalRecord_id,
+        examiner_id: req.user.id,
+        // progrssNote_id: progressNote.id,
+      },
+      { userId: req.user.id }
+    );
     // const VitalSigns = vitals.map((v) => {
     //   return db.VitalResult.create({
     //     vital_id: vital.id,
@@ -1069,12 +1104,13 @@ module.exports = MedicalRecordController = {
     //     // progrssNote_id: req.user.id,
     //   });
     // });
+    // console.log(vi);
     await Promise.all(
       vitals.map(async (v) => {
         return db.VitalResult.create({
           vital_id: vital.id,
-          vitalSignField_id: v.vitalId,
-          result: v.value,
+          vitalSignField_id: v.vitalSignField_id,
+          result: v.result,
           // progrssNote_id: req.user.id,
         });
       })
@@ -1086,47 +1122,21 @@ module.exports = MedicalRecordController = {
   }),
   addVitalSign: asyncHandler(async (req, res) => {
     const { vitals } = req.body;
-
-    // const today = new Date();
-    // const vitals = req.body;
-    // console.log(req.body);
-    // return;
-    // console.log(vitals);
-    // const patientVisit = await db.PatientAssignment.findOne({
-    //   where: {
-    //     medicalRecord_id: req.params.id,
-    //   },
-    // });
-    // console.log(patientVisit);
-    // if (!patientVisit) {
-    //   res.status(404);
-    //   throw new Error("Patient assignment not found");
-    // }
-    // patientVisit.symptom_notes = patientVisit.symptom_notes
-    //   ? patientVisit.symptom_notes + "\n" + symptom
-    //   : symptom;
-    // patientVisit.stage = "Waiting for doctor";
-    // patientVisit.visit_type = visit_type;
-    // await patientVisit.save();
     const medicalRecord = await db.MedicalRecord.findByPk(req.params.id);
     if (!medicalRecord) {
       res.status(404);
       throw new Error("Medical record not found");
     }
-    const vital = await db.Vital.create({
-      medicalRecord_id: medicalRecord.id,
-      examiner_id: req.user.id,
-      taken_date: Date.now(),
-      // progrssNote_id: progressNote.id,
-    });
-    // const VitalSigns = vitals.map((v) => {
-    //   return db.VitalResult.create({
-    //     vital_id: vital.id,
-    //     vitalSignField_id: v.vitalId,
-    //     result: v.value,
-    //     // progrssNote_id: req.user.id,
-    //   });
-    // });
+    const vital = await db.Vital.create(
+      {
+        medicalRecord_id: medicalRecord.id,
+        examiner_id: req.user.id,
+        taken_date: Date.now(),
+        // progrssNote_id: progressNote.id,
+      },
+      { userId: req.user.id }
+    );
+
     await Promise.all(
       vitals.map(async (v) => {
         return db.VitalResult.create({
@@ -1193,13 +1203,16 @@ module.exports = MedicalRecordController = {
     let prescriptionID;
     if (!prescriptionExist) {
       console.log("\nPrescription\n");
-      const prescription = await db.Prescription.create({
-        medical_record_id: id,
-        patient_id: medicalRecord.patient_id,
-      });
+      const prescription = await db.Prescription.create(
+        {
+          medical_record_id: id,
+          patient_id: medicalRecord.patient_id,
+        },
+        { userId: req.user.id }
+      );
       prescriptionID = prescription.id;
     } else {
-      console.log("\n\nheloo\n\n");
+      // console.log("\n\nheloo\n\n");
       prescriptionID = prescriptionExist.id;
     }
     const medicineItemIds = prescription.map(
@@ -1209,24 +1222,28 @@ module.exports = MedicalRecordController = {
     // return;
     await Promise.all(
       req.body.map(async (prescription) => {
-        await db.PrescribedMedicine.create({
-          prescription_id: prescriptionID,
-          doctor_id: req.user.id,
-          medicine_id: prescription.medicine_id,
-          dosage: prescription.dosage,
-          frequency: prescription.frequency,
-          duration: prescription.duration,
-          // notes: prescription.notes,
-          is_internal: true,
-          start_date: prescription.start_date,
-        });
+        await db.PrescribedMedicine.create(
+          {
+            prescription_id: prescriptionID,
+            doctor_id: req.user.id,
+            medicine_id: prescription.medicine_id,
+            dosage: prescription.dosage,
+            frequency: prescription.frequency,
+            duration: prescription.duration,
+            // notes: prescription.notes,
+            is_internal: true,
+            start_date: prescription.start_date,
+          },
+          { userId: req.user.id }
+        );
       })
     )
       .then(() => {
         add_MedicalRecord_medicineItem_to_Billing(
           medicalRecord.id,
           medicineItemIds,
-          "prescription"
+          "prescription",
+          req.user.id
         );
       })
       .then((payments) => {
@@ -1323,10 +1340,13 @@ module.exports = MedicalRecordController = {
     let prescriptionID;
     if (!prescriptionExist) {
       // console.log("\nPrescription\n");
-      const prescription = await db.Prescription.create({
-        medical_record_id: id,
-        patient_id: medicalRecord.patient_id,
-      });
+      const prescription = await db.Prescription.create(
+        {
+          medical_record_id: id,
+          patient_id: medicalRecord.patient_id,
+        },
+        { userId: req.user.id }
+      );
       prescriptionID = prescription.id;
     } else {
       console.log("\n\nheloo\n\n");
@@ -1335,18 +1355,21 @@ module.exports = MedicalRecordController = {
 
     await Promise.all(
       req.body.map(async (prescription) => {
-        return await db.PrescribedMedicine.create({
-          prescription_id: prescriptionID,
-          doctor_id: req.user.id,
-          // medicine_id: prescription.medicine_id,
-          dosage: prescription.dosage,
-          frequency: prescription.frequency,
-          drug_name: prescription.drug_name,
-          duration: prescription.duration,
-          // notes: prescription.notes,
-          is_internal: false,
-          start_date: prescription.start_date,
-        });
+        return await db.PrescribedMedicine.create(
+          {
+            prescription_id: prescriptionID,
+            doctor_id: req.user.id,
+            // medicine_id: prescription.medicine_id,
+            dosage: prescription.dosage,
+            frequency: prescription.frequency,
+            drug_name: prescription.drug_name,
+            duration: prescription.duration,
+            // notes: prescription.notes,
+            is_internal: false,
+            start_date: prescription.start_date,
+          },
+          { userId: req.user.id }
+        );
       })
     )
       .then((prescription) => {

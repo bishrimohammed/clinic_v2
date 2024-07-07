@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
 
             // Check if doctor_id is not null before adding it to the whereClause
             if (this.doctor_id) {
-              whereClause.doctor_id = { [Op.ne]: this.doctor_id };
+              whereClause.doctor_id = { [Op.eq]: this.doctor_id };
               const existingSchedule = await Schedule.findOne({
                 where: whereClause,
               });
@@ -114,6 +114,6 @@ module.exports = (sequelize, DataTypes) => {
       },
     }
   );
-  Schedule.sync({ alter: true, force: false });
+  Schedule.sync({ alter: false, force: false });
   return Schedule;
 };

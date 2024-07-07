@@ -101,7 +101,7 @@ const UpdateWorkHourModal = ({ show, handleClose, event }) => {
         }
       })
       .catch((err) => {
-        // console.log(err);
+        console.log(err);
         const errors = err.response.data.message;
         // console.log(err);
         if (Array.isArray(errors)) {

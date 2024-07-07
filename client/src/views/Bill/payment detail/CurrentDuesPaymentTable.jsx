@@ -34,7 +34,7 @@ const CurrentDuesPaymentTable = ({}) => {
     id: state.id,
     filter,
   });
-  console.log(data);
+  console.log(state);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showTakePaymentModal, setShowTakePaymentModal] = useState({
     isShow: false,
@@ -299,7 +299,7 @@ const CurrentDuesPaymentTable = ({}) => {
           }
           paymentId={showTakePaymentModal.paymentId}
           patient={state.patient}
-          visit={state.medicalRecord.visit}
+          visit={state.visit}
           item={showTakePaymentModal.item}
         />
       )}

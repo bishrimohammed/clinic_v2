@@ -349,7 +349,7 @@ module.exports = PatientVisitController = {
       throw new Error("Patient visit not found");
     }
     visit.status = false;
-    await visit.save();
+    await visit.save({ userId: req.user.id });
     res.json(visit);
   }),
   startTraige: asyncHandler(async (req, res) => {
@@ -360,7 +360,7 @@ module.exports = PatientVisitController = {
       throw new Error("Patient visit not found");
     }
     visit.stage = "Performing triage";
-    await visit.save();
+    await visit.save({ userId: req.user.id });
     res.json(visit);
   }),
   finishTraige: asyncHandler(async (req, res) => {
@@ -371,13 +371,12 @@ module.exports = PatientVisitController = {
       throw new Error("Patient visit not found");
     }
     visit.stage = "Waiting for examiner";
-    await visit.save();
+    await visit.save({ userId: req.user.id });
     res.json(visit);
   }),
   admitVisit: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const visit = await db.PatientAssignment.findByPk(id);
-
     if (!visit) {
       res.status(404);
       throw new Error("Patient visit not found");
@@ -390,10 +389,11 @@ module.exports = PatientVisitController = {
         where: {
           id: visit.patient_id,
         },
+        userId: req.user.id,
       }
     );
     visit.stage = "Admitted";
-    await visit.save();
+    await visit.save({ userId: req.user.id });
     res.json(visit);
   }),
 };

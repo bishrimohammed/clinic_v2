@@ -82,5 +82,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
+  medicalRecordDetailAudit.sync({ alert: false, force: false });
   return medicalRecordDetailAudit;
 };

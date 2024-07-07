@@ -84,6 +84,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  ScheduleAudit.sync({ alter: true });
+  ScheduleAudit.sync({ alter: false });
   return ScheduleAudit;
 };

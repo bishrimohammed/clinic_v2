@@ -107,6 +107,7 @@ module.exports = (sequelize, DataTypes) => {
             patient_visit_id: previousValue.id,
             doctor_id: previousValue.doctor_id,
             patient_id: previousValue.patient_id,
+            medicalRecord_id: previousValue.medicalRecord_id,
             visit_type_id: previousValue.visit_type_id,
             assignment_date: previousValue.assignment_date,
             visit_time: previousValue.visit_time,

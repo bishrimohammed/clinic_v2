@@ -23,6 +23,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   });
-  PastMedicalHistory.sync({ alter: true });
+  PastMedicalHistory.sync({ alter: false });
   return PastMedicalHistory;
 };

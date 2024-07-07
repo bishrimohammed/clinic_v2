@@ -53,13 +53,14 @@ module.exports.AppointementController = {
       "Friday",
       "Saturday",
     ];
+    console.log(req.body);
     const Weekdate = new Date(date).getDay();
     // console.log(Weekdate);
     // console.log(daysOfWeek[Weekdate]);
     const doctor = await db.Schedule.findOne({
       where: {
         day_of_week: daysOfWeek[Weekdate],
-        doctor_id: doctor_id,
+        doctor_id: parseInt(doctor_id),
         // appointment_date: this.appointment_date,
         // appointment_time: this.appointment_time,
         [Op.and]: [

@@ -132,7 +132,7 @@ module.exports = InvestigationController = {
           {
             result: value.result,
             comment: value.comment,
-            report_time: new Date(),
+            report_time: Date.now(),
             status: "completed",
             reported_by: req.user.id,
           },
@@ -140,6 +140,8 @@ module.exports = InvestigationController = {
             where: {
               id: value.test_id,
             },
+            individualHooks: true,
+            userId: req.user.id,
           }
         );
       })
@@ -152,6 +154,8 @@ module.exports = InvestigationController = {
           where: {
             id,
           },
+          individualHooks: true,
+          userId: req.user.id,
         }
       );
       res.status(200).json({
