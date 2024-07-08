@@ -905,13 +905,16 @@ module.exports = PatientController = {
       res.status(400);
       throw new Error("Patient doesn't exist");
     }
-    await db.Allergy.create({
-      patient_id: patient.id,
-      severity: severity,
-      allergy_type: allergy_type,
-      reaction_details: reaction_details,
-      created_by: req.user.id,
-    });
+    await db.Allergy.create(
+      {
+        patient_id: patient.id,
+        severity: severity,
+        allergy_type: allergy_type,
+        reaction_details: reaction_details,
+        created_by: req.user.id,
+      },
+      { userId: req.user.id }
+    );
     // patient.allergies = req.body.allergies;
     // await patient.save();
     res.status(201).json({ message: "Patient allergies added successfully" });
@@ -923,12 +926,15 @@ module.exports = PatientController = {
       res.status(400);
       throw new Error("Patient doesn't exist");
     }
-    await db.FamilyHistory.create({
-      patient_id: patient.id,
-      medical_condition: medical_condition,
-      relationship: relationship,
-      created_by: req.user.id,
-    });
+    await db.FamilyHistory.create(
+      {
+        patient_id: patient.id,
+        medical_condition: medical_condition,
+        relationship: relationship,
+        created_by: req.user.id,
+      },
+      { userId: req.user.id }
+    );
     // patient.family_history = req.body.family_history;
     // await patient.save();
     res
@@ -943,10 +949,13 @@ module.exports = PatientController = {
       res.status(400);
       throw new Error("Family History doesn't exist");
     }
-    await familyHistory.update({
-      medical_condition: medical_condition,
-      relationship: relationship,
-    });
+    await familyHistory.update(
+      {
+        medical_condition: medical_condition,
+        relationship: relationship,
+      },
+      { userId: req.user.id }
+    );
     // patient.family_history = req.body.family_history;
     // await patient.save();
     res
@@ -959,11 +968,11 @@ module.exports = PatientController = {
       res.status(400);
       throw new Error("Family History doesn't exist");
     }
-    await familyHistory.destroy();
+    await familyHistory.destroy({ userId: req.user.id });
     // patient.family_history = req.body.family_history;
     // await patient.save();
     res
-      .status(200)
+      .status(202)
       .json({ message: "Patient family history deleted successfully" });
   }),
 
@@ -976,15 +985,20 @@ module.exports = PatientController = {
       res.status(400);
       throw new Error("Patient doesn't exist");
     }
-    await db.SocialHistory.create({
-      patient_id: patient.id,
-      tobacco_use: tobacco_use,
-      alcohol_use: alcohol_use,
-      created_by: req.user.id,
-    });
+    await db.SocialHistory.create(
+      {
+        patient_id: patient.id,
+        tobacco_use: tobacco_use,
+        alcohol_use: alcohol_use,
+        created_by: req.user.id,
+      },
+      { userId: req.user.id }
+    );
     // patient.social_history = req.body.social_history;
     // await patient.save();
-    res.json({ message: "Patient social history added successfully" });
+    res
+      .status(201)
+      .json({ message: "Patient social history added successfully" });
   }),
   updateSocialHistory: expressAsyncHandler(async (req, res) => {
     const { tobacco_use, alcohol_use } = req.body;
@@ -994,10 +1008,13 @@ module.exports = PatientController = {
       res.status(400);
       throw new Error("Social History doesn't exist");
     }
-    await socialHistory.update({
-      tobacco_use: tobacco_use,
-      alcohol_use: alcohol_use,
-    });
+    await socialHistory.update(
+      {
+        tobacco_use: tobacco_use,
+        alcohol_use: alcohol_use,
+      },
+      { userId: req.user.id }
+    );
     // patient.social_history = req.body.social_history;
     // await patient.save();
     res
@@ -1010,7 +1027,7 @@ module.exports = PatientController = {
       res.status(400);
       throw new Error("Social History doesn't exist");
     }
-    await socialHistory.destroy();
+    await socialHistory.destroy({ userId: req.user.id });
     // patient.social_history = req.body.social_history;
     // await patient.save();
     res

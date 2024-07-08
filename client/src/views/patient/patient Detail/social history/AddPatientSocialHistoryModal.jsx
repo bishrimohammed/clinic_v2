@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Alert, Button, Col, Form, Modal, Row, Table } from "react-bootstrap";
+import {
+  Alert,
+  Button,
+  Col,
+  Form,
+  Modal,
+  Row,
+  Spinner,
+  Table,
+} from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 // import { useAddPatientSocialHistory } from "../../hooks/patientHooks/useAddPatientSocialHistory";
@@ -100,7 +109,7 @@ const AddPatientSocialHistoryModal = ({
           }
         })
         .catch((err) => {
-          console.log(err);
+          // console.log(err);
           const errors = err?.response?.data?.message;
           if (Array.isArray(errors)) {
             errors.map((err) => {
@@ -127,6 +136,7 @@ const AddPatientSocialHistoryModal = ({
             // handleClose();
             setSuccessState(res.data.message);
             reset();
+            setAction("Save");
           }
         })
         .catch((err) => {
@@ -175,6 +185,8 @@ const AddPatientSocialHistoryModal = ({
         }
       });
   };
+  let isPending = addSocialHistory.isPending || updateSocialHistory.isPending;
+  // deleteSocialHistory.isPending;
   return (
     <Modal size="lg" show={show} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -338,9 +350,9 @@ const AddPatientSocialHistoryModal = ({
                     type="submit"
                     className="btn btn-primary"
                     // onClick={handleClose}
-                    // disabled={isPending}
+                    disabled={isPending}
                   >
-                    {/* {isPending && <Spinner size="sm" animation="border" />} */}
+                    {isPending && <Spinner size="sm" animation="border" />}
                     {action}
                   </button>
                 </div>

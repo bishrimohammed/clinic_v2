@@ -221,6 +221,15 @@ db.Temporary_Prescription =
 
 // Audit
 db.PatientAudit = require("./audit/PatientAudit.js")(sequelize, DataTypes);
+db.AllergyAudit = require("./audit/AllergyAudit.js")(sequelize, DataTypes);
+db.FamilyHistoryAudit = require("./audit/FamilyHistoryAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.SocialHistoryAudit = require("./audit/SocialHistoryAudit.js")(
+  sequelize,
+  DataTypes
+);
 db.AppointmentAudit = require("./audit/AppointmentAudit.js")(
   sequelize,
   DataTypes
@@ -241,6 +250,17 @@ db.PatientVisitAudit = require("./audit/PatientVisitsAudit.js")(
   DataTypes
 );
 db.MedicalRecordAudit = require("./audit/MedicalRecordAudit.js")(
+  sequelize,
+  DataTypes
+);
+// db.DiscontinuedMedicationAudit = require("./audit/DiscontinuedMedicationAudit.js")(sequelize, DataTypes)
+db.DiscontinuedMedicationAudit =
+  require("./audit/DiscontinuedMedicationAudit.js")(sequelize, DataTypes);
+db.PastMedicalHistoryAudit = require("./audit/PastMedicalHistoryAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.CurrentMedicationAudit = require("./audit/CurrentMedicationAudit.js")(
   sequelize,
   DataTypes
 );

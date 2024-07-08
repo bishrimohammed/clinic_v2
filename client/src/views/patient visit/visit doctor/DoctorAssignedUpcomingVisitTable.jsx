@@ -247,9 +247,11 @@ const DoctorAssignedUpcomingVisitTable = () => {
                             <RiEditLine /> Start Consultation
                           </Dropdown.Item>
                         ) : null}
-                        {/* {rowEl.original.stage !== "Waiting for examiner" &&
-                        rowEl.original.stage !== "Admitted" ? ( */}
-                        {rowEl.original.stage !== "Waiting for doctor" ? (
+
+                        {rowEl.original.stage !== "Waiting for doctor" &&
+                        rowEl.original.stage !== "Waiting for triage" &&
+                        rowEl.original.stage !== "Performing triage" &&
+                        rowEl.original.stage !== "Waiting for service fee" ? (
                           <Dropdown.Item
                             className="d-flex gap-2 align-items-center"
                             role="button"
@@ -270,7 +272,10 @@ const DoctorAssignedUpcomingVisitTable = () => {
                             <RiEditLine /> Continue Consultation
                           </Dropdown.Item>
                         ) : null}
-                        {rowEl.original.stage === "Performing consultation" ? (
+                        {rowEl.original.stage === "Performing consultation" &&
+                        rowEl.original.stage !== "Waiting for triage" &&
+                        rowEl.original.stage !== "Performing triage" &&
+                        rowEl.original.stage !== "Waiting for service fee" ? (
                           <Dropdown.Item
                             className="d-flex gap-2 align-items-center"
                             role="button"
@@ -293,12 +298,9 @@ const DoctorAssignedUpcomingVisitTable = () => {
                           style={{ zIndex: "50" }}
                           onClick={(event) => {
                             event.stopPropagation();
-                            // setData_to_be_Edited(rowEl.original);
-                            // handleShowEdit();
                             setShowAdmitModal({
                               isShow: true,
                               patientVisitId: rowEl.original.id,
-                              // action: "Finish",
                             });
                           }}
                         >

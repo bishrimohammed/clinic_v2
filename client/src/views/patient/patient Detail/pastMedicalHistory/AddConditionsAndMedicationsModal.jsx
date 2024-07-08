@@ -185,6 +185,7 @@ const AddConditionsAndMedicationsModal = ({
             .then((res) => {
               if (res.status === 201) {
                 setSuccessState("Current Medication added successfully");
+                reset();
               }
             })
             .catch((err) => {
@@ -202,10 +203,11 @@ const AddConditionsAndMedicationsModal = ({
             .then((res) => {
               if (res.status === 201) {
                 setSuccessState("Discontinued Medication added successfully");
+                reset();
               }
             })
             .catch((err) => {
-              console.log(err);
+              // console.log(err);
               setErrorState(err?.response?.data?.message);
             });
 
@@ -230,6 +232,8 @@ const AddConditionsAndMedicationsModal = ({
             .then((res) => {
               if (res.status === 200) {
                 setSuccessState("Previous Medication updated successfully");
+                reset();
+                setAction("Save");
               }
             })
             .catch((err) => {
@@ -253,6 +257,8 @@ const AddConditionsAndMedicationsModal = ({
             .then((res) => {
               if (res.status === 200) {
                 setSuccessState("Current Medication updated successfully");
+                reset();
+                setAction("Save");
               }
             })
             .catch((err) => {
@@ -274,6 +280,8 @@ const AddConditionsAndMedicationsModal = ({
             .then((res) => {
               if (res.status === 200) {
                 setSuccessState("Discontinued Medication added successfully");
+                reset();
+                // setAction("Save")
               }
             })
             .catch((err) => {
@@ -322,7 +330,7 @@ const AddConditionsAndMedicationsModal = ({
           }
         })
         .catch((err) => {
-          console.log(err);
+          // console.log(err);
           setErrorState(err?.response?.data?.message);
         });
     }

@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-  const DiscontinuedMedicationAudit = sequelize.define(
-    "discontinued_medications_audit",
+  const AllergyAudit = sequelize.define(
+    "allergies_audit",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -8,25 +8,35 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         allowNull: false,
       },
-      discontinuedMedication_id: {
+      allergy_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "discontinued_medications",
+          model: "allergies",
           key: "id",
         },
         onDelete: "CASCADE",
       },
-      medical_record_id: {
+      patient_id: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      //Mild, Moderate, Severe
+      allergy_type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      severity: {
+        type: DataTypes.ENUM,
+        allowNull: false,
+        values: ["Mild", "Moderate", "Severe"],
+      },
+      reaction_details: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
       created_by: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      medication_name: {
-        type: DataTypes.STRING,
         allowNull: false,
       },
       operation_type: {
@@ -64,6 +74,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  DiscontinuedMedicationAudit.sync({ alter: true });
-  return DiscontinuedMedicationAudit;
+  AllergyAudit.sync({ alter: true });
+  return AllergyAudit;
 };

@@ -9,11 +9,11 @@ export const useDeletePastMedicalHistory = () => {
     mutationFn: async (data) => {
       return await Axiosinstance.delete(
         `/conditions-medication/patient/${data.id}/past-medical-history`,
-        headers
+        { headers }
       );
     },
     onSuccess: (data, variables) => {
-      console.log(variables);
+      // console.log(variables);
       queryClient.invalidateQueries({
         queryKey: ["Patient", variables.patientId, "Past Medical History"],
       });

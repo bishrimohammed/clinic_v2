@@ -32,8 +32,8 @@ module.exports = AllergyController = {
       res.status(400);
       throw new Error("Patient doesn't exist");
     }
-    await Allergy.destroy();
-    res.status(201).json({ message: "Patient allergies deleted successfully" });
+    await Allergy.destroy({ userId: req.user.id });
+    res.status(200).json({ message: "Patient allergies deleted successfully" });
   }),
   updatePatientAllergy: asyncHandler(async (req, res) => {
     const { severity, allergy_type, reaction_details } = req.body;
@@ -42,12 +42,15 @@ module.exports = AllergyController = {
       res.status(400);
       throw new Error("Patient doesn't exist");
     }
-    await Allergy.update({
-      severity: severity,
-      allergy_type: allergy_type,
-      reaction_details: reaction_details,
-      //   created_by: req.user.id,
-    });
+    await Allergy.update(
+      {
+        severity: severity,
+        allergy_type: allergy_type,
+        reaction_details: reaction_details,
+        created_by: req.user.id,
+      },
+      { userId: req.user.id }
+    );
     res.status(200).json({ message: "Patient allergies updated successfully" });
   }),
   getPatientAllergy: asyncHandler(async (req, res) => {}),

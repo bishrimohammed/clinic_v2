@@ -138,7 +138,16 @@ const PatientAllergyDetails = ({ show, handleClose, allergies, patientId }) => {
   const deleteAllergyHandler = (id) => {
     // console.log(action);
     // return;
-    deleteAllergyMutation.mutate({ id, patientId });
+    deleteAllergyMutation
+      .mutateAsync({ id, patientId })
+      .then((res) => {
+        if (res.status === 200) {
+          setSuccessState("Patient allergy deleted successfully");
+        }
+      })
+      .catch((err) => {
+        setErrorState(err.response.data.message);
+      });
     // if (action === "Deactivate") {
     //   deactiveMutation
     //     .mutateAsync(id)
