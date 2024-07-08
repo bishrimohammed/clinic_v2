@@ -7,6 +7,11 @@ module.exports = (sequelize, DataTypes) => {
       medicalRecord_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "medicalrecords",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       // clinical_finding: DataTypes.STRING,
       status: {
@@ -55,6 +60,6 @@ module.exports = (sequelize, DataTypes) => {
       },
     }
   );
-  InvestigationOrder.sync({ force: false, alter: true });
+  InvestigationOrder.sync({ force: false, alter: false });
   return InvestigationOrder;
 };

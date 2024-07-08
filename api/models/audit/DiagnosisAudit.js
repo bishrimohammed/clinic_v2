@@ -14,8 +14,8 @@ module.exports = (sequelize, DataTypes) => {
         references: {
           model: "diagnoses",
           key: "id",
-          onDelete: "CASCADE",
         },
+        onDelete: "CASCADE",
       },
       medical_record_id: {
         type: DataTypes.INTEGER,

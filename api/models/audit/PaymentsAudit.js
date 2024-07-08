@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
       payment_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "payments",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       payment_amount: {
         type: DataTypes.INTEGER,

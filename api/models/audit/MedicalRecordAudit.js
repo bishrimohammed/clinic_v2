@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
       medicalRecord_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "medicalrecords",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       patient_id: {
         type: DataTypes.INTEGER,

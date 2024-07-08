@@ -14,10 +14,11 @@ module.exports = (sequelize, DataTypes) => {
       investigationOrder_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        //   references: {
-        //     model: db.InvestigationOrder,
-        //     key: "id",
-        //   },
+        references: {
+          model: "investigationorders",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       serviceItem_id: {
         type: DataTypes.INTEGER,

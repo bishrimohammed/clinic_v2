@@ -23,6 +23,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   });
-  CurrentMedication.sync({ alter: false, force: true });
+  CurrentMedication.sync({ alter: false, force: false });
   return CurrentMedication;
 };

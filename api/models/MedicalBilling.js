@@ -16,10 +16,20 @@ module.exports = (sequelize, DataTypes) => {
       visit_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "patientassignments",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       medical_record_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "medicalrecords",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       date: {
         type: DataTypes.DATE,

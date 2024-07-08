@@ -15,9 +15,10 @@ module.exports = (sequelize, DataTypes) => {
           model: "vitals",
           key: "id",
           // deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE,
-          // onDelete: 'CASCADE',
+          //
           // onUpdate: 'CASCADE',
         },
+        onDelete: "CASCADE",
       },
       medicalRecord_id: {
         type: DataTypes.INTEGER,

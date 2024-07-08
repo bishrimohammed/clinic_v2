@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
       medicalRecordDetail_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "medicalrecorddetails",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       // physical_ExaminationField_id: {
       //   type: DataTypes.INTEGER,

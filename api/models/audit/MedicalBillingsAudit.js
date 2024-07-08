@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
           model: "medicalbillings",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       patient_id: {
         type: DataTypes.INTEGER,
@@ -35,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
           model: "medicalrecords",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       date: {
         type: DataTypes.DATE,

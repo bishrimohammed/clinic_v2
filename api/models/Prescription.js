@@ -13,6 +13,11 @@ module.exports = (sequilize, DataTypes) => {
       medical_record_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "medicalrecords",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       patient_id: {
         type: DataTypes.INTEGER,

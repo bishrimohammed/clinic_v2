@@ -14,8 +14,8 @@ module.exports = (sequelize, DataTypes) => {
         references: {
           model: "prescribed_medicines",
           key: "id",
-          onDelete: "CASCADE",
         },
+        onDelete: "CASCADE",
       },
       prescription_id: {
         type: DataTypes.INTEGER,
@@ -93,6 +93,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  PrescribedMedicinesAudit.sync({ alter: true });
+  PrescribedMedicinesAudit.sync({ alter: false });
   return PrescribedMedicinesAudit;
 };

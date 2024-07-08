@@ -8,7 +8,15 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         allowNull: false,
       },
-      physicalExamination_id: { type: DataTypes.INTEGER, allowNull: false },
+      physicalExamination_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "physical_examinations",
+          key: "id",
+        },
+        onDelete: "CASCADE",
+      },
       physical_ExaminationField_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
