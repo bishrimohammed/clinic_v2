@@ -505,10 +505,10 @@ const CreateCreditCompanyModal = ({ show, handleClose }) => {
             <Button
               variant="primary"
               type="submit"
-              //   disabled={isPending}
+              disabled={isPending}
               //   onClick={() => handleClose(false)}
             >
-              {/* {isPending && (
+              {isPending && (
                 <Spinner
                   as="span"
                   animation="border"
@@ -516,7 +516,7 @@ const CreateCreditCompanyModal = ({ show, handleClose }) => {
                   role="status"
                   aria-hidden="true"
                 />
-              )} */}
+              )}
               Save
             </Button>
           </Modal.Footer>

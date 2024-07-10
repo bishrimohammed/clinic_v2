@@ -11,11 +11,12 @@ export const useAddAppointment = () => {
     mutationFn: async (data) => {
       return await Axiosinstance.post(`/appointment`, data, { headers });
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      console.log(data);
       queryClient.invalidateQueries({
         queryKey: ["appointments"],
       });
-      toast.success("Appointment added successfully");
+      toast.success(data.data.message);
     },
   });
 };

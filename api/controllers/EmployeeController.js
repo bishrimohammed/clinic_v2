@@ -164,13 +164,16 @@ module.exports = EmployeeController = {
       res.status(400);
       throw new Error("Employee phone is already in use");
     }
-    const newAddress = await db.Address.create({
-      woreda_id: address.woreda_id,
-      house_number: address.house_number ? address.house_number : null,
-      phone_1: address.phone_1,
-      phone_2: address.phone_2 ? address.phone_2 : null,
-      email: address?.email ? address.email : null,
-    });
+    const newAddress = await db.Address.create(
+      {
+        woreda_id: address.woreda_id,
+        house_number: address.house_number ? address.house_number : null,
+        phone_1: address.phone_1,
+        phone_2: address.phone_2 ? address.phone_2 : null,
+        email: address?.email ? address.email : null,
+      },
+      { userId: req.user.id }
+    );
     let emergenceContact_AddressId;
     if (emergence.the_same_address_as_employee) {
       emergenceContact_AddressId = newAddress.id;
@@ -185,13 +188,16 @@ module.exports = EmployeeController = {
         res.status(400);
         throw new Error("phone is already in use try another numbetr");
       }
-      const newAddress1 = await db.Address.create({
-        woreda_id: emergence.woreda_id,
-        house_number: emergence.house_number,
-        phone_1: emergence.phone,
-        phone_2: emergence.phone_2,
-        email: emergence?.email ? emergence.email : null,
-      });
+      const newAddress1 = await db.Address.create(
+        {
+          woreda_id: emergence.woreda_id,
+          house_number: emergence.house_number,
+          phone_1: emergence.phone,
+          phone_2: emergence.phone_2,
+          email: emergence?.email ? emergence.email : null,
+        },
+        { userId: req.user.id }
+      );
       emergenceContact_AddressId = newAddress1.id;
     }
     const emergencePhoneExist = await db.EmergencyContact.findOne({
@@ -204,36 +210,47 @@ module.exports = EmployeeController = {
       res.status(400);
       throw new Error("Emergency phone number already exists");
     }
-    const EmergencyContact = await db.EmergencyContact.create({
-      firstName,
-      middleName,
-      lastName,
-      relationship: emergence.relation,
-      other_relationship: emergence?.other_relation,
-      address_id: emergenceContact_AddressId,
-      phone: emergence.phone,
-    });
+    const EmergencyContact = await db.EmergencyContact.create(
+      {
+        firstName,
+        middleName,
+        lastName,
+        relationship: emergence.relation,
+        other_relationship: emergence?.other_relation,
+        address_id: emergenceContact_AddressId,
+        phone: emergence.phone,
+      },
+      { userId: req.user.id }
+    );
     const DATEOFBIRTH = new Date(date_of_birth).toISOString();
     const DATEOFHIRE = new Date(date_of_hire).toISOString();
 
     const convertedBirthDate = fromZonedTime(DATEOFBIRTH, "Africa/Nairobi");
     const convertedHireDate = fromZonedTime(DATEOFHIRE, "Africa/Nairobi");
-    const newEmployee = await db.Employee.create({
-      firstName,
-      middleName,
-      lastName,
-      position: position,
-      other_position: position === "Other" ? other_position : null,
-      gender,
-      date_of_birth: format(convertedBirthDate, "yyyy-MM-dd"),
-      date_of_hire: format(convertedHireDate, "yyyy-MM-dd"),
-      photo: req.files["photo"] && "uploads/" + req.files["photo"][0]?.filename,
-      digital_signature:
-        req.files["digital_signature"] &&
-        "uploads/" + req.files["digital_signature"][0]?.filename,
-      address_id: newAddress.id,
-      emergence_contact_id: EmergencyContact.id,
-    });
+    const newEmployee = await db.Employee.create(
+      {
+        firstName,
+        middleName,
+        lastName,
+        position: position,
+        other_position: position === "Other" ? other_position : null,
+        gender,
+        date_of_birth: format(convertedBirthDate, "yyyy-MM-dd"),
+        date_of_hire: format(convertedHireDate, "yyyy-MM-dd"),
+        photo:
+          req.files["photo"] && "uploads/" + req.files["photo"][0]?.filename,
+        digital_signature:
+          req.files["digital_signature"] &&
+          "uploads/" + req.files["digital_signature"][0]?.filename,
+        address_id: newAddress.id,
+
+        emergence_contact_id: EmergencyContact.id,
+        doctor_titer:
+          req.files["doctor_titer"] &&
+          "/uploads" + req.files["doctor_titer"][0].filename,
+      },
+      { userId: req.user.id }
+    );
 
     res.status(201).json({ message: "Employee is registered successfully" });
   }),
@@ -287,7 +304,7 @@ module.exports = EmployeeController = {
     empExist.digital_signature = req.files["digital_signature"]
       ? "uploads/" + req.files["digital_signature"][0]?.filename
       : empExist.digital_signature;
-    await empExist.save();
+    await empExist.save({ userId: req.user.id });
     const addressExits = await db.Address.findOne({
       where: {
         phone_1: address.phone_1,
@@ -312,6 +329,8 @@ module.exports = EmployeeController = {
         where: {
           id: address.id,
         },
+        individualHooks: true,
+        userId: req.user.id,
       }
     );
     const EmergencyE = await db.EmergencyContact.findOne({
@@ -339,8 +358,8 @@ module.exports = EmployeeController = {
       if (emergence.the_same_address_as_employee) {
         // create new Address
         EmergencyExist.address_id = address.id;
-        await EmergencyExist.save();
-        await Eaddress.destroy();
+        await EmergencyExist.save({ userId: req.user.id });
+        await Eaddress.destroy({ userId: req.user.id });
       } else {
         // woreda_id: emergence.woreda_id,
         // house_number: emergence.house_number,
@@ -350,21 +369,24 @@ module.exports = EmployeeController = {
         Eaddress.house_number = emergence.house_number;
         Eaddress.phone_1 = emergence.phone_1;
         Eaddress.phone_2 = emergence.phone_2;
-        await Eaddress.save();
+        await Eaddress.save({ userId: req.user.id });
       }
     } else {
       if (!emergence.the_same_address_as_employee) {
-        const newAddress1 = await db.Address.create({
-          woreda_id: emergence.woreda_id,
-          house_number: emergence.house_number,
-          phone_1: emergence.phone_1,
-          phone_2: emergence.phone_2,
-        });
+        const newAddress1 = await db.Address.create(
+          {
+            woreda_id: emergence.woreda_id,
+            house_number: emergence.house_number,
+            phone_1: emergence.phone_1,
+            phone_2: emergence.phone_2,
+          },
+          { userId: req.user.id }
+        );
         EmergencyExist.address_id = newAddress1.id;
       }
     }
 
-    await EmergencyExist.save();
+    await EmergencyExist.save({ userId: req.user.id });
 
     res.status(200).json({ message: "hello" }); //
   }),
@@ -376,7 +398,7 @@ module.exports = EmployeeController = {
       res.send(404);
       throw new Error(`Employee not found`);
     }
-    await empExist.destroy();
+    await empExist.destroy({ userId: req.user.id });
     // delete employee
     // await db.Employee.distory({
     //   where: { id: id },
@@ -395,7 +417,7 @@ module.exports = EmployeeController = {
       throw new Error(`Employee not found`);
     }
     empExist.status = false;
-    await empExist.save();
+    await empExist.save({ userId: req.user.id });
     // const employee = await db.Employee.update({
     //   status: false
     // },{
@@ -414,7 +436,7 @@ module.exports = EmployeeController = {
       throw new Error(`Employee not found`);
     }
     empExist.status = true;
-    await empExist.save();
+    await empExist.save({ userId: req.user.id });
     // const employee = await db.Employee.update({
     //   status: false
     // },{

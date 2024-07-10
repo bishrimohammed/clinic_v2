@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     action: {
       type: DataTypes.ENUM,
       allowNull: false,
-      values: ["delete", "read", "update", "create"],
+      values: ["delete", , "update", "create"],
     },
     approval_level: {
       type: DataTypes.INTEGER,

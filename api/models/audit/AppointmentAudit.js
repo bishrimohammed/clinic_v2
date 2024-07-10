@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       appointment_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       patient_id: {
         type: DataTypes.INTEGER,
@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       patient_name: DataTypes.STRING,
       doctor_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: "users",
           key: "id",
@@ -31,19 +31,23 @@ module.exports = (sequelize, DataTypes) => {
       },
       appointment_date: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
+        allowNull: true,
       },
       appointment_time: {
         type: DataTypes.TIME,
-        allowNull: false,
+        allowNull: true,
       },
       reason: DataTypes.STRING,
       appointment_type: DataTypes.STRING,
       status: {
         type: DataTypes.ENUM,
-        allowNull: false,
+        allowNull: true,
         values: ["upcoming", "overdue", "cancelled"],
         defaultValue: "upcoming",
+      },
+      metaData: {
+        type: DataTypes.JSON,
+        allowNull: true,
       },
       deletedAt: {
         type: DataTypes.DATE,
@@ -85,6 +89,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  AppointmentAudit.sync({ alter: false });
+  AppointmentAudit.sync({ alter: true });
   return AppointmentAudit;
 };

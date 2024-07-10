@@ -64,6 +64,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  DiscontinuedMedicationAudit.sync({ alter: true });
+  DiscontinuedMedicationAudit.sync({ alter: false });
   return DiscontinuedMedicationAudit;
 };

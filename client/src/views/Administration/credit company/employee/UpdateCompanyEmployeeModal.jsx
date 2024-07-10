@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { useGetWoredas } from "../../../../hooks/useGetWoredas";
 import { useGetRegions } from "../../../../hooks/useGetRegions";
 import { useGetCities } from "../../../../hooks/useGetCities";
@@ -379,7 +379,8 @@ const UpdateCompanyEmployeeModal = ({ show, handleClose, employee }) => {
             <Button variant="secondary" onClick={() => handleClose()}>
               Close
             </Button>
-            <Button type="submit" variant="primary">
+            <Button type="submit" variant="primary" disabled={isPending}>
+              {isPending && <Spinner as="span" animation="border" size="sm" />}
               Update
             </Button>
           </Modal.Footer>

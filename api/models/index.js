@@ -174,10 +174,6 @@ db.MedicalBilling = require("./MedicalBilling.js")(sequelize, DataTypes);
 db.Payment = require("./Payment.js")(sequelize, DataTypes);
 db.AdvancedPayment = require("./AdvancedPayment.js")(sequelize, DataTypes);
 
-// db.sequelize.sync({ force: false, alter: true }).then(() => {
-//   console.log("yes re-sync done!");
-// });
-
 db.Medicine = require("./Medicine.js")(sequelize, DataTypes);
 db.Prescription = require("./Prescription.js")(sequelize, DataTypes);
 db.PrescribedMedicine = require("./PrescribedMedicine.js")(
@@ -190,7 +186,7 @@ db.ApprovalSettingApprover = require("./ApprovalSettingApprovers.js")(
   sequelize,
   DataTypes
 );
-
+db.ApprovalRequest = require("./ApprovalRequest.js")(sequelize, DataTypes);
 // temporary tables
 db.Temporary_ProgressNote =
   require("./temporaryTables/Temporary_ProgressNote.js")(sequelize, DataTypes);
@@ -220,6 +216,27 @@ db.Temporary_Prescription =
   require("./temporaryTables/Temporary_Prescription.js")(sequelize, DataTypes);
 
 // Audit
+db.CreditCompanyProfileAudit = require("./audit/CreditCompanyProfileAudit.js")(
+  sequelize,
+  DataTypes
+);
+
+// db.CreditPatientAudit = require("./audit/CreditPatientAudit.js")(
+//   sequelize,
+//   DataTypes
+// );
+
+db.CreditAgreementAudit = require("./audit/CreditAgreementAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.CompanyEmployeesAudit = require("./audit/CompanyEmployeesAudit.js")(
+  sequelize,
+  DataTypes
+);
+
+//
+
 db.PatientAudit = require("./audit/PatientAudit.js")(sequelize, DataTypes);
 db.AllergyAudit = require("./audit/AllergyAudit.js")(sequelize, DataTypes);
 db.FamilyHistoryAudit = require("./audit/FamilyHistoryAudit.js")(
@@ -239,6 +256,7 @@ db.ClinicProfileAudit = require("./audit/ClinicProfileAudit.js")(
   sequelize,
   DataTypes
 );
+db.EmployeeAudit = require("./audit/EmployeeAudit.js")(sequelize, DataTypes);
 db.ScheduleAudit = require("./audit/SchedulesAudit.js")(sequelize, DataTypes);
 db.AddressAudit = require("./audit/AddressAudit.js")(sequelize, DataTypes);
 db.EmergencyContactAudit = require("./audit/EmergancyContactAudit.js")(
@@ -296,6 +314,9 @@ db.MedicalBillingAudit = require("./audit/MedicalBillingsAudit.js")(
   DataTypes
 );
 db.PaymentAudit = require("./audit/PaymentsAudit.js")(sequelize, DataTypes);
+db.sequelize.sync({ force: false, alter: false }).then(() => {
+  console.log("yes re-sync done!");
+});
 patientAssignmentSAssociation(db);
 MedicalRecordAssociation(db);
 MedicalRecordDetailAssocations(db);

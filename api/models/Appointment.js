@@ -50,10 +50,7 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true,
       hooks: {
         afterCreate: async (appointment, options) => {
-          // console.log("\n\nf\n");
-          // console.log(sequelize.models.appointments_audit);
-          // console.log(appointment);
-          // console.log("\n\nf\n\n");
+          
           await sequelize.models.appointments_audit.create({
             appointment_id: appointment.id,
             patient_id: appointment.patient_id,

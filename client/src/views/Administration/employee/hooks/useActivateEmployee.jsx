@@ -1,15 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Axiosinstance from "../../../../api/axiosInstance";
 import { toast } from "react-toastify";
+import { AxiosHeaders } from "../../../../api/useAxiosHeaders";
 
 export const useActivateEmployee = () => {
   const queryClient = useQueryClient();
+  const { headers } = AxiosHeaders();
+
   return useMutation({
-    mutationFn: async (id) => Axiosinstance.patch(`/employee/${id}/activate`),
+    mutationFn: async (id) =>
+      Axiosinstance.patch(`/employee/${id}/activate`, {}, { headers }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["Employees"],
-        exact: true,
+        exact: false,
       });
       // queryClient.refetchQueries({
       //   queryKey: ["Employees"],

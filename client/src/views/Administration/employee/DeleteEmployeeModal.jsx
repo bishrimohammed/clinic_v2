@@ -18,15 +18,14 @@ const DeleteEmployeeModal = ({ show, handleClose, employeeId, action }) => {
           handleClose(false);
         }
       });
-    }
-    if (action === "deactivate") {
+    } else if (action === "deactivate") {
       deactiveMutation.mutateAsync(employeeId).then(async (res) => {
         if (res.status === 200) {
           // refetch();
           handleClose(false);
         }
       });
-    } else {
+    } else if (action === "activate") {
       activateMutation.mutateAsync(employeeId).then(async (res) => {
         if (res.status === 200) {
           // refetch();
@@ -52,10 +51,16 @@ const DeleteEmployeeModal = ({ show, handleClose, employeeId, action }) => {
         </Button>
         <Button
           variant={action === "activate" ? "success" : "danger"}
-          disabled={deleteMutation.isPending || deactiveMutation.isPending}
+          disabled={
+            deleteMutation.isPending ||
+            deactiveMutation.isPending ||
+            activateMutation.isPending
+          }
           onClick={clickHandler}
         >
-          {(deleteMutation.isPending || deactiveMutation.isPending) && (
+          {(deleteMutation.isPending ||
+            deactiveMutation.isPending ||
+            activateMutation.isPending) && (
             <Spinner animation="border" size="sm" />
           )}
           {action === "delete"

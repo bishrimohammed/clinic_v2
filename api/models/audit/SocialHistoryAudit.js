@@ -70,6 +70,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  SocialHistoryAudit.sync({ alter: true });
+  SocialHistoryAudit.sync({ alter: false });
   return SocialHistoryAudit;
 };

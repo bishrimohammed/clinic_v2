@@ -60,12 +60,12 @@ router.put(
 //   .get("/:patientId/overviewdata", getPatientOverviewData);
 // router.post("/", createPatient); //.post("/search", searchPatient);
 // router.put("/:id", updatePatient);
-router.patch("/:id/activate", PatientController.activatePatient);
+router.patch("/:id/activate", protect, PatientController.activatePatient);
 
-router.patch("/:id/deactivate", PatientController.deactivatePatient);
+router.patch("/:id/deactivate", protect, PatientController.deactivatePatient);
 
-router.patch("/:id/hiv", PatientController.updateHivStatus);
-router.patch("/:id/disability", PatientController.updateDisablity);
+router.patch("/:id/hiv", protect, PatientController.updateHivStatus);
+router.patch("/:id/disability", protect, PatientController.updateDisablity);
 
 router.delete(
   "/family-history/:id",

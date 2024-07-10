@@ -81,6 +81,6 @@ module.exports = (sequelize, DataTypes) => {
       },
     }
   );
-  Allergy.sync({ alter: true });
+  Allergy.sync({ alter: false });
   return Allergy;
 };

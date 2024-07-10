@@ -34,6 +34,7 @@ const InventoryRoute = require("./Inventory.router.js");
 const InvestigationRoute = require("./Investigation.route.js");
 const DashbordDataRoute = require("./DashboardData.route.js");
 const ApprovalSettingRoute = require("./ApprovalSetting.route.js");
+const ApprovalRequestRoute = require("./ApprovalRequest.router.js");
 
 const TemporarySavedDataRoute = require("./TemporarySavedData.route.js");
 const ConditionsAndMedicationRoute = require("./ConditionsAndMedication.route.js");
@@ -69,4 +70,5 @@ module.exports = {
   TemporarySavedDataRoute,
   AllergyRoute,
   ConditionsAndMedicationRoute,
+  ApprovalRequestRoute,
 };

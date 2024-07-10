@@ -12,15 +12,36 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      requested_data: {
-        type: DataTypes.JSON,
-        allowNull: false,
+      main_tableName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      main_targetId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      audit_tableName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      audit_targetId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
       requested_by: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+          as: "requestedBy",
+        },
       },
       current_approval_level: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      current_approval_user: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
@@ -39,5 +60,6 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true,
     }
   );
+  ApprovalRequest.sync({ alter: true });
   return ApprovalRequest;
 };

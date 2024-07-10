@@ -69,6 +69,6 @@ module.exports = (sequelize, DataTypes) => {
       },
     }
   );
-  SocialHistory.sync({ alter: true });
+  SocialHistory.sync({ alter: false });
   return SocialHistory;
 };

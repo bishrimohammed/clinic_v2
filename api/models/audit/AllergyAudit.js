@@ -74,6 +74,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  AllergyAudit.sync({ alter: true });
+  AllergyAudit.sync({ alter: false });
   return AllergyAudit;
 };

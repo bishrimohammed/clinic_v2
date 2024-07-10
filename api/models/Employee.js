@@ -57,6 +57,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      doctor_titer: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       status: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
@@ -69,6 +73,75 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       paranoid: true,
+      hooks: {
+        afterCreate: async (employee, options) => {
+          await sequelize.models.employees_audit.create({
+            firstName: employee.firstName,
+            lastName: employee.lastName,
+            middleName: employee.middleName,
+            gender: employee.gender,
+            date_of_birth: employee.date_of_birth,
+            date_of_hire: employee.date_of_hire,
+            position: employee.position,
+            other_position: employee.other_position,
+            photo: employee.photo,
+            address_id: employee.address_id,
+            emergence_contact_id: employee.emergence_contact_id,
+            has_digital_signature: employee.has_digital_signature,
+            digital_signature: employee.digital_signature,
+            status: employee.status,
+            operation_type: "I",
+            created_by: options.userId,
+            created_at: Date.now(),
+          });
+        },
+        beforeUpdate: async (employee, options) => {
+          const previousValue = employee._previousDataValues;
+          console.log(previousValue);
+          await sequelize.models.employees_audit.create({
+            employee_id: previousValue.id,
+            firstName: previousValue.firstName,
+            lastName: previousValue.lastName,
+            middleName: previousValue.middleName,
+            gender: previousValue.gender,
+            date_of_birth: previousValue.date_of_birth,
+            date_of_hire: previousValue.date_of_hire,
+            position: previousValue.position,
+            other_position: previousValue.other_position,
+            photo: previousValue.photo,
+            address_id: previousValue.address_id,
+            emergence_contact_id: previousValue.emergence_contact_id,
+            has_digital_signature: previousValue.has_digital_signature,
+            digital_signature: previousValue.digital_signature,
+            status: previousValue.status,
+            operation_type: "U",
+            changed_by: options.userId,
+            changed_at: Date.now(),
+          });
+        },
+        beforeDestroy: async (employee, options) => {
+          await sequelize.models.employees_audit.create({
+            employee_id: employee.id,
+            firstName: employee.firstName,
+            lastName: employee.lastName,
+            middleName: employee.middleName,
+            gender: employee.gender,
+            date_of_birth: employee.date_of_birth,
+            date_of_hire: employee.date_of_hire,
+            position: employee.position,
+            other_position: employee.other_position,
+            photo: employee.photo,
+            address_id: employee.address_id,
+            emergence_contact_id: employee.emergence_contact_id,
+            has_digital_signature: employee.has_digital_signature,
+            digital_signature: employee.digital_signature,
+            status: employee.status,
+            operation_type: "D",
+            changed_by: options.userId,
+            changed_at: Date.now(),
+          });
+        },
+      },
     }
   );
   Employee.sync({ alter: false, force: false });

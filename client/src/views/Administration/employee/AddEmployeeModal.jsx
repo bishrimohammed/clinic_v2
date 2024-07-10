@@ -44,6 +44,8 @@ const AddEmployeeModal = ({ show, handleClose }) => {
     formData.append("other_position", data.other_position);
     formData.append("photo", data.photo[0]);
     formData.append("digital_signature", data.digital_signature[0]);
+    formData.append("doctor_titer", data.doctor_titer[0]);
+
     formData.append("address", JSON.stringify(data.address));
     formData.append("Emergency", JSON.stringify(data.Emergency));
     // console.log(formData);
@@ -375,6 +377,17 @@ const AddEmployeeModal = ({ show, handleClose }) => {
                     type="file"
                     accept="image/*"
                     name="digital_signature"
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={4} sm={12}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Doctor Titer</Form.Label>
+                  <Form.Control
+                    {...register("doctor_titer")}
+                    type="file"
+                    accept="image/*"
+                    name="doctor_titer"
                   />
                 </Form.Group>
               </Col>

@@ -270,6 +270,11 @@ const Sidebar = () => {
               Report
             </CNavItem>
           )}
+          <CNavItem to="/approvalrequests" component={NavLink}>
+            {/* <CIcon icon={cilSpeedometer} customClassName="nav-icon" /> */}
+            <MdSpaceDashboard className="nav-icon" />
+            Approval Requests
+          </CNavItem>
           {/* {hasPermission("appointment", "read") && (
             <CNavGroup
               idx="appointment"

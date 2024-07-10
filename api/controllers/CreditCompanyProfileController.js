@@ -165,29 +165,38 @@ module.exports = CreditCompanyProfileController = {
       res.status(400);
       throw new Error("Address is already in use");
     }
-    const newAddress = await db.Address.create({
-      street: parseAddress.street_name,
-      woreda_id: parseAddress.woreda_id,
-      phone_1: parseAddress.phone_1,
-      phone_2: parseAddress.phone_2,
-      email: parseAddress.email,
-      house_number: parseAddress.house_number,
-    });
-    const creditCompany = await db.CreditCompanyProfile.create({
-      name,
-      tin,
-      representative_name,
-      representative_phone,
-      address_id: newAddress.id,
-    });
+    const newAddress = await db.Address.create(
+      {
+        street: parseAddress.street_name,
+        woreda_id: parseAddress.woreda_id,
+        phone_1: parseAddress.phone_1,
+        phone_2: parseAddress.phone_2,
+        email: parseAddress.email,
+        house_number: parseAddress.house_number,
+      },
+      { userId: req.user.id }
+    );
+    const creditCompany = await db.CreditCompanyProfile.create(
+      {
+        name,
+        tin,
+        representative_name,
+        representative_phone,
+        address_id: newAddress.id,
+      },
+      { userId: req.user.id }
+    );
     if (creditCompany) {
-      const Agreement = await db.CreditAgreement.create({
-        start_date: parseAgreement.start_date,
-        end_date: parseAgreement.end_date,
-        max_limit: parseAgreement.max_limit,
-        company_id: creditCompany.id,
-        agreement_doc: "uploads/" + req.file?.filename,
-      });
+      const Agreement = await db.CreditAgreement.create(
+        {
+          start_date: parseAgreement.start_date,
+          end_date: parseAgreement.end_date,
+          max_limit: parseAgreement.max_limit,
+          company_id: creditCompany.id,
+          agreement_doc: "uploads/" + req.file?.filename,
+        },
+        { userId: req.user.id }
+      );
     }
 
     res.status(201).json(creditCompany);
@@ -214,7 +223,7 @@ module.exports = CreditCompanyProfileController = {
     creditCompany.tin = tin;
     creditCompany.representative_name = representative_name;
     creditCompany.representative_phone = representative_phone;
-    await creditCompany.save();
+    await creditCompany.save({ userId: req.user.id });
     const addressExist = await db.Address.findByPk(parseAddress.id);
     if (!addressExist) {
       res.status(400);
@@ -226,7 +235,7 @@ module.exports = CreditCompanyProfileController = {
     addressExist.house_number = parseAddress.house_number;
     addressExist.woreda_id = parseAddress.woreda_id;
     addressExist.street = parseAddress.street_name;
-    await addressExist.save();
+    await addressExist.save({ userId: req.user.id });
 
     const Agreement = await db.CreditAgreement.findByPk(parseAgreement.id);
     if (!Agreement) {
@@ -239,7 +248,7 @@ module.exports = CreditCompanyProfileController = {
     Agreement.agreement_doc = req.file
       ? "uploads/" + req.file?.filename
       : Agreement.agreement_doc;
-    await Agreement.save();
+    await Agreement.save({ userId: req.user.id });
 
     res.json(creditCompany);
   }),
@@ -253,7 +262,7 @@ module.exports = CreditCompanyProfileController = {
       throw new Error("Credit Company not found");
     }
     creditCompany.status = true;
-    await creditCompany.save();
+    await creditCompany.save({ userId: req.user.id });
     res.status(200).json({ message: "Credit Company activated" });
   }),
   deactivateCreditCompany: asyncHandler(async (req, res) => {
@@ -265,7 +274,7 @@ module.exports = CreditCompanyProfileController = {
       throw new Error("Credit Company not found");
     }
     creditCompany.status = false;
-    await creditCompany.save();
+    await creditCompany.save({ userId: req.user.id });
     res.status(200).json({ message: "Credit Company deactivated" });
   }),
 
@@ -278,19 +287,22 @@ module.exports = CreditCompanyProfileController = {
       throw new Error("Agreement not found");
     }
     agreement.status = false;
-    await agreement.save();
+    await agreement.save({ userId: req.user.id });
     res.status(200).json({ message: "Agreement terminated" });
   }),
   createAgreement: asyncHandler(async (req, res) => {
     const { start_date, end_date, max_limit, company_id } = req.body;
     console.log(req.body);
-    const agreement = await db.CreditAgreement.create({
-      start_date,
-      end_date,
-      max_limit,
-      company_id,
-      agreement_doc: "uploads/" + req.file?.filename,
-    });
+    const agreement = await db.CreditAgreement.create(
+      {
+        start_date,
+        end_date,
+        max_limit,
+        company_id,
+        agreement_doc: "uploads/" + req.file?.filename,
+      },
+      { userId: req.user.id }
+    );
     console.log(req.file);
     res.status(201).json(agreement);
   }),
@@ -306,7 +318,7 @@ module.exports = CreditCompanyProfileController = {
       gender,
       company_id,
     } = req.body;
-    // console.log(req.body);
+    console.log(req.body);
     // res.status(404).json({ message: "hello" });
     // return;
     // const emergence = JSON.parse(Emergency);
@@ -321,7 +333,17 @@ module.exports = CreditCompanyProfileController = {
       res.status(400);
       throw new Error("Employee phone is already in use");
     }
-    const newAddress = await db.Address.create(address);
+    const newAddress = await db.Address.create(
+      {
+        street: address.street_name,
+        woreda_id: address.woreda_id,
+        phone_1: address.phone_1,
+        phone_2: address.phone_2,
+        email: address.email,
+        house_number: address.house_number,
+      },
+      { userId: req.user.id }
+    );
 
     // const newAddress1= = await db.Address.create({
     //   woreda_id: emergence.woreda_id,
@@ -330,21 +352,24 @@ module.exports = CreditCompanyProfileController = {
     //   phone_2: emergence.phone_2,
     // });
 
-    const newEmployee = await db.CompanyEmployee.create({
-      firstName,
-      middleName,
-      lastName,
-      position: position,
-      gender,
-      date_of_birth: date_of_birth,
-      date_of_hire: date_of_hire,
-      photo_url: req.file && "uploads/" + req.file?.filename,
-      address_id: newAddress.id,
-      company_id,
-      // emergence_contact_id: EmergencyContact.id,
-    });
+    const newEmployee = await db.CompanyEmployee.create(
+      {
+        firstName,
+        middleName,
+        lastName,
+        position: position,
+        gender,
+        date_of_birth: date_of_birth,
+        date_of_hire: date_of_hire,
+        photo_url: req.file && "uploads/" + req.file?.filename,
+        address_id: newAddress.id,
+        company_id,
+        // emergence_contact_id: EmergencyContact.id,
+      },
+      { userId: req.user.id }
+    );
     newEmployee.empl_id = getPaddedName(newEmployee.id, 4, "Emp");
-    await newEmployee.save();
+    await newEmployee.save({ hooks: false });
     res.status(201).json(newEmployee);
   }),
   updateEmployeeCompany: asyncHandler(async (req, res) => {
@@ -372,7 +397,7 @@ module.exports = CreditCompanyProfileController = {
     employee.date_of_hire = date_of_hire;
     employee.gender = gender;
     employee.company_id = company_id;
-    await employee.save();
+    await employee.save({ userId: req.user.id });
     const address = JSON.parse(req.body?.address);
     const addressExist = await db.Address.findByPk(address.id);
     if (!addressExist) {
@@ -385,7 +410,7 @@ module.exports = CreditCompanyProfileController = {
     addressExist.house_number = address.house_number;
     addressExist.woreda_id = address.woreda_id;
     addressExist.street = address.street_name;
-    await addressExist.save();
+    await addressExist.save({ userId: req.user.id });
 
     res.status(200).json(employee);
   }),
@@ -397,7 +422,7 @@ module.exports = CreditCompanyProfileController = {
       throw new Error("Employee not found");
     }
     employee.status = true;
-    await employee.save();
+    await employee.save({ userId: req.user.id });
     res.status(200).json({ message: "Employee activated" });
   }),
   deactivateCompanyEmployee: asyncHandler(async (req, res) => {
@@ -408,7 +433,7 @@ module.exports = CreditCompanyProfileController = {
       throw new Error("Employee not found");
     }
     employee.status = false;
-    await employee.save();
+    await employee.save({ userId: req.user.id });
     res.status(200).json({ message: "Employee deactivated" });
   }),
 };

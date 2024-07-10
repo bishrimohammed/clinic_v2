@@ -7,7 +7,7 @@ module.exports.ApprovalSettingAssocoation = (db) => {
   });
   db.ApprovalSetting.hasMany(db.ApprovalSettingApprover, {
     foreignKey: "approval_setting_id",
-    as: "approval_setting_approvers",
+    as: "approvers",
   });
   db.ApprovalSettingApprover.belongsTo(db.User, {
     foreignKey: "user_id",
@@ -16,5 +16,13 @@ module.exports.ApprovalSettingAssocoation = (db) => {
   db.ApprovalSettingApprover.belongsTo(db.ApprovalSetting, {
     foreignKey: "approval_setting_id",
     as: "approval_setting",
+  });
+  db.ApprovalRequest.belongsTo(db.ApprovalSetting, {
+    foreignKey: "approval_setting_id",
+    as: "approvalSetting",
+  });
+  db.ApprovalRequest.belongsTo(db.User, {
+    foreignKey: "requested_by",
+    as: "requestedBy",
   });
 };

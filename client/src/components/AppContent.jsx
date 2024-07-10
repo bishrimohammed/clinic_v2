@@ -3,6 +3,14 @@ import { Route, Routes } from "react-router-dom";
 // import { CSpinner } from "@coreui/react";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
+const ApprovalRequests = React.lazy(() =>
+  import("../views/Approvalrequests/ApprovalRequests")
+);
+
+const ApprovalRequestList = React.lazy(() =>
+  import("../views/Approvalrequests/ApprovalRequestList")
+);
+
 const ViewBillDetails = React.lazy(() =>
   import("../views/Bill/ViewBillDetails")
 );
@@ -438,6 +446,9 @@ const AppContent = () => {
           </Route>
           <Route path="appointment" element={<Appointment />}>
             <Route index element={<AppointmentList />} />
+          </Route>
+          <Route path="approvalrequests" element={<ApprovalRequests />}>
+            <Route index element={<ApprovalRequestList />} />
           </Route>
         </Routes>
       </Suspense>

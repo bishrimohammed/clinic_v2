@@ -11,6 +11,7 @@ export const Employeeschema = yup.object().shape({
   lastName: yup.string().transform((value) => value.trim()),
   photo: yup.mixed(),
   digital_signature: yup.mixed(),
+  doctor_titer: yup.mixed(),
   gender: yup.string().required("Gender is required"),
   position: yup.string().required("Position is required"),
   other_position: yup
@@ -178,7 +179,7 @@ export const EditEmployeeschema = yup.object().shape({
   lastName: yup.string().transform((value) => value.trim()),
   photo: yup.mixed(),
   digital_signature: yup.mixed(),
-
+  doctor_titer: yup.mixed(),
   gender: yup.string().required("Gender is required"),
   position: yup
     .string()

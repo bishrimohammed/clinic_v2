@@ -68,6 +68,7 @@ const {
   patientVisitRoute,
   AllergyRoute,
   ConditionsAndMedicationRoute,
+  ApprovalRequestRoute,
 } = require("./routes/index.js");
 const db = require("./models/index.js");
 const { Sequelize } = require("sequelize");
@@ -135,6 +136,7 @@ app.use("/api/v1/inventory", InventoryRoute);
 app.use("/api/v1/investigation", InvestigationRoute);
 
 app.use("/api/v1/approval-settings", ApprovalSettingRoute);
+app.use("/api/v1/approvalrequests", ApprovalRequestRoute);
 app.use("/api/v1/temporarydata", TemporarySavedDataRoute);
 
 app.use("/models", async (req, res) => {
