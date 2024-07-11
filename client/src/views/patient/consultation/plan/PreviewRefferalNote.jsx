@@ -1,18 +1,21 @@
 import React from "react";
 import { Host_URL } from "../../../../utils/getHost_URL";
-import { Modal } from "react-bootstrap";
+import { Image, Modal } from "react-bootstrap";
 import PrintHeader from "../../History/print/printComponents/PrintHeader";
 import { useGetPatient } from "../../hooks/patientHooks/useGetPatient";
 import { useLocation } from "react-router-dom";
 import { useGetDiagnosis } from "../../hooks/consultationHooks/useGetDiagnosis";
 import { useGet_Internal_MedicalRecordPrescription } from "../../hooks/consultationHooks/medication/useGet_Internal_MedicalRecordPrescription";
 import { differenceInYears } from "date-fns";
+import { useGetCurrentUser } from "../../../../hooks/useGetCurrentUser";
+import { getClinicInformation } from "../../../../utils/getClinicInformation";
+// import getClinicInformation from "../../../../../../api/helpers/getClinicInformation";
 
 const PreviewRefferalNote = ({
   show,
   handleClose,
   clinical_finding,
-  hostipal_name,
+  hospital_name,
   department_name,
   reason,
 }) => {
@@ -22,13 +25,14 @@ const PreviewRefferalNote = ({
   const { data: prescriptions } = useGet_Internal_MedicalRecordPrescription(
     state.medicalRecord_id
   );
-  console.log(prescriptions);
+  // console.log(prescriptions);
+  const user = useGetCurrentUser();
   return (
     <Modal size="md" show={show} onHide={handleClose}>
       <Modal.Header className="py-1 px-3" closeButton>
         <Modal.Title>
           {" "}
-          <span style={{ fontSize: 16 }}>Preview Sick Leave Note</span>{" "}
+          <span style={{ fontSize: 16 }}>Preview Referral Note</span>{" "}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -38,7 +42,7 @@ const PreviewRefferalNote = ({
       </p> */}
         <div className="">
           <div className="mb-2">
-            <PrintHeader document_title="Sick Leave" />
+            <PrintHeader document_title="Referral Note" />
             {/* <hr className="opacity-100 border-2 mt-4 border-dark" /> */}
           </div>
           {/* <div className="mb-2 d-flex align-items-center justify-content-center">
@@ -59,7 +63,7 @@ const PreviewRefferalNote = ({
             </div>
           </div>
           <p className="py-1">
-            To <span className="fw-bold">{hostipal_name} </span> Hospital{" "}
+            To <span className="fw-bold">{hospital_name} </span> Hospital{" "}
             <span className="fw-bold">{department_name}</span> Department
           </p>
           <p className="mb-1">
@@ -139,7 +143,7 @@ const PreviewRefferalNote = ({
             and including <span className="fw-bold">{end_date}</span>{" "} */}
           </p>
         </div>
-        <div className=" mt-2">
+        {/* <div className=" mt-2">
           <p>
             <span className="fw-bold">Phyasican Name:</span> Dr Tola
           </p>
@@ -156,6 +160,32 @@ const PreviewRefferalNote = ({
               alt=""
             />
           </p>
+        </div> */}
+        <div className="d-flex mt-2">
+          <div>
+            <p>
+              <span className="fw-bold">Phyasican Name:</span>{" "}
+              {user.doctor_titer ? (
+                <Image src={Host_URL + user?.doctor_titer} fluid width={110} />
+              ) : (
+                "Dr " + user.name
+              )}
+            </p>
+            <p className="">
+              <span className="fw-bold align-self-start">Signature:</span>{" "}
+              <img
+                src={Host_URL + user.digital_signature}
+                // height={100}
+                width={150}
+                style={{ objectFit: "contain", objectPosition: "center" }}
+                alt=""
+              />
+            </p>
+          </div>
+          <div>
+            <Image src={Host_URL + getClinicInformation()?.clinic_seal} />
+            {/* {getClinicInformation().clinicSeal} */}
+          </div>
         </div>
       </Modal.Body>
       {/* <Modal.Footer>

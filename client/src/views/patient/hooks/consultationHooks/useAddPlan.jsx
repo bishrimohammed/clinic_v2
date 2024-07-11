@@ -12,7 +12,7 @@ export const useAddPlan = () => {
         `medicalrecords/${data.medicalRecordId}/add-plan`,
         data.formData,
         { headers }
-      ).then((res) => res.data);
+      );
     },
     onSuccess: async (data, variables) => {
       const { data: resData } = data;

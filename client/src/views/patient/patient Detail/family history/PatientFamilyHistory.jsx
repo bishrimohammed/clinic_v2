@@ -9,7 +9,7 @@ const PatientFamilyHistory = ({ familyHistories, patientId }) => {
   const [showAddFamilyHistoryModal, setShowAddFamilyHistoryModal] =
     useState(false);
   const { data } = useGetFamilyHistory(patientId);
-  console.log(patientId);
+  // console.log(patientId);
   return (
     <>
       <div className="family-history-section mb-2">

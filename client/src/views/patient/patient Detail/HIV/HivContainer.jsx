@@ -4,7 +4,7 @@ import ChangeHIVStatusModal from "./ChangeHIVStatusModal";
 import { getBrandColor } from "../../../../utils/getBrandColor";
 
 const HivContainer = ({ patient }) => {
-  console.log(patient);
+  // console.log(patient);
   const [showChangeStatusModal, setShowChangeStatusModal] = useState(false);
   return (
     <div>

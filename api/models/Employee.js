@@ -76,6 +76,7 @@ module.exports = (sequelize, DataTypes) => {
       hooks: {
         afterCreate: async (employee, options) => {
           await sequelize.models.employees_audit.create({
+            employee_id: employee.id,
             firstName: employee.firstName,
             lastName: employee.lastName,
             middleName: employee.middleName,
@@ -91,8 +92,8 @@ module.exports = (sequelize, DataTypes) => {
             digital_signature: employee.digital_signature,
             status: employee.status,
             operation_type: "I",
-            created_by: options.userId,
-            created_at: Date.now(),
+            changed_by: options.userId,
+            changed_at: Date.now(),
           });
         },
         beforeUpdate: async (employee, options) => {
@@ -144,6 +145,6 @@ module.exports = (sequelize, DataTypes) => {
       },
     }
   );
-  Employee.sync({ alter: false, force: false });
+  Employee.sync({ alter: true, force: false });
   return Employee;
 };

@@ -241,6 +241,7 @@ module.exports = MedicalRecordController = {
     const { id } = req.params;
     const { plan, sickNote, RefferalNote } = req.body;
     // console.log(req.body);
+    // res.status(400);
     // return;
     const medicalRecordDetail = await db.MedicalRecordDetail.findOne({
       where: {
@@ -256,81 +257,103 @@ module.exports = MedicalRecordController = {
     await medicalRecordDetail.save({ userId: req.user.id });
     const medicalRecord = await db.MedicalRecord.findByPk(req.params.id);
     if (sickNote) {
-      let sickNoteId;
-      const ExistingSickNote = await db.SickLeaveNote.findOne({
-        where: { medical_record_id: medicalRecord.id },
-      });
+      // let sickNoteId;
 
-      if (ExistingSickNote) {
-        ExistingSickNote.start_date = sickNote.start_date;
-        ExistingSickNote.end_date = sickNote.end_date;
-        ExistingSickNote.date_of_examination = medicalRecord.createdAt;
-        //  ExistingSickNote.note= sickNote,
-        //  ExistingSickNote.examiner_id= req.user.id,
-        await ExistingSickNote.save();
-        sickNoteId = ExistingSickNote.id;
-      } else {
-        const SickNOTE = await db.SickLeaveNote.create({
-          medical_record_id: medicalRecord.id,
-          patient_id: medicalRecord.patient_id,
-          doctor_id: req.user.id,
-          date: Date.now(),
-          start_date: sickNote.start_date,
-          end_date: sickNote.end_date,
-          date_of_examination: medicalRecord.createdAt,
-          // note: sickNote,
-          // examiner_id: req.user.id,
-        });
-        sickNoteId = SickNOTE.id;
-      }
-      await db.Diagnosis.update(
-        {
-          sick_leave_note_id: null,
-        },
-        {
-          where: {
-            medical_record_id: medicalRecord.id,
-          },
-        }
-      );
       await Promise.all(
-        sickNote.diagnosis?.map((id) => {
-          return db.Diagnosis.update(
-            {
-              sick_leave_note_id: sickNoteId,
-            },
-            { where: { id: id } }
+        sickNote.map(async (sicknote) => {
+          const SN = await db.SickLeaveNote.create({
+            medical_record_id: medicalRecord.id,
+            patient_id: medicalRecord.patient_id,
+            doctor_id: req.user.id,
+            date: Date.now(),
+            start_date: sicknote.start_date,
+            end_date: sicknote.end_date,
+            date_of_examination: medicalRecord.createdAt,
+          });
+
+          await Promise.all(
+            sicknote.diagnosis.map(async (diagnosticId) => {
+              return db.DiagnosisSickLeave.create({
+                sick_leave_note_id: SN.id,
+                diagnosis_id: diagnosticId,
+              });
+            })
           );
         })
       );
+      //   const SickNOTE = await db.SickLeaveNote.create({
+      //     medical_record_id: medicalRecord.id,
+      //     patient_id: medicalRecord.patient_id,
+      //     doctor_id: req.user.id,
+      //     date: Date.now(),
+      //     start_date: sickNote.start_date,
+      //     end_date: sickNote.end_date,
+      //     date_of_examination: medicalRecord.createdAt,
+      //     // note: sickNote,
+      //     // examiner_id: req.user.id,
+      //   });
+      //   sickNoteId = SickNOTE.id;
+      // }
+      // await db.Diagnosis.update(
+      //   {
+      //     sick_leave_note_id: null,
+      //   },
+      //   {
+      //     where: {
+      //       medical_record_id: medicalRecord.id,
+      //     },
+      //   }
+      // );
+      // await Promise.all(
+      //   sickNote.diagnosis?.map((id) => {
+      //     return db.Diagnosis.update(
+      //       {
+      //         sick_leave_note_id: sickNoteId,
+      //       },
+      //       { where: { id: id } }
+      //     );
+      //   })
+      // );
     }
     if (RefferalNote) {
-      const ExistingRefferalNote = await db.ReferralNote.findOne({
-        where: {
-          medical_record_id: medicalRecord.id,
-        },
-      });
-      let ReferralId;
-      if (ExistingRefferalNote) {
-        ExistingRefferalNote.reason_for_referral = RefferalNote.reason;
-        ExistingRefferalNote.referral_to = RefferalNote.hostipal_name;
-        ExistingRefferalNote.department = RefferalNote.department_name;
-        ExistingRefferalNote.clinical_finding = RefferalNote.clinical_finding;
-        await ExistingRefferalNote.save();
-        ReferralId = ExistingRefferalNote.id;
-      } else {
-        const referralNote = await db.ReferralNote.create({
-          medical_record_id: medicalRecord.id,
-          patient_id: medicalRecord.patient_id,
-          doctor_id: req.user.id,
-          referral_date: Date.now(),
-          reason_for_referral: RefferalNote.reason,
-          referral_to: RefferalNote.hostipal_name,
-          department: RefferalNote.department_name,
-          clinical_finding: RefferalNote.clinical_finding,
-        });
-        ReferralId = referralNote.id;
-      }
+      // const ExistingRefferalNote = await db.ReferralNote.findOne({
+      //   where: {
+      //     medical_record_id: medicalRecord.id,
+      //   },
+      // });
+      // let ReferralId;
+      // if (ExistingRefferalNote) {
+      // ExistingRefferalNote.reason_for_referral = RefferalNote.reason;
+      // ExistingRefferalNote.referral_to = RefferalNote.hostipal_name;
+      // ExistingRefferalNote.department = RefferalNote.department_name;
+      // ExistingRefferalNote.clinical_finding = RefferalNote.clinical_finding;
+      // await ExistingRefferalNote.save();
+      // ReferralId = ExistingRefferalNote.id;
+      // }
+      await Promise.all(
+        RefferalNote.map((referralNotes) => {
+          return db.ReferralNote.create({
+            medical_record_id: medicalRecord.id,
+            patient_id: medicalRecord.patient_id,
+            doctor_id: req.user.id,
+            referral_date: Date.now(),
+            reason_for_referral: referralNotes.reason,
+            referral_to: referralNotes.hospital_name,
+            department: referralNotes.department_name,
+            clinical_finding: referralNotes.clinical_finding,
+          });
+        })
+      );
+      // const referralNote = await db.ReferralNote.create({
+      //   medical_record_id: medicalRecord.id,
+      //   patient_id: medicalRecord.patient_id,
+      //   doctor_id: req.user.id,
+      //   referral_date: Date.now(),
+      //   reason_for_referral: RefferalNote.reason,
+      //   referral_to: RefferalNote.hostipal_name,
+      //   department: RefferalNote.department_name,
+      //   clinical_finding: RefferalNote.clinical_finding,
+      // });
     }
     res.json({ message: "Plan added successfully" });
   }),
@@ -386,7 +409,7 @@ module.exports = MedicalRecordController = {
       res.status(404);
       throw new Error("Medical Record not found");
     }
-    const ReferralNote = await db.ReferralNote.findOne({
+    const ReferralNote = await db.ReferralNote.findAll({
       where: { medical_record_id: id },
       include: [
         {

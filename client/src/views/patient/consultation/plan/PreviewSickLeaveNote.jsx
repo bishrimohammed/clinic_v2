@@ -1,10 +1,12 @@
 import React from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Image, Modal } from "react-bootstrap";
 import PrintHeader from "../../History/print/printComponents/PrintHeader";
 import { useGetPatient } from "../../hooks/patientHooks/useGetPatient";
 import { useLocation } from "react-router-dom";
 import { differenceInYears } from "date-fns";
 import { Host_URL } from "../../../../utils/getHost_URL";
+import { useGetCurrentUser } from "../../../../hooks/useGetCurrentUser";
+import { getClinicInformation } from "../../../../utils/getClinicInformation";
 
 const PreviewSickLeaveNote = ({
   show,
@@ -16,12 +18,15 @@ const PreviewSickLeaveNote = ({
 }) => {
   //   console.log(diagnosis);
   //   console.log(diagnosisIds);
+  const user = useGetCurrentUser();
+  console.log(diagnosisIds);
   const { state } = useLocation();
   const { data: patient } = useGetPatient(state.patient_id);
   //   console.log(patient);
   //   map((dia) => diagnosis?.find((diag) => diag.id === parseInt(dia.diagnosis_id)))
   const getDiagnosis = (id) => {
     const diag = diagnosis?.find((diag) => diag.id === parseInt(id));
+    console.log(diag);
     return diag ? diag?.diagnosis + "(" + diag.status + ")" : null;
   };
   return (
@@ -83,7 +88,7 @@ const PreviewSickLeaveNote = ({
             <span className="fw-bold">
               {patient?.firstName} {patient?.middleName} {patient?.lastName}{" "}
             </span>{" "}
-            was seen by <span className="fw-bold">Dr Ali Man</span> on{" "}
+            was seen by <span className="fw-bold">Dr {user.name}</span> on{" "}
             <span className="fw-bold">07-02-2024</span>.{" "}
           </p>
 
@@ -106,23 +111,31 @@ const PreviewSickLeaveNote = ({
             and including <span className="fw-bold">{end_date}</span>{" "}
           </p>
         </div>
-        <div className=" mt-2">
-          <p>
-            <span className="fw-bold">Phyasican Name:</span> Dr Tola
-          </p>
-          <p className="">
-            <span className="fw-bold align-self-start">Signature:</span>{" "}
-            <img
-              src={
-                Host_URL +
-                "uploads/photo_2024-07-02_09-11-55-removebg-preview.png"
-              }
-              // height={100}
-              width={150}
-              style={{ objectFit: "contain", objectPosition: "center" }}
-              alt=""
-            />
-          </p>
+        <div className="d-flex mt-2">
+          <div>
+            <p>
+              <span className="fw-bold">Phyasican Name:</span>{" "}
+              {user.doctor_titer ? (
+                <Image src={Host_URL + user?.doctor_titer} fluid width={110} />
+              ) : (
+                "Dr " + user.name
+              )}
+            </p>
+            <p className="">
+              <span className="fw-bold align-self-start">Signature:</span>{" "}
+              <img
+                src={Host_URL + user.digital_signature}
+                // height={100}
+                width={150}
+                style={{ objectFit: "contain", objectPosition: "center" }}
+                alt=""
+              />
+            </p>
+          </div>
+          <div>
+            <Image src={Host_URL + getClinicInformation()?.clinic_seal} />
+            {/* {getClinicInformation().clinicSeal} */}
+          </div>
         </div>
       </Modal.Body>
       {/* <Modal.Footer>

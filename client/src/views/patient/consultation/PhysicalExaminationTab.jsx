@@ -61,7 +61,7 @@ const PhysicalExaminationTab = React.forwardRef((props, ref) => {
   const { data: lab_investigation, error } = useOrdered_Lab_Investigations(
     state.medicalRecord_id
   );
-  console.log(lab_investigation);
+  // console.log(lab_investigation);
   const { mutateAsync, isPending } = useAddPhysicalExamination();
   const [showAddVitalSignModa, setShowAddVitalSignModal] = useState(false);
   const dispatch = useDispatch();

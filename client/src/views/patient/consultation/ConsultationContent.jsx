@@ -20,7 +20,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
     (state) => state.consultation.finishButtonDisabled
   );
 
-  console.log(disabledFinishButton);
+  // console.log(disabledFinishButton);
   // const [childData, setChildData] = useState([]);
   const chiefComplaintRef = useRef(null);
   const ExaminationRef = useRef(null);

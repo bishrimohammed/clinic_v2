@@ -225,7 +225,10 @@ const UserController = {
         user.employee.middleName +
         " " +
         user.employee.lastName,
+
       token,
+      digital_signature: user.employee.digital_signature,
+      doctor_titer: user.employee.doctor_titer,
       role: role,
       permissions: user.userPermissions,
       clinicInfo: clinicInfo,

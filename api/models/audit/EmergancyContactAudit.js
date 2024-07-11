@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
           model: "emergencycontacts",
           key: "id",
         },
+        onDelete: "CASCADE",
       },
       firstName: {
         type: DataTypes.STRING,
@@ -85,6 +86,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  EmergencyContactAudit.sync({ alter: false });
+  EmergencyContactAudit.sync({ alter: true });
   return EmergencyContactAudit;
 };

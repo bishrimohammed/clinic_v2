@@ -4,7 +4,7 @@ const { format, parse } = require("date-fns");
 const { fromZonedTime } = require("date-fns-tz");
 // import { zonedTimeToUtc } from 'date-fns-tz';
 // const e = require("express");
-const { Op, Sequelize } = require("sequelize");
+// const { Op, Sequelize } = require("sequelize");
 // const getEmploye = async()
 module.exports = EmployeeController = {
   getEmployees: asynHandler(async (req, res) => {
@@ -247,7 +247,7 @@ module.exports = EmployeeController = {
         emergence_contact_id: EmergencyContact.id,
         doctor_titer:
           req.files["doctor_titer"] &&
-          "/uploads" + req.files["doctor_titer"][0].filename,
+          "uploads/" + req.files["doctor_titer"][0].filename,
       },
       { userId: req.user.id }
     );

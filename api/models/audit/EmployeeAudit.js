@@ -72,6 +72,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      doctor_titer: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       status: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
@@ -116,6 +120,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  EmployeeAudit.sync({ alter: false });
+  EmployeeAudit.sync({ alter: true });
   return EmployeeAudit;
 };

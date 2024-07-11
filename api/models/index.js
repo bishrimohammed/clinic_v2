@@ -101,6 +101,10 @@ db.SickLeaveNote = require("./medicalRecords/SickLeaveNote.js")(
   sequelize,
   DataTypes
 );
+db.DiagnosisSickLeave = require("./medicalRecords/DiagnosisSickLeave.js")(
+  sequelize,
+  DataTypes
+);
 db.ReferralNote = require("./medicalRecords/ReferralNote.js")(
   sequelize,
   DataTypes
