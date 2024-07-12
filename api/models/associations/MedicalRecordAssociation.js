@@ -112,9 +112,15 @@ module.exports.MedicalRecordAssociation = (db) => {
     foreignKey: "patient_id",
     as: "patient",
   });
-  db.SickLeaveNote.hasMany(db.Diagnosis, {
+  db.SickLeaveNote.belongsToMany(db.Diagnosis, {
+    through: db.DiagnosisSickLeave,
     foreignKey: "sick_leave_note_id",
-    as: "diagnosis",
+    as: "diagnoses",
+  });
+  db.Diagnosis.belongsToMany(db.SickLeaveNote, {
+    through: db.DiagnosisSickLeave,
+    foreignKey: "diagnosis_id",
+    as: "diagnoses",
   });
   db.ReferralNote.belongsTo(db.User, {
     foreignKey: "doctor_id",

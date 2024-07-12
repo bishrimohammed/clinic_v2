@@ -47,7 +47,7 @@ const Login = () => {
       return Axiosinstance.post("/user/login", data).then((res) => res.data);
     },
     onSuccess: async (data) => {
-      console.log(data);
+      // console.log(data);
       if (data.is_new) {
         dispatch(setlogin(data));
         toast.success("success");
@@ -56,7 +56,7 @@ const Login = () => {
         navigate("/changepassword", { state: data, replace: true });
         // window.history.pushState(null, null, window.location.href);
       } else {
-        console.log("not new");
+        // console.log("not new");
         dispatch(setlogin(data));
         toast.success("success");
         navigate("/", { replace: true });
@@ -74,7 +74,6 @@ const Login = () => {
     //e.preventDefault();
     // console.log(data);
     loginMutation.mutate(data);
-    return;
   };
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">

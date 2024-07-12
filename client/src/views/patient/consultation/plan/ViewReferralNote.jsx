@@ -1,38 +1,28 @@
 import React from "react";
-import { Host_URL } from "../../../../utils/getHost_URL";
 import { Image, Modal } from "react-bootstrap";
 import PrintHeader from "../../History/print/printComponents/PrintHeader";
-import { useGetPatient } from "../../hooks/patientHooks/useGetPatient";
+import { differenceInYears } from "date-fns";
+import { getClinicInformation } from "../../../../utils/getClinicInformation";
+import { Host_URL } from "../../../../utils/getHost_URL";
 import { useLocation } from "react-router-dom";
 import { useGetDiagnosis } from "../../hooks/consultationHooks/useGetDiagnosis";
 import { useGet_Internal_MedicalRecordPrescription } from "../../hooks/consultationHooks/medication/useGet_Internal_MedicalRecordPrescription";
-import { differenceInYears } from "date-fns";
-import { useGetCurrentUser } from "../../../../hooks/useGetCurrentUser";
-import { getClinicInformation } from "../../../../utils/getClinicInformation";
-// import getClinicInformation from "../../../../../../api/helpers/getClinicInformation";
 
-const PreviewRefferalNote = ({
-  show,
-  handleClose,
-  clinical_finding,
-  hospital_name,
-  department_name,
-  reason,
-}) => {
+const ViewReferralNote = ({ show, handleClose, referralNote }) => {
+  //   console.log(referralNote);
+  //   return;
   const { state } = useLocation();
-  const { data: patient } = useGetPatient(state.patient_id);
+  //   const { data: patient } = useGetPatient(state.patient_id);
   const { data: diagnosis } = useGetDiagnosis(state.medicalRecord_id);
   const { data: prescriptions } = useGet_Internal_MedicalRecordPrescription(
     state.medicalRecord_id
   );
-  // console.log(prescriptions);
-  const user = useGetCurrentUser();
   return (
-    <Modal size="md" show={show} onHide={handleClose}>
+    <Modal show={show} onHide={handleClose}>
       <Modal.Header className="py-1 px-3" closeButton>
         <Modal.Title>
           {" "}
-          <span style={{ fontSize: 16 }}>Preview Referral Note</span>{" "}
+          <span style={{ fontSize: 16 }}>View Referral Note</span>{" "}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -55,7 +45,8 @@ const PreviewRefferalNote = ({
             <div>
               <p className="mb-1">
                 {" "}
-                <span className="fw-bold">Ref. No.</span> {patient?.card_number}
+                <span className="fw-bold">Ref. No.</span>{" "}
+                {referralNote?.patient?.card_number}
               </p>
               <p className="mb-1">
                 <span className="fw-bold">Date</span>: 26/01/2024
@@ -63,23 +54,27 @@ const PreviewRefferalNote = ({
             </div>
           </div>
           <p className="py-1">
-            To <span className="fw-bold">{hospital_name} </span> Hospital{" "}
-            <span className="fw-bold">{department_name}</span> Department
+            To <span className="fw-bold">{referralNote?.referral_to} </span>{" "}
+            Hospital <span className="fw-bold">{referralNote?.department}</span>{" "}
+            Department
           </p>
           <p className="mb-1">
             <span className="fw-bold">Patient's Name:</span>{" "}
-            {patient?.firstName} {patient?.middleName} {patient?.lastName}
+            {referralNote?.patient?.firstName}{" "}
+            {referralNote?.patient?.middleName}{" "}
+            {referralNote?.patient?.lastName}
           </p>
           <div className="d-flex gap-5 mb-1">
             <p className="mb-1">
               {" "}
               <span className="fw-bold">Age:</span>{" "}
-              {differenceInYears(new Date(), patient?.birth_date)} years old
+              {differenceInYears(new Date(), referralNote?.patient?.birth_date)}{" "}
+              years old
             </p>
             <p className="mb-1">
               {" "}
               <span className="fw-bold">Sex: </span>
-              {patient?.gender}
+              {referralNote?.patient?.gender}
             </p>
           </div>
           {/* <p>
@@ -103,7 +98,7 @@ const PreviewRefferalNote = ({
           ))} */}
           <div className="d-flex gap-2 mb-2">
             <h6 className="text-nowrap">Clinical Finding:</h6>
-            <p>{clinical_finding}</p>
+            <p>{referralNote?.clinical_finding}</p>
           </div>
           <div className="d-flex gap-2 mb-2">
             <h6 className="text-nowrap">Diagnosis:</h6>
@@ -134,7 +129,7 @@ const PreviewRefferalNote = ({
           </div>
           <div className="d-flex gap-2 my-2">
             <h6 className="text-nowrap">Reasons for Referral:</h6>
-            <p>{reason}</p>
+            <p>{referralNote?.reason_for_referral}</p>
           </div>
           <p style={{ fontSize: 14 }} className="mt-2">
             {/* {" "}
@@ -165,16 +160,24 @@ const PreviewRefferalNote = ({
           <div>
             <p>
               <span className="fw-bold">Phyasican Name:</span>{" "}
-              {user.doctor_titer ? (
-                <Image src={Host_URL + user?.doctor_titer} fluid width={110} />
+              {referralNote?.doctor?.employee?.doctor_titer ? (
+                <Image
+                  src={Host_URL + referralNote?.doctor?.employee?.doctor_titer}
+                  fluid
+                  width={110}
+                />
               ) : (
-                "Dr " + user.name
+                "Dr " +
+                referralNote?.doctor?.employee?.firstName +
+                referralNote?.doctor?.employee?.middleName
               )}
             </p>
             <p className="">
               <span className="fw-bold align-self-start">Signature:</span>{" "}
               <img
-                src={Host_URL + user.digital_signature}
+                src={
+                  Host_URL + referralNote?.doctor?.employee?.digital_signature
+                }
                 // height={100}
                 width={150}
                 style={{ objectFit: "contain", objectPosition: "center" }}
@@ -192,4 +195,4 @@ const PreviewRefferalNote = ({
   );
 };
 
-export default PreviewRefferalNote;
+export default ViewReferralNote;

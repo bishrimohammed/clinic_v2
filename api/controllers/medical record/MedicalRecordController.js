@@ -365,7 +365,7 @@ module.exports = MedicalRecordController = {
       res.status(404);
       throw new Error("Medical Record not found");
     }
-    const sickLeaveNotes = await db.SickLeaveNote.findOne({
+    const sickLeaveNotes = await db.SickLeaveNote.findAll({
       where: { medical_record_id: id },
       include: [
         {
@@ -381,6 +381,7 @@ module.exports = MedicalRecordController = {
                 "middleName",
                 "lastName",
                 "digital_signature",
+                "doctor_titer",
               ],
             },
           ],
@@ -389,14 +390,22 @@ module.exports = MedicalRecordController = {
         {
           model: db.Patient,
           as: "patient",
+          attributes: [
+            "id",
+            "firstName",
+            "middleName",
+            "lastName",
+            "card_number",
+            "gender",
+          ],
         },
         {
           model: db.Diagnosis,
-          as: "diagnosis",
-          // through: {
-          //   model: db.SickLeaveNoteDiagnosis,
-          //   as: "sickLeaveNoteDiagnosis",
-          // },
+
+          through: {
+            model: db.DiagnosisSickLeave,
+          },
+          as: "diagnoses",
         },
       ],
     });
@@ -425,6 +434,7 @@ module.exports = MedicalRecordController = {
                 "middleName",
                 "lastName",
                 "digital_signature",
+                "doctor_titer",
               ],
             },
           ],
@@ -433,6 +443,14 @@ module.exports = MedicalRecordController = {
         {
           model: db.Patient,
           as: "patient",
+          attributes: [
+            "id",
+            "firstName",
+            "middleName",
+            "lastName",
+            "card_number",
+            "gender",
+          ],
         },
       ],
     });

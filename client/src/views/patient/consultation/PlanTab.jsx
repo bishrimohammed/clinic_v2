@@ -26,6 +26,8 @@ import { useGetSickNote } from "../hooks/consultationHooks/plan/useGetSickNote";
 import AddSickNoteModal from "./plan/AddSickNoteModal";
 import { FaPlusCircle } from "react-icons/fa";
 import AddReferralNoteModal from "./plan/AddReferralNoteModal";
+import ViewSickNote from "./plan/ViewSickNote";
+import ViewReferralNote from "./plan/ViewReferralNote";
 const planSchema = yup.object().shape({
   plan: yup.string().required(),
   // selectedLabs: yup.array().of(yup.number()),
@@ -113,7 +115,7 @@ const PlanTab = React.forwardRef((props, ref) => {
   const { data: refferalnote } = useGetRefferalNote(state.medicalRecord_id);
   const { data: sicknote } = useGetSickNote(state.medicalRecord_id);
   // console.log(refferalnote);
-  // console.log(data);
+  // console.log(sicknote);
   // const sicknoteDiagonasis = sicknote?.diagnosis?.
   const { mutateAsync, isPending } = useAddPlan();
   // const { data: laboratoryTests } = useGetLaboratory();
@@ -131,7 +133,6 @@ const PlanTab = React.forwardRef((props, ref) => {
     setValue,
     control,
     watch,
-
     reset,
   } = useForm({
     resolver: yupResolver(planSchema),
@@ -183,6 +184,14 @@ const PlanTab = React.forwardRef((props, ref) => {
     diagnosisIds: [],
   });
   const [showPreviewRefferalNote, setShowPreviewRefferalNote] = useState({
+    show: false,
+    referralNote: null,
+  });
+  const [showViewSickNoteNote, setShowViewSickNoteNote] = useState({
+    show: false,
+    sickNote: null,
+  });
+  const [showViewReferralNoteNote, setShowViewReferralNoteNote] = useState({
     show: false,
     referralNote: null,
   });
@@ -298,18 +307,6 @@ const PlanTab = React.forwardRef((props, ref) => {
               Out Come
             </Accordion.Header>
             <Accordion.Body className="px-1">
-              {/* <Form.Group className="mb-3">
-                <Form.Check
-                  type="switch"
-                  // onChange={(e) => {
-                  //   console.log();
-                  //   setShowFollowUpAccordion(e.target.checked);
-                  // }}
-                  {...register("is_follow_up_visit")}
-                  label="Follow Up Visit"
-                  // placeholder="Out Come"
-                />
-              </Form.Group> */}
               <div
                 className="border-bottom border-2 py-1 px-2 d-flex align-items-center"
                 style={{ backgroundColor: "rgba(128, 128, 128, 0.1)" }}
@@ -431,61 +428,56 @@ const PlanTab = React.forwardRef((props, ref) => {
                       </tbody>
                     </Table>
                   )}
-                  {/* <Form.Group className="my-3 px-2">
-              <Form.Label>
-                {" "}
-                <span className="border-bottom pb-1">Diagnosis</span>{" "}
-              </Form.Label>
-              {diagnosis?.map((d, index) => (
-                <Fragment key={d.id}>
-                  <Form.Check
-                    type="checkbox"
-                    {...register(`sick_notes.diagnosis[${index}].value`)}
-                    label={d.diagnosis + "(" + d.status + ")"}
-                    // placeholder="Diagnosis"
-                  />
-                  <input
-                    type="hidden"
-                    {...register(`sick_notes.diagnosis[${index}].diagnosis_id`)}
-                    value={d.id}
-                  />
-                </Fragment>
-              ))}
-            </Form.Group>
-            <Row>
-              <Col md={4} sm={12}>
-                <Form.Group>
-                  <Form.Label>Start Date</Form.Label>
-                  <Form.Control
-                    type="date"
-                    {...register("sick_notes.start_date")}
-                    placeholder="Start Date"
-                    isInvalid={errors.sick_notes?.start_date}
-                    defaultValue={new Date().toISOString().substring(0, 10)}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.sick_notes?.start_date?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={4} sm={12}>
-                <Form.Group>
-                  <Form.Label>End Date</Form.Label>
-                  <Form.Control
-                    type="date"
-                    {...register("sick_notes.end_date")}
-                    placeholder="End Date"
-                    isInvalid={errors.sick_notes?.end_date}
-                    min={new Date().toISOString().substring(0, 10)}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.sick_notes?.end_date?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={4} sm={12}></Col>
-              <Col md={4} sm={12}></Col>
-            </Row> */}
+                  {sicknote?.length > 0 && (
+                    <>
+                      <h6></h6>
+                      <Table striped bordered className="mt-2">
+                        <thead>
+                          <tr>
+                            <th>Diagnosis</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sicknote?.map((s, index) => (
+                            <tr key={index}>
+                              <td>
+                                {s.diagnoses.map((d) => (
+                                  <p key={d.id + d.diagnosis} className="mb-0">
+                                    {d.diagnosis} ({d.status})
+                                  </p>
+                                ))}
+                              </td>
+                              <td>{s.start_date}</td>
+                              <td>{s.end_date}</td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-info ms-2"
+                                  onClick={() => {
+                                    setShowViewSickNoteNote({
+                                      show: true,
+                                      sickNote: s,
+                                    });
+                                  }}
+                                >
+                                  View
+                                </button>
+                                {/* <button
+                                  type="button"
+                                  className="btn btn-sm btn-warning ms-2"
+                                >
+                                  Print
+                                </button> */}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    </>
+                  )}
                 </>
               )}
               <div
@@ -553,121 +545,107 @@ const PlanTab = React.forwardRef((props, ref) => {
                       </button> */}
                     </div>
                   </div>
-                  {/* <Row className="mt-2">
-              <Col md={6} sm={12}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Hospital</Form.Label>
-                  <Form.Control
-                    // type="date"
-                    type="text"
-                    {...register("referral_notes.hostipal_name")}
-                    // placeholder="Start Date"
-                    isInvalid={errors.referral_notes?.hostipal_name}
-                    // defaultValue={new Date().toISOString().substring(0, 10)}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.referral_notes?.hostipal_name?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={6} sm={12}>
-                <Form.Group>
-                  <Form.Label>Department</Form.Label>
-                  <Form.Control
-                    // type="date"
-                    type="text"
-                    {...register("referral_notes.department_name")}
-                    // placeholder="Start Date"
-                    isInvalid={errors.referral_notes?.department_name}
-                    // defaultValue={new Date().toISOString().substring(0, 10)}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.referral_notes?.department_name?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={6} sm={12}>
-                <Form.Group>
-                  <Form.Label>Clinical Finding</Form.Label>
-                  <Form.Control
-                    // type="date"
-                    as="textarea"
-                    {...register("referral_notes.clinical_finding")}
-                    // placeholder="Start Date"
-                    isInvalid={errors.referral_notes?.clinical_finding}
-                    // defaultValue={new Date().toISOString().substring(0, 10)}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors?.referral_notes?.clinical_finding?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={6} sm={12}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Reason</Form.Label>
-                  <Form.Control
-                    // type="date"
-                    type="text"
-                    {...register("referral_notes.reason")}
-                    // placeholder="Start Date"
-                    isInvalid={errors.referral_notes?.reason}
-                    // defaultValue={new Date().toISOString().substring(0, 10)}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.referral_notes?.reason?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={4} sm={12}></Col>
-              <Col md={4} sm={12}></Col>
-            </Row> */}
                   {referralFields.length > 0 && (
-                    <Table>
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Hospital Name</th>
-                          <th>Department</th>
-                          <th>Clinical Finding</th>
-                          <th>Reason</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {watch("referral_notes")?.map((referralNote, index) => (
-                          <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{referralNote.hospital_name}</td>
-                            <td>{referralNote.department_name}</td>
-                            <td>{referralNote.clinical_finding}</td>
-                            <td>{referralNote.reason}</td>
-                            <td>
-                              <button
-                                type="button"
-                                className="btn btn-sm btn-danger ms-2"
-                                onClick={() => {
-                                  removeReferralNote(index);
-                                }}
-                              >
-                                Delete
-                              </button>
-                              <button
-                                type="button"
-                                className="btn btn-sm btn-info ms-2"
-                                onClick={() => {
-                                  setShowPreviewRefferalNote({
-                                    show: true,
-                                    referralNote,
-                                  });
-                                }}
-                              >
-                                Preview
-                              </button>
-                            </td>
+                    <>
+                      <Table className="my-1">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Hospital Name</th>
+                            <th>Department</th>
+                            <th>Clinical Finding</th>
+                            <th>Reason</th>
+                            <th>Action</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </Table>
+                        </thead>
+                        <tbody>
+                          {watch("referral_notes")?.map(
+                            (referralNote, index) => (
+                              <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{referralNote.hospital_name}</td>
+                                <td>{referralNote.department_name}</td>
+                                <td>{referralNote.clinical_finding}</td>
+                                <td>{referralNote.reason}</td>
+                                <td>
+                                  <button
+                                    type="button"
+                                    className="btn btn-sm btn-danger ms-2"
+                                    onClick={() => {
+                                      removeReferralNote(index);
+                                    }}
+                                  >
+                                    Delete
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-sm btn-info ms-2"
+                                    onClick={() => {
+                                      setShowPreviewRefferalNote({
+                                        show: true,
+                                        referralNote,
+                                      });
+                                    }}
+                                  >
+                                    Preview
+                                  </button>
+                                </td>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                      </Table>
+                      <hr />
+                    </>
+                  )}
+                  {refferalnote?.length > 0 && (
+                    <>
+                      {/* <h6 className="mt-2">Saved referral note</h6> */}
+                      <Table>
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Hospital Name</th>
+                            <th>Department</th>
+                            <th>Clinical Finding</th>
+                            <th>Referral Date</th>
+                            <th>Reason</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {refferalnote?.map((referralNote, index) => (
+                            <tr key={index}>
+                              <td>{index + 1}</td>
+                              <td>{referralNote.referral_to}</td>
+                              <td>{referralNote.department}</td>
+                              <td>{referralNote.clinical_finding}</td>
+                              <td>
+                                {new Date(referralNote.referral_date)
+                                  .toISOString()
+                                  .substring(0, 10)}
+                              </td>
+                              <td>{referralNote.reason_for_referral}</td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-info ms-2"
+                                  onClick={() => {
+                                    setShowViewReferralNoteNote({
+                                      show: true,
+                                      referralNote,
+                                    });
+                                  }}
+                                >
+                                  View
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>{" "}
+                      {/* <hr /> */}
+                    </>
                   )}
                 </>
               )}
@@ -778,6 +756,27 @@ const PlanTab = React.forwardRef((props, ref) => {
           remove={removeReferralNote}
           getValues={getValues}
           watch={watch}
+        />
+      )}
+      {showViewSickNoteNote.show && (
+        <ViewSickNote
+          show={showViewSickNoteNote.show}
+          handleClose={() =>
+            setShowViewSickNoteNote({ show: false, sickNote: null })
+          }
+          sickNote={showViewSickNoteNote.sickNote}
+        />
+      )}
+      {showViewReferralNoteNote.show && (
+        <ViewReferralNote
+          show={showViewReferralNoteNote.show}
+          handleClose={() =>
+            setShowViewReferralNoteNote({
+              show: false,
+              referralNote: null,
+            })
+          }
+          referralNote={showViewReferralNoteNote.referralNote}
         />
       )}
     </div>
