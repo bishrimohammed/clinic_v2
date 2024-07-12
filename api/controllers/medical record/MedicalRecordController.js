@@ -33,6 +33,51 @@ module.exports = MedicalRecordController = {
     });
     res.json(medicalRecords);
   }),
+  getMedicalRecordsOverview: asyncHandler(async (req, res) => {
+    const medicalRecords = await db.MedicalRecord.findAll({
+      where: { status: true },
+      include: [
+        {
+          model: db.Patient,
+          as: "patient",
+          attributes: [
+            "id",
+            "firstName",
+            "middleName",
+            "lastName",
+            "birth_date",
+            "gender",
+            "card_number",
+            "phone",
+          ],
+        },
+      ],
+    });
+    res.json(medicalRecords);
+  }),
+  getMedicalRecordsOverviewDetail: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const medicalRecords = await db.MedicalRecord.findAll({
+      where: { status: true, id: id },
+      include: [
+        {
+          model: db.Patient,
+          as: "patient",
+          attributes: [
+            "id",
+            "firstName",
+            "middleName",
+            "lastName",
+            "birth_date",
+            "gender",
+            "card_number",
+            "phone",
+          ],
+        },
+      ],
+    });
+    res.json(medicalRecords);
+  }),
   // @desc    Get a single MedicalRecord by ID
   // @route   GET /api/medicalRecords/:id
   // @access  Public
@@ -397,6 +442,7 @@ module.exports = MedicalRecordController = {
             "lastName",
             "card_number",
             "gender",
+            "birth_date",
           ],
         },
         {
@@ -450,6 +496,7 @@ module.exports = MedicalRecordController = {
             "lastName",
             "card_number",
             "gender",
+            "birth_date",
           ],
         },
       ],
@@ -1319,6 +1366,7 @@ module.exports = MedicalRecordController = {
         {
           model: db.ServiceItem,
           as: "medicine",
+          attributes: ["id", "service_name"],
         },
         {
           model: db.User,
@@ -1327,7 +1375,14 @@ module.exports = MedicalRecordController = {
             {
               model: db.Employee,
               as: "employee",
-              attributes: ["id", "firstName", "middleName", "lastName"],
+              attributes: [
+                "id",
+                "firstName",
+                "middleName",
+                "lastName",
+                "digital_signature",
+                "doctor_titer",
+              ],
             },
           ],
           attributes: ["id"],

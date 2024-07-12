@@ -247,60 +247,10 @@ const PhysicalExaminationTab = React.forwardRef((props, ref) => {
                 )}
               </Accordion.Body>
             </Accordion.Item>
-            {/* <Accordion.Item eventKey="1" className="mt-2">
-              <Accordion.Header>Investigations</Accordion.Header>
-              <Accordion.Body>
-                {" "}
-                <OrderedLabInvestigationTable
-                  investigations={lab_investigation?.orderedTest}
-                  getValues={getValues}
-                  setValue={setValue}
-                  // watch={watch}
-                />
-              </Accordion.Body>
-            </Accordion.Item> */}
           </Accordion>
-
-          {/* {VitalSignFields?.map((field, index) => (
-            <Col key={field.id} md={4} sm={12} className="">
-              <Form.Group className="mb-3">
-                <Form.Label>{field.name}</Form.Label>
-                <input
-                  type="hidden"
-                  {...register(`vitals[${index}].vitalId`)}
-                  value={field.id}
-                />
-                <input
-                  type="hidden"
-                  {...register(`vitals[${index}].name`)}
-                  value={field.name}
-                />
-                <Form.Control
-                  type="number"
-                  {...register(`vitals[${index}].value`)}
-                  //   placeholder={field.name}
-                  isInvalid={errors?.vitals?.[index]?.value}
-                  // defaultValue={getVitalDefaultValue(field.id)}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors?.vitals?.[index]?.value?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-              // {/* <Form.Control type="text" placeholder={field.name} /> 
-            </Col>
-          ))} */}
         </Row>
       </Form>
-      {/* <Accordion defaultActiveKey="0" className="px-2 mt-2">
-        <Accordion.Item eventKey="0">
-          <Accordion.Header>Investigations</Accordion.Header>
-          <Accordion.Body>
-            <OrderedLabInvestigationTable
-              investigations={lab_investigation?.orderedTest}
-            />
-          </Accordion.Body>
-        </Accordion.Item>
-      </Accordion> */}
+
       <div className="px-2">
         <OrderedLabInvestigationTable
           investigations={lab_investigation?.orderedTest}

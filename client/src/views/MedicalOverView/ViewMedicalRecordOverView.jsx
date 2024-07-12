@@ -1,8 +1,7 @@
 import React from "react";
 import { Container } from "react-bootstrap";
 import { Outlet } from "react-router-dom";
-
-const ApprovalRequests = () => {
+const ViewMedicalRecordOverView = () => {
   return (
     <Container className="p-2 mb-5">
       <div className="p-3 bg-hrun-box hrunboxshadow">
@@ -12,4 +11,4 @@ const ApprovalRequests = () => {
   );
 };
 
-export default ApprovalRequests;
+export default ViewMedicalRecordOverView;

@@ -275,6 +275,14 @@ const Sidebar = () => {
             <MdSpaceDashboard className="nav-icon" />
             Approval Requests
           </CNavItem>
+          {hasPermission("View lab Result", "read") && (
+            <CNavItem to="/medicaloverview" component={NavLink}>
+              {/* <CIcon icon={cilSpeedometer} customClassName="nav-icon" /> */}
+              <MdSpaceDashboard className="nav-icon" />
+              Medical Record Overview
+            </CNavItem>
+          )}
+
           {/* {hasPermission("appointment", "read") && (
             <CNavGroup
               idx="appointment"

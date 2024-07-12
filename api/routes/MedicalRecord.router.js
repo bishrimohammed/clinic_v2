@@ -3,6 +3,7 @@ const MedicalRecordController = require("../controllers/medical record/MedicalRe
 const { protect } = require("../middleware/authMiddleWare");
 const router = express.Router();
 router.get("/", MedicalRecordController.getMedicalRecords);
+router.get("/overview", MedicalRecordController.getMedicalRecordsOverview);
 router.get(
   "/getActiveInvestigation",
   MedicalRecordController.getActiveInvestigation
@@ -13,6 +14,10 @@ router.get(
 );
 
 router.get("/:id", MedicalRecordController.getMedicalRecordById);
+router.get(
+  "/:id/overview",
+  MedicalRecordController.getMedicalRecordsOverviewDetail
+);
 router.get(
   "/:id/getinvestagion",
   MedicalRecordController.getOrdered_Investigation_ByMedicalRecordId

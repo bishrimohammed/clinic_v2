@@ -6,7 +6,7 @@ import { differenceInYears } from "date-fns";
 import PrintHeader from "../../History/print/printComponents/PrintHeader";
 
 const ViewSickNote = ({ show, handleClose, sickNote }) => {
-  //   console.log(sickNote);
+  console.log(sickNote);
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header className="py-1 px-3" closeButton>
@@ -61,7 +61,8 @@ const ViewSickNote = ({ show, handleClose, sickNote }) => {
           </div>
           <p>
             {" "}
-            <span className="fw-bold">Date of Examination: </span>7/2/2024
+            <span className="fw-bold">Date of Examination: </span>{" "}
+            {sickNote?.date_of_examination}
           </p>
           <p style={{ fontSize: 14 }}>
             This is to certify that{" "}

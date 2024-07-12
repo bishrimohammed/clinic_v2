@@ -141,11 +141,7 @@ const Login = () => {
                           Login
                         </Button>
                       </Col>
-                      <Col xs={6} className="text-right">
-                        {/* <Link color="link" className="px-0">
-                          Forgot password?
-                        </Link> */}
-                      </Col>
+                      <Col xs={6} className="text-right"></Col>
                     </Row>
                   </Form>
                 </CardBody>
