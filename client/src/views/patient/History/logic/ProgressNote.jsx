@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import { useRef } from "react";
 import { Button, Container, Form, Spinner } from "react-bootstrap";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import { delta } from "../../../../utils/DeltaQuill";
+// import ReactQuill from "react-quill";
+// import "react-quill/dist/quill.snow.css";
+// import { delta } from "../../../../utils/DeltaQuill";
 
 import { useParams } from "react-router-dom";
 import { useAddPrograssNote } from "../note/hooks/useAddPrograssNote";

@@ -60,6 +60,6 @@ module.exports = (sequelize, DataTypes) => {
       paranoid: true,
     }
   );
-  ApprovalRequest.sync({ alter: true });
+  ApprovalRequest.sync({ alter: false });
   return ApprovalRequest;
 };

@@ -15,6 +15,8 @@ module.exports = (sequelize, DataTypes) => {
           model: "diagnoses",
           key: "id",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
 
       sick_leave_note_id: {
@@ -24,11 +26,20 @@ module.exports = (sequelize, DataTypes) => {
           model: "sick_leave_notes",
           key: "id",
         },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE",
       },
     },
     {
       timestamps: false,
       freezeTableName: true,
+      indexes: [
+        {
+          name: "diagnosis_sick_leave_diagnosis_id_sick_leave_note_id_uq",
+          unique: true,
+          fields: ["diagnosis_id", "sick_leave_note_id"],
+        },
+      ],
     }
   );
   DiagnosisSickLeave.sync({ alter: false, force: false });

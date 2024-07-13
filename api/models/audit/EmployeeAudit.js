@@ -120,6 +120,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  EmployeeAudit.sync({ alter: true });
+  EmployeeAudit.sync({ alter: false });
   return EmployeeAudit;
 };

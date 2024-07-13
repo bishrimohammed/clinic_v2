@@ -145,6 +145,6 @@ module.exports = (sequelize, DataTypes) => {
       },
     }
   );
-  Employee.sync({ alter: true, force: false });
+  Employee.sync({ alter: false, force: false });
   return Employee;
 };
