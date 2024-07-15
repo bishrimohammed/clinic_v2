@@ -11,7 +11,7 @@ import { differenceInYears } from "date-fns";
 const OverviewDetail = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  //   console.log(state);
+  // console.log(state);
   return (
     <div>
       <div className=" p-2  d-flex gap-3 align-items-center">
@@ -46,7 +46,7 @@ const OverviewDetail = () => {
         justify
       >
         <Tab eventKey="Lab result" title="Lab Result">
-          <LabResultTab />
+          <LabResultTab patient={state.patient} />
           {/* <ChiefComplaint /> */}
         </Tab>
         <Tab
@@ -55,7 +55,7 @@ const OverviewDetail = () => {
           //   disabled={examTabLocked}
         >
           {/* <PhysicalExaminationTab ref={ExaminationRef} /> */}
-          <SickleaveNoteTab />
+          <SickleaveNoteTab patient={state.patient} />
         </Tab>{" "}
         <Tab
           eventKey="Referral Note"
@@ -63,7 +63,7 @@ const OverviewDetail = () => {
           //   disabled={treatmentTabLocked}
         >
           {/* <TreatmentTab /> */}
-          <ReferralNoteTab />
+          <ReferralNoteTab patient={state.patient} />
         </Tab>
         <Tab
           eventKey="Prescriptions"
@@ -71,7 +71,7 @@ const OverviewDetail = () => {
           //   disabled={planTabLocked}
         >
           {/* <PlanTab ref={PlanRefs} /> */}
-          <PrescriptionsTab />
+          <PrescriptionsTab patient={state.patient} />
         </Tab>
       </Tabs>
     </div>

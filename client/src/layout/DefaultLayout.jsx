@@ -4,6 +4,7 @@ import Sidebar from "../components/Sidebar";
 
 import { useSelector } from "react-redux";
 import useScreenWidth from "../hooks/useScreenWidth";
+import SideBar2 from "../components/SideBar2";
 
 const DefaultLayout = () => {
   const sidebarShow = useSelector((state) => state.sidebar.sidebarShow);
@@ -59,7 +60,8 @@ const DefaultLayout = () => {
         </div>
       </div> */}
       <div>
-        <Sidebar />
+        {/* <Sidebar /> */}
+        <SideBar2 />
         <div
           style={{ paddingLeft: sidebarShow ? "17rem" : 0 }}
           className="d-flex flex-column min-vh-100 bg-light"
@@ -68,7 +70,9 @@ const DefaultLayout = () => {
           <div className="body flex-grow-1  ps-1  bg-hrun-content">
             <AppContent />
           </div>
-          <AppFooter />
+          <div style={{ paddingLeft: sidebarShow ? "17rem" : 0 }}>
+            <AppFooter sidebarShow={sidebarShow} />
+          </div>
         </div>
       </div>
     </>

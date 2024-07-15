@@ -19,7 +19,7 @@ import { useAddDiscontinuedMedication } from "../../hooks/ConditionsAndMedicatio
 import { useDeleteCurrentMedication } from "../../hooks/ConditionsAndMedicationsHooks/useDeleteCurrentMedication";
 import { useDeletePastMedicalHistory } from "../../hooks/ConditionsAndMedicationsHooks/useDeletePastMedicalHistory";
 import { useDeleteDiscontinuedMedication } from "../../hooks/ConditionsAndMedicationsHooks/useDeleteDiscontinuedMedication";
-import { useUpdateCurrentMedication } from "../../hooks/ConditionsAndMedicationsHooks/UseUpdateCurrentMedication";
+import { useUpdateCurrentMedication } from "../../hooks/ConditionsAndMedicationsHooks/useUpdateCurrentMedication";
 import { useUpdatePastMedicalHistory } from "../../hooks/ConditionsAndMedicationsHooks/useUpdatePastMedicalHistory";
 import { useUpdateDiscontinuedmedication } from "../../hooks/ConditionsAndMedicationsHooks/useUpdateDiscontinuedmedication";
 // import { updateDiscontinuedMedication } from "../../../../../../api/controllers/patient/ConditionsAndMedicationController";

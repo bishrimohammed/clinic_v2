@@ -139,12 +139,12 @@ a {
   background-color: rgb(243, 244, 247);
 }
 
-.footer {
+/* .footer {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-}
+} */
 input:focus {
   outline: none;
 }

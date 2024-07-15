@@ -3,12 +3,13 @@ import { useLocation } from "react-router-dom";
 import { useGet_Internal_MedicalRecordPrescription } from "../../patient/hooks/consultationHooks/medication/useGet_Internal_MedicalRecordPrescription";
 import { Spinner, Table } from "react-bootstrap";
 import { IoReloadOutline } from "react-icons/io5";
+import PrintPrescriptionButton from "../components/PrintPrescriptionButton";
 
-const PrescriptionsTab = () => {
+const PrescriptionsTab = ({ patient }) => {
   const { state } = useLocation();
   const { data, isRefetching, refetch } =
     useGet_Internal_MedicalRecordPrescription(state.id);
-  //   console.log(data);
+  console.log(data);
   return (
     <div>
       <div className="d-flex justify-content-end gap-2 align-items-center w-100 mb-2  mt-2">
@@ -32,6 +33,7 @@ const PrescriptionsTab = () => {
           )}
           Reload
         </button>
+        <PrintPrescriptionButton patient={patient} prescriptions={data} />
       </div>
       <Table responsive striped bordered>
         <thead>

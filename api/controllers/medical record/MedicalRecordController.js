@@ -973,6 +973,12 @@ module.exports = MedicalRecordController = {
           as: "test",
 
           attributes: ["id", "service_name", "serviceCategory_id"],
+          include: [
+            {
+              model: db.LabTestProfile,
+              as: "labTestProfile",
+            },
+          ],
         },
         {
           model: db.User,

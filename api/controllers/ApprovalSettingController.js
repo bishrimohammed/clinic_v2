@@ -23,7 +23,7 @@ module.exports = ApprovalSettingController = {
         },
         {
           model: db.ApprovalSettingApprover,
-          as: "approval_setting_approvers",
+          as: "approvers",
 
           include: [
             {

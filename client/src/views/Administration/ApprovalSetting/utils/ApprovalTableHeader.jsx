@@ -19,7 +19,7 @@ export const ApprovalTableHeader = [
     header: " Approval Levels",
     accessorFn: (row) => `${row.approval_level}`,
   },
-  columnHelper.accessor("approval_setting_approvers", {
+  columnHelper.accessor("approvers", {
     header: "Approvers",
     enableSorting: false,
     // accessorFn: (row) => `${row.approval_setting_approvers}`
