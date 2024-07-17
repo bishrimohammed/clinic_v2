@@ -598,36 +598,30 @@ module.exports = MedicalRecordController = {
         doctor_id: req.user.id,
       },
     });
-    const physicalExamination = await db.PhysicalExamination.create(
-      {
-        medicalRecordDetail_id: medicalRecordDetail.id,
-        examiner_id: req.user.id,
-      },
-      { userId: req.user.id }
-    );
-    // const vital = await db.Vital.findOne({
-    //   where: {
-    //     medicalRecord_id: id,
-    //     examiner_id: req.user.id,
-    //   },
-    // });
-    //physicalExaminationId
-    // value
-    // if (physicalExamination) {
-    await Promise.all(
-      physicalExaminations.map(async (Examination) => {
-        return db.physicalExaminationResult.create({
-          // medicalRecordDetail_id: medicalRecordDetail.id,
-          physicalExamination_id: physicalExamination.id,
-          physical_ExaminationField_id: Examination.physicalExaminationId,
-          result: Examination.value,
-          physicalExamination_id: physicalExamination.id,
-          // examiner_id: req.user.id,
-          // progressNote_id: progressNote.id
-        });
-      })
-    );
-    // }
+    if (physicalExaminations) {
+      const physicalExamination = await db.PhysicalExamination.create(
+        {
+          medicalRecordDetail_id: medicalRecordDetail.id,
+          examiner_id: req.user.id,
+        },
+        { userId: req.user.id }
+      );
+
+      await Promise.all(
+        physicalExaminations.map(async (Examination) => {
+          return db.physicalExaminationResult.create({
+            // medicalRecordDetail_id: medicalRecordDetail.id,
+            physicalExamination_id: physicalExamination.id,
+            physical_ExaminationField_id: Examination.physicalExaminationId,
+            result: Examination.value,
+            physicalExamination_id: physicalExamination.id,
+            // examiner_id: req.user.id,
+            // progressNote_id: progressNote.id
+          });
+        })
+      );
+    }
+
     const is_Invetigated = await db.InvestigationOrder.findOne({
       where: {
         medicalRecord_id: id,
@@ -728,7 +722,7 @@ module.exports = MedicalRecordController = {
     // }
 
     // console.log(medicalRecordDetail);
-    res.status(202).json({
+    res.status(201).json({
       message:
         // physicalExamination
         //   ? "Physical Examination update successfully"        :
@@ -962,7 +956,7 @@ module.exports = MedicalRecordController = {
       //   // },
       // ],
     });
-    console.log(investigation);
+    // console.log(investigation);
     const orderedTest = await db.OrderedTest.findAll({
       where: {
         investigationOrder_id: investigation.id,
@@ -1159,10 +1153,10 @@ module.exports = MedicalRecordController = {
   }),
   // @desc add vital sign
   addTriage: asyncHandler(async (req, res) => {
-    const { vitals, symptom, visit_type } = req.body;
+    const { vitals, symptom, visit } = req.body;
     // const today = new Date();
     // const vitals = req.body;
-    // console.log(req.body);
+    console.log(req.body);
     // return;
     // console.log(vitals);
     const patientVisit = await db.PatientAssignment.findOne({
@@ -1179,7 +1173,13 @@ module.exports = MedicalRecordController = {
       ? patientVisit.symptom_notes + "\n" + symptom
       : symptom;
     patientVisit.stage = "Waiting for doctor";
-    patientVisit.visit_type = visit_type;
+    patientVisit.visit_type = visit.visit_type;
+    patientVisit.assignment_date = visit.date;
+    patientVisit.visit_time = new Date(visit.date)
+
+      .toISOString()
+      .substring(11.16);
+    patientVisit.doctor_id = visit.doctor_id;
     await patientVisit.save({ userId: req.user.id });
 
     const vital = await db.Vital.create(
@@ -1515,5 +1515,92 @@ module.exports = MedicalRecordController = {
       })
     );
     res.status(201).json({ msg: "Sick leave note added successfully" });
+  }),
+  cancelMedicalRecord: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const medicalRecord = await getMedicalRecordById(id);
+    if (!medicalRecord) {
+      res.status(404);
+      throw new Error("Medical record not found");
+    }
+    await db.CurrentMedication.destroy({
+      where: {
+        medical_record_id: medicalRecord.id,
+        created_by: req.user.id,
+      },
+      userId: req.user.id,
+    });
+    await db.DiscontinuedMedication.destroy({
+      where: {
+        medical_record_id: medicalRecord.id,
+        created_by: req.user.id,
+      },
+      userId: req.user.id,
+    });
+    await db.Vital.destroy({
+      where: {
+        medicalRecord_id: medicalRecord.id,
+        examiner_id: req.user.id,
+      },
+      userId: req.user.id,
+    });
+    const medicalRecordDetail = await db.MedicalRecordDetail.findOne({
+      where: {
+        medicalRecord_id: medicalRecord?.id,
+        doctor_id: req.user.id,
+      },
+    });
+    if (medicalRecordDetail) {
+      await db.PhysicalExamination.destroy({
+        where: {
+          medicalRecordDetail_id: medicalRecordDetail?.id,
+          examiner_id: req.user.id,
+        },
+        userId: req.user.id,
+      });
+    }
+
+    await db.Diagnosis.destroy({
+      where: {
+        medical_record_id: medicalRecord.id,
+        doctor_id: req.user.id,
+      },
+      userId: req.user.id,
+    });
+    const InvestigationOrder = await db.InvestigationOrder.findOne({
+      where: {
+        medicalRecord_id: medicalRecord.id,
+      },
+    });
+    if (InvestigationOrder) {
+      await db.OrderedTest.destroy({
+        where: {
+          investigationOrder_id: InvestigationOrder?.id,
+          requested_by: req.user.id,
+        },
+        userId: req.user.id,
+      });
+      await InvestigationOrder.destroy({ userId: req.user.id });
+    }
+
+    const prescription = await db.Prescription.findOne({
+      where: {
+        medical_record_id: medicalRecord.id,
+      },
+    });
+    if (prescription) {
+      await db.PrescribedMedicine.destroy(
+        {
+          where: {
+            prescription_id: prescription?.id,
+            doctor_id: req.user.id,
+          },
+        },
+        { userId: req.user.id }
+      );
+    }
+
+    await medicalRecordDetail?.destroy({ userId: req.user.id });
+    res.status(200).json({ msg: "Medical record cancelled successfully" });
   }),
 };

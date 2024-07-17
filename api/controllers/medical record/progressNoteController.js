@@ -118,7 +118,7 @@ module.exports = progressNoteController = {
       current_management: currentmanagement,
       taken_date: new Date(),
     });
-    if (investigations.length > 0) {
+    if (investigations?.length > 0) {
       // console.log("\nejdgbwjegfv\n");
       const is_Invetigated = await db.InvestigationOrder.findOne({
         where: {
@@ -155,7 +155,7 @@ module.exports = progressNoteController = {
         investigations,
         "lab"
       );
-      if (underPanels.length > 0) {
+      if (underPanels?.length > 0) {
         await Promise.all(
           underPanels.map((test) => {
             return db.OrderedTest.create({
@@ -176,7 +176,7 @@ module.exports = progressNoteController = {
 
     // console.log(prescriptionExist);
 
-    if (internal_prescriptions.length > 0) {
+    if (internal_prescriptions?.length > 0) {
       const medicineItemIds = internal_prescriptions.map((medicine) => {
         return parseInt(medicine.medicine_id);
       });
@@ -213,7 +213,7 @@ module.exports = progressNoteController = {
 
       console.log(medicineItemIds);
     }
-    if (diagnoses.length > 0) {
+    if (diagnoses?.length > 0) {
       await Promise.all(
         diagnoses.map(async (diagnosis) => {
           return db.Diagnosis.create({
@@ -250,7 +250,7 @@ module.exports = progressNoteController = {
         })
       );
     }
-    if (vitals.length > 0) {
+    if (vitals?.length > 0) {
       const vital = await db.Vital.create({
         medicalRecord_id: medicalRecord.id,
         examiner_id: req.user.id,

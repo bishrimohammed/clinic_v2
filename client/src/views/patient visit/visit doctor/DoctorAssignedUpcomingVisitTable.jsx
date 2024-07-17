@@ -291,7 +291,7 @@ const DoctorAssignedUpcomingVisitTable = () => {
                           </Dropdown.Item>
                         ) : null}
                         {/* {rowEl.original.stage === "Performing consultation" ? ( */}
-                        <Dropdown.Item
+                        {/* <Dropdown.Item
                           className="d-flex gap-2 align-items-center"
                           role="button"
                           disabled={!rowEl.original.status}
@@ -305,7 +305,7 @@ const DoctorAssignedUpcomingVisitTable = () => {
                           }}
                         >
                           <RiEditLine /> Admit
-                        </Dropdown.Item>
+                        </Dropdown.Item> */}
                         {/* ) : null} */}
                         <Dropdown.Item
                           className="d-flex gap-2 align-items-center"

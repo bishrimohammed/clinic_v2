@@ -218,7 +218,7 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                     type="datetime-local"
                     {...register("date", {
                       onChange: (e) => {
-                        console.log(format(new Date(), "HH:mm"));
+                        // console.log(format(new Date(), "HH:mm"));
                         const dateTime = e.target.value;
                         const date = dateTime.substring(0, 10);
                         const time = dateTime.substring(11, 16);

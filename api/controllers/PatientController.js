@@ -52,6 +52,7 @@ module.exports = PatientController = {
         "phone",
         "status",
         "createdAt",
+        "card_number",
       ],
       order: [
         ["firstName", "ASC"],

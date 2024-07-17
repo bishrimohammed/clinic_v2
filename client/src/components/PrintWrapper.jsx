@@ -26,7 +26,7 @@ const PrintWrapper = (props) => {
           style={{ position: "absolute", bottom: "0", right: "20px" }}
           // className="d-flex justify-content-end"
         >
-          <Image src={Host_URL + getClinicInformation()?.clinic_seal} />
+          {/* <Image src={Host_URL + getClinicInformation()?.clinic_seal} /> */}
         </div>
       </div>
       <div>

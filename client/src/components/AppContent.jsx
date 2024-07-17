@@ -81,8 +81,8 @@ const PatientVisit = React.lazy(() =>
 const PatientVisitList = React.lazy(() =>
   import("../views/patient visit/PatientVisitList")
 );
-const ViewUpcomingVisitDetail = React.lazy(() =>
-  import("../views/patient visit/upcoming/ViewUpcomingVisitDetail")
+const PerformTriage = React.lazy(() =>
+  import("../views/patient visit/upcoming/PerformTriage")
 );
 
 // jhglbjvjh
@@ -303,7 +303,7 @@ const AppContent = () => {
                 )
               }
             />
-            <Route path="view" element={<ViewUpcomingVisitDetail />} />
+            <Route path="view" element={<PerformTriage />} />
             {/* <Route path="addpatient" element={<AddpatientToQue />} />
   <Route path="patientlist" element={<PatientQueList />} /> */}
           </Route>

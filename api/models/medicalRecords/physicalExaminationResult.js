@@ -22,8 +22,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       result: { type: DataTypes.STRING, allowNull: false },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      },
     },
     {
+      paranoid: true,
+
       freezeTableName: true,
       tableName: "physical_examination_result",
       timestamps: false,

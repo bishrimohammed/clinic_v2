@@ -230,16 +230,16 @@ const OutStandingBillListTable = (
                       }
                     }
                   >
-                    {rowEl.original.has_advanced_payment && (
-                      <AddAdvancedPaymentButton
-                        billId={rowEl.original.id}
-                        patient={rowEl.original.patient}
-                        visit_stage={rowEl.original.visit.stage}
-                        is_advanced_payment_amount_completed={
-                          rowEl.original.is_advanced_payment_amount_completed
-                        }
-                      />
-                    )}
+                    {/* {rowEl.original.has_advanced_payment && ( */}
+                    <AddAdvancedPaymentButton
+                      billId={rowEl.original.id}
+                      patient={rowEl.original.patient}
+                      visit_stage={rowEl.original.visit.stage}
+                      is_advanced_payment_amount_completed={
+                        rowEl.original.is_advanced_payment_amount_completed
+                      }
+                    />
+                    {/* )} */}
 
                     <Dropdown
                       id={rowEl.original.id + "dropdown"}

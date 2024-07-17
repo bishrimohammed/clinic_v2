@@ -9,6 +9,9 @@ import PlanTab from "./PlanTab";
 import InvestigationTab from "./InvestigationTab";
 import { LuLock } from "react-icons/lu";
 import { useSelector } from "react-redux";
+import CancelCunsultaionButton from "./CancelCunsultaionButton";
+import ConsultationBackButton from "./ConsultationBackButton";
+// import { ConsultationBackButton } from "./ConsultationBackButton";
 const ConsultationContent = ({ changeVisibleContent }) => {
   const navigate = useNavigate();
   const examTabLocked = useSelector((state) => state.consultation.examLocked);
@@ -32,16 +35,16 @@ const ConsultationContent = ({ changeVisibleContent }) => {
     const ExaminationData = ExaminationRef.current.getSaveForLaterData();
     const PlanData = PlanRefs.current.getSaveForLaterData();
 
-    console.log(chiefComplaintData);
-    console.log(ExaminationData);
-    console.log(PlanData);
+    // console.log(chiefComplaintData);
+    // console.log(ExaminationData);
+    // console.log(PlanData);
   };
-  const resetHandler = () => {
-    chiefComplaintRef.current.resetData();
-    ExaminationRef.current.resetData();
-    PlanRefs.current.resetData();
-    // setChildData([]);
-  };
+  // const resetHandler = () => {
+  //   chiefComplaintRef.current.resetData();
+  //   ExaminationRef.current.resetData();
+  //   PlanRefs.current.resetData();
+  //   // setChildData([]);
+  // };
 
   const changeVisibleContentHandler = () => {
     changeVisibleContent("ProgressNotePage");
@@ -50,27 +53,11 @@ const ConsultationContent = ({ changeVisibleContent }) => {
     <div>
       <div className="d-flex mt-2 justify-content-between gap-2 border-bottom pb-2 top-buttons">
         <div className=" p-2  d-flex gap-3 align-items-center">
-          <IoMdArrowRoundBack
-            className="cursorpointer"
-            size={22}
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate(-1)}
-          />
-          <h5 className="mb-0">Back</h5>
+          <ConsultationBackButton />
+          <h5 className="mb-0">Perform Consultation</h5>
         </div>
         <div className=" d-flex gap-2">
-          <Button
-            variant="danger"
-            className="btn-sm"
-            // disabled={
-            //   !localStorage.getItem(`medical_${state.medicalRecord_id}`) ||
-            //   isPending
-            // }
-            // onClick={() => setShowCancelTriageModal(true)}
-            onClick={resetHandler}
-          >
-            Cancel
-          </Button>
+          <CancelCunsultaionButton medicalRecordId={state.medicalRecord_id} />
           <Button
             // disabled={isPending}
             onClick={handleSaveForLater}
@@ -112,11 +99,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
       >
         <Tab
           eventKey="Symptoms"
-          title={
-            <span className="d-flex align-items-center">
-              Symptoms <LuLock className="ms-2" />
-            </span>
-          }
+          title={<span className="d-flex align-items-center">Symptoms</span>}
         >
           <ChiefComplaint ref={chiefComplaintRef} />
         </Tab>
@@ -124,7 +107,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           eventKey="Examination"
           title={
             <span className="d-flex align-items-center">
-              Examination <LuLock className="ms-1" />
+              Examination {examTabLocked && <LuLock className="ms-1" />}
             </span>
           }
           disabled={examTabLocked}
@@ -147,7 +130,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           title={
             <span className="d-flex align-items-center">
               Treatment
-              <LuLock className="ms-1" />
+              {treatmentTabLocked && <LuLock className="ms-1" />}
             </span>
           }
           disabled={treatmentTabLocked}
@@ -159,7 +142,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           title={
             <span className="d-flex align-items-center">
               Plan
-              <LuLock className="ms-1" />
+              {planTabLocked && <LuLock className="ms-1" />}
             </span>
           }
           disabled={planTabLocked}

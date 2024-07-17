@@ -24,8 +24,15 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      },
     },
     {
+      // timestamps: true,
+      paranoid: true,
       hooks: {
         afterCreate: async (currentMedication, options) => {
           await sequelize.models.current_medications_audit.create({

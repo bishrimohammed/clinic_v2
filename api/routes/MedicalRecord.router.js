@@ -110,6 +110,7 @@ router.post(
   protect,
   MedicalRecordController.addSickLeaveNote
 );
+
 router.patch(
   "/diagnosis/:diagnosis_id/confirm",
   protect,
@@ -121,5 +122,9 @@ router.patch(
   protect,
   MedicalRecordController.Ruled_out_Diagnosis
 );
-
+router.delete(
+  "/:id/cancel-medical-record",
+  protect,
+  MedicalRecordController.cancelMedicalRecord
+);
 module.exports = router;

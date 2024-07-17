@@ -19,8 +19,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: true,
       },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      },
     },
     {
+      paranoid: true,
+
       hooks: {
         afterCreate: async (investigationOrder, options) => {
           await sequelize.models.investigation_orders_audit.create({

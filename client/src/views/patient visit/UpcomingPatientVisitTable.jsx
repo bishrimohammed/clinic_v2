@@ -290,7 +290,7 @@ const UpcomingPatientVisitTable = () => {
                             >
                               <RiEditLine /> Continue Triage
                             </Dropdown.Item>
-                            <Dropdown.Item
+                            {/* <Dropdown.Item
                               className="d-flex gap-2 align-items-center"
                               role="button"
                               disabled={!rowEl.original.status}
@@ -307,7 +307,7 @@ const UpcomingPatientVisitTable = () => {
                               }}
                             >
                               <RiEditLine /> Finish Triage
-                            </Dropdown.Item>
+                            </Dropdown.Item> */}
                           </>
                         ) : null}
                         <Dropdown.Item

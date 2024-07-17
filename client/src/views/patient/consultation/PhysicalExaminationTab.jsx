@@ -30,12 +30,10 @@ const physicalExaminationSchema = yup.object().shape({
     yup.object().shape({
       physicalExaminationId: yup.number().required(),
       name: yup.string(),
-      value: yup
-        .string()
-        .transform((value) => value.trim())
-        .when("name", ([name], schema) => {
-          return schema.required(name + "  is required");
-        }),
+      value: yup.string().transform((value) => value.trim()),
+      // .when("name", ([name], schema) => {
+      //   return schema.required(name + "  is required");
+      // }),
     })
   ),
   // vitals: yup.array().of(
@@ -96,30 +94,33 @@ const PhysicalExaminationTab = React.forwardRef((props, ref) => {
     resetData: () => reset(),
   }));
   const submitHandler = (data) => {
-    console.log(data);
+    // console.log(data);
+    // return;
+    const physicalExamination = data.physicalExaminations.some(
+      (phy) => phy.value !== ""
+    )
+      ? data.physicalExaminations
+      : undefined;
+    // console.log(physicalExamination);
     // return;
     mutateAsync({
       medicalRecordId: state.medicalRecord_id,
-      formData: data,
+      formData: {
+        indirectlySelectedLabs: data.indirectlySelectedLabs,
+        selectedLabs: data.selectedLabs,
+        physicalExaminations: physicalExamination,
+      },
     }).then((res) => {
+      console.log(res);
       if (res.status === 201) {
         reset();
+        // setValue("indirectlySelectedLabs", []);
+        // setValue("selectedTests", []);
+        // setValue("i", []);
       }
     });
   };
-  // console.log("rere");
-  if (PhysicalExaminationPending) return <Spinner />;
-  const getPhysicalExaminationDefaultValue = (id) => {
-    const physicalExamination = data?.physicalExamination.find(
-      (physicalExamination) =>
-        physicalExamination.physical_ExaminationField_id === id
-    );
-    return physicalExamination?.value;
-  };
-  // const getVitalDefaultValue = (id) => {
-  //   const vital = data?.vital.find((vital) => vital.vitalSignField_id === id);
-  //   return vital?.result;
-  // };
+
   const vitalSignFieldNames = Array.from(
     new Set(
       vitalSigns?.flatMap((item) =>

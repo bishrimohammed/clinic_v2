@@ -13,7 +13,7 @@ export const useAddPhysicalExamination = () => {
         `medicalrecords/${data.medicalRecordId}/add_physical_examination`,
         data.formData,
         { headers }
-      ).then((res) => res.data);
+      );
     },
     onSuccess: (data, variables) => {
       toast.success(data.message);
@@ -22,6 +22,13 @@ export const useAddPhysicalExamination = () => {
           "Medical Record",
           variables?.medicalRecordId,
           "Physical Examination",
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "Medical Record",
+          variables?.medicalRecordId,
+          "Ordered Lab Investigations",
         ],
       });
     },

@@ -64,8 +64,15 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: "pending",
         values: ["pending", "completed"],
       },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      },
     },
     {
+      paranoid: true,
+
       hooks: {
         afterCreate: async (orderedTest, options) => {
           await sequelize.models.ordered_tests_audit.create({

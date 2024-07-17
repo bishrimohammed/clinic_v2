@@ -1,8 +1,9 @@
 import React from "react";
-import { Modal, Table } from "react-bootstrap";
+import { Image, Modal, Table } from "react-bootstrap";
 import PrintWrapper from "../../../components/PrintWrapper";
 import PrintHeader from "../../patient/History/print/printComponents/PrintHeader";
 import PatientInfornPrint from "../../patient/History/print/printComponents/PatientInfornPrint";
+import { getClinicInformation } from "../../../utils/getClinicInformation";
 
 const PrescriptionPrintPreviewModal = ({
   show,
@@ -92,12 +93,12 @@ const PrescriptionPrintPreviewModal = ({
                   </tbody>
                 </Table>
               </div>
-              {/* <div
-              style={{ position: "absolute", bottom: "0", right: "20px" }}
-              className="d-flex justify-content-end"
-            >
-              <Image src={Host_URL + getClinicInformation()?.clinic_seal} />
-            </div> */}
+              <div
+                // style={{ position: "absolute", bottom: "0", right: "20px" }}
+                className="d-flex justify-content-end"
+              >
+                {/* <Image src={Host_URL + getClinicInformation()?.clinic_seal} /> */}
+              </div>
             </div>
           </div>
         </PrintWrapper>

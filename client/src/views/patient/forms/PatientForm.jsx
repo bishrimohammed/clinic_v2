@@ -21,7 +21,7 @@ import { nationalityList } from "../utils/Nationality";
 // import { generatePatientID } from "../utils/generatePatientID";
 // const getPatientId = await generatePatientID();
 const PatientForm = ({ patient }) => {
-  console.log(patient);
+  // console.log(patient);
   // const PateintUniqueId = useCallback(
   //   () => generatePatientID().then((res) => res),
   //   []
@@ -35,44 +35,43 @@ const PatientForm = ({ patient }) => {
     // generate patient id
     const generatePatientID = async () => {
       // Retrieve the last used patient ID from your data store (e.g., local storage, database)
-      let lastID = localStorage.getItem("LastPatientID");
+      // let lastID = localStorage.getItem("LastPatientID");
       // console.log(lastID);
       // Extract the numeric part of the last ID and increment it
       let nextNumber;
-      if (lastID) {
-        nextNumber = String(parseInt(lastID?.split("-")[1]) + 1).padStart(
-          5,
-          "0"
-        );
+      // if (lastID) {
+      // nextNumber = String(parseInt(lastID?.split("-")[1]) + 1).padStart(
+      //   5,
+      //   "0"
+      // );
 
-        return `P-${nextNumber}`;
-      } else {
+      // return `P-${nextNumber}`;
+      // } else {
+      if (!patient) {
         const res = await Axiosinstance.get("patient/lastPatientID");
         //  .then((res) => {
         //   console.log(res.data);
-        nextNumber = String(parseInt(res.data?.split("-")[1]) + 1).padStart(
-          5,
-          "0"
-        );
+
         // });
         if (!res.data) {
-          localStorage.setItem("LastPatientID", "P-00001");
-          return "P-00001";
+          // localStorage.setItem("LastPatientID", "P-00001");
+          setValue("patientId", "P-00001");
+        } else {
+          nextNumber = String(parseInt(res.data?.split("-")[1]) + 1).padStart(
+            5,
+            "0"
+          );
+          setValue("patientId", nextNumber);
         }
-        localStorage.setItem(
-          "LastPatientID",
-          "P-" + String(parseInt(res.data?.split("-")[1])).padStart(5, "0")
-        );
-        return `P-${nextNumber}`;
-        console.log(nextNumber);
+      } else {
+        setValue("patientId", patient.card_number);
       }
-      // Combine the prefix and the new number
-      let newID = `P-${nextNumber}`;
 
-      // Store the new last used patient ID
-      // localStorage.setItem('LastPatientID', newID);
-
-      return newID;
+      // localStorage.setItem(
+      //   "LastPatientID",
+      //   "P-" + String(parseInt(res.data?.split("-")[1])).padStart(5, "0")
+      // );
+      return `P-${nextNumber}`;
     };
     generatePatientID();
     // .then((res) => {

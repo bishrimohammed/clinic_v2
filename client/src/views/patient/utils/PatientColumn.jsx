@@ -4,8 +4,8 @@ const columnHelper = createColumnHelper();
 
 export const patientColumns = [
   {
-    header: "#",
-    accessorFn: (row, index) => index + 1,
+    header: "Patient ID",
+    accessorFn: (row, index) => row.card_number,
   },
   {
     header: "Name",

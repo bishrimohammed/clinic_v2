@@ -35,6 +35,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      },
     },
     {
       hooks: {
@@ -66,6 +71,7 @@ module.exports = (sequelize, DataTypes) => {
           });
         },
       },
+      paranoid: true,
     }
   );
   physicalExamination.sync({ alter: false, force: false });

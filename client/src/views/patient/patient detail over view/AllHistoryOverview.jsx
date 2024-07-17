@@ -18,14 +18,14 @@ const AllHistoryOverview = ({ medicalRecords }) => {
           <Card.Header>
             <ContextAwareToggle eventKey={index}>
               <div className="d-flex justify-content-between">
-                {format(new Date(history.createdAt), "yyyy-mm-d")}
-                <Link
+                {format(new Date(history.createdAt), "yyyy-MM-d")}
+                {/* <Link
                   to={`/patients/history/${history.id}`}
                   //replace
                   className="me-2"
                 >
                   view detail
-                </Link>
+                </Link> */}
               </div>
             </ContextAwareToggle>
           </Card.Header>

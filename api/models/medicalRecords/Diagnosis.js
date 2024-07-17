@@ -29,8 +29,14 @@ module.exports = (sequelize, DataTypes) => {
         values: ["Suspected", "Confirmed", "Ruled out"],
         defaultValue: "Suspected",
       },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      },
     },
     {
+      paranoid: true,
       hooks: {
         afterCreate: async (diagnosis, options) => {
           await sequelize.models.diagnoses_audit.create({

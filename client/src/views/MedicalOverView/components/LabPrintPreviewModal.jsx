@@ -145,12 +145,12 @@ const LabPrintPreviewModal = ({ show, handleClose, patient, labTests }) => {
                   </tbody>
                 </Table>
               </div>
-              {/* <div
-                style={{ position: "absolute", bottom: "0", right: "20px" }}
+              <div
+                // style={{ position: "absolute", bottom: "0", right: "20px" }}
                 className="d-flex justify-content-end"
               >
                 <Image src={Host_URL + getClinicInformation()?.clinic_seal} />
-              </div> */}
+              </div>
             </div>
           </div>
         </PrintWrapper>

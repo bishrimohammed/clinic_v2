@@ -42,8 +42,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: true,
       },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      },
     },
     {
+      paranoid: true,
+
       hooks: {
         afterCreate: async (record, options) => {
           await sequelize.models.medicalrecorddetails_audit.create({

@@ -103,7 +103,7 @@ const ViewBillDetails = () => {
         variant="underline"
         className="mb-3 mt-3 border-bottom gap-5 "
       >
-        <Tab eventKey="home" title="Current Dues Payments">
+        <Tab eventKey="home" title="Active Visit Payments">
           <CurrentDuesPaymentTable payments={state.payments} />
         </Tab>
         <Tab eventKey="profile" title="Previous Payment History">

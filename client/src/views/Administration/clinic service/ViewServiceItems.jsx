@@ -7,7 +7,7 @@ import ServiceItemsFilterModal from "./serviceItems/ServiceItemsFilterModal";
 import ViewServiceItemDetail from "./serviceItems/ViewServiceItemDetail";
 import UpdateServiceItemModal from "./update/UpdateServiceItemModal";
 import ServiceGroupModal from "./ServiceGroupModal";
-import CreateServiceItemModal from "./serviceItems/createServiceItemModal";
+import CreateServiceItemModal from "./serviceItems/CreateServiceItemModal";
 
 const ViewServiceItems = () => {
   const [filter, setFilter] = useState({

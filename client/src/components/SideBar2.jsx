@@ -18,6 +18,7 @@ import { changeSidebarShow } from "../store/sidebarSlice";
 import SimpleBar from "simplebar-react";
 import {
   MdAdminPanelSettings,
+  MdOutlineMoneyOffCsred,
   MdSchedule,
   MdSpaceDashboard,
 } from "react-icons/md";
@@ -331,6 +332,25 @@ const SideBar2 = () => {
               Medical Record Overview
             </CNavLink>
           </CNavItem>
+        )}
+        {currentUser.role?.name === "cashier" && (
+          <CNavGroup
+            idx="payments"
+            visible={location.pathname.startsWith("payments")}
+            toggler={navLink(
+              "Payments",
+              // <CIcon icon={cilPuzzle} customClassName="nav-icon" />
+              <MdOutlineMoneyOffCsred className="nav-icon" />
+            )}
+          >
+            <CNavLink to="/payments" as={NavLink}>
+              Outstanding Payments
+            </CNavLink>
+
+            {/* <CNavItem to="/billings/prices" component={NavLink}>
+                Prices
+              </CNavItem> */}
+          </CNavGroup>
         )}
         {/* </SimpleBar> */}
       </CSidebarNav>

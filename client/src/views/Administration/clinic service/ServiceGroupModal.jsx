@@ -6,7 +6,7 @@ import * as yup from "yup";
 import { useGetClinicService } from "./hooks/useGetClinicService";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAddServiceGroup } from "./hooks/service group/UseAddServiceGroup";
+import { useAddServiceGroup } from "./hooks/service group/useAddServiceGroup";
 import { useEditServiceGroup } from "./hooks/service group/useEditServiceGroup";
 import { FaLock, FaUnlock, FaUserLock } from "react-icons/fa6";
 import ServiceGroupDeactivateModal from "./service group/ServiceGroupDeactivateModal";

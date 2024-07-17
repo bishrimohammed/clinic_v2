@@ -141,6 +141,7 @@ const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
     //   vitals: VitalSignFields,
     // },
   });
+  console.log(errors);
   const { fields, append, remove } = useFieldArray({
     control,
     name: "internal_prescriptions",

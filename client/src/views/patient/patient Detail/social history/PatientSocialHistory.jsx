@@ -34,7 +34,7 @@ const PatientSocialHistory = ({
           {data?.map((condition, index) => (
             <span key={index + condition.id}>
               {condition.tobacco_use}
-              {index !== socialHistories.length - 1 ? ", " : null}
+              {index !== socialHistories?.length - 1 ? ", " : null}
             </span>
           ))}
         </div>

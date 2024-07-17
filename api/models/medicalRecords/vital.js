@@ -20,12 +20,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
-      // vital_id: {
-      //   type: DataTypes.INTEGER,
-      //   allowNull: true,
-      // },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+      },
     },
     {
+      paranoid: true,
       hooks: {
         afterCreate: async (vitalSign, options) => {
           await sequelize.models.vital_signs_audit.create({

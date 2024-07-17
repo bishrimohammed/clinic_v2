@@ -15,7 +15,7 @@ const AddAdvancedPaymentButton = ({
       <button
         className="btn btn-secondary btn-sm"
         onClick={() => setShowAddAdvancedPaymentModal(true)}
-        disabled={!is_advanced_payment_amount_completed}
+        // disabled={!is_advanced_payment_amount_completed}
       >
         Process Advance
       </button>
