@@ -95,6 +95,11 @@ module.exports = (sequelize, DataTypes) => {
           "Done",
         ],
       },
+      isAdmitted: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       status: {
         type: DataTypes.BOOLEAN,
         allowNull: false,

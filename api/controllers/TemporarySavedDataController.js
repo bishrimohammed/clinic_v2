@@ -120,8 +120,8 @@ module.exports = TemporarySavedDataController = {
       });
       await SavedForLateprogressNote.destroy();
     }
-    console.log(SavedForLateprogressNote);
-    return;
+    // console.log(SavedForLateprogressNote);
+    // return;
     const progressNote = await db.Temporary_ProgressNote.create({
       medical_record_id: medical_record_id,
       problem_list: problemList,
@@ -166,5 +166,11 @@ module.exports = TemporarySavedDataController = {
     });
     // res.status(201).json(progressNote);
     console.log(req.body);
+  }),
+  saveTemporaryConsultationData: asyncHandler(async (req, res) => {
+    const { medical_record_id } = req.params;
+    const { symptoms, examination, plan } = req.body;
+    console.log(req.body);
+    res.json({ msg: "jhdvbjwgv" });
   }),
 };

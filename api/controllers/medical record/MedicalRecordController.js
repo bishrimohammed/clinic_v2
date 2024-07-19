@@ -1215,7 +1215,8 @@ module.exports = MedicalRecordController = {
     res.status(201).json({ msg: "Vital Signatures added successfully" });
   }),
   addVitalSign: asyncHandler(async (req, res) => {
-    const { vitals } = req.body;
+    const { vitals, vital_takenAt } = req.body;
+    console.log(req.body);
     const medicalRecord = await db.MedicalRecord.findByPk(req.params.id);
     if (!medicalRecord) {
       res.status(404);
@@ -1225,7 +1226,7 @@ module.exports = MedicalRecordController = {
       {
         medicalRecord_id: medicalRecord.id,
         examiner_id: req.user.id,
-        taken_date: Date.now(),
+        taken_date: vital_takenAt ? new Date(vital_takenAt) : Date.now(),
         // progrssNote_id: progressNote.id,
       },
       { userId: req.user.id }

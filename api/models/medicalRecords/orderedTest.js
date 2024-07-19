@@ -72,7 +72,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       paranoid: true,
-
       hooks: {
         afterCreate: async (orderedTest, options) => {
           await sequelize.models.ordered_tests_audit.create({

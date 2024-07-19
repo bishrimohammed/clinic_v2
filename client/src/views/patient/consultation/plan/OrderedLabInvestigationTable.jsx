@@ -121,9 +121,8 @@ export const OrderedLabInvestigationTable = ({
               <tr>
                 <th>#</th>
                 <th>test Name</th>
-                {/* <th>Requested Time</th> */}
                 <th>Requested By</th>
-
+                <th>Requested Time</th>
                 <th>Status</th>
               </tr>
 
@@ -136,16 +135,41 @@ export const OrderedLabInvestigationTable = ({
                   <tr key={investigation.id}>
                     <td>{index + 1}</td>
                     <td>{investigation.test?.service_name}</td>
-                    {/* <td>
-                    {format(new Date(investigation.createdAt), "yyyy-MM-dd") +
-                      "    " +
-                      format(new Date(investigation.createdAt), "hh:mm a")}
-                  </td> */}
+
                     <td>
                       {investigation.requestedBy?.employee?.firstName}{" "}
                       {investigation.requestedBy?.employee?.middleName}{" "}
                     </td>
-                    <td>{investigation.status}</td>
+                    <td>
+                      {format(
+                        new Date(investigation.order_time),
+                        "yyyy-MM-dd"
+                      ) +
+                        "    " +
+                        format(new Date(investigation.order_time), "hh:mm a")}
+                    </td>
+                    <td>
+                      {" "}
+                      <span
+                        style={{
+                          borderRadius: 15,
+                          padding: "0.2rem 0.5rem",
+                          fontSize: 13,
+                          fontWeight: 500,
+                          backgroundColor:
+                            investigation.status === "completed"
+                              ? "green"
+                              : "#ffc107",
+                          color:
+                            investigation.status === "completed"
+                              ? "white"
+                              : "white",
+                        }}
+                        className="d-inline-flex align-items-center justify-content-center"
+                      >
+                        {investigation.status}
+                      </span>
+                    </td>
                   </tr>
                 ))}
             </tbody>

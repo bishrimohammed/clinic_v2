@@ -43,7 +43,7 @@ const AddReferralNoteModal = ({
         <Row className="">
           <Col sm={12}>
             <Form.Group className="mb-3">
-              <Form.Label>Hospital Name</Form.Label>
+              <Form.Label>Refer To</Form.Label>
               <Form.Control
                 // type="date"
                 type="text"

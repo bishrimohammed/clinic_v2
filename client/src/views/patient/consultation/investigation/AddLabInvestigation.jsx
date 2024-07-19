@@ -8,12 +8,14 @@ import { useLocation, useParams } from "react-router-dom";
 import { useGetLaboratory } from "../../History/investigation/hooks/useGetLaboratory";
 import { useGetLabCategory } from "./useGetLabCategory";
 import { useAddLabOrder } from "../../History/investigation/hooks/useAddLabOrder";
+import { useGetImagingCategory } from "../../History/investigation/hooks/useGetImagingCategory";
 
 const AddLabInvestigation = ({ show, handleClose, setValue, getValues }) => {
   const { data: laboratoryTests, error } = useGetLaboratory();
   const { data: labCategories } = useGetLabCategory();
-  // console.log(labCategories);
-  const { mutateAsync, isPending } = useAddLabOrder();
+  const { data: imagingCategories } = useGetImagingCategory();
+  console.log(imagingCategories);
+  // const { mutateAsync, isPending } = useAddLabOrder();
   // console.log(laboratoryTests);
   // const remarkref = useRef();
 
@@ -26,11 +28,7 @@ const AddLabInvestigation = ({ show, handleClose, setValue, getValues }) => {
       : []
   );
   const { state } = useLocation();
-  // console.log(state);
-  // Add a handler to toggle a test selected state
 
-  // console.log(serviceCategory);
-  // return;
   const [activeCategory, setActiveCategory] = useState(1);
 
   if (error) return "An error has occurred: " + error.message;
@@ -203,46 +201,6 @@ const AddLabInvestigation = ({ show, handleClose, setValue, getValues }) => {
       selectedTests.filter((t) => t !== testId)
     );
   };
-
-  const submitHandler = () => {
-    // if (remarkref.current.value === "") {
-    //   toast.error(" clinical finding empty");
-    //   return;
-    // }
-    const investigations = selectedTests.map((t) => {
-      const lab = laboratoryTests.find((lab) => lab.id === t);
-      // console.log(lab);
-      return lab?.labTest_id;
-    });
-    const underPanels = indirecSselectedTests.map((t) => {
-      const lab = laboratoryTests.find((lab) => lab.id === t);
-      // console.log(lab);
-      return lab?.labTest_id;
-    });
-
-    // console.log(selectedTests);
-    // console.log(investigations);
-    // return;
-    const formData = {
-      investigations: investigations,
-      underPanels,
-      // clinical_finding: remarkref.current.value,
-    };
-    mutateAsync({ formData, medicalRecord_id: state.medicalRecord_id }).then(
-      (resData) => {
-        console.log(resData);
-        if (resData.status === 201) {
-          setSelectedTests([]);
-          // setIndirecSselectedTests([]);
-          // remarkref.current.value = "";
-          handleClose();
-        }
-      }
-    );
-    // mutate(Data);
-    // console.log(Data);
-  };
-  // console.log(laboratoryTests);
 
   const testList = laboratoryTests
     ?.filter(

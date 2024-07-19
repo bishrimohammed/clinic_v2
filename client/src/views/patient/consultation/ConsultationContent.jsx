@@ -1,5 +1,5 @@
 import React, { Fragment, useRef, useState } from "react";
-import { Button, Tab, Tabs } from "react-bootstrap";
+import { Button, Spinner, Tab, Tabs } from "react-bootstrap";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
 import ChiefComplaint from "./ChiefComplaint";
@@ -11,9 +11,14 @@ import { LuLock } from "react-icons/lu";
 import { useSelector } from "react-redux";
 import CancelCunsultaionButton from "./CancelCunsultaionButton";
 import ConsultationBackButton from "./ConsultationBackButton";
+import LabResultTab from "./LabResultTab";
+import { useConsultationSaveForLater } from "../hooks/consultationHooks/useConsultationSaveForLater";
+import HistoryTab from "./HistoryTab";
+// import LabResultTab from "./LabResultTab";
 // import { ConsultationBackButton } from "./ConsultationBackButton";
 const ConsultationContent = ({ changeVisibleContent }) => {
   const navigate = useNavigate();
+  const { mutateAsync, isPending } = useConsultationSaveForLater();
   const examTabLocked = useSelector((state) => state.consultation.examLocked);
   const treatmentTabLocked = useSelector(
     (state) => state.consultation.treatmentLocked
@@ -34,10 +39,30 @@ const ConsultationContent = ({ changeVisibleContent }) => {
     const chiefComplaintData = chiefComplaintRef.current.getSaveForLaterData();
     const ExaminationData = ExaminationRef.current.getSaveForLaterData();
     const PlanData = PlanRefs.current.getSaveForLaterData();
-
-    // console.log(chiefComplaintData);
-    // console.log(ExaminationData);
-    // console.log(PlanData);
+    const symptoms = {
+      chiefComplaint: chiefComplaintData.chief_complaint,
+      HPI: chiefComplaintData.HPI,
+    };
+    const physicalExamination = ExaminationData.physicalExaminations.some(
+      (phy) => phy.value !== ""
+    )
+      ? ExaminationData.physicalExaminations
+      : undefined;
+    const examination = {
+      physicalExaminations: physicalExamination,
+      underpanels: ExaminationData?.indirectlySelectedLabs,
+      investigations: ExaminationData?.selectedLabs,
+    };
+    const PLAN = {
+      plan: PlanData.plan,
+    };
+    mutateAsync({
+      formData: { plan: PlanData.plan, examination, symptoms },
+      medicalRecordId: state.medicalRecord_id,
+    });
+    console.log(chiefComplaintData);
+    console.log(ExaminationData);
+    console.log(PlanData);
   };
   // const resetHandler = () => {
   //   chiefComplaintRef.current.resetData();
@@ -65,6 +90,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
             className="btn-sm text-white"
             // className="text-white"
           >
+            {isPending && <Spinner size="sm" />}
             Save for Later
           </Button>
           <Button
@@ -91,22 +117,36 @@ const ConsultationContent = ({ changeVisibleContent }) => {
         </div>
       ) : null}
       <Tabs
-        defaultActiveKey="Symptoms"
+        defaultActiveKey="Home"
         id="uncontrolled-tab-example"
         className="mb-3 mt-2 border-bottom"
         variant="underline"
         justify
       >
         <Tab
+          eventKey="History"
+          title={
+            <span className="d-flex justify-content-center align-items-center">
+              History
+            </span>
+          }
+        >
+          <HistoryTab />
+        </Tab>
+        <Tab
           eventKey="Symptoms"
-          title={<span className="d-flex align-items-center">Symptoms</span>}
+          title={
+            <span className="d-flex justify-content-center align-items-center">
+              Symptoms
+            </span>
+          }
         >
           <ChiefComplaint ref={chiefComplaintRef} />
         </Tab>
         <Tab
           eventKey="Examination"
           title={
-            <span className="d-flex align-items-center">
+            <span className="d-flex justify-content-center align-items-center">
               Examination {examTabLocked && <LuLock className="ms-1" />}
             </span>
           }
@@ -114,21 +154,18 @@ const ConsultationContent = ({ changeVisibleContent }) => {
         >
           <PhysicalExaminationTab ref={ExaminationRef} />
         </Tab>{" "}
-        {/* <Tab
-          eventKey="InvestigationTab"
-          title={
-            <span className="d-flex align-items-center">
-              Investigation <LuLock />
-            </span>
-          }
-          disabled={treatmentTabLocked}
+        <Tab
+          eventKey="LabResultTab"
+          title="Lab Result"
+
+          // disabled={treatmentTabLocked}
         >
-          <InvestigationTab />
-        </Tab> */}
+          <LabResultTab />
+        </Tab>
         <Tab
           eventKey="Treatment"
           title={
-            <span className="d-flex align-items-center">
+            <span className="d-flex justify-content-center  align-items-center">
               Treatment
               {treatmentTabLocked && <LuLock className="ms-1" />}
             </span>
@@ -140,7 +177,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
         <Tab
           eventKey="Plan"
           title={
-            <span className="d-flex align-items-center">
+            <span className="d-flex justify-content-center align-items-center">
               Plan
               {planTabLocked && <LuLock className="ms-1" />}
             </span>

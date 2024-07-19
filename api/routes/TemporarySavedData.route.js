@@ -12,5 +12,10 @@ router.post(
   protect,
   TemporarySavedDataController.saveTemporaryProgressNoteData
 );
+router.post(
+  "/:medical_record_id/consultation",
+  protect,
+  TemporarySavedDataController.saveTemporaryConsultationData
+);
 
 module.exports = router;

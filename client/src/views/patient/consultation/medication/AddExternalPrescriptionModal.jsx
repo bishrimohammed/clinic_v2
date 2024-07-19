@@ -2,7 +2,6 @@ import React from "react";
 import { Form, Modal, Row, Spinner, Table } from "react-bootstrap";
 import { useFieldArray, useForm } from "react-hook-form";
 import * as yup from "yup";
-
 import { useLocation } from "react-router-dom";
 import { medicationOptions } from "../utils/medicationOptions";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -16,19 +15,15 @@ const ExternalMedicationSchema = yup.object().shape({
         .transform((value) => value.trim())
         .required("Drug name is required"),
 
-      dosage: yup
-        .string()
-        .transform((value) => value.trim())
-        .required("Dosage is required"),
-      frequency: yup
-        .string()
-        .transform((value) => value.trim())
-        .required("Frequency is required"),
+      dosage: yup.string().transform((value) => value.trim()),
+      // .required("Dosage is required"),
+      frequency: yup.string().transform((value) => value.trim()),
+      // .required("Frequency is required"),
       duration: yup
         .number()
         .positive()
-        .min(0, "Duration must be greater than 0")
-        .required(),
+        .min(0, "Duration must be greater than 0"),
+      // .required(),
       start_date: yup.date().required("Start date is required"),
       notes: yup.string().transform((value) => value.trim()),
     })
@@ -50,7 +45,7 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
     control,
     name: "rows",
   });
-  console.log(errors);
+  // console.log(errors);
   // const medicinesOptions = useMemo(
   //   () =>
   //     data?.map((m) => {
@@ -66,7 +61,7 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
     // console.log(data);
     const formData = data.rows;
 
-    console.log(formData);
+    // console.log(formData);
     // return;
     addprescriptionMutation
       .mutateAsync({ medicalRecord_id: state.medicalRecord_id, formData })
@@ -99,7 +94,7 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
                 <th>
                   <button
                     type="button"
-                    className="btn btn-success py-1"
+                    className="btn btn-sm btn-success py-1"
                     onClick={() =>
                       append({
                         drug_name: "",
@@ -111,7 +106,7 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
                       })
                     }
                   >
-                    Add
+                    +Add
                   </button>
                 </th>
               </tr>

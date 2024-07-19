@@ -170,11 +170,14 @@ input:focus {
   background-color: #fff !important;
 }
 
-/* .progressTab .nav-link {
-  color: #333 !important;
-} */
+/* .progressTab   */
 
-.progressTab .nav-link.active {
+.consultationHistory .nav-link {
+  color: #333 !important;
+}
+
+.progressTab .nav-link.active,
+.consultationHistory .nav-link.active {
   color: rgb(144, 7, 182) !important;
   /* color: rgb(117, 91, 180) !important; */
 }

@@ -40,30 +40,38 @@ const planSchema = yup.object().shape({
   sick_notes: yup.array().of(
     yup.object().shape({
       is_show: yup.boolean(),
-      start_date: yup
-        .date()
+      sickleave: yup
+        .number()
         .transform((value, originalValue) => {
           if (originalValue === "") {
             return undefined; // Return undefined for empty string
           }
           return value;
         })
-        .when("is_show", ([is_show], schema) => {
-          if (is_show) return schema.required("Start Date is required");
-          return schema;
-        }),
-      end_date: yup
-        .date()
-        .transform((value, originalValue) => {
-          if (originalValue === "") {
-            return undefined; // Return undefined for empty string
-          }
-          return value;
-        })
-        .when("is_show", ([is_show], schema) => {
-          if (is_show) return schema.required("End Date is required");
-          return schema;
-        }),
+        .min(1, "must be greater or equal to one day")
+        .required("sickleave is required"),
+      start_date: yup.date(),
+      // .transform((value, originalValue) => {
+      //   if (originalValue === "") {
+      //     return undefined; // Return undefined for empty string
+      //   }
+      //   return value;
+      // })
+      // .when("is_show", ([is_show], schema) => {
+      //   if (is_show) return schema.required("Start Date is required");
+      //   return schema;
+      // }),
+      end_date: yup.date(),
+      // .transform((value, originalValue) => {
+      //   if (originalValue === "") {
+      //     return undefined; // Return undefined for empty string
+      //   }
+      //   return value;
+      // })
+      // .when("is_show", ([is_show], schema) => {
+      //   if (is_show) return schema.required("End Date is required");
+      //   return schema;
+      // }),
       diagnosis: yup.array().of(
         yup.object().shape({
           diagnosis_id: yup.number(),
@@ -350,6 +358,7 @@ const PlanTab = React.forwardRef((props, ref) => {
                               .substring(0, 10),
                             end_date: "",
                             diagnosis: [],
+                            sickleave: "",
                           });
                           setShowAddSickNoteModal(true);
                         }}
@@ -380,8 +389,9 @@ const PlanTab = React.forwardRef((props, ref) => {
                         <tr>
                           <th>#</th>
                           <th>Diagnosis</th>
-                          <th>Start Date</th>
-                          <th>End Date</th>
+                          <th>Sick Leave Day</th>
+                          {/* <th>Start Date</th> */}
+                          {/* <th>End Date</th> */}
                           <th>Action</th>
                         </tr>
                       </thead>
@@ -396,8 +406,9 @@ const PlanTab = React.forwardRef((props, ref) => {
                                 </p>
                               ))}
                             </td>
-                            <td>{sickNote.start_date}</td>
-                            <td>{sickNote.end_date}</td>
+                            <td>{sickNote.sickleave}</td>
+                            {/* <td>{sickNote.start_date}</td>
+                            <td>{sickNote.end_date}</td> */}
                             <td>
                               <button
                                 type="button"

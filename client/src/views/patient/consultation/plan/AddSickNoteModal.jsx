@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { Col, Form, Modal, Row } from "react-bootstrap";
 
 const AddSickNoteModal = ({
   show,
@@ -11,14 +11,21 @@ const AddSickNoteModal = ({
   getValues,
   remove,
 }) => {
-  console.log(errors.sick_notes?.[fieldsLength - 1]?.end_date);
+  // console.log(errors.sick_notes?.[fieldsLength - 1]?.end_date);
   return (
     <Modal
       show={show}
       onHide={() => {
+        // if (
+        //   errors.sick_notes?.[fieldsLength - 1]?.end_date ||
+        //   getValues(`sick_notes[${fieldsLength - 1}].end_date`) === ""
+        // ) {
+        //   //   console.log(`sick_notes[${fieldsLength - 1}].end_date`);
+        //   remove(fieldsLength - 1);
+        // }
         if (
-          errors.sick_notes?.[fieldsLength - 1]?.end_date ||
-          getValues(`sick_notes[${fieldsLength - 1}].end_date`) === ""
+          errors.sick_notes?.[fieldsLength - 1]?.sickleave ||
+          getValues(`sick_notes[${fieldsLength - 1}].sickleave`) === ""
         ) {
           //   console.log(`sick_notes[${fieldsLength - 1}].end_date`);
           remove(fieldsLength - 1);
@@ -59,7 +66,22 @@ const AddSickNoteModal = ({
           ))}
         </Form.Group>
         <Row>
-          <Col md={4} sm={12}>
+          <Col md={6} sm={12}>
+            <Form.Group>
+              <Form.Label>Start Date</Form.Label>
+              <Form.Control
+                type="number"
+                {...register(`sick_notes.${fieldsLength - 1}.sickleave`)}
+                placeholder="Start Date"
+                isInvalid={errors?.sick_notes?.[fieldsLength - 1]?.sickleave}
+                // defaultValue={new Date().toISOString().substring(0, 10)}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.sick_notes?.[fieldsLength - 1]?.sickleave?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+          </Col>
+          {/* <Col md={4} sm={12}>
             <Form.Group>
               <Form.Label>Start Date</Form.Label>
               <Form.Control
@@ -88,9 +110,9 @@ const AddSickNoteModal = ({
                 {errors.sick_notes?.[fieldsLength - 1]?.end_date?.message}
               </Form.Control.Feedback>
             </Form.Group>
-          </Col>
-          <Col md={4} sm={12}></Col>
-          <Col md={4} sm={12}></Col>
+          </Col> */}
+          {/* <Col md={4} sm={12}></Col>
+          <Col md={4} sm={12}></Col> */}
         </Row>
       </Modal.Body>
       <Modal.Footer>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { useGetActiveVitalSignFields } from "../../../patient visit/hooks/useGetActiveVitalSignFields";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -19,6 +19,12 @@ const vitalSignSchema = yup.object().shape({
   //       }),
   //   })
   // ),
+  vital_takenAt: yup.date().transform((value, originalValue) => {
+    if (originalValue === "") {
+      return undefined; // Return undefined for empty string
+    }
+    return value;
+  }),
   vitals: yup.array().of(
     yup.object().shape({
       vitalId: yup.number(),
@@ -31,7 +37,7 @@ const vitalSignSchema = yup.object().shape({
 });
 const AddVitalSignModal = ({ show, handleClose, medicalRecordId }) => {
   const { data: VitalSignFields } = useGetActiveVitalSignFields();
-  const { mutateAsync } = useAddVitalSign();
+  const { mutateAsync, isPending } = useAddVitalSign();
   const {
     register,
     formState: { errors },
@@ -49,11 +55,13 @@ const AddVitalSignModal = ({ show, handleClose, medicalRecordId }) => {
     // },
   });
   const submitHandler = (data) => {
-    console.log(data);
+    // console.log(data);
     const Data = {
       vitalData: data,
       medicalRecordId: medicalRecordId,
     };
+    // console.log(Data);
+    // return;
     mutateAsync(Data)
       .then((res) => {
         if (res.status === 201) {
@@ -76,6 +84,20 @@ const AddVitalSignModal = ({ show, handleClose, medicalRecordId }) => {
       <Modal.Body>
         <Form id="vitalForm" onSubmit={handleSubmit(submitHandler)}>
           <Row>
+            <Col md={4} sm={12}>
+              <Form.Group className="mb-3">
+                <Form.Label>Vitals Taken At</Form.Label>
+                <Form.Control
+                  type="datetime-local"
+                  {...register("vital_takenAt")}
+                  isInvalid={errors.vital_takenAt}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.vital_takenAt?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+
             {VitalSignFields?.map((field, index) => (
               <Col key={field.id} md={4} sm={12} className="">
                 <Form.Group className="mb-3">
@@ -117,7 +139,8 @@ const AddVitalSignModal = ({ show, handleClose, medicalRecordId }) => {
         <Button variant="secondary" onClick={handleClose} type="button">
           Close
         </Button>
-        <Button form="vitalForm" type="submit">
+        <Button form="vitalForm" disabled={isPending} type="submit">
+          {isPending && <Spinner size="sm" />}
           Save
         </Button>
       </Modal.Footer>

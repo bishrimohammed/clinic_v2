@@ -76,6 +76,11 @@ module.exports = (sequelize, DataTypes) => {
           "Done",
         ],
       },
+      isAdmitted: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+      },
       status: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
@@ -101,6 +106,7 @@ module.exports = (sequelize, DataTypes) => {
             mode_of_arrival: visit.mode_of_arrival,
             stage: visit.stage,
             status: visit.status,
+            isAdmitted: visit.isAdmitted,
             operation_type: "I",
             changed_by: options.userId,
             changed_at: Date.now(),
@@ -124,7 +130,31 @@ module.exports = (sequelize, DataTypes) => {
             mode_of_arrival: previousValue.mode_of_arrival,
             stage: previousValue.stage,
             status: previousValue.status,
+            isAdmitted: previousValue.isAdmitted,
             operation_type: "U",
+            changed_by: options.userId,
+            changed_at: Date.now(),
+          });
+        },
+        beforeDestroy: async (visit, options) => {
+          await sequelize.models.patientvisits_audit.create({
+            patient_visit_id: visit.id,
+            doctor_id: visit.doctor_id,
+            patient_id: visit.patient_id,
+            medicalRecord_id: visit.medicalRecord_id,
+            visit_type_id: visit.visit_type_id,
+            assignment_date: visit.assignment_date,
+            visit_time: visit.visit_time,
+            visit_type: visit.visit_type,
+            is_referred: visit.is_referred,
+            reason: visit.reason,
+            created_by: visit.created_by,
+            symptom_notes: visit.symptom_notes,
+            mode_of_arrival: visit.mode_of_arrival,
+            stage: visit.stage,
+            status: visit.status,
+            isAdmitted: visit.isAdmitted,
+            operation_type: "D",
             changed_by: options.userId,
             changed_at: Date.now(),
           });
@@ -132,12 +162,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     }
   );
-  // patientAssignment.associate = (models) => {
-  //   Patient.belongsTo(models.Patient, {
-  //     foreignKey: "patient_id",
-  //     as: "patient",
-  //   });
-  // };
+
   patientAssignment.sync({ force: false, alter: false });
   return patientAssignment;
 };

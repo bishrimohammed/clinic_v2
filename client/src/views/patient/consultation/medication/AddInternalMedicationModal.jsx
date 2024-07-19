@@ -17,19 +17,15 @@ const InternalMedicationSchema = yup.object().shape({
           .transform((value) => value.trim())
           .required("Medicine is required"),
         medicineID: yup.string(),
-        dosage: yup
-          .string()
-          .transform((value) => value.trim())
-          .required("Dosage is required"),
-        frequency: yup
-          .string()
-          .transform((value) => value.trim())
-          .required("Frequency is required"),
+        dosage: yup.string().transform((value) => value.trim()),
+        // .required("Dosage is required"),
+        frequency: yup.string().transform((value) => value.trim()),
+        // .required("Frequency is required"),
         duration: yup
           .number()
           .positive()
-          .min(0, "Duration must be greater than 0")
-          .required(),
+          .min(0, "Duration must be greater than 0"),
+        // .required(),
         start_date: yup.date().required("Start date is required"),
         notes: yup.string().transform((value) => value.trim()),
       })
@@ -120,7 +116,7 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
                 <th>
                   <button
                     type="button"
-                    className="btn btn-success py-1"
+                    className="btn btn-sm btn-success py-1"
                     onClick={() =>
                       append({
                         medicine_id: "",
