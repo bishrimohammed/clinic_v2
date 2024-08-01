@@ -104,7 +104,7 @@ const DoctorAssignedPreviousVisitTable = () => {
         <thead>
           {tableInstance.getHeaderGroups().map((headerEl) => {
             return (
-              <tr key={headerEl.id}>
+              <tr className="text-nowrap" key={headerEl.id}>
                 {headerEl.headers.map((columnEl, index) => {
                   return (
                     <th key={columnEl.id} colSpan={columnEl.colSpan}>
@@ -177,6 +177,7 @@ const DoctorAssignedPreviousVisitTable = () => {
                     // });
                     navigate("view", { state: rowEl.original });
                   }}
+                  className="text-nowrap"
                 >
                   {rowEl.getVisibleCells().map((cellEl, index) => {
                     return (

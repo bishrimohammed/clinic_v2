@@ -55,7 +55,7 @@ export const UpcomingPatientVisitColumn = [
             backgroundColor: s.getValue() === "Done" ? "green" : "#ffc107",
             color: s.getValue() === "Done" ? "white" : "white",
           }}
-          className="d-inline-flex align-items-center justify-content-center"
+          className="d-inline-flex align-items-center justify-content-center text-nowrap"
         >
           {s.getValue()}
         </span>

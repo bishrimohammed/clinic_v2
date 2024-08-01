@@ -1,7 +1,18 @@
 import React from "react";
 import { Tab, Tabs } from "react-bootstrap";
+import { useGetClinicData } from "../hooks/consultationHooks/PatientOverViewHooks/useGetClinicData";
+import { useLocation } from "react-router-dom";
+import HomeTab from "./HistoryTabs/HomeTab";
+import ClinicDataTab from "./HistoryTabs/ClinicDataTab";
+import HistoryPrescriptionsTab from "./HistoryTabs/HistoryPrescriptionsTab";
+import CertificatesTab from "./HistoryTabs/CertificatesTab";
+import LabAndImagingTab from "./HistoryTabs/LabAndImagingTab";
+import ProcedureTab from "./HistoryTabs/ProcedureTab";
 
 const HistoryTab = () => {
+  const { state } = useLocation();
+  const { data } = useGetClinicData(state.patient_id);
+  console.log(data);
   return (
     <div>
       <Tabs
@@ -12,22 +23,22 @@ const HistoryTab = () => {
         // justify
       >
         <Tab eventKey="Home" title="Home">
-          <h2>Home</h2>
+          <HomeTab patientId={state.patient_id} />
         </Tab>
         <Tab eventKey="clinic Data" title="clinic Data">
-          <h2>clinic Data</h2>
+          <ClinicDataTab patientId={state.patient_id} />
         </Tab>
         <Tab eventKey="Prescriptions" title="Prescriptions">
-          <h2>Prescriptions</h2>
+          <HistoryPrescriptionsTab patientId={state.patient_id} />
         </Tab>
         <Tab eventKey="Certificates" title="Certificates">
-          <h2>Certificates</h2>
+          <CertificatesTab patientId={state.patient_id} />
         </Tab>
         <Tab eventKey="Lab & Imaging" title="Lab & Imaging">
-          <h2>Lab & Imaging</h2>
+          <LabAndImagingTab patientId={state.patient_id} />
         </Tab>
         <Tab eventKey="Procuders" title="Procuders">
-          <h2>Procuders</h2>
+          <ProcedureTab patientId={state.patient_id} />
         </Tab>
       </Tabs>
     </div>

@@ -43,8 +43,10 @@ const InternalMedicineTable = () => {
             <th>Drug Name</th>
             <th>Dosage</th>
             <th>Frequency</th>
-            <th>Duration</th>
-            <th>Start Date</th>
+            {/* <th>Duration</th> */}
+            <th>Route</th>
+            <th>When</th>
+            {/* <th>Start Date</th> */}
             <th>Prescriber</th>
             {/* <th>Action</th> */}
           </tr>
@@ -55,10 +57,32 @@ const InternalMedicineTable = () => {
               <tr key={p.id}>
                 <td>{index + 1}</td>
                 <td>{p.medicine?.service_name}</td>
-                <td>{p.dosage}</td>
-                <td>{p.frequency}</td>
-                <td>{p.duration}</td>
-                <td>{new Date(p.start_date).toISOString().substring(0, 10)}</td>
+                <td>
+                  {" "}
+                  {p.dosage ? (
+                    p.dosage
+                  ) : (
+                    <span className="text-danger">__</span>
+                  )}
+                </td>
+                <td>
+                  {p.frequency ? (
+                    p.frequency
+                  ) : (
+                    <span className="text-danger">__</span>
+                  )}
+                </td>
+                {/* <td>{p.duration}</td> */}
+                <td>
+                  {" "}
+                  {p.route ? p.route : <span className="text-danger">__</span>}
+                </td>
+                <td>
+                  {" "}
+                  {p.when ? p.when : <span className="text-danger">__</span>}
+                </td>
+                {/* <td>{p.duration}</td> */}
+                {/* <td>{new Date(p.start_date).toISOString().substring(0, 10)}</td> */}
                 <td>
                   {/* {
                     p.doctor?.id === currentUser.id ? "You" : p.doctor?.employee?.firstName + " " + p.doctor?.middleName 

@@ -14,6 +14,8 @@ import ConsultationBackButton from "./ConsultationBackButton";
 import LabResultTab from "./LabResultTab";
 import { useConsultationSaveForLater } from "../hooks/consultationHooks/useConsultationSaveForLater";
 import HistoryTab from "./HistoryTab";
+import { useGetPatient } from "../hooks/patientHooks/useGetPatient";
+import PatientGeneralInforamtion from "../patient Detail/PatientGeneralInforamtion";
 // import LabResultTab from "./LabResultTab";
 // import { ConsultationBackButton } from "./ConsultationBackButton";
 const ConsultationContent = ({ changeVisibleContent }) => {
@@ -34,6 +36,9 @@ const ConsultationContent = ({ changeVisibleContent }) => {
   const ExaminationRef = useRef(null);
   const PlanRefs = useRef();
   const { state } = useLocation();
+  const { data: patient, isPending: patientLoading } = useGetPatient(
+    state.patient_id
+  );
   // console.log(state);
   const handleSaveForLater = () => {
     const chiefComplaintData = chiefComplaintRef.current.getSaveForLaterData();
@@ -76,18 +81,18 @@ const ConsultationContent = ({ changeVisibleContent }) => {
   };
   return (
     <div>
-      <div className="d-flex mt-2 justify-content-between gap-2 border-bottom pb-2 top-buttons">
+      <div className="d-flex mt-2 justify-content-between align-items-center gap-2 border-bottom pb-2 top-buttons">
         <div className=" p-2  d-flex gap-3 align-items-center">
           <ConsultationBackButton />
-          <h5 className="mb-0">Perform Consultation</h5>
+          <h5 className="mb-0 fs-md-1 ">Perform Consultation</h5>
         </div>
-        <div className=" d-flex gap-2">
+        <div className="d-flex gap-2 flex-wrap">
           <CancelCunsultaionButton medicalRecordId={state.medicalRecord_id} />
           <Button
             // disabled={isPending}
             onClick={handleSaveForLater}
             variant="warning"
-            className="btn-sm text-white"
+            className="btn-sm text-white text-nowrap"
             // className="text-white"
           >
             {isPending && <Spinner size="sm" />}
@@ -116,8 +121,15 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           </button>
         </div>
       ) : null}
+      <div className="d-md-none d-block mt-2 border ps-1">
+        {patientLoading ? (
+          <Spinner animation="grow" />
+        ) : (
+          <PatientGeneralInforamtion patient={patient} />
+        )}
+      </div>
       <Tabs
-        defaultActiveKey="Home"
+        defaultActiveKey="History"
         id="uncontrolled-tab-example"
         className="mb-3 mt-2 border-bottom"
         variant="underline"
@@ -156,7 +168,12 @@ const ConsultationContent = ({ changeVisibleContent }) => {
         </Tab>{" "}
         <Tab
           eventKey="LabResultTab"
-          title="Lab Result"
+          // title="Lab Result"
+          title={
+            <span className="d-flex justify-content-center align-items-center text-nowrap">
+              Lab Result
+            </span>
+          }
 
           // disabled={treatmentTabLocked}
         >

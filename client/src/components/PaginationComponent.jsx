@@ -1,5 +1,5 @@
 import { Pagination } from "react-bootstrap";
-
+import { FaGreaterThan, FaLessThan } from "react-icons/fa6";
 import PropTypes from "prop-types";
 
 const PaginationComponent = ({ tableInstance }) => {
@@ -18,11 +18,12 @@ const PaginationComponent = ({ tableInstance }) => {
         &lt;&lt;
       </button>
       <button
-        // className="btn btn-outline-secondary"
+        // className="btn  px-2 btn-sm"
         onClick={() => tableInstance.previousPage()}
         disabled={!tableInstance.getCanPreviousPage()}
       >
         &lt;
+        {/* <FaLessThan /> */}
       </button>
       <button
         // className="btn btn-outline-secondary"

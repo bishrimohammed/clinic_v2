@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Button, Image, Modal } from "react-bootstrap";
 import PrintHeader from "../../History/print/printComponents/PrintHeader";
 import { useGetPatient } from "../../hooks/patientHooks/useGetPatient";
@@ -19,11 +19,12 @@ const PreviewSickLeaveNote = ({
   //   console.log(diagnosis);
   //   console.log(diagnosisIds);
   const user = useGetCurrentUser();
-  console.log(diagnosisIds);
+  // console.log(diagnosisIds);
   const { state } = useLocation();
   const { data: patient } = useGetPatient(state.patient_id);
   //   console.log(patient);
   //   map((dia) => diagnosis?.find((diag) => diag.id === parseInt(dia.diagnosis_id)))
+
   const getDiagnosis = (id) => {
     const diag = diagnosis?.find((diag) => diag.id === parseInt(id));
     console.log(diag);

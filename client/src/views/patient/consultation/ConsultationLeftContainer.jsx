@@ -10,13 +10,13 @@ const ConsultationLeftContainer = () => {
   };
 
   return (
-    <div>
+    <>
       {visibleContent === "consultation" ? (
         <ConsultationContent changeVisibleContent={changeVisibleContent} />
       ) : (
         <ProgressNotePage changeVisibleContent={changeVisibleContent} />
       )}
-    </div>
+    </>
   );
 };
 

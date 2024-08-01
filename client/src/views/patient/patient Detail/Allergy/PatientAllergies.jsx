@@ -12,7 +12,7 @@ const PatientAllergies = ({ allergies, patientId }) => {
   // console.log(allergies);
   return (
     <>
-      <div className="allergies-section mb-2 mt-2">
+      <div className="allergies-section mb-2 ">
         <div className="d-flex align-items-center">
           {" "}
           <h6 style={{ color: getBrandColor() }} className="mb-0">

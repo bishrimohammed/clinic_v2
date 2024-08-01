@@ -201,7 +201,7 @@ const PhysicalExaminationTab = React.forwardRef((props, ref) => {
                   <AddVitalSignButton />
                 </div>
                 {vitalSigns?.length > 0 && (
-                  <Table bordered striped>
+                  <Table bordered striped responsive>
                     <thead>
                       <tr>
                         <th>#</th>

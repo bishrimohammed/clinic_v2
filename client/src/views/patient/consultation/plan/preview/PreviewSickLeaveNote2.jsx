@@ -1,30 +1,29 @@
-import React, { Fragment, useMemo } from "react";
-import { Button, Col, Form, Modal, Row } from "react-bootstrap";
-import { useGetClinicInformation } from "../../../Administration/clinic setting/hooks/useGetClinicInformation";
-import { getClinicInformation } from "../../../../utils/getClinicInformation";
+import React, { useMemo } from "react";
+import { useGetPatient } from "../../../hooks/patientHooks/useGetPatient";
+import { useGet_Internal_MedicalRecordPrescription } from "../../../hooks/consultationHooks/medication/useGet_Internal_MedicalRecordPrescription";
+import { useGet_External_MedicalRecordPrescription } from "../../../hooks/consultationHooks/medication/useGet_External_MedicalRecordPrescription";
+import { useGetClinicInformation } from "../../../../Administration/clinic setting/hooks/useGetClinicInformation";
+import { Modal, Row, Col, Button } from "react-bootstrap";
 import { MdEmail, MdOutlinePhoneInTalk } from "react-icons/md";
-// import internetIcon from "../../../../assets/internet.png";
 import { TbWorldWww } from "react-icons/tb";
-import { useLocation } from "react-router-dom";
-import { useGetPatient } from "../../hooks/patientHooks/useGetPatient";
-import Select from "react-select";
-import { useGet_Internal_MedicalRecordPrescription } from "../../hooks/consultationHooks/medication/useGet_Internal_MedicalRecordPrescription";
-import { useGet_External_MedicalRecordPrescription } from "../../hooks/consultationHooks/medication/useGet_External_MedicalRecordPrescription";
-import { useGetCurrentUser } from "../../../../hooks/useGetCurrentUser";
-import { Host_URL } from "../../../../utils/getHost_URL";
 import { Controller } from "react-hook-form";
-const AddSickNoteModal = ({
+import Select from "react-select";
+import { Host_URL } from "../../../../../utils/getHost_URL";
+import { useLocation } from "react-router-dom";
+import { useGetCurrentUser } from "../../../../../hooks/useGetCurrentUser";
+
+const PreviewSickLeaveNote2 = ({
   show,
   handleClose,
-  fieldsLength,
+  sicknote,
   diagnosis,
-  register,
-  errors,
+  control,
   getValues,
   remove,
-  control,
+  fieldIndex,
+  register,
+  errors,
 }) => {
-  // console.log(errors.sick_notes?.[fieldsLength - 1]?.end_date);
   const { data: clinicData } = useGetClinicInformation();
   const { state } = useLocation();
   const { data: patient } = useGetPatient(state.patient_id);
@@ -42,7 +41,6 @@ const AddSickNoteModal = ({
       return { value: diag.id, label: diag.diagnosis };
     })
   );
-  // console.log(user);
   const customStyles = {
     control: (provided, state) => ({
       ...provided,
@@ -76,23 +74,22 @@ const AddSickNoteModal = ({
         //   //   console.log(`sick_notes[${fieldsLength - 1}].end_date`);
         //   remove(fieldsLength - 1);
         // }
-        console.log("jhvhgchgvhmg");
         if (
-          errors.sick_notes?.[fieldsLength - 1]?.sickleave ||
-          getValues(`sick_notes[${fieldsLength - 1}].sickleave`) === ""
+          errors.sick_notes?.[fieldIndex]?.sickleave ||
+          getValues(`sick_notes[${fieldIndex}].sickleave`) === ""
         ) {
           //   console.log(`sick_notes[${fieldsLength - 1}].end_date`);
-          remove(fieldsLength - 1);
+          remove(fieldIndex);
         }
-        handleClose();
+        handleClose(false);
       }}
       //   backdrop="static"
     >
       <Modal.Header className="py-3" closeButton>
-        <Modal.Title>Add Sick Note</Modal.Title>
+        <Modal.Title>Preview Sick Note</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div style={{ color: getClinicInformation()?.brand_color }}>
+        <div style={{ color: clinicData?.brand_color }}>
           <div style={{ width: "70%" }} className="d-flex flex-column">
             <div>
               <h5
@@ -215,7 +212,7 @@ const AddSickNoteModal = ({
               {" "}
               <Controller
                 control={control}
-                name={`sick_notes[${fieldsLength - 1}].diagnosis`}
+                name={`sick_notes[${fieldIndex}].diagnosis`}
                 render={({ field }) => (
                   // <CreatableSelect
                   //   {...field}
@@ -245,10 +242,10 @@ const AddSickNoteModal = ({
                 )}
               />
               {/* <Select
-                isMulti
-                styles={customStyles}
-                options={diagnosesSelectOptions}
-              /> */}
+              isMulti
+              styles={customStyles}
+              options={diagnosesSelectOptions}
+            /> */}
             </span>
           </div>
           <div className="d-flex align-items-center gap-1 mt-3">
@@ -280,7 +277,7 @@ const AddSickNoteModal = ({
                 borderBottom: `1px solid ${clinicData?.brand_color}`,
                 outline: "none",
               }}
-              {...register(`sick_notes.${fieldsLength - 1}.sickleave`)}
+              {...register(`sick_notes.${fieldIndex}.sickleave`)}
               className="flex-grow-1"
             />
           </div>
@@ -321,80 +318,80 @@ const AddSickNoteModal = ({
         </div>
 
         {/* <Form.Group className="my-3 px-2">
-          <Form.Label>
-            {" "}
-            <span className="border-bottom pb-1">Diagnosis</span>{" "}
-          </Form.Label>
-          {diagnosis?.map((d, index) => (
-            <Fragment key={d.id}>
-              <Form.Check
-                type="checkbox"
-                {...register(
-                  `sick_notes.${fieldsLength - 1}.diagnosis[${index}].value`
-                )}
-                label={d.diagnosis + "(" + d.status + ")"}
-                // placeholder="Diagnosis"
-              />
-              <input
-                type="hidden"
-                {...register(
-                  `sick_notes.${
-                    fieldsLength - 1
-                  }.diagnosis[${index}].diagnosis_id`
-                )}
-                value={d.id}
-              />
-            </Fragment>
-          ))}
-        </Form.Group> */}
+        <Form.Label>
+          {" "}
+          <span className="border-bottom pb-1">Diagnosis</span>{" "}
+        </Form.Label>
+        {diagnosis?.map((d, index) => (
+          <Fragment key={d.id}>
+            <Form.Check
+              type="checkbox"
+              {...register(
+                `sick_notes.${fieldsLength - 1}.diagnosis[${index}].value`
+              )}
+              label={d.diagnosis + "(" + d.status + ")"}
+              // placeholder="Diagnosis"
+            />
+            <input
+              type="hidden"
+              {...register(
+                `sick_notes.${
+                  fieldsLength - 1
+                }.diagnosis[${index}].diagnosis_id`
+              )}
+              value={d.id}
+            />
+          </Fragment>
+        ))}
+      </Form.Group> */}
         <Row>
           {/* <Col md={6} sm={12}>
-            <Form.Group>
-              <Form.Label>Start Date</Form.Label>
-              <Form.Control
-                type="number"
-                {...register(`sick_notes.${fieldsLength - 1}.sickleave`)}
-                placeholder="Start Date"
-                isInvalid={errors?.sick_notes?.[fieldsLength - 1]?.sickleave}
-                // defaultValue={new Date().toISOString().substring(0, 10)}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.sick_notes?.[fieldsLength - 1]?.sickleave?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col> */}
+          <Form.Group>
+            <Form.Label>Start Date</Form.Label>
+            <Form.Control
+              type="number"
+              {...register(`sick_notes.${fieldsLength - 1}.sickleave`)}
+              placeholder="Start Date"
+              isInvalid={errors?.sick_notes?.[fieldsLength - 1]?.sickleave}
+              // defaultValue={new Date().toISOString().substring(0, 10)}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.sick_notes?.[fieldsLength - 1]?.sickleave?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col> */}
           {/* <Col md={4} sm={12}>
-            <Form.Group>
-              <Form.Label>Start Date</Form.Label>
-              <Form.Control
-                type="date"
-                {...register(`sick_notes.${fieldsLength - 1}.start_date`)}
-                placeholder="Start Date"
-                isInvalid={errors?.sick_notes?.[fieldsLength - 1]?.start_date}
-                defaultValue={new Date().toISOString().substring(0, 10)}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.sick_notes?.[fieldsLength - 1]?.start_date?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-          <Col md={4} sm={12}>
-            <Form.Group>
-              <Form.Label>End Date</Form.Label>
-              <Form.Control
-                type="date"
-                {...register(`sick_notes.${fieldsLength - 1}.end_date`)}
-                placeholder="End Date"
-                isInvalid={errors.sick_notes?.[fieldsLength - 1]?.end_date}
-                min={new Date().toISOString().substring(0, 10)}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.sick_notes?.[fieldsLength - 1]?.end_date?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col> */}
+          <Form.Group>
+            <Form.Label>Start Date</Form.Label>
+            <Form.Control
+              type="date"
+              {...register(`sick_notes.${fieldsLength - 1}.start_date`)}
+              placeholder="Start Date"
+              isInvalid={errors?.sick_notes?.[fieldsLength - 1]?.start_date}
+              defaultValue={new Date().toISOString().substring(0, 10)}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.sick_notes?.[fieldsLength - 1]?.start_date?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+        <Col md={4} sm={12}>
+          <Form.Group>
+            <Form.Label>End Date</Form.Label>
+            <Form.Control
+              type="date"
+              {...register(`sick_notes.${fieldsLength - 1}.end_date`)}
+              placeholder="End Date"
+              isInvalid={errors.sick_notes?.[fieldsLength - 1]?.end_date}
+              min={new Date().toISOString().substring(0, 10)}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.sick_notes?.[fieldsLength - 1]?.end_date?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col> */}
           {/* <Col md={4} sm={12}></Col>
-          <Col md={4} sm={12}></Col> */}
+        <Col md={4} sm={12}></Col> */}
         </Row>
       </Modal.Body>
       <Modal.Footer>
@@ -402,11 +399,11 @@ const AddSickNoteModal = ({
           variant="secondary"
           onClick={() => {
             if (
-              errors.sick_notes?.[fieldsLength - 1]?.sickleave ||
-              getValues(`sick_notes[${fieldsLength - 1}].sickleave`) === ""
+              errors.sick_notes?.[fieldIndex]?.sickleave ||
+              getValues(`sick_notes[${fieldIndex}].sickleave`) === ""
             ) {
-              //   console.log(`sick_notes[${fieldsLength - 1}].end_date`);
-              remove(fieldsLength - 1);
+              //   console.log(`sick_notes[${fieldIndex}].end_date`);
+              remove(fieldIndex);
             }
             handleClose();
           }}
@@ -418,4 +415,4 @@ const AddSickNoteModal = ({
   );
 };
 
-export default AddSickNoteModal;
+export default PreviewSickLeaveNote2;

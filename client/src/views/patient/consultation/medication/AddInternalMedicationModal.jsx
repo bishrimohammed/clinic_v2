@@ -27,6 +27,8 @@ const InternalMedicationSchema = yup.object().shape({
           .min(0, "Duration must be greater than 0"),
         // .required(),
         start_date: yup.date().required("Start date is required"),
+        route: yup.string(),
+        when: yup.string(),
         notes: yup.string().transform((value) => value.trim()),
       })
     )
@@ -43,8 +45,6 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
     formState: { errors },
     handleSubmit,
     control,
-    watch,
-    getValues,
   } = useForm({
     resolver: yupResolver(InternalMedicationSchema),
   });
@@ -52,7 +52,7 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
     control,
     name: "rows",
   });
-  console.log(errors);
+  // console.log(errors);
   // const medicinesOptions = useMemo(
   //   () =>
   //     data?.map((m) => {
@@ -80,10 +80,13 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
         start_date: medicine.start_date,
         duration: medicine.duration,
         notes: medicine.notes,
+        route: medicine.route,
+        when: medicine.when,
       };
     });
     // console.log(Data);
     console.log(formData);
+    // return;
     addprescriptionMutation
       .mutateAsync({ medicalRecord_id: state.medicalRecord_id, formData })
       .then((res) => {
@@ -95,7 +98,7 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
   };
   if (isPending) return <Spinner />;
   return (
-    <Modal size="lg" show={show} onHide={handleClose}>
+    <Modal size="xl" show={show} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>Add Internal Medication</Modal.Title>
       </Modal.Header>
@@ -105,13 +108,16 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
             <thead>
               <tr>
                 <td>#</td>
-                <th className="text-nowrap">Drug Name</th>
-                <th>
-                  <span style={{ opacity: 0 }}>ergagrtshsfgbsrh</span>{" "}
+                <th className="text-nowrap" colSpan={2}>
+                  Drug Name
                 </th>
+                {/* <th>
+                  <span style={{ opacity: 0 }}>ergagrtshsfgbsrh</span>{" "}
+                </th> */}
                 <th>Dosage</th>
                 <th>Frequency</th>
-                <th>Start Date</th>
+                <th>Route</th>
+                <th>When</th>
                 <th>Duration</th>
                 <th>
                   <button
@@ -124,6 +130,8 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
                         frequency: "",
                         start_date: new Date().toISOString().substring(0, 10),
                         duration: "",
+                        route: "",
+                        when: "",
                       })
                     }
                   >
@@ -178,13 +186,44 @@ const AddInternalMedicationModal = ({ show, handleClose }) => {
                     />
                   </td>
                   <td>
-                    <Form.Control
+                    {/* <Form.Control
                       type="date"
                       min={new Date().toISOString().substring(0, 10)}
                       defaultValue={new Date().toISOString().substring(0, 10)}
                       {...register(`rows.${index}.start_date`)}
                       isInvalid={!!errors.rows?.[index]?.start_date}
-                    />
+                    /> */}
+                    <Form.Select
+                      // type="date"
+
+                      {...register(`rows.${index}.route`)}
+                      isInvalid={!!errors.rows?.[index]?.route}
+                    >
+                      <option value="">Select Route</option>
+                      <option value="Oral">Oral</option>
+                      <option value="Tablet">Tablet</option>
+                      {/* <option value="Subcutaneous">Subcutaneous</option> */}
+                      {/* <option value="Topical">Topical</option> */}
+                      <option value="Injection">Injection</option>
+                    </Form.Select>
+                  </td>
+                  <td>
+                    <Form.Select
+                      type="text"
+                      {...register(`rows.${index}.when`)}
+                      // placeholder="when"
+                      isInvalid={!!errors.rows?.[index]?.when}
+                    >
+                      <option value="">Select When</option>
+                      <option value="Before meals">Before Meals</option>
+                      <option value="After meals">After Meals</option>
+                      <option value="Before bedtime">Before Bedtime</option>
+                      <option value="Before exercise">Before Exercise</option>
+                      <option value="Before sleep">Before Sleep</option>
+                      <option value="Before break fast">
+                        Before break fast
+                      </option>
+                    </Form.Select>
                   </td>
                   <td>
                     <Form.Control

@@ -105,7 +105,11 @@ const DoctorAssignedUpcomingVisitTable = () => {
               <tr key={headerEl.id}>
                 {headerEl.headers.map((columnEl, index) => {
                   return (
-                    <th key={columnEl.id} colSpan={columnEl.colSpan}>
+                    <th
+                      className="text-nowrap"
+                      key={columnEl.id}
+                      colSpan={columnEl.colSpan}
+                    >
                       {columnEl.isPlaceholder ? null : (
                         <div
                           className={
@@ -175,6 +179,7 @@ const DoctorAssignedUpcomingVisitTable = () => {
                     // });
                     // navigate("view", { state: rowEl.original });
                   }}
+                  className="text-nowrap"
                 >
                   {rowEl.getVisibleCells().map((cellEl, index) => {
                     return (

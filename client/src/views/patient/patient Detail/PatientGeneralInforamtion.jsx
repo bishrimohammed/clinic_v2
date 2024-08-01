@@ -11,15 +11,17 @@ import Disability from "./disability/Disability";
 const PatientGeneralInforamtion = ({ patient, medicalRecordId }) => {
   // console.log(patient);
   return (
-    <React.Fragment>
-      <p className="mb-1 small">
-        Name: {patient?.firstName} {patient?.middleName} {patient?.lastName}{" "}
-      </p>
-      <p className="mb-1 small">ID: {patient?.card_number}</p>
-      <p className="mb-1 small">
-        Age: {differenceInYears(new Date(), patient?.birth_date)} years
-      </p>
-      <p className="mb-1 small">Sex: {patient?.gender}</p>
+    <div className="d-flex flex-md-column flex-wrap gap-md-0 gap-3">
+      <div>
+        <p className="mb-1 small">
+          Name: {patient?.firstName} {patient?.middleName} {patient?.lastName}{" "}
+        </p>
+        <p className="mb-1 small">ID: {patient?.card_number}</p>
+        <p className="mb-1 small">
+          Age: {differenceInYears(new Date(), patient?.birth_date)} years
+        </p>
+        <p className="mb-1 small">Sex: {patient?.gender}</p>
+      </div>
 
       <PatientAllergies
         // allergies={patient?.allergies}
@@ -48,7 +50,7 @@ const PatientGeneralInforamtion = ({ patient, medicalRecordId }) => {
       />
       <HivContainer patient={patient} />
       <Disability patient={patient} />
-    </React.Fragment>
+    </div>
   );
 };
 

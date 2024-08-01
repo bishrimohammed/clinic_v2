@@ -13,6 +13,7 @@ const ConsultationPage = () => {
   // console.log(state);
   const { data: patient, isPending } = useGetPatient(state.patient_id);
   const dispatch = useDispatch();
+  // console.log(patient);
   React.useEffect(() => {
     return () => {
       dispatch(resetConsultation());
@@ -21,7 +22,7 @@ const ConsultationPage = () => {
   return (
     <Container className="p-2 mb-5">
       <div className="p-3 bg-hrun-box hrunboxshadow">
-        <div className="d-flex gap-3">
+        <div className="d-md-flex d-none gap-3">
           <div style={{ flex: 75 }} className="left ">
             <ConsultationLeftContainer />
           </div>
@@ -32,6 +33,9 @@ const ConsultationPage = () => {
               <PatientGeneralInforamtion patient={patient} />
             )}
           </div>
+        </div>
+        <div className="d-md-none d-block">
+          <ConsultationLeftContainer />
         </div>
       </div>
     </Container>

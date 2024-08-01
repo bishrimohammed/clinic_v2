@@ -26,6 +26,8 @@ const ExternalMedicationSchema = yup.object().shape({
       // .required(),
       start_date: yup.date().required("Start date is required"),
       notes: yup.string().transform((value) => value.trim()),
+      route: yup.string(),
+      when: yup.string(),
     })
   ),
 });
@@ -73,7 +75,7 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
       });
   };
   return (
-    <Modal size="lg" show={show} onHide={handleClose}>
+    <Modal size="xl" show={show} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>Add Internal Medication</Modal.Title>
       </Modal.Header>
@@ -84,12 +86,14 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
               <tr>
                 <td>#</td>
                 <th>Drug </th>
-                <th>
+                {/* <th>
                   <span style={{ opacity: 0 }}>ergagrtshsfgbsrh</span>{" "}
-                </th>
+                </th> */}
                 <th>Dosage</th>
                 <th>Frequency</th>
-                <th>Start Date</th>
+                <th>Route</th>
+                <th>When</th>
+                {/* <th>Start Date</th> */}
                 <th>Duration </th>
                 <th>
                   <button
@@ -103,6 +107,8 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
                         duration: "",
                         start_date: new Date().toISOString().substring(0, 10),
                         notes: "",
+                        route: "",
+                        when: "",
                       })
                     }
                   >
@@ -115,7 +121,7 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
               {fields.map((item, index) => (
                 <tr key={item.id}>
                   <td>{index + 1}</td>
-                  <td colSpan={2}>
+                  <td>
                     <Form.Control
                       placeholder="medicine"
                       list="medicines"
@@ -150,13 +156,44 @@ const AddExternalPrescriptionModal = ({ show, handleClose }) => {
                     />
                   </td>
                   <td>
-                    <Form.Control
+                    {/* <Form.Control
                       type="date"
                       min={new Date().toISOString().substring(0, 10)}
                       defaultValue={new Date().toISOString().substring(0, 10)}
                       {...register(`rows.${index}.start_date`)}
                       isInvalid={!!errors.rows?.[index]?.start_date}
-                    />
+                    /> */}
+                    <Form.Select
+                      // type="date"
+
+                      {...register(`rows.${index}.route`)}
+                      isInvalid={!!errors.rows?.[index]?.route}
+                    >
+                      <option value="">Select Route</option>
+                      <option value="Oral">Oral</option>
+                      <option value="Tablet">Tablet</option>
+                      {/* <option value="Subcutaneous">Subcutaneous</option> */}
+                      {/* <option value="Topical">Topical</option> */}
+                      <option value="Injection">Injection</option>
+                    </Form.Select>
+                  </td>
+                  <td>
+                    <Form.Select
+                      type="text"
+                      {...register(`rows.${index}.when`)}
+                      // placeholder="when"
+                      isInvalid={!!errors.rows?.[index]?.when}
+                    >
+                      <option value="">Select When</option>
+                      <option value="Before meals">Before Meals</option>
+                      <option value="After meals">After Meals</option>
+                      <option value="Before bedtime">Before Bedtime</option>
+                      <option value="Before exercise">Before Exercise</option>
+                      <option value="Before sleep">Before Sleep</option>
+                      <option value="Before break fast">
+                        Before break fast
+                      </option>
+                    </Form.Select>
                   </td>
                   <td>
                     <Form.Control
