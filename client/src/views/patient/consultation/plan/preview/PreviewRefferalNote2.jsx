@@ -1,27 +1,27 @@
-import React, { Fragment, useMemo } from "react";
-import { Col, Form, Modal, Row } from "react-bootstrap";
-import { useGetClinicInformation } from "../../../Administration/clinic setting/hooks/useGetClinicInformation";
+import React, { useMemo } from "react";
+import { useGetClinicInformation } from "../../../../Administration/clinic setting/hooks/useGetClinicInformation";
+import { useLocation } from "react-router-dom";
+import { useGetPatient } from "../../../hooks/patientHooks/useGetPatient";
+import { useGet_Internal_MedicalRecordPrescription } from "../../../hooks/consultationHooks/medication/useGet_Internal_MedicalRecordPrescription";
+import { useGet_External_MedicalRecordPrescription } from "../../../hooks/consultationHooks/medication/useGet_External_MedicalRecordPrescription";
+import { useGetCurrentUser } from "../../../../../hooks/useGetCurrentUser";
+import { Button, Modal } from "react-bootstrap";
+import { Host_URL } from "../../../../../utils/getHost_URL";
 import { MdEmail, MdOutlinePhoneInTalk } from "react-icons/md";
 import { TbWorldWww } from "react-icons/tb";
-import { useLocation } from "react-router-dom";
-import { useGetPatient } from "../../hooks/patientHooks/useGetPatient";
-import { useGet_Internal_MedicalRecordPrescription } from "../../hooks/consultationHooks/medication/useGet_Internal_MedicalRecordPrescription";
-import { useGet_External_MedicalRecordPrescription } from "../../hooks/consultationHooks/medication/useGet_External_MedicalRecordPrescription";
-import { useGetCurrentUser } from "../../../../hooks/useGetCurrentUser";
-import { Host_URL } from "../../../../utils/getHost_URL";
 
-const AddReferralNoteModal = ({
+const PreviewRefferalNote2 = ({
   show,
   handleClose,
-  fieldsLength,
+  // sicknote,
   diagnosis,
-  register,
-  errors,
+  control,
   getValues,
   remove,
-  watch,
+  fieldIndex,
+  register,
+  errors,
 }) => {
-  //   console.log(errors);
   const { data: clinicData } = useGetClinicInformation();
   const { state } = useLocation();
   const { data: patient } = useGetPatient(state.patient_id);
@@ -36,28 +36,30 @@ const AddReferralNoteModal = ({
   const user = useGetCurrentUser();
   return (
     <Modal
-      size="md"
       show={show}
+      // style={{ width: 800 }}
+      size="md"
       onHide={() => {
+        // if (
+        //   errors.sick_notes?.[fieldsLength - 1]?.end_date ||
+        //   getValues(`sick_notes[${fieldsLength - 1}].end_date`) === ""
+        // ) {
+        //   //   console.log(`sick_notes[${fieldsLength - 1}].end_date`);
+        //   remove(fieldsLength - 1);
+        // }
         if (
-          errors.referral_notes?.[fieldsLength - 1]?.hospital_name ||
-          getValues(`referral_notes[${fieldsLength - 1}].hospital_name`) ===
-            "" ||
-          getValues(`referral_notes[${fieldsLength - 1}].clinical_finding`) ===
-            "" ||
-          errors.referral_notes?.[fieldsLength - 1]?.clinical_finding
+          errors.sick_notes?.[fieldIndex]?.sickleave ||
+          getValues(`sick_notes[${fieldIndex}].sickleave`) === ""
         ) {
-          console.log(
-            getValues(`referral_notes[${fieldsLength - 1}].hospital_name`)
-          );
-          remove(fieldsLength - 1);
+          //   console.log(`sick_notes[${fieldsLength - 1}].end_date`);
+          remove(fieldIndex);
         }
         handleClose(false);
       }}
       //   backdrop="static"
     >
       <Modal.Header className="py-3" closeButton>
-        <Modal.Title>Add Referral Note</Modal.Title>
+        <Modal.Title>Preview Referral Note</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div style={{ color: clinicData?.brand_color }}>
@@ -141,9 +143,7 @@ const AddReferralNoteModal = ({
                 borderBottom: `1px solid ${clinicData?.brand_color}`,
                 // outline: "none",
               }}
-              {...register(
-                `referral_notes.[${fieldsLength - 1}].hospital_name`
-              )}
+              {...register(`referral_notes.[${fieldIndex}].hospital_name`)}
               // placeholder="Start Date"
 
               className="mb-0 text-dark flex-grow-1 px-2"
@@ -217,9 +217,7 @@ const AddReferralNoteModal = ({
                 borderBottom: `1px solid ${clinicData?.brand_color}`,
                 outline: "none",
               }}
-              {...register(
-                `referral_notes.[${fieldsLength - 1}].clinical_finding`
-              )}
+              {...register(`referral_notes.[${fieldIndex}].clinical_finding`)}
               className="mb-0 text-dark flex-grow-1 px-2"
             />
           </div>
@@ -270,7 +268,7 @@ const AddReferralNoteModal = ({
                 borderBottom: `1px solid ${clinicData?.brand_color}`,
                 // outline: "none",
               }}
-              {...register(`referral_notes.[${fieldsLength - 1}].reason`)}
+              {...register(`referral_notes.[${fieldIndex}].reason`)}
               className="mb-0 text-dark flex-grow-1 px-2"
             />
           </div>
@@ -309,101 +307,26 @@ const AddReferralNoteModal = ({
             </p>
           </div>
         </div>
-        {/* <Row className="">
-          <Col sm={12}>
-            <Form.Group className="mb-3">
-              <Form.Label>Refer To</Form.Label>
-              <Form.Control
-                // type="date"
-                type="text"
-                {...register(
-                  `referral_notes.[${fieldsLength - 1}].hospital_name`
-                )}
-                // placeholder="Start Date"
-                isInvalid={
-                  errors.referral_notes?.[fieldsLength - 1]?.hospital_name
-                }
-                // defaultValue={new Date().toISOString().substring(0, 10)}
-              />
-              <Form.Control.Feedback type="invalid">
-                {
-                  errors.referral_notes?.[fieldsLength - 1].hospital_name
-                    ?.message
-                }
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-          <Col sm={12}>
-            <Form.Group>
-              <Form.Label>Department</Form.Label>
-              <Form.Control
-                // type="date"
-                type="text"
-                {...register(
-                  `referral_notes.[${fieldsLength - 1}].department_name`
-                )}
-                // placeholder="Start Date"
-                isInvalid={
-                  errors.referral_notes?.[fieldsLength - 1]?.department_name
-                }
-                // defaultValue={new Date().toISOString().substring(0, 10)}
-              />
-              <Form.Control.Feedback type="invalid">
-                {
-                  errors.referral_notes?.[fieldsLength - 1]?.department_name
-                    ?.message
-                }
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-          <Col sm={12}>
-            <Form.Group>
-              <Form.Label>Clinical Finding</Form.Label>
-              <Form.Control
-                // type="date"
-                as="textarea"
-                {...register(
-                  `referral_notes.[${fieldsLength - 1}].clinical_finding`
-                )}
-                // placeholder="Start Date"
-                isInvalid={
-                  errors.referral_notes?.[fieldsLength - 1]?.clinical_finding
-                }
-                // defaultValue={new Date().toISOString().substring(0, 10)}
-              />
-              <Form.Control.Feedback type="invalid">
-                {
-                  errors?.referral_notes?.[fieldsLength - 1]?.clinical_finding
-                    ?.message
-                }
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-          <Col sm={12}>
-            <Form.Group className="mb-3">
-              <Form.Label>Reason</Form.Label>
-              <Form.Control
-                // type="date"
-                type="text"
-                {...register(`referral_notes.[${fieldsLength - 1}].reason`)}
-                // placeholder="Start Date"
-                isInvalid={errors.referral_notes?.[fieldsLength - 1]?.reason}
-                // defaultValue={new Date().toISOString().substring(0, 10)}
-              />
-              <Form.Control.Feedback type="invalid">
-                {errors.referral_notes?.[fieldsLength - 1]?.reason?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-        </Row> */}
       </Modal.Body>
       <Modal.Footer>
-        {/* <Button variant="secondary" onClick={handleClose}>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            if (
+              errors.sick_notes?.[fieldIndex]?.sickleave ||
+              getValues(`sick_notes[${fieldIndex}].sickleave`) === ""
+            ) {
+              //   console.log(`sick_notes[${fieldIndex}].end_date`);
+              remove(fieldIndex);
+            }
+            handleClose();
+          }}
+        >
           Ok
-        </Button> */}
+        </Button>
       </Modal.Footer>
     </Modal>
   );
 };
 
-export default AddReferralNoteModal;
+export default PreviewRefferalNote2;

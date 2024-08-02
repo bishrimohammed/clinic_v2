@@ -3,6 +3,15 @@ import { Route, Routes } from "react-router-dom";
 // import { CSpinner } from "@coreui/react";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
+const NurseTreatmentList = React.lazy(() =>
+  import("../views/nurseTreatment/NurseTreatmentList")
+);
+
+// React.lazy(() =>  import())
+
+const NurseTreatment = React.lazy(() =>
+  import("../views/nurseTreatment/NurseTreatment")
+);
 const ViewMedicalRecordOverView = React.lazy(() =>
   import("../views/MedicalOverView/ViewMedicalRecordOverView")
 );
@@ -463,6 +472,9 @@ const AppContent = () => {
           <Route path="medicaloverview" element={<ViewMedicalRecordOverView />}>
             <Route index element={<OverviewList />} />
             <Route path="view-detail" element={<OverviewDetail />} />
+          </Route>
+          <Route path="nursetreatment" element={<NurseTreatment />}>
+            <Route index element={<NurseTreatmentList />} />
           </Route>
         </Routes>
       </Suspense>

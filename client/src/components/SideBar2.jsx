@@ -352,6 +352,15 @@ const SideBar2 = () => {
               </CNavItem> */}
           </CNavGroup>
         )}
+        {hasPermission("nurse treatment", "read") && (
+          <CNavItem>
+            <CNavLink to="/nursetreatment" as={NavLink}>
+              {/* <CIcon icon={cilSpeedometer} customClassName="nav-icon" /> */}
+              <MdSpaceDashboard className="nav-icon" />
+              Nurse Treatment
+            </CNavLink>
+          </CNavItem>
+        )}
         {/* </SimpleBar> */}
       </CSidebarNav>
       {/* <CSidebarHeader className="border-top">

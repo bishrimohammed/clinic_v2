@@ -29,6 +29,7 @@ import AddReferralNoteModal from "./plan/AddReferralNoteModal";
 import ViewSickNote from "./plan/ViewSickNote";
 import ViewReferralNote from "./plan/ViewReferralNote";
 import PreviewSickLeaveNote2 from "./plan/preview/PreviewSickLeaveNote2";
+import PreviewRefferalNote2 from "./plan/preview/PreviewRefferalNote2";
 const planSchema = yup.object().shape({
   plan: yup.string().required(),
   // selectedLabs: yup.array().of(yup.number()),
@@ -186,7 +187,7 @@ const PlanTab = React.forwardRef((props, ref) => {
   });
 
   const { data: diagnosis } = useGetDiagnosis(state.medicalRecord_id);
-  console.log(diagnosis);
+  // console.log(diagnosis);
   const [showpreviewshowSickNote, setShowPreviewShowSickNote] = useState({
     show: false,
     sicknote: null,
@@ -194,7 +195,7 @@ const PlanTab = React.forwardRef((props, ref) => {
   });
   const [showPreviewRefferalNote, setShowPreviewRefferalNote] = useState({
     show: false,
-    referralNote: null,
+    fieldIndex: null,
   });
   const [showViewSickNoteNote, setShowViewSickNoteNote] = useState({
     show: false,
@@ -233,9 +234,9 @@ const PlanTab = React.forwardRef((props, ref) => {
   //           .map((d) => d.diagnosis_id),
   // console.log(errors);
   // console.log(getValues(`sick_notes`));
-  console.log(errors);
+  // console.log(errors);
   const submitHandler = async (data) => {
-    console.log(data);
+    // console.log(data);
     // return;
     const sickNote =
       data.sick_notes?.length > 0
@@ -246,6 +247,7 @@ const PlanTab = React.forwardRef((props, ref) => {
               start_date: sn.start_date,
               end_date: sn.end_date,
               diagnosis: sn.diagnosis?.map((d) => d.value),
+              sick_leave_day: sn.sickleave,
             };
           })
         : null;
@@ -258,8 +260,8 @@ const PlanTab = React.forwardRef((props, ref) => {
       sickNote,
       RefferalNote,
     };
-    console.log(formData);
-    return;
+    // console.log(formData);
+    // return;
     mutateAsync({ formData, medicalRecordId: state.medicalRecord_id }).then(
       (res) => {
         if (res.status === 200) {
@@ -362,23 +364,8 @@ const PlanTab = React.forwardRef((props, ref) => {
                         }}
                         type="button"
                       >
-                        {/* import { FaPlusCircle } from "react-icons/fa"; */}
                         <FaPlusCircle size={20} />
                       </button>
-                      {/* <button
-                  style={{ color: "#cf01f9" }}
-                  className="border-0 bg-transparent fw-bold"
-                  onClick={() => setShowPreviewShowSickNote(true)}
-                  type="button"
-                >
-                  Preview
-                </button> */}
-                      {/* <button
-                        type="button"
-                        className="border-0 btn btn-sm btn-warning ms-4 text-white"
-                      >
-                        Print <LuPrinter className="ms-1" />
-                      </button> */}
                     </div>
                   </div>
                   {fields.length > 0 && (
@@ -451,24 +438,34 @@ const PlanTab = React.forwardRef((props, ref) => {
                       <Table striped bordered className="mt-2">
                         <thead>
                           <tr>
+                            {/* <th>#</th> */}
                             <th>Diagnosis</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
+                            <th>Sick Leave Day</th>
+                            {/* <th>Start Date</th> */}
+                            {/* <th>End Date</th> */}
                             <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
                           {sicknote?.map((s, index) => (
                             <tr key={index}>
+                              {/* <td>{index + 1}</td> */}
                               <td>
-                                {s.diagnoses.map((d) => (
-                                  <p key={d.id + d.diagnosis} className="mb-0">
-                                    {d.diagnosis} ({d.status})
+                                {s.diagnoses.map((d, index) => (
+                                  <p
+                                    key={d.id + d.diagnosis}
+                                    className="mb-0 d-inline-flex"
+                                  >
+                                    {d.diagnosis}
+
+                                    {index < s.diagnoses.length - 1 && (
+                                      <span>, </span>
+                                    )}
                                   </p>
                                 ))}
                               </td>
-                              <td>{s.start_date}</td>
-                              <td>{s.end_date}</td>
+                              <td>{s.sick_leave_day} days</td>
+                              {/* <td>{s.end_date}</td> */}
                               <td>
                                 <button
                                   type="button"
@@ -569,7 +566,7 @@ const PlanTab = React.forwardRef((props, ref) => {
                           <tr>
                             <th>#</th>
                             <th>Hospital Name</th>
-                            <th>Department</th>
+                            {/* <th>Department</th> */}
                             <th>Clinical Finding</th>
                             <th>Reason</th>
                             <th>Action</th>
@@ -581,10 +578,10 @@ const PlanTab = React.forwardRef((props, ref) => {
                               <tr key={index}>
                                 <td>{index + 1}</td>
                                 <td>{referralNote.hospital_name}</td>
-                                <td>{referralNote.department_name}</td>
+                                {/* <td>{referralNote.department_name}</td> */}
                                 <td>{referralNote.clinical_finding}</td>
                                 <td>{referralNote.reason}</td>
-                                <td>
+                                <td className="d-flex">
                                   <button
                                     type="button"
                                     className="btn btn-sm btn-danger ms-2"
@@ -600,7 +597,7 @@ const PlanTab = React.forwardRef((props, ref) => {
                                     onClick={() => {
                                       setShowPreviewRefferalNote({
                                         show: true,
-                                        referralNote,
+                                        fieldIndex: index,
                                       });
                                     }}
                                   >
@@ -622,10 +619,10 @@ const PlanTab = React.forwardRef((props, ref) => {
                         <thead>
                           <tr>
                             <th>#</th>
-                            <th>Hospital Name</th>
-                            <th>Department</th>
+                            <th className="text-nowrap">Hospital Name</th>
+                            {/* <th>Department</th> */}
                             <th>Clinical Finding</th>
-                            <th>Referral Date</th>
+                            <th className="text-nowrap">Referral Date</th>
                             <th>Reason</th>
                             <th>Action</th>
                           </tr>
@@ -635,7 +632,7 @@ const PlanTab = React.forwardRef((props, ref) => {
                             <tr key={index}>
                               <td>{index + 1}</td>
                               <td>{referralNote.referral_to}</td>
-                              <td>{referralNote.department}</td>
+                              {/* <td>{referralNote.department}</td> */}
                               <td>{referralNote.clinical_finding}</td>
                               <td>
                                 {new Date(referralNote.referral_date)
@@ -740,7 +737,7 @@ const PlanTab = React.forwardRef((props, ref) => {
         />
       )}
       {showPreviewRefferalNote.show && (
-        <PreviewRefferalNote
+        <PreviewRefferalNote2
           show={showPreviewRefferalNote.show}
           handleClose={() => setShowPreviewRefferalNote(false)}
           clinical_finding={
@@ -751,6 +748,13 @@ const PlanTab = React.forwardRef((props, ref) => {
           department_name={
             showPreviewRefferalNote.referralNote?.department_name
           }
+          register={register}
+          control={control}
+          diagnosis={diagnosis}
+          errors={errors}
+          fieldIndex={showPreviewRefferalNote.fieldIndex}
+          getValues={getValues}
+          remove={removeReferralNote}
         />
       )}
       {showAddSickNoteModal && (
