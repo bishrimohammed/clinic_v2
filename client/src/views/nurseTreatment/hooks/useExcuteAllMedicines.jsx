@@ -1,4 +1,3 @@
-import React from "react";
 import { AxiosHeaders } from "../../../api/useAxiosHeaders";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Axiosinstance from "../../../api/axiosInstance";
@@ -16,7 +15,7 @@ export const useExcuteAllMedicines = () => {
     },
     onSuccess: (response, variables) => {
       // Your success callback here
-      const { data } = response;
+      //   const { data } = response;
       queryClient.invalidateQueries({
         queryKey: ["activeTreatments"],
       });

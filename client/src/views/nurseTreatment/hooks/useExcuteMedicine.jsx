@@ -16,7 +16,7 @@ export const useExcuteMedicine = () => {
     onSuccess: (response, variables) => {
       // Your success callback here
       const { data } = response;
-      console.log(data);
+      //   console.log(data);
       queryClient.invalidateQueries({
         queryKey: ["prescriptions", data.prescription_id],
         // invalidate: false,

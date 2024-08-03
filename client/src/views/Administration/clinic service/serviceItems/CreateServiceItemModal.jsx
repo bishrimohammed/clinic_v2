@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
-import { Button, Col, Form, Row, Modal } from "react-bootstrap";
+import { Button, Col, Form, Row, Modal, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 
 import * as yup from "yup";
@@ -90,10 +90,10 @@ const CreateServiceItemModal = ({ show, handleClose, state }) => {
   // console.log(state);
   // console.log(groups);
   const submitHandler = (data) => {
-    console.log(data);
+    // console.log(data);
     // return;
     mutateAsync(data).then((res) => {
-      console.log(res);
+      // console.log(res);
       if (res.status === 201) {
         handleClose(false);
       }
@@ -263,7 +263,10 @@ const CreateServiceItemModal = ({ show, handleClose, state }) => {
           </Row>
           <div className="d-flex justify-content-end">
             {" "}
-            <Button type="submit">Save</Button>
+            <Button disabled={isPending} type="submit">
+              {isPending && <Spinner size="sm" />}
+              Save
+            </Button>
           </div>
         </Form>
       </Modal.Body>
