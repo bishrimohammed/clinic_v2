@@ -275,6 +275,15 @@ const SideBar2 = () => {
               </span>
               Pending Lab
             </CNavLink>
+            {hasPermission("External Lab Service Result", "read") && (
+              <CNavLink to="/lab/external" as={NavLink}>
+                <span className="nav-icon">
+                  <span className="nav-icon-bullet"></span>
+                </span>
+                External Service
+              </CNavLink>
+            )}
+
             <CNavLink to="/lab/completed" as={NavLink}>
               <span className="nav-icon">
                 <span className="nav-icon-bullet"></span>
@@ -358,6 +367,15 @@ const SideBar2 = () => {
               {/* <CIcon icon={cilSpeedometer} customClassName="nav-icon" /> */}
               <MdSpaceDashboard className="nav-icon" />
               Nurse Treatment
+            </CNavLink>
+          </CNavItem>
+        )}
+        {hasPermission("external service", "read") && (
+          <CNavItem>
+            <CNavLink to="/externalservice" as={NavLink}>
+              {/* <CIcon icon={cilSpeedometer} customClassName="nav-icon" /> */}
+              <MdSpaceDashboard className="nav-icon" />
+              External Service
             </CNavLink>
           </CNavItem>
         )}

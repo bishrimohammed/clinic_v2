@@ -8,7 +8,7 @@ const LabRequestedList = () => {
   const navigate = useNavigate();
 
   const { data, isPending, error } = UseGetLabRequested();
-  console.log(data);
+  // console.log(data);
   const labs = useMemo(() => data || [], [data]);
   // return;
   if (isPending) return <Spinner animation="grow" />;

@@ -38,7 +38,7 @@ const PatientPastMedicalHistory = ({ patientId, pastMedicalHistories }) => {
           patientId={patientId}
         />
       )} */}
-      <ConditionsAndMedications />
+      <ConditionsAndMedications patientId={patientId} />
     </>
   );
 };

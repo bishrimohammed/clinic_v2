@@ -3,6 +3,13 @@ import { Route, Routes } from "react-router-dom";
 // import { CSpinner } from "@coreui/react";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
+import ExternalLabRequestList from "../views/lab/ExternalLabRequestList";
+const ExternalService = React.lazy(() =>
+  import("../views/externalServices/ExternalService")
+);
+const ExternalServiceList = React.lazy(() =>
+  import("../views/externalServices/ExternalServiceList")
+);
 const NurseTreatmentList = React.lazy(() =>
   import("../views/nurseTreatment/NurseTreatmentList")
 );
@@ -358,12 +365,13 @@ const AppContent = () => {
             <Route index element={<ApprovalSettingContanier />} />
           </Route>
 
-          <Route path="patientque" element={<PatientQue />}>
+          {/* <Route path="patientque" element={<PatientQue />}>
             <Route index path="list" element={<PatientQueList />} />
             <Route path="addtoque" element={<AddpatientToQue />} />
-          </Route>
+          </Route> */}
           <Route path="lab" element={<Lab />}>
             <Route index element={<LabRequestedList />} />
+            <Route path="external" element={<ExternalLabRequestList />} />
             <Route path="completed" element={<LabCompletedList />} />
             <Route path="addresult" element={<AddLabResult />} />
           </Route>
@@ -475,6 +483,9 @@ const AppContent = () => {
           </Route>
           <Route path="nursetreatment" element={<NurseTreatment />}>
             <Route index element={<NurseTreatmentList />} />
+          </Route>
+          <Route path="externalservice" element={<ExternalService />}>
+            <Route index element={<ExternalServiceList />} />
           </Route>
         </Routes>
       </Suspense>

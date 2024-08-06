@@ -8,8 +8,18 @@ import { differenceInYears } from "date-fns";
 import ConditionsAndMedications from "./pastMedicalHistory/ConditionsAndMedications";
 import HivContainer from "./HIV/HivContainer";
 import Disability from "./disability/Disability";
-const PatientGeneralInforamtion = ({ patient, medicalRecordId }) => {
+import { useGetPatient } from "../hooks/patientHooks/useGetPatient";
+import { Spinner } from "react-bootstrap";
+const PatientGeneralInforamtion = ({
+  patient1,
+  medicalRecordId,
+  isExternalService,
+  patientId,
+}) => {
   // console.log(patient);
+  const { data: patient, isPending: patientPending } = useGetPatient(patientId);
+  console.log(patient);
+  if (patientPending) return <Spinner />;
   return (
     <div className="d-flex flex-md-column flex-wrap gap-md-0 gap-3">
       <div>

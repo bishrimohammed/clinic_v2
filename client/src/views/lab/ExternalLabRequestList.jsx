@@ -1,9 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Button, Spinner, Table } from "react-bootstrap";
-import SearchInput from "../../components/inputs/SearchInput";
-import { LuFilter } from "react-icons/lu";
-import { PendingLab_Column } from "./utils/PendingLab_Column";
-import useDebounce from "../../hooks/useDebounce";
+
 import {
   flexRender,
   getCoreRowModel,
@@ -12,33 +8,36 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
-import { FaSortDown, FaSortUp } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+//   import { externalServiceColumn } from "./utils/externalServiceColumn";
+// import PaginationComponent from "../../components/PaginationComponent";
+import { FaEye, FaSortDown, FaSortUp } from "react-icons/fa";
+import { Spinner, Table } from "react-bootstrap";
+import { ExternalPendingColumn } from "./utils/ExternalPendingColumn";
+import { useGetExternalLabRequested } from "./hooks/useGetExternalLabRequested";
 import PaginationComponent from "../../components/PaginationComponent";
-
-const PendingLabInvestigationTable = ({ isPending, labs }) => {
-  const navigate = useNavigate();
-  const [search, setSearch] = useState("");
+import { useNavigate } from "react-router-dom";
+const ExternalLabRequestList = () => {
+  const { data, isPending } = useGetExternalLabRequested();
   const [sorting, setSorting] = useState([]);
-  const [pagination, setPagination] = React.useState({
+  const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
-  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
-  // const [dropdownPosition, setDropdownPosition] = useState({});
-  const handleToggleDropdown = (index, event) => {
-    setOpenDropdownIndex(index === openDropdownIndex ? null : index);
-    // setDropdownPosition({ left: event.clientX - 20, top: event.clientY - 200 });
-  };
+  // const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+  // // const [dropdownPosition, setDropdownPosition] = useState({});
+  // const handleToggleDropdown = (index, event) => {
+  //   setOpenDropdownIndex(index === openDropdownIndex ? null : index);
+  //   // setDropdownPosition({ left: event.clientX - 20, top: event.clientY - 200 });
+  // };
+  const navigate = useNavigate();
   // console.log(appointments);
-  const debouncedValue = useDebounce(search, 500);
+  // const debouncedValue = useDebounce(search, 500);
   // const employeeData = useMemo(() => Data, []);
-  const columns = useMemo(() => PendingLab_Column, []);
-
+  const columns = useMemo(() => ExternalPendingColumn, []);
+  const externalServiceData = useMemo(() => data || [], [data]);
   const tableInstance = useReactTable({
     columns: columns,
-    data: labs,
+    data: externalServiceData,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -46,28 +45,14 @@ const PendingLabInvestigationTable = ({ isPending, labs }) => {
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     state: {
-      globalFilter: debouncedValue,
+      // globalFilter: debouncedValue,
       pagination: pagination,
       sorting,
     },
-    onGlobalFilterChange: setSearch,
+    // onGlobalFilterChange: setSearch,
   });
   return (
     <div>
-      <div className=" d-flex flex-wrap  gap-2 align-items-center p-1 w-100 mb-1 mt-2">
-        <SearchInput searchvalue={search} setSearch={setSearch} />
-
-        <Button
-          variant="secondary"
-          className="d-flex align-items-center gap-1"
-          onClick={() => setShowFilterModal(true)}
-        >
-          <LuFilter size={16} /> Filter
-        </Button>
-        <Button variant="warning" onClick={() => setFilter({ status: "" })}>
-          Reset
-        </Button>
-      </div>
       <Table
         striped
         bordered
@@ -131,7 +116,7 @@ const PendingLabInvestigationTable = ({ isPending, labs }) => {
               </td>
             </tr>
           )}
-          {!isPending && labs?.length === 0 && (
+          {!isPending && data?.length === 0 && (
             <tr>
               <td className="  align-items-center" colSpan="8">
                 <span className="text-danger fw-bold">No Record</span>
@@ -147,7 +132,7 @@ const PendingLabInvestigationTable = ({ isPending, labs }) => {
                   onClick={() => {
                     // setShowViewEmployee(true);
                     navigate("/lab/addresult", {
-                      state: { ...rowEl.original, isInternalService: true },
+                      state: { ...rowEl.original, isInternalService: false },
                     });
                   }}
                 >
@@ -162,7 +147,6 @@ const PendingLabInvestigationTable = ({ isPending, labs }) => {
                     );
                   })}
                   <td
-                    className="p-0"
                     onClick={(e) => e.stopPropagation()}
                     style={
                       {
@@ -170,17 +154,29 @@ const PendingLabInvestigationTable = ({ isPending, labs }) => {
                         // overflow: "hidden",
                       }
                     }
-                  ></td>
+                  >
+                    <>
+                      <div className="px-3">
+                        <FaEye
+                          color="green"
+                          onClick={() => {
+                            alert("sdkjfbewjkvh");
+                            console.log("sdmbcjsdvcdsg");
+                          }}
+                        />
+                      </div>
+                    </>
+                  </td>
                 </tr>
               );
             })}
         </tbody>
       </Table>
-      {labs?.length > 0 && !isPending && (
+      {data?.length > 0 && !isPending && (
         <PaginationComponent tableInstance={tableInstance} />
       )}
     </div>
   );
 };
 
-export default PendingLabInvestigationTable;
+export default ExternalLabRequestList;

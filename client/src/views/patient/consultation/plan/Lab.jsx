@@ -10,10 +10,10 @@ import { RxCross1 } from "react-icons/rx";
 const Lab = ({ setValue, getValues }) => {
   const { data: laboratoryTests, error } = useGetLaboratory();
   const { data: labCategories } = useGetLabCategory();
-  // console.log(labCategories);
+  // console.log(laboratoryTests);
   const { mutateAsync, isPending } = useAddLabOrder();
   // console.log(laboratoryTests);
-  const remarkref = useRef();
+  // const remarkref = useRef();
 
   const [selectedTests, setSelectedTests] = useState(
     getValues("selectedLabs") ? getValues("selectedLabs") : []
@@ -23,13 +23,8 @@ const Lab = ({ setValue, getValues }) => {
       ? getValues("indirectlySelectedLabs")
       : []
   );
-  // console.log();
   const { state } = useLocation();
-  // console.log(state);
-  // Add a handler to toggle a test selected state
 
-  // console.log(serviceCategory);
-  // return;
   const [activeCategory, setActiveCategory] = useState(1);
 
   if (error) return "An error has occurred: " + error.message;
@@ -46,30 +41,44 @@ const Lab = ({ setValue, getValues }) => {
           //     ? "visibleFill"
           //     : "painted",
           //   opacity: selectedTests.includes(labtest._id) ? 0.5 : 1,
-          cursor: selectedTests?.includes(labtest.id) ? "no-drop" : "pointer",
+          cursor: selectedTests.includes(labtest._id) ? "no-drop" : "pointer",
         }}
-        type="button"
         className="bg-gredient text-nowrap width23 border-0  py-2 d-flex justify-content-center align-items-center"
         onClick={() => PanelSalect(labtest)}
         key={index}
         // disabled={selectedTests.includes(labtest._id)}
       >
-        {selectedTests.includes(labtest.id) && <FaCheck color="green" />}{" "}
+        {selectedTests.includes(labtest.labTest_id) && (
+          <FaCheck color="green" />
+        )}{" "}
         {labtest.serviceItem.service_name}
       </button>
     ));
+  // console.log(getValues("indirectlySelectedLabs"));
+  // console.log(indirecSselectedTests);
+  // console.log(getValues("selectedLabs"));
 
   const PanelSalect = (test) => {
-    console.log(test);
-    const index = selectedTests.findIndex((t) => t === test.id);
+    // console.log(test.underPanels);
+    // let up = test.underPanels.map((t) => {
+    //   const lab = laboratoryTests.find((lab) => lab.id === t.underpanel_id);
+    //   // console.log(lab);
+    //   return lab?.labTest_id;
+    // });
+
+    // console.log(up);
+    const index = selectedTests.findIndex((t) => t === test?.serviceItem?.id);
     // console.log();
-
     if (index === -1) {
-      setSelectedTests([...selectedTests, test.id]);
-      console.log(selectedTests);
-      setValue("selectedLabs", [...selectedTests, test.id]);
-
-      const underPanel = test.underPanels.map((t) => t.underpanel_id);
+      // console.log("\n\njhvvvvvvvvvvvvv\n\n");
+      setSelectedTests([...selectedTests, test?.serviceItem?.id]);
+      setValue("selectedLabs", [...selectedTests, test?.serviceItem?.id]);
+      // const underPanel = test.underPanels.map((t) => t.underpanel_id);
+      const underPanel = test.underPanels.map((t) => {
+        const lab = laboratoryTests.find((lab) => lab.id === t.underpanel_id);
+        // console.log(lab);
+        return lab?.labTest_id;
+      });
       // if (test.isPanel) {
       //   console.log("kdjcJDCVGH");
       //   // if (selectedTests.includes(underPanel)) {
@@ -88,22 +97,34 @@ const Lab = ({ setValue, getValues }) => {
         ...underPanel,
       ]);
     } else {
-      setSelectedTests(selectedTests.filter((t) => t !== test.id));
-      let underPanel = test.underPanels.map((t) => t.underpanel_id);
+      setSelectedTests(
+        selectedTests.filter((t) => t !== test?.serviceItem?.id)
+      );
+      // let underPanel = test.underPanels.map((t) => t.underpanel_id);
+      let underPanel = test.underPanels.map((t) => {
+        const lab = laboratoryTests.find((lab) => lab.id === t.underpanel_id);
+        // console.log(lab);
+        return lab?.labTest_id;
+      });
       setIndirecSselectedTests(
         indirecSselectedTests.filter((t) => {
-          underPanel.map((pg) => pg !== t.underpanel_id);
+          underPanel.map((pg) => pg !== t);
         })
-      );
-      setValue(
-        "indirectlySelectedLabs",
-        indirecSselectedTests.filter((t) => {
-          underPanel.map((pg) => pg !== t.underpanel_id);
-        })
+        // [...indirecSselectedTests, ...underPanel]
       );
       setValue(
         "selectedLabs",
-        selectedTests.filter((t) => t !== test.id)
+        selectedTests.filter((t) => t !== test?.serviceItem?.id)
+      );
+      // setValue("indirectlySelectedLabs", [
+      //   ...indirecSselectedTests,
+      //   ...underPanel,
+      // ]);
+      setValue(
+        "indirectlySelectedLabs",
+        indirecSselectedTests.filter((t) => {
+          underPanel.map((pg) => pg !== t);
+        })
       );
       // if (test.isPanel) {
       //   console.log("kdjcJDCVGH");
@@ -121,17 +142,19 @@ const Lab = ({ setValue, getValues }) => {
   };
 
   const TestSelect = (test) => {
-    const index = selectedTests.findIndex((t) => t === test.id);
+    const index = selectedTests.findIndex((t) => t === test?.serviceItem?.id);
     if (index === -1) {
-      setSelectedTests([...selectedTests, test.id]);
-      setValue("selectedLabs", [...selectedTests, test.id]);
+      setSelectedTests([...selectedTests, test?.serviceItem?.id]);
+      setValue("selectedLabs", [...selectedTests, test?.serviceItem?.id]);
     } else {
       //   let panelgroup = test?.panelGroup.map((t) => t._id);
       //   console.log(panelgroup);
-      setSelectedTests(selectedTests.filter((t) => t !== test.id));
+      setSelectedTests(
+        selectedTests.filter((t) => t !== test?.serviceItem?.id)
+      );
       setValue(
         "selectedLabs",
-        selectedTests.filter((t) => t !== test.id)
+        selectedTests.filter((t) => t !== test?.serviceItem?.id)
       );
       //   setIndirecSselectedTests(indirecSselectedTests.filter(t));
     }
@@ -139,24 +162,32 @@ const Lab = ({ setValue, getValues }) => {
   // console.log(selectedTests);
   // console.log(indirecSselectedTests);
   function getServiceItemNameById(serviceItemId) {
-    const lab = laboratoryTests.find((service) => service.id === serviceItemId);
+    const lab = laboratoryTests.find(
+      (service) => service.labTest_id === serviceItemId
+    );
     // console.log(lab);
     return lab.serviceItem.service_name;
+    // return "dfge";
   }
 
   const removeTestFromSelectedTest = (testId) => {
-    const lab = laboratoryTests.find((test) => test.id === testId);
+    const lab = laboratoryTests.find((test) => test.labTest_id === testId);
     if (lab.isPanel) {
-      const underPanel = lab.underPanels.map((t) => t.underpanel_id);
+      const underPanel = lab.underPanels.map((t) => {
+        const lab = laboratoryTests.find((lab) => lab.id === t.underpanel_id);
+        // console.log(lab);
+        return lab?.labTest_id;
+      });
+      // const underPanel = lab.underPanels.map((t) => t.underpanel_id);
       setIndirecSselectedTests(
         indirecSselectedTests.filter((t) => {
-          underPanel.map((pg) => pg !== t.id);
+          underPanel.map((pg) => pg !== t);
         })
       );
       setValue(
         "indirectlySelectedLabs",
         indirecSselectedTests.filter((t) => {
-          underPanel.map((pg) => pg !== t.id);
+          underPanel.map((pg) => pg !== t);
         })
       );
     }
@@ -166,45 +197,6 @@ const Lab = ({ setValue, getValues }) => {
       selectedTests.filter((t) => t !== testId)
     );
   };
-
-  const submitHandler = () => {
-    if (remarkref.current.value === "") {
-      toast.error(" clinical finding empty");
-      return;
-    }
-    const investigations = selectedTests.map((t) => {
-      const lab = laboratoryTests.find((lab) => lab.id === t);
-      // console.log(lab);
-      return lab?.labTest_id;
-    });
-    const underPanels = indirecSselectedTests.map((t) => {
-      const lab = laboratoryTests.find((lab) => lab.id === t);
-      // console.log(lab);
-      return lab?.labTest_id;
-    });
-
-    // console.log(selectedTests);
-    // console.log(investigations);
-    // return;
-    const formData = {
-      investigations: investigations,
-      underPanels,
-      clinical_finding: remarkref.current.value,
-    };
-    mutateAsync({ formData, medicalRecord_id: state.medicalRecord_id }).then(
-      (resData) => {
-        if (resData.status === 201) {
-          setSelectedTests([]);
-          // setIndirecSselectedTests([]);
-          remarkref.current.value = "";
-          handleClose();
-        }
-      }
-    );
-    // mutate(Data);
-    // console.log(Data);
-  };
-  // console.log(laboratoryTests);
 
   const testList = laboratoryTests
     ?.filter(
@@ -216,16 +208,15 @@ const Lab = ({ setValue, getValues }) => {
         style={{
           cursor: selectedTests.includes(test.id) ? "pointer" : "pointer",
         }}
-        type="button"
         className="bg-gredient text-nowrap width23 border-0  py-2 d-flex justify-content-center align-items-center"
         onClick={() => TestSelect(test)}
         key={index}
-        disabled={indirecSselectedTests.includes(test.id)}
+        disabled={indirecSselectedTests.includes(test?.serviceItem?.id)}
       >
-        {selectedTests.includes(test.id) && (
+        {selectedTests.includes(test?.serviceItem?.id) && (
           <FaCheck color="green" className="me-1" />
         )}
-        {indirecSselectedTests.includes(test.id) && (
+        {indirecSselectedTests.includes(test?.serviceItem?.id) && (
           <FaCheck className="me-1" />
         )}
         {test.serviceItem.service_name}

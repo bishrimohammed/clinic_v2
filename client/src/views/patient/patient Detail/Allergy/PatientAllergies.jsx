@@ -7,6 +7,7 @@ import { MdRemoveRedEye } from "react-icons/md";
 import { getBrandColor } from "../../../../utils/getBrandColor";
 
 const PatientAllergies = ({ allergies, patientId }) => {
+  console.log(patientId);
   const [showAddAllergyModal, setShowAddAllergyModal] = useState(false);
   const { data } = useGetPatientAllergy(patientId);
   // console.log(allergies);

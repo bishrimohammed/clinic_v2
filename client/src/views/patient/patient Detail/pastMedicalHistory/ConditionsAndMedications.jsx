@@ -10,6 +10,7 @@ import { MdRemoveRedEye } from "react-icons/md";
 import { getBrandColor } from "../../../../utils/getBrandColor";
 const ConditionsAndMedications = ({ patientId, medicalRecordId }) => {
   const { state } = useLocation();
+  console.log(state);
   const [showAddModal, setShowAddModal] = useState(false);
   const { data: currentmedications } = useGetCurrenMedication(
     state.medicalRecord_id
@@ -18,7 +19,7 @@ const ConditionsAndMedications = ({ patientId, medicalRecordId }) => {
     state.medicalRecord_id
   );
   const { data: pastmedicalHistories } = useGetPastMedicalHistory(
-    state.patient_id
+    state.patient_id || patientId
   );
   // console.log(state);
   return (

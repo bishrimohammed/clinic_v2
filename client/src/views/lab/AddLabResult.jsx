@@ -10,6 +10,7 @@ import { useGetPatientGeneralInfo } from "../patient/hooks/patientHooks/useGetPa
 import PatientGeneralInforamtion from "../patient/patient Detail/PatientGeneralInforamtion";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { useAddLabResult } from "./hooks/useAddLabResult";
+import { useGetPatient } from "../patient/hooks/patientHooks/useGetPatient";
 
 const labResultSchema = yup.object().shape({
   results: yup.array().of(
@@ -24,12 +25,15 @@ const labResultSchema = yup.object().shape({
 const AddLabResult = () => {
   const { state } = useLocation();
   //   const { data: laboratoryTests, error } = useGetLaboratory();
+  // console.log(state);
   const { data } = useGetOrderedTests(state.id);
-  const { data: patient } = useGetPatientGeneralInfo(
-    state.medicalRecord.patient.id
-  );
+  // const { data: patient, isPending: patientPending } = useGetPatient(
+  //   state?.medicalRecord?.patient?.id
+  // );
+  // console.log(patient);
   const { mutateAsync, isPending } = useAddLabResult();
   const navigate = useNavigate();
+  // return <div>dkfjvbfh</div>;
   const {
     register,
     formState: { errors },
@@ -41,7 +45,7 @@ const AddLabResult = () => {
 
   const Tests = useMemo(() => data?.filter((t) => t.test !== null), [data]);
   const submitHandler = (Data) => {
-    console.log(Data);
+    // console.log(Data);
     const Panels = data?.filter((t) => t.test === null);
     const result = Panels?.map((t) => {
       return {
@@ -84,53 +88,55 @@ const AddLabResult = () => {
                 </tr>
               </thead>
               <tbody>
-                {Tests?.map((t, index) => (
-                  <tr key={t.id}>
-                    <td>{index + 1}</td>
-                    <td>
-                      <input
-                        hidden
-                        type="number"
-                        {...register(`results[${index}].test_id`)}
-                        name={`results[${index}].test_id`}
-                        defaultValue={t.id}
-                      />
-                      <Form.Group>
+                {Tests?.filter((t) => !t.test.labTestProfile.isPanel)?.map(
+                  (t, index) => (
+                    <tr key={t.id}>
+                      <td>{index + 1}</td>
+                      <td>
                         <input
-                          disabled
-                          type="text"
-                          className="border-0"
-                          {...register(`results[${index}].test_name`)}
-                          name={`results[${index}].test_name`}
-                          value={t.test?.service_name}
-                        ></input>
-                      </Form.Group>
-                    </td>
-                    <td>
-                      <Form.Group>
-                        <Form.Control
-                          type="text"
-                          placeholder="lab result"
-                          {...register(`results[${index}].result`)}
-                          name={`results[${index}.result`}
-                          defaultValue={t.result}
-                          isInvalid={errors?.results?.[index]?.result}
-                        ></Form.Control>
-                      </Form.Group>
-                    </td>
-                    <td>
-                      <Form.Group>
-                        <Form.Control
-                          type="text"
-                          placeholder="Comment"
-                          {...register(`results[${index}].comment`)}
-                          defaultValue={t.comment ? t.comment : ""}
-                          name={`results[${index}.comment`}
-                        ></Form.Control>
-                      </Form.Group>
-                    </td>
-                  </tr>
-                ))}
+                          hidden
+                          type="number"
+                          {...register(`results[${index}].test_id`)}
+                          name={`results[${index}].test_id`}
+                          defaultValue={t.id}
+                        />
+                        <Form.Group>
+                          <input
+                            disabled
+                            type="text"
+                            className="border-0"
+                            {...register(`results[${index}].test_name`)}
+                            name={`results[${index}].test_name`}
+                            value={t.test?.service_name}
+                          ></input>
+                        </Form.Group>
+                      </td>
+                      <td>
+                        <Form.Group>
+                          <Form.Control
+                            type="text"
+                            placeholder="lab result"
+                            {...register(`results[${index}].result`)}
+                            name={`results[${index}.result`}
+                            defaultValue={t.result}
+                            isInvalid={errors?.results?.[index]?.result}
+                          ></Form.Control>
+                        </Form.Group>
+                      </td>
+                      <td>
+                        <Form.Group>
+                          <Form.Control
+                            type="text"
+                            placeholder="Comment"
+                            {...register(`results[${index}].comment`)}
+                            defaultValue={t.comment ? t.comment : ""}
+                            name={`results[${index}.comment`}
+                          ></Form.Control>
+                        </Form.Group>
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </Table>
             <div className="d-flex justify-content-end">
@@ -147,7 +153,35 @@ const AddLabResult = () => {
           </Form>
         </div>
         <div style={{ flex: 25 }} className="right p-2 border">
-          <PatientGeneralInforamtion patient={patient} />
+          {
+            state.isInternalService && (
+              // (patientPending ? (
+              //   <Spinner size="sm" animation="grow" />
+              // ) : (
+              <PatientGeneralInforamtion
+                // patient={patient}
+                medicalRecordId={state.medicalRecord_id}
+                patientId={state?.medicalRecord?.patient?.id}
+              />
+            )
+            // ))
+          }
+          {!state.isInternalService && (
+            <div>
+              <p className="mb-1 small">
+                Patient Name: {state.externalService.patient_name}
+              </p>
+              {/* <p className="mb-1 small">ID: {patient?.card_number}</p> */}
+            </div>
+          )}
+          {/* {patientPending ? (
+            <Spinner size="sm" animation="grow" />
+          ) : (
+            <PatientGeneralInforamtion
+              patient={patient}
+              medicalRecordId={state.medicalRecord_id}
+            />
+          )} */}
         </div>
       </div>
     </div>
