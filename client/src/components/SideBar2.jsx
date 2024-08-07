@@ -353,7 +353,16 @@ const SideBar2 = () => {
             )}
           >
             <CNavLink to="/payments" as={NavLink}>
+              <span className="nav-icon">
+                <span className="nav-icon-bullet"></span>
+              </span>
               Outstanding Payments
+            </CNavLink>
+            <CNavLink to="/payments/externalservicepayments" as={NavLink}>
+              <span className="nav-icon">
+                <span className="nav-icon-bullet"></span>
+              </span>
+              External Service Payments
             </CNavLink>
 
             {/* <CNavItem to="/billings/prices" component={NavLink}>

@@ -17,7 +17,7 @@ export const externalServiceColumn = [
     accessorFn: (row) => row.service_type,
   },
   {
-    header: "Date",
+    header: "Service Date",
     // accessorFn: (row) => format(parseISO(row.service_time), "dd/MM/yyyy"),
     accessorFn: (row) => row.service_time,
   },

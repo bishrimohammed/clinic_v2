@@ -15,7 +15,7 @@ export const useSettlePayments = () => {
       );
     },
     onSuccess: (data, variables) => {
-      console.log(variables);
+      //   console.log(variables);
       queryClient.invalidateQueries({
         queryKey: ["Medical Billing", variables],
       });

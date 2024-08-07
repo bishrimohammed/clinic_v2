@@ -56,7 +56,7 @@ const SettleAllPaymentButton = ({
                 })
                 .catch((err) => {
                   toast.error(err.response.data.message, {
-                    delay: 5000,
+                    // delay: 5000,
                   });
                   setShowConfirmModal(false);
                   queryClient.invalidateQueries({

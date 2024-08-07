@@ -1,5 +1,10 @@
 import React, { useMemo, useState } from "react";
-import useDebounce from "../../../hooks/useDebounce";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useGetMedicalBillPayment } from "./hooks/useGetMedicalBillPayment";
+import PaginationComponent from "../../components/PaginationComponent";
+import PaymentsTable from "./payment detail/PaymentsTable";
+import { Button, Spinner, Table } from "react-bootstrap";
+import { FaSortDown, FaSortUp } from "react-icons/fa";
 import {
   flexRender,
   getCoreRowModel,
@@ -8,81 +13,33 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { IndividualPaymentColumn } from "../utils/IndividualPaymentColumn";
-import { Button, Dropdown, Spinner, Table, Form } from "react-bootstrap";
-// import { TbCalendarCancel } from "react-icons/tb";
-// import { RiEditLine } from "react-icons/ri";
-// import { GrRevert } from "react-icons/gr";
-// import { FaMoneyCheckDollar } from "react-icons/fa6";
-// import { BsThreeDotsVertical } from "react-icons/bs";
-import { FaSortDown, FaSortUp } from "react-icons/fa";
-import { FcCancel } from "react-icons/fc";
-import TakePaymentModal from "./TakePaymentModal";
-import { useLocation } from "react-router-dom";
-import { useGetMedicalBillPayment } from "../hooks/useGetMedicalBillPayment";
-import VoidPaymentModal from "./VoidPaymentModal";
-import { IoMdArrowRoundBack } from "react-icons/io";
-import SearchInput from "../../../components/inputs/SearchInput";
+import { IndividualPaymentColumn } from "./utils/IndividualPaymentColumn";
+import useDebounce from "../../hooks/useDebounce";
+import SearchInput from "../../components/inputs/SearchInput";
 import { LuFilter } from "react-icons/lu";
-import FilterPaymentsModal from "./FilterPaymentsModal";
-import PaginationComponent from "../../../components/PaginationComponent";
-import { useGetPatientVisitById } from "../../patient visit/hooks/useGetPatientVisitById";
-import { useGetMedicalBillingById } from "../hooks/useGetMedicalBillingById";
-import AddAdvancedPaymentButton from "../AddAdvancedPaymentButton";
-import SettleAllPaymentButton from "./SettleAllPaymentButton";
-import PaymentsTable from "./PaymentsTable";
+import FilterPaymentsModal from "./payment detail/FilterPaymentsModal";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
-const CurrentDuesPaymentTable = ({}) => {
+const ExternalServicePaymentDetail = () => {
   const { state } = useLocation();
-  const [filter, setFilter] = useState({ status: "" });
-  const { data, isPending } = useGetMedicalBillPayment({
-    id: state.id,
-    filter,
-  });
-  const { data: visit } = useGetPatientVisitById(state.visit_id);
-  const { data: medicalBilling } = useGetMedicalBillingById(state.id);
-  // console.log(state);
-  // console.log(medicalBilling);
-  // console.log(visit);
-  const [showFilterModal, setShowFilterModal] = useState(false);
-  const [showTakePaymentModal, setShowTakePaymentModal] = useState({
-    isShow: false,
-    paymentId: null,
-    item: null,
-  });
-  const [showVoidPaymentModal, setShowVoidPaymentModal] = useState({
-    isShow: false,
-    paymentId: null,
-  });
-
-  //   console.log(state);
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
-  const payments = useMemo(() => data || [], [data, isPending]);
-  // console.log(payments);
-  const outStandingAmount = useMemo(
-    () =>
-      payments
-        ?.filter((p) => p.status === "Unpaid")
-        ?.reduce((sum, item) => sum + item.item.price, 0),
-    [payments]
-  );
-  // console.log(outStandingAmount);
-  //   const isPending = false;
-  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
-  // const [dropdownPosition, setDropdownPosition] = useState({});
-  const handleToggleDropdown = (index, event) => {
-    setOpenDropdownIndex(index === openDropdownIndex ? null : index);
-    // setDropdownPosition({ left: event.clientX - 20, top: event.clientY - 200 });
-  };
-  const debouncedValue = useDebounce(search, 500);
-  // const employeeData = useMemo(() => Data, []);
-  const columns = useMemo(() => IndividualPaymentColumn, []);
+  const [filter, setFilter] = useState({ status: "" });
+  const [showFilterModal, setShowFilterModal] = useState(false);
 
+  const { data, isPending } = useGetMedicalBillPayment({
+    id: state.id,
+    filter,
+  });
+  const payments = useMemo(() => data || [], [data, isPending]);
+  //   console.log(state);
+  const debouncedValue = useDebounce(search, 500);
+  const columns = useMemo(() => IndividualPaymentColumn, []);
   const tableInstance = useReactTable({
     columns: columns,
     data: payments,
@@ -100,74 +57,40 @@ const CurrentDuesPaymentTable = ({}) => {
     onGlobalFilterChange: setSearch,
   });
   return (
-    <>
-      <div className=" d-flex justify-content-between flex-wrap  gap-2 align-items-center p-1 w-100 mb-1 mt-2">
-        <div className="d-flex flex-wrap  gap-2 align-items-center">
-          <SearchInput searchvalue={search} setSearch={setSearch} />
-
-          <Button
-            variant="secondary"
-            className="d-flex align-items-center gap-1"
-            onClick={() => setShowFilterModal(true)}
-          >
-            <LuFilter size={16} /> Filter
-          </Button>
-          <Button variant="warning" onClick={() => setFilter({ status: "" })}>
-            Reset
-          </Button>
-        </div>
-        <div>
-          {visit?.isAdmitted && (
-            <>
-              {" "}
-              <AddAdvancedPaymentButton
-                billId={medicalBilling?.id}
-                patient={state.patient}
-                visit_stage={visit?.stage}
-                is_advanced_payment_amount_completed={
-                  medicalBilling?.is_advanced_payment_amount_completed
-                }
-                has_advanced_payment={medicalBilling?.has_advanced_payment}
-              />
-              <SettleAllPaymentButton
-                has_advanced_payment={medicalBilling?.has_advanced_payment}
-                payments={payments}
-                medicalBillingId={medicalBilling?.id}
-                billId={medicalBilling?.id}
-              />
-            </>
-          )}
-        </div>
+    <div>
+      {" "}
+      <div className=" d-flex border-bottom p-2 mb-3 gap-3 align-items-center mb-1">
+        <IoMdArrowRoundBack
+          className="cursorpointer"
+          size={22}
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate(-1)}
+        />
+        <h4 className="mb-0">View Patient Payment Details</h4>
       </div>
-      <div className="d-flex justify-content-end">
-        {visit?.isAdmitted && (
-          <div className="d-flex align-items-center gap-2">
-            <Form.Group>
-              <Form.Label className="text-nowrap">Remaning Amount:</Form.Label>
-              <Form.Control
-                type="text"
-                value={
-                  medicalBilling?.advancedPayments?.length > 0
-                    ? medicalBilling?.advancedPayments[0]?.remaining_amount +
-                      " Birr"
-                    : "0 Birr"
-                }
-                disabled
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label className="text-nowrap">Out Standing:</Form.Label>
-              <Form.Control
-                type="text"
-                value={outStandingAmount + " birr"}
-                disabled
-              />
-            </Form.Group>
-            {/* <Form.Control value={} /> */}
-          </div>
-        )}
+      <div className="d-flex align-items-center mb-3">
+        <h6 className="mb-0">Patient Name: </h6>
+        <p className="mb-0 ms-2">{state.externalService.patient_name}</p>
       </div>
+      <div className="d-flex flex-wrap  gap-2 align-items-center">
+        <SearchInput searchvalue={search} setSearch={setSearch} />
 
+        <Button
+          variant="secondary"
+          size="sm"
+          className="d-flex align-items-center gap-1"
+          onClick={() => setShowFilterModal(true)}
+        >
+          <LuFilter size={16} /> Filter
+        </Button>
+        <Button
+          size="sm"
+          variant="warning"
+          onClick={() => setFilter({ status: "" })}
+        >
+          Reset
+        </Button>
+      </div>
       <Table
         striped
         bordered
@@ -235,8 +158,9 @@ const CurrentDuesPaymentTable = ({}) => {
             !isPending && (
               <PaymentsTable
                 tableInstance={tableInstance}
-                visit={visit}
-                patient={state.patient}
+                visit={null}
+                patient={null}
+                externalService={state?.externalService}
               />
             )
             // tableInstance.getRowModel().rows.map((rowEl) => {
@@ -350,30 +274,6 @@ const CurrentDuesPaymentTable = ({}) => {
           // setShowTakePaymentModal={setShowTakePaymentModal}
         />
       )}
-      {showTakePaymentModal.isShow && (
-        <TakePaymentModal
-          show={showTakePaymentModal}
-          handleClose={() =>
-            setShowTakePaymentModal({ isShow: false, paymentId: null })
-          }
-          paymentId={showTakePaymentModal.paymentId}
-          patient={state.patient}
-          visit={state.visit}
-          item={showTakePaymentModal.item}
-        />
-      )}
-      {showVoidPaymentModal.isShow && (
-        <VoidPaymentModal
-          show={showVoidPaymentModal.isShow}
-          handleClose={() =>
-            setShowVoidPaymentModal({
-              isShow: false,
-              paymentId: null,
-            })
-          }
-          paymentId={showVoidPaymentModal.paymentId}
-        />
-      )}
       {showFilterModal && (
         <FilterPaymentsModal
           show={showFilterModal}
@@ -382,8 +282,8 @@ const CurrentDuesPaymentTable = ({}) => {
           filter={filter}
         />
       )}
-    </>
+    </div>
   );
 };
 
-export default CurrentDuesPaymentTable;
+export default ExternalServicePaymentDetail;

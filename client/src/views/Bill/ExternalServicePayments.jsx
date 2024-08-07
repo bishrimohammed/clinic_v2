@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
-import AddExternalServiceButton from "./AddExternalServiceButton";
-import { useGetActiveExternalService } from "./hooks/useGetActiveExternalService";
+import { useGetExternalServiceOutStanding } from "./hooks/useGetExternalServiceOutStanding";
 import {
   flexRender,
   getCoreRowModel,
@@ -9,17 +8,19 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { externalServiceColumn } from "./utils/externalServiceColumn";
-import PaginationComponent from "../../components/PaginationComponent";
-import { FaEye, FaSortDown, FaSortUp } from "react-icons/fa";
+import { externalServicePaymentsColumn } from "./utils/externalServicePaymentsColumn";
+import { FaEye, FaSortDown, FaSortUp } from "react-icons/fa6";
 import { Spinner, Table } from "react-bootstrap";
-import { useGetCurrentUser } from "../../hooks/useGetCurrentUser";
-import { externalServicePaymentsColumn } from "../Bill/utils/externalServicePaymentsColumn";
-const ExternalServiceList = () => {
-  const user = useGetCurrentUser();
-  const { data, isPending } = useGetActiveExternalService({
-    role: user.role.name,
-  });
+import PaginationComponent from "../../components/PaginationComponent";
+import { useNavigate } from "react-router-dom";
+
+const ExternalServicePayments = () => {
+  const { data, isPending } = useGetExternalServiceOutStanding();
+  const navigate = useNavigate();
+  //   console.log(data);
+  //   const { data, isPending } = useGetActiveExternalService({
+  //     role: user.role.name,
+  //   });
 
   // console.log(data);
   // const [search, setSearch] = useState("");
@@ -37,7 +38,7 @@ const ExternalServiceList = () => {
   // console.log(appointments);
   // const debouncedValue = useDebounce(search, 500);
   // const employeeData = useMemo(() => Data, []);
-  const columns = useMemo(() => externalServiceColumn, []);
+  const columns = useMemo(() => externalServicePaymentsColumn, []);
   const externalServiceData = useMemo(() => data || [], [data]);
   const tableInstance = useReactTable({
     columns: columns,
@@ -57,7 +58,6 @@ const ExternalServiceList = () => {
   });
   return (
     <div>
-      <AddExternalServiceButton />
       <Table
         striped
         bordered
@@ -136,8 +136,8 @@ const ExternalServiceList = () => {
                   style={{ cursor: "pointer", zIndex: "-1" }}
                   onClick={() => {
                     // setShowViewEmployee(true);
-                    // navigate("addresult", { state: rowEl.original });
-                    console.log("mmmmmmmmmmm");
+                    navigate("details", { state: rowEl.original });
+                    // console.log("mmmmmmmmmmm");
                   }}
                 >
                   {rowEl.getVisibleCells().map((cellEl, index) => {
@@ -183,4 +183,4 @@ const ExternalServiceList = () => {
   );
 };
 
-export default ExternalServiceList;
+export default ExternalServicePayments;

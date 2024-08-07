@@ -8,8 +8,8 @@ const AddAdvancedPaymentButton = ({
   is_advanced_payment_amount_completed,
   has_advanced_payment,
 }) => {
-  console.log(has_advanced_payment);
-  console.log(is_advanced_payment_amount_completed);
+  // console.log(has_advanced_payment);
+  // console.log(is_advanced_payment_amount_completed);
   const [showAddAdvancedPaymentModal, setShowAddAdvancedPaymentModal] =
     useState(false);
   return (

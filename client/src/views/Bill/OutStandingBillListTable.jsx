@@ -17,7 +17,7 @@ import { hasPermission } from "../../utils/hasPermission";
 import { LuFilter } from "react-icons/lu";
 import SearchInput from "../../components/inputs/SearchInput";
 import { useNavigate } from "react-router-dom";
-import AddAdvancedPaymentButton from "./AddAdvancedPaymentButton";
+// import AddAdvancedPaymentButton from "./AddAdvancedPaymentButton";
 import FilterOutStandingBilligModal from "./FilterOutStandingBilligModal";
 import { useGetOutStandingPayments } from "./hooks/useGetDraftPayments";
 import PaginationComponent from "../../components/PaginationComponent";

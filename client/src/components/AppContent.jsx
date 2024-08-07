@@ -4,6 +4,8 @@ import { Route, Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
 import ExternalLabRequestList from "../views/lab/ExternalLabRequestList";
+import ExternalServicePayments from "../views/Bill/ExternalServicePayments";
+import ExternalServicePaymentDetail from "../views/Bill/ExternalServicePaymentDetail";
 const ExternalService = React.lazy(() =>
   import("../views/externalServices/ExternalService")
 );
@@ -383,6 +385,15 @@ const AppContent = () => {
             <Route index element={<Billings />} />
             {/* <Route path="list" element={<Billings />} /> */}
             <Route path="detail" element={<ViewBillDetails />} />
+
+            <Route
+              path="externalservicepayments"
+              element={<ExternalServicePayments />}
+            />
+            <Route
+              path="externalservicepayments/details"
+              element={<ExternalServicePaymentDetail />}
+            />
           </Route>
 
           <Route path="administrations" element={<ClinicService />}>

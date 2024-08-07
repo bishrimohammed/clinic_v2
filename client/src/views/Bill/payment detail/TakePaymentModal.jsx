@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
-import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useTakePayment } from "../hooks/useTakePayment";
@@ -18,6 +18,7 @@ const TakePaymentModal = ({
   patient,
   paymentId,
   item,
+  externalService,
 }) => {
   // console.log(visit);
   const { mutateAsync, isPending } = useTakePayment();
@@ -27,20 +28,21 @@ const TakePaymentModal = ({
     formState: { errors },
   } = useForm({
     defaultValues: {
-      patientId: patient.card_number,
-      patientName:
-        patient.firstName + " " + patient.middleName + " " + patient.lastName,
-      paymentName: item.service_name,
-      visitDate: visit.assignment_date,
+      patientId: patient ? patient.card_number : "",
+      patientName: patient
+        ? patient.firstName + " " + patient.middleName + " " + patient.lastName
+        : externalService?.patient_name,
+      paymentName: item?.service_name,
+      visitDate: visit ? visit.assignment_date : externalService?.service_time,
       paymentAmount: item.price,
     },
     resolver: yupResolver(paymentSchema),
   });
+  // console.log(errors);
   const submitHandler = (data) => {
-    console.log(data);
+    // console.log(data);
     const Data = {
       paymentId: paymentId,
-
       paymentAmount: data.paymentAmount,
     };
     mutateAsync(Data)
@@ -62,17 +64,20 @@ const TakePaymentModal = ({
       <Modal.Body>
         <Form onSubmit={handleSubmit(submitHandler)}>
           <Row>
-            <Col md={4} sm={12}>
-              <Form.Group className="mb-3">
-                <Form.Label>Patient Id</Form.Label>
-                <Form.Control
-                  type="text"
-                  {...register("patientId")}
-                  //   value={patient.card_number}
-                  disabled
-                />
-              </Form.Group>
-            </Col>
+            {patient && (
+              <Col md={4} sm={12}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Patient Id</Form.Label>
+                  <Form.Control
+                    type="text"
+                    {...register("patientId")}
+                    //   value={patient.card_number}
+                    disabled
+                  />
+                </Form.Group>
+              </Col>
+            )}
+
             <Col md={4} sm={12}>
               <Form.Group className="mb-3">
                 <Form.Label>Patient Name</Form.Label>
@@ -83,27 +88,35 @@ const TakePaymentModal = ({
                 />
               </Form.Group>
             </Col>
-            <Col md={4} sm={12}>
-              <Form.Group className="mb-3">
-                <Form.Label>Visit Date</Form.Label>
-                <Form.Control
-                  type="date"
-                  {...register("visitDate")}
-                  //   value={visit.assignment_date}
-                  disabled
-                />
-              </Form.Group>
-            </Col>
-            <Col md={4} sm={12}>
-              <Form.Group className="mb-3">
-                <Form.Label>Payment Name</Form.Label>
-                <Form.Control
-                  type="etxt"
-                  {...register("paymentName")}
-                  disabled
-                />
-              </Form.Group>
-            </Col>
+            {patient && (
+              <>
+                {" "}
+                <Col md={4} sm={12}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>
+                      {visit ? "Visit Date" : "Service Date"}
+                    </Form.Label>
+                    <Form.Control
+                      type="date"
+                      {...register("visitDate")}
+                      //   value={visit.assignment_date}
+                      disabled
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={4} sm={12}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Item Name</Form.Label>
+                    <Form.Control
+                      type="etxt"
+                      {...register("paymentName")}
+                      disabled
+                    />
+                  </Form.Group>
+                </Col>
+              </>
+            )}
+
             <Col md={4} sm={12}>
               <Form.Group className="mb-3">
                 <Form.Label>Payment Amount</Form.Label>
@@ -122,6 +135,7 @@ const TakePaymentModal = ({
               Close
             </Button>
             <Button type="submit" disabled={isPending} variant="success">
+              {isPending && <Spinner size="sm" />}
               Pay
             </Button>
           </Modal.Footer>
