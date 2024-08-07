@@ -5,7 +5,7 @@ import { format } from "date-fns";
 
 const LabAndImagingTab = ({ patientId }) => {
   const { data: labs } = useGetPatientLabs({ patientId });
-  console.log(labs);
+  // console.log(labs);
   // const {data} =
   return (
     <div>

@@ -10,10 +10,10 @@ import { resetConsultation } from "../../../store/consultationSlice";
 
 const ConsultationPage = () => {
   const { state } = useLocation();
-  // console.log(state);
-  const { data: patient, isPending } = useGetPatient(state.patient_id);
+  console.log(state);
+  // const { data: patient, isPending } = useGetPatient(state.patient_id);
   const dispatch = useDispatch();
-  // console.log(patient);
+  console.log(state.patient_id);
   React.useEffect(() => {
     return () => {
       dispatch(resetConsultation());
@@ -27,11 +27,15 @@ const ConsultationPage = () => {
             <ConsultationLeftContainer />
           </div>
           <div style={{ flex: 25 }} className="right p-2 border">
-            {isPending ? (
+            {/* {isPending ? (
               <Spinner animation="grow" />
-            ) : (
-              <PatientGeneralInforamtion patient={patient} />
-            )}
+            ) : ( */}
+            <PatientGeneralInforamtion
+              patientId={state?.patient_id}
+              // isExternalService={}
+              // patient={patient}
+            />
+            {/* )} */}
           </div>
         </div>
         <div className="d-md-none d-block">

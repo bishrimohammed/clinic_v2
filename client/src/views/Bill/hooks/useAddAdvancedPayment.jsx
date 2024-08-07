@@ -16,5 +16,10 @@ export const useAddAdvancedPayment = () => {
         }
       );
     },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["Medical Billing", variables.billId],
+      });
+    },
   });
 };

@@ -12,7 +12,7 @@ import ProcedureTab from "./HistoryTabs/ProcedureTab";
 const HistoryTab = () => {
   const { state } = useLocation();
   const { data } = useGetClinicData(state.patient_id);
-  console.log(data);
+  // console.log(data);
   return (
     <div>
       <Tabs

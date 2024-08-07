@@ -1,28 +1,31 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-import Axiosinstance from "../../../api/axiosInstance";
 import { toast } from "react-toastify";
+import Axiosinstance from "../../../api/axiosInstance";
 import { AxiosHeaders } from "../../../api/useAxiosHeaders";
 
-export const useAdmitPatient = () => {
+export const useSettlePayments = () => {
   const queryClient = useQueryClient();
   const { headers } = AxiosHeaders();
   return useMutation({
-    mutationFn: async (visitId) => {
+    mutationFn: async (medicalBillingId) => {
       return await Axiosinstance.patch(
-        `/patientvisits/${visitId}/admit`,
+        `/payments/${medicalBillingId}/settlepayments`,
         {},
         { headers }
       );
     },
     onSuccess: (data, variables) => {
+      console.log(variables);
       queryClient.invalidateQueries({
-        queryKey: ["UpcomingAssignedVisitToDoctor"],
+        queryKey: ["Medical Billing", variables],
       });
       queryClient.invalidateQueries({
-        queryKey: ["Patient Visit", variables.visitId],
+        queryKey: ["MedicalBillPayment", variables, { status: "" }],
       });
-      toast.success(`Patient Admitted successfully`);
+      toast.success("Payments settled successfully");
+    },
+    onError: (err) => {
+      console.log("Error settling payments");
     },
   });
 };

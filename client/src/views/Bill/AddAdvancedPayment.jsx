@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Modal } from "react-bootstrap";
+import { Form, Modal, Spinner } from "react-bootstrap";
 import * as yup from "yup";
 
 import { useForm } from "react-hook-form";
@@ -25,7 +25,7 @@ const advancedPaymentSchema = yup.object().shape({
   Description: yup.string().transform((value) => value.trim()),
 });
 const AddAdvancedPayment = ({ show, handleClose, billId, patient }) => {
-  console.log(billId);
+  // console.log(billId);
   const { mutateAsync, isPending } = useAddAdvancedPayment();
   const {
     register,
@@ -35,7 +35,7 @@ const AddAdvancedPayment = ({ show, handleClose, billId, patient }) => {
     resolver: yupResolver(advancedPaymentSchema),
   });
   const submitHandler = (data) => {
-    console.log(data);
+    // console.log(data);
     // return;
     const Data = {
       formData: {
@@ -48,7 +48,7 @@ const AddAdvancedPayment = ({ show, handleClose, billId, patient }) => {
     mutateAsync(Data).then((res) => {
       console.log(res);
       if (res.status === 201) {
-        alert("Payment Added Successfully");
+        // alert("Payment Added Successfully");
         toast.success(
           `Advanced Payment Added Successfully for ${patient.firstName} ${patient.middleName}`
         );
@@ -121,7 +121,8 @@ const AddAdvancedPayment = ({ show, handleClose, billId, patient }) => {
           disabled={isPending}
           className="btn btn-primary"
         >
-          Save changes
+          {isPending && <Spinner size="sm" />}
+          Save
         </button>
       </Modal.Footer>
     </Modal>

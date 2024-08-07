@@ -16,6 +16,7 @@ import { useConsultationSaveForLater } from "../hooks/consultationHooks/useConsu
 import HistoryTab from "./HistoryTab";
 import { useGetPatient } from "../hooks/patientHooks/useGetPatient";
 import PatientGeneralInforamtion from "../patient Detail/PatientGeneralInforamtion";
+import { useGetPatientVisitById } from "../../patient visit/hooks/useGetPatientVisitById";
 // import LabResultTab from "./LabResultTab";
 // import { ConsultationBackButton } from "./ConsultationBackButton";
 const ConsultationContent = ({ changeVisibleContent }) => {
@@ -36,6 +37,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
   const ExaminationRef = useRef(null);
   const PlanRefs = useRef();
   const { state } = useLocation();
+  const { data: visit } = useGetPatientVisitById(state.id);
   const { data: patient, isPending: patientLoading } = useGetPatient(
     state.patient_id
   );
@@ -111,7 +113,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           </Button>
         </div>
       </div>
-      {state.patient.patient_type === "inpatient" ? (
+      {visit?.isAdmitted ? (
         <div className="d-flex justify-content-end mt-2">
           <button
             onClick={changeVisibleContentHandler}
@@ -125,7 +127,10 @@ const ConsultationContent = ({ changeVisibleContent }) => {
         {patientLoading ? (
           <Spinner animation="grow" />
         ) : (
-          <PatientGeneralInforamtion patient={patient} />
+          <PatientGeneralInforamtion
+            patient={patient}
+            patientId={state?.patient_id}
+          />
         )}
       </div>
       <Tabs

@@ -6,9 +6,9 @@ const CertificatesTab = ({ patientId }) => {
   const { data: medicalCertificates } = useGetPatientMedicalCertificates({
     patientId,
   });
-  console.log(medicalCertificates);
+  // console.log(medicalCertificates);
   const { data: referralNotes } = useGetPatientReferralNotes({ patientId });
-  console.log(referralNotes);
+  // console.log(referralNotes);
   return <div>CertificatesTab</div>;
 };
 

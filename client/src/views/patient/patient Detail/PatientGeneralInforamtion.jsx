@@ -16,9 +16,9 @@ const PatientGeneralInforamtion = ({
   isExternalService,
   patientId,
 }) => {
-  // console.log(patient);
+  // console.log(patientId);
   const { data: patient, isPending: patientPending } = useGetPatient(patientId);
-  console.log(patient);
+  // console.log(patient);
   if (patientPending) return <Spinner />;
   return (
     <div className="d-flex flex-md-column flex-wrap gap-md-0 gap-3">

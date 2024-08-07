@@ -19,7 +19,7 @@ const TakePaymentModal = ({
   paymentId,
   item,
 }) => {
-  console.log(visit);
+  // console.log(visit);
   const { mutateAsync, isPending } = useTakePayment();
   const {
     register,

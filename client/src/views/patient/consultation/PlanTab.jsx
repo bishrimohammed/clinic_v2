@@ -30,6 +30,7 @@ import ViewSickNote from "./plan/ViewSickNote";
 import ViewReferralNote from "./plan/ViewReferralNote";
 import PreviewSickLeaveNote2 from "./plan/preview/PreviewSickLeaveNote2";
 import PreviewRefferalNote2 from "./plan/preview/PreviewRefferalNote2";
+import AdmitButton from "./plan/AdmitButton";
 const planSchema = yup.object().shape({
   plan: yup.string().required(),
   // selectedLabs: yup.array().of(yup.number()),
@@ -284,18 +285,21 @@ const PlanTab = React.forwardRef((props, ref) => {
   };
 
   // console.log(getValues("referral_notes"));
-  const getDiagnosisName = (id) => {
-    // console.log(id);
-    // console.log(diagnosis);
-    // return;
-    const diagnosis2 = diagnosis?.find((d) => d.id === parseInt(id));
-    // console.log(diagnosis2);
-    return (
-      value == true && diagnosis2?.diagnosis + "(" + diagnosis2?.status + ")"
-    );
-  };
+  // const getDiagnosisName = (id) => {
+  //   // console.log(id);
+  //   // console.log(diagnosis);
+  //   // return;
+  //   const diagnosis2 = diagnosis?.find((d) => d.id === parseInt(id));
+  //   // console.log(diagnosis2);
+  //   return (
+  //     value == true && diagnosis2?.diagnosis + "(" + diagnosis2?.status + ")"
+  //   );
+  // };
   return (
     <div>
+      <div className="d-flex justify-content-end pe-4">
+        <AdmitButton />
+      </div>
       <Form onSubmit={handleSubmit(submitHandler)} className="">
         <Form.Group className="mb-3">
           {/* <input type="hidden" {...register("selectedLabs")} /> */}

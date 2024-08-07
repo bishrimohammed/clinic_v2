@@ -173,7 +173,7 @@ const OutStandingBillListTable = (
                   );
                 })}
 
-                <th>Actions</th>
+                {/* <th>Actions</th> */}
               </tr>
             );
           })}
@@ -220,7 +220,7 @@ const OutStandingBillListTable = (
                       </td>
                     );
                   })}
-                  <td
+                  {/* <td
                     className="p-0"
                     onClick={(e) => e.stopPropagation()}
                     style={
@@ -229,18 +229,7 @@ const OutStandingBillListTable = (
                         // overflow: "hidden",
                       }
                     }
-                  >
-                    {/* {rowEl.original.has_advanced_payment && ( */}
-                    <AddAdvancedPaymentButton
-                      billId={rowEl.original.id}
-                      patient={rowEl.original.patient}
-                      visit_stage={rowEl.original.visit.stage}
-                      is_advanced_payment_amount_completed={
-                        rowEl.original.is_advanced_payment_amount_completed
-                      }
-                    />
-                    {/* )} */}
-
+                  >                   
                     <Dropdown
                       id={rowEl.original.id + "dropdown"}
                       autoClose="outside"
@@ -250,67 +239,8 @@ const OutStandingBillListTable = (
                       // show={openDropdowns[rowEl.original.id]}
                       onToggle={(event) => handleToggleDropdown(null, event)}
                       show={openDropdownIndex === rowEl.original.id}
-                    >
-                      {/* <Dropdown.Toggle
-                        caret="false"
-                        className="employee-dropdown px-3 border-0"
-                        style={{ backgroundColor: "transparent" }}
-                        // style={{ zIndex: 6 }}
-                        id={`dropdown-${rowEl.original.id}`}
-                        onClick={(event) =>
-                          handleToggleDropdown(rowEl.original.id, event)
-                        }
-                      >
-                        <span
-                          // style={{ color: "red", zIndex: -1 }}
-                          className="text-dark"
-                        >
-                          <BsThreeDotsVertical />
-                        </span>
-                      </Dropdown.Toggle> */}
-
-                      {/* <Dropdown.Menu style={{ zIndex: 55 }}>
-                        <Dropdown.Item
-                          className="d-flex gap-2 align-items-center"
-                          role="button"
-                          disabled={!rowEl.original.status}
-                          style={{ zIndex: "50" }}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            // setData_to_be_Edited(rowEl.original);
-                            // handleShowEdit();
-                            setShowTransferredPatientVisitModal({
-                              isShow: true,
-                              visit: rowEl.original,
-                            });
-                          }}
-                        >
-                          <RiEditLine /> Transfer
-                        </Dropdown.Item>
-
-                        <Dropdown.Item
-                          className="d-flex gap-2 align-items-center"
-                          role="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setShowCancelPatientVisitModal({
-                              isShow: true,
-                              visitId: rowEl.original.id,
-                            });
-                            // setSelectedEmployee({
-                            //   id: rowEl.original.id,
-                            //   selectedFor: "deactivate",
-                            // });
-                            // setShowDelete(true);
-                          }}
-                        >
-                          <TbCalendarCancel color="red" /> Cancel
-                        </Dropdown.Item>
-
-                       
-                      </Dropdown.Menu> */}
-                    </Dropdown>
-                  </td>
+                    ></Dropdown>
+                  </td> */}
                 </tr>
               );
             })}
@@ -319,74 +249,6 @@ const OutStandingBillListTable = (
       {billings?.length > 0 && !isPending && (
         <PaginationComponent tableInstance={tableInstance} />
       )}
-      {/* <div
-        style={{ zIndex: 0 }}
-        className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2"
-      >
-        <button
-          className="border-0"
-          style={{ outline: "none" }}
-          onClick={() => tableInstance.firstPage()}
-          disabled={!tableInstance.getCanPreviousPage()}
-        >
-          &lt;&lt;
-        </button>
-        <button
-          // className="btn btn-outline-secondary"
-          onClick={() => tableInstance.previousPage()}
-          disabled={!tableInstance.getCanPreviousPage()}
-        >
-          &lt;
-        </button>
-        <button
-          // className="btn btn-outline-secondary"
-          onClick={() => tableInstance.nextPage()}
-          disabled={!tableInstance.getCanNextPage()}
-        >
-          &gt;
-        </button>
-        <button
-          // className="btn btn-outline-secondary"
-          onClick={() => tableInstance.lastPage()}
-          disabled={!tableInstance.getCanNextPage()}
-        >
-          &gt;&gt;
-        </button>
-        <span className="d-flex align-items-center gap-1">
-          <div>Page</div>
-          <strong className="d-flex align-items-center gap-1">
-            {tableInstance.getState().pagination.pageIndex + 1} of{" "}
-            {tableInstance.getPageCount().toLocaleString()}
-          </strong>
-        </span>
-        <span className="d-flex align-items-center gap-1">
-          | Go to page:
-          <input
-            type="number"
-            value={tableInstance.getState().pagination.pageIndex + 1}
-            // defaultValue={tableInstance.options.state.pagination.pageIndex}
-            onChange={(e) => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
-              tableInstance.setPageIndex(page);
-            }}
-            className="form-control w-25"
-          />
-        </span>
-        <select
-          value={tableInstance.getState().pagination.pageSize}
-          // value={tableInstance.options.state.pagination.pageIndex}
-          onChange={(e) => {
-            tableInstance.setPageSize(Number(e.target.value));
-          }}
-          // className="form-select"
-        >
-          {[10, 20, 30, 40, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
-      </div> */}
       {showFilterModal && (
         <FilterOutStandingBilligModal
           show={showFilterModal}
