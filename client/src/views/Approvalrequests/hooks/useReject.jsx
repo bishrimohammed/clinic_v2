@@ -4,7 +4,7 @@ import Axiosinstance from "../../../api/axiosInstance";
 export const useReject = () => {
   return useMutation({
     mutationFn: async (id) => {
-      return await Axiosinstance.patch(`./${id}/approve`);
+      return await Axiosinstance.patch(`/approvalrequests/${id}/reject`);
     },
     onSuccess: (data, variables) => {
       console.log("Request rejected successfully", data);
