@@ -7,20 +7,24 @@ export const useSettlePayments = () => {
   const queryClient = useQueryClient();
   const { headers } = AxiosHeaders();
   return useMutation({
-    mutationFn: async (medicalBillingId) => {
+    mutationFn: async (data) => {
       return await Axiosinstance.patch(
-        `/payments/${medicalBillingId}/settlepayments`,
-        {},
+        `/payments/${data.medicalBillingId}/settlepayments`,
+        { paymentIds: data.paymentIds },
         { headers }
       );
     },
     onSuccess: (data, variables) => {
-      //   console.log(variables);
+      console.log(variables);
       queryClient.invalidateQueries({
-        queryKey: ["Medical Billing", variables],
+        queryKey: ["Medical Billing", variables.medicalBillingId],
       });
       queryClient.invalidateQueries({
-        queryKey: ["MedicalBillPayment", variables, { status: "" }],
+        queryKey: [
+          "MedicalBillPayment",
+          variables.medicalBillingId,
+          { status: "" },
+        ],
       });
       toast.success("Payments settled successfully");
     },

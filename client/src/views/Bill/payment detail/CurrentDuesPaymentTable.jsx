@@ -143,7 +143,7 @@ const CurrentDuesPaymentTable = ({}) => {
         {visit?.isAdmitted && (
           <div className="d-flex align-items-center gap-2">
             <Form.Group>
-              <Form.Label className="text-nowrap">Remaning Amount:</Form.Label>
+              <Form.Label className="text-nowrap">Credit Amount:</Form.Label>
               <Form.Control
                 type="text"
                 value={

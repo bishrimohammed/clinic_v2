@@ -38,9 +38,6 @@ const HistoryPrescriptionsTab = ({ patientId }) => {
       pagination: pagination,
       sorting,
     },
-    // onGlobalFilterChange: setSearch,
-    // defaultSortColumn: "Name", // Set the default sort column
-    // defaultSortDirection: "asc",
   });
   return (
     <div>
@@ -55,7 +52,7 @@ const HistoryPrescriptionsTab = ({ patientId }) => {
         <thead>
           {tableInstance.getHeaderGroups().map((headerEl) => {
             return (
-              <tr key={headerEl.id}>
+              <tr key={headerEl.id} className="text-nowrap">
                 {headerEl.headers.map((columnEl, index) => {
                   return (
                     <th key={columnEl.id} colSpan={columnEl.colSpan}>
@@ -124,6 +121,7 @@ const HistoryPrescriptionsTab = ({ patientId }) => {
                 <tr
                   key={rowEl.id}
                   style={{ cursor: "pointer", zIndex: "-1" }}
+                  className="text-nowrap"
                   // onClick={() => {
                   //   setShowViewPatient({
                   //     isShow: true,

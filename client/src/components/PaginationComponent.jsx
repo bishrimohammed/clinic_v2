@@ -1,6 +1,5 @@
 import { Pagination } from "react-bootstrap";
 import { FaGreaterThan, FaLessThan } from "react-icons/fa6";
-import PropTypes from "prop-types";
 
 const PaginationComponent = ({ tableInstance }) => {
   // console.log(tableInstance.getState().pagination.pageIndex);
