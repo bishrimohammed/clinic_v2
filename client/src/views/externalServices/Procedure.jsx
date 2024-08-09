@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Col, ListGroup, Row } from "react-bootstrap";
 import { useGetProcedures } from "./hooks/useGetProcedures";
 import { FaCheck } from "react-icons/fa";
+import { RxCross1 } from "react-icons/rx";
 
 const Procedure = ({ getValues, setValue }) => {
   const { data: procedures } = useGetProcedures();
   const [selectedProcedure, setSelectedProcedure] = useState(
-    getValues("procedure")
+    getValues("procedures") || []
   );
+  // console.log(procedures);
   const testList = procedures?.map((test, index) => (
     <button
       style={
@@ -18,13 +20,20 @@ const Procedure = ({ getValues, setValue }) => {
       type="button"
       className="bg-gredient text-nowrap width23 border-0  py-2 d-flex justify-content-center align-items-center"
       onClick={() => {
-        setValue("procedure", test.id);
-        setSelectedProcedure(test.id);
+        console.log(test);
+        let proceduresList;
+        if (selectedProcedure.includes(test.id)) {
+          proceduresList = selectedProcedure.filter((id) => id !== test.id);
+        } else {
+          proceduresList = [...selectedProcedure, test.id];
+        }
+        setSelectedProcedure(proceduresList);
+        setValue("procedures", proceduresList);
       }}
       key={index}
       // disabled={indirecSselectedTests.includes(test.id)}
     >
-      {selectedProcedure == test.id && (
+      {selectedProcedure.includes(test.id) && (
         <FaCheck color="green" className="me-1" />
       )}
 
@@ -32,6 +41,19 @@ const Procedure = ({ getValues, setValue }) => {
     </button>
   ));
 
+  function getServiceItemNameById(procedureId) {
+    // console.log(procedureId);
+    const procedure = procedures.find((p) => p.id == parseInt(procedureId));
+    // console.log(procedure);
+    return procedure?.service_name;
+    // return "dfge";
+  }
+
+  const removeTestFromSelectedTest = (testId) => {
+    const procedures = selectedProcedure.filter((id) => id !== testId);
+    setValue("procedures", procedures);
+    setSelectedProcedure(procedures);
+  };
   return (
     <div>
       <Row className="py-2">
@@ -59,14 +81,14 @@ const Procedure = ({ getValues, setValue }) => {
             <div className="d-flex  flex-wrap gap-2">{testList}</div>
             <div className="d-flex justify-content-between  gap-2 py-2 mt-2">
               <div style={{ width: "70%" }} className=" pb-2 ">
-                {/* <h6>
+                <h6>
                   {" "}
                   <span className="border-bottom border-2 pb-1">
                     Selected Procedure:
                   </span>{" "}
-                </h6> */}
-                {/* <div className="d-flex  flex-wrap gap-2">
-                  {selectedTests.map((testId, index) => (
+                </h6>
+                <div className="d-flex  flex-wrap gap-2">
+                  {selectedProcedure.map((testId, index) => (
                     <ListGroup.Item
                       as="li"
                       className=" d-flex gap-1 align-items-center p-1 "
@@ -81,7 +103,7 @@ const Procedure = ({ getValues, setValue }) => {
                       />
                     </ListGroup.Item>
                   ))}
-                </div> */}
+                </div>
               </div>
             </div>
           </>

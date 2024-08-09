@@ -79,7 +79,7 @@ const AddExternalServiceModal = ({ show, handleClose }) => {
   }, [ServiceTimeWatcher]);
 
   const submitHandler = (data) => {
-    console.log(data);
+    // console.log(data);
     const formData = {
       externalService: {
         patient_name: data.patient_name,
