@@ -9,16 +9,18 @@ const ProcedureList = () => {
   const { data, isPending } = useGetProcedureByMedicalRecordId(
     state.medicalRecord_id
   );
-  console.log(data);
+  //   console.log(data);
   return (
     <div>
       <AddProcedureBtn />
       <Table striped responsive bordered className="mt-2">
         <thead>
-          <th>#</th>
-          <th>Procuder</th>
-          <th>CreatedBy</th>
-          <th>Date</th>
+          <tr>
+            <th>#</th>
+            <th>Procuder</th>
+            <th>CreatedBy</th>
+            <th>Date</th>
+          </tr>
 
           {/* <th></th>
         <th></th> */}

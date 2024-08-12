@@ -21,6 +21,10 @@ export const useExcuteMedicine = () => {
         queryKey: ["prescriptions", data.prescription_id],
         // invalidate: false,
       });
+      queryClient.invalidateQueries({
+        queryKey: ["prescriptions", data.prescription_id, "excuted"],
+        // invalidate: false,
+      });
     },
     onError: (error) => {
       // Your error callback here

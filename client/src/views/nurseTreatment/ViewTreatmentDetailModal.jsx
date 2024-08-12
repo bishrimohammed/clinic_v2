@@ -1,13 +1,26 @@
 import React, { useState } from "react";
-import { Button, Col, Modal, Row, Spinner, Table } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Modal,
+  Row,
+  Spinner,
+  Tab,
+  Table,
+  Tabs,
+} from "react-bootstrap";
 import { useGetAllPrescribedMedicine } from "./hooks/useGetAllPrescribedMedicine";
 import { useExcuteAllMedicines } from "./hooks/useExcuteAllMedicines";
 import { useExcuteMedicine } from "./hooks/useExcuteMedicine";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
+import { useGetExcutedMedication } from "./hooks/useGetExcutedMedication";
+import UnExcutedTreatmentTab from "./UnExcutedTreatmentTab";
+import ExcutedTreatementTab from "./ExcutedTreatementTab";
 
 const ViewTreatmentDetailModal = ({ show, handleClose, treatment }) => {
   const { patient, prescribedMedicines, medicalRecord } = treatment;
+  const { data: excutedTreatment } = useGetExcutedMedication(treatment.id);
   const [showExcuteAllModal, setShowExcuteAllModal] = useState(false);
   const [showExcuteModal, setShowExcuteModal] = useState({
     show: false,
@@ -101,7 +114,7 @@ const ViewTreatmentDetailModal = ({ show, handleClose, treatment }) => {
               Excute All
             </Button>
           </div>
-          <Table responsive striped bordered>
+          {/* <Table responsive striped bordered>
             <thead>
               <tr>
                 <th>#</th>
@@ -145,12 +158,27 @@ const ViewTreatmentDetailModal = ({ show, handleClose, treatment }) => {
                     >
                       Excute
                     </Button>
-                    {/*   <Button variant="danger">Delete</Button> */}
+                 
                   </td>
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </Table> */}
+          <Tabs
+            defaultActiveKey="Unexcuted"
+            id="uncontrolled-tab-example"
+            className="mb-3 mt-2 border-bottom consultationHistory"
+            variant="underline"
+            // justify
+          >
+            <Tab eventKey="Unexcuted" title="Unexcuted Medication">
+              {/* <HomeTab patientId={state.patient_id} /> */}
+              <UnExcutedTreatmentTab treatmentId={treatment?.id} />
+            </Tab>
+            <Tab eventKey="Excuted Medication" title="Excuted Medication">
+              <ExcutedTreatementTab treatmentId={treatment?.id} />
+            </Tab>
+          </Tabs>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

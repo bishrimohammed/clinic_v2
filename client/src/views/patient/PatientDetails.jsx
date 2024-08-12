@@ -9,13 +9,19 @@ import AllHistoryOverview from "./patient detail over view/AllHistoryOverview";
 import AllLaboratoryOverview from "./patient detail over view/AllLaboratoryOverview";
 import AllImagingStudiesOverview from "./patient detail over view/AllImagingStudiesOverview";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import ClinicDataTab from "./consultation/HistoryTabs/ClinicDataTab";
+import HistoryPrescriptionsTab from "./consultation/HistoryTabs/HistoryPrescriptionsTab";
+import CertificatesTab from "./consultation/HistoryTabs/CertificatesTab";
+import LabAndImagingTab from "./consultation/HistoryTabs/LabAndImagingTab";
+import ProcedureTab from "./consultation/HistoryTabs/ProcedureTab";
+// import ProcedureTab from "./consultation/ProcedureTab";
 
 const PatientDetails = () => {
   const [key, setKey] = useState("active");
   const navigate = useNavigate();
   const { id } = useParams();
   const { data: patient, error, isPending, isError } = useGetPatient(id);
-  // console.log(patient);
+  console.log(patient);
   if (isPending) return <Spinner animation="grow" />;
   if (isError) return <div>error {error.message}</div>;
   return (
@@ -44,47 +50,34 @@ const PatientDetails = () => {
                 className="flex-grow-1 px-3 py-3 "
               >
                 <h5 className="border-bottom border-bottom-1 border-2 pb-2 mt-2">
-                  Patient Medical Records
+                  Patient Over View
                 </h5>
-                <AllHistoryOverview medicalRecords={patient.medicalRecords} />
+                {/* <AllHistoryOverview medicalRecords={patient.medicalRecords} /> */}
                 <Tabs
-                  id="controlled-tab-example"
-                  activeKey={key}
-                  onSelect={(k) => setKey(k)}
-                  //defaultActiveKey="active"
-                  // className="mb-3 border-bottom border-bottom-1 border-2"
+                  defaultActiveKey="Clinic Data"
+                  id="uncontrolled-tab-example"
+                  className="mb-3 mt-2 border-bottom consultationHistory"
                   variant="underline"
-                  fill
+                  // justify
                 >
-                  {/* <Tab eventKey="active" title="History and Examinations">
-                    {key === "active" && (
-                      <AllHistoryOverview
-                        medicalRecords={patient.medicalRecords}
-                      />
-                    )}
-                  </Tab> */}
-                  {/* <Tab eventKey="vital" title="Vitals">
-                    {key === "vital" && <div>vital</div>}
+                  {/* <Tab eventKey="Home" title="Home">
+          <HomeTab patientId={state.patient_id} />
+        </Tab> */}
+                  <Tab eventKey="Clinic Data" title="Clinic Data">
+                    <ClinicDataTab patientId={patient?.id} />
                   </Tab>
-
-                  <Tab eventKey="lab" title="Laboratory">
-                    {key === "lab" && (
-                      <AllLaboratoryOverview laboratorys={data.laboverview} />
-                    )}
+                  <Tab eventKey="Prescriptions" title="Prescriptions">
+                    <HistoryPrescriptionsTab patientId={patient?.id} />
                   </Tab>
-                  <Tab eventKey="image" title="Imaging">
-                    {key === "image" && (
-                      <AllImagingStudiesOverview
-                        imagings={data.imagingoverview}
-                      />
-                    )}
+                  <Tab eventKey="Certificates" title="Certificates">
+                    <CertificatesTab patientId={patient?.id} />
                   </Tab>
-                  <Tab eventKey="family" title="Family History">
-                    {key === "family" && <div>family History</div>}
+                  <Tab eventKey="Lab & Imaging" title="Lab & Imaging">
+                    <LabAndImagingTab patientId={patient?.id} />
                   </Tab>
-                  <Tab eventKey="social" title="Social History">
-                    {key === "social" && <div>Social History</div>}
-                  </Tab> */}
+                  <Tab eventKey="Procuders" title="Procuders">
+                    <ProcedureTab patientId={patient?.id} />
+                  </Tab>
                 </Tabs>
               </div>
             </div>

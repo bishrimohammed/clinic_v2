@@ -17,12 +17,12 @@ const LabResultTab = () => {
         <thead>
           <tr>
             <th>#</th>
-            <th>Test Name</th>
+            <th className="text-nowrap">Test Name</th>
             <th>RequestedBy</th>
-            <th>Requested Time</th>
+            <th className="text-nowrap">Requested Time</th>
             <th>Result</th>
-            <th>ReportedBy</th>
-            <th>Report Time</th>
+            <th className="text-nowrap">ReportedBy</th>
+            <th className="text-nowrap">Report Time</th>
             <th>Status</th>
           </tr>
         </thead>

@@ -16,9 +16,15 @@ export const useExcuteAllMedicines = () => {
     onSuccess: (response, variables) => {
       // Your success callback here
       //   const { data } = response;
+      console.log(response);
+      console.log(variables);
       queryClient.invalidateQueries({
         queryKey: ["activeTreatments"],
       });
+      // queryClient.invalidateQueries({
+      //   queryKey: ["prescriptions", data.prescription_id, "excuted"],
+      //   // invalidate: false,
+      // });
       //   console.log(data);
       // queryClient.invalidateQueries
     },

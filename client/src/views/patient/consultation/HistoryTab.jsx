@@ -25,7 +25,7 @@ const HistoryTab = () => {
         <Tab eventKey="Home" title="Home">
           <HomeTab patientId={state.patient_id} />
         </Tab>
-        <Tab eventKey="clinic Data" title="clinic Data">
+        <Tab eventKey="clinic Data" title="Clinic Data">
           <ClinicDataTab patientId={state.patient_id} />
         </Tab>
         <Tab eventKey="Prescriptions" title="Prescriptions">
