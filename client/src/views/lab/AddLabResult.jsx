@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useGetOrderedTests } from "./hooks/useGetOrderedTests";
-import { Form, Spinner, Table } from "react-bootstrap";
+import { Alert, Form, Spinner, Table } from "react-bootstrap";
 import { useGetLaboratory } from "../patient/History/investigation/hooks/useGetLaboratory";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
@@ -17,8 +17,8 @@ const labResultSchema = yup.object().shape({
     yup.object().shape({
       test_id: yup.number(),
       test_name: yup.string(),
-      result: yup.string().required("Lab Result is required"),
-      comment: yup.string(),
+      result: yup.string().transform((value) => value.trim()),
+      comment: yup.string().transform((value) => value.trim()),
     })
   ),
 });
@@ -30,7 +30,7 @@ const AddLabResult = () => {
   // const { data: patient, isPending: patientPending } = useGetPatient(
   //   state?.medicalRecord?.patient?.id
   // );
-  // console.log(patient);
+  // console.log(data);
   const { mutateAsync, isPending } = useAddLabResult();
   const navigate = useNavigate();
   // return <div>dkfjvbfh</div>;
@@ -38,29 +38,48 @@ const AddLabResult = () => {
     register,
     formState: { errors },
     handleSubmit,
+    watch,
+    reset,
   } = useForm({
     resolver: yupResolver(labResultSchema),
   });
-  //   console.log(state);
-
+  const [errorState, setErrorState] = useState("");
+  // console.log(errorState);
+  useEffect(() => {
+    if (errorState) {
+      const timeoutId = setTimeout(() => {
+        setErrorState("");
+      }, 5000);
+      // Clean up the timeout when the effect is re-run or unmounted
+      return () => clearTimeout(timeoutId);
+    }
+  }, [errorState]);
   const Tests = useMemo(() => data?.filter((t) => t.test !== null), [data]);
+  // console.log(Tests);
   const submitHandler = (Data) => {
     // console.log(Data);
-    const Panels = data?.filter((t) => t.test === null);
-    const result = Panels?.map((t) => {
-      return {
-        test_id: t.id,
-        result: null,
-        comment: null,
-      };
-    });
-    // console.log(result);
+    // console.log(Data.results.some((r) => r.result !== ""));
+    // Data.results.map((r) => console.log(r));
+    if (Data.results.every((r) => r.result === "")) {
+      setErrorState("Please enter result for at least one test");
+      return;
+    }
+    const Panels = data?.filter((t) => t.test.labTestProfile.isPanel);
+
+    // console.log(Panels);
+    // return;
     const formData = {
-      results: Data.results.concat(result),
+      results: Data.results?.filter((t) => t.result !== ""),
+      panels: Panels?.map((t) => t.id),
     };
     // console.log(formData);
     // return;
-    mutateAsync(formData);
+    mutateAsync(formData).then((result) => {
+      // if (result.status === 201) {
+      //   handleClose();
+      // }
+      reset();
+    });
   };
   //   console.log(Tests);
   return (
@@ -74,7 +93,7 @@ const AddLabResult = () => {
         />
         <h5 className="mb-0">Add Laboratory Result</h5>
       </div>
-
+      {errorState && <Alert variant="danger">{errorState}</Alert>}
       <div className="d-flex gap-3 px-2">
         <div style={{ flex: 75 }} className="left ">
           <Form id="resultForm" onSubmit={handleSubmit(submitHandler)}>
@@ -88,8 +107,9 @@ const AddLabResult = () => {
                 </tr>
               </thead>
               <tbody>
-                {Tests?.filter((t) => !t.test.labTestProfile.isPanel)?.map(
-                  (t, index) => (
+                {Tests?.filter((t) => !t.test.labTestProfile.isPanel)
+                  ?.filter((t) => t.reported_by === null) // filter test that didn't have result
+                  ?.map((t, index) => (
                     <tr key={t.id}>
                       <td>{index + 1}</td>
                       <td>
@@ -135,8 +155,7 @@ const AddLabResult = () => {
                         </Form.Group>
                       </td>
                     </tr>
-                  )
-                )}
+                  ))}
               </tbody>
             </Table>
             <div className="d-flex justify-content-end">

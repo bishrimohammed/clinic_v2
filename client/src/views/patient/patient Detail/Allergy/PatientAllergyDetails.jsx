@@ -16,8 +16,8 @@ import { FaLock, FaTrash, FaUnlock } from "react-icons/fa6";
 import { useForm } from "react-hook-form";
 // import { useDeactivateServiceGroup } from "../../../Administration/clinic service/hooks/service group/useDeactivateServiceGroup";
 // import { useActivateServiceGroup } from "../../../Administration/clinic service/hooks/service group/useActivateServiceGroup";
-import { useGetServiceGroups } from "../../../Administration/clinic service/hooks/useGetServiceGroups";
-import { useGetClinicService } from "../../../Administration/clinic service/hooks/useGetClinicService";
+// import { useGetServiceGroups } from "../../../Administration/clinic service/hooks/useGetServiceGroups";
+// import { useGetClinicService } from "../../../Administration/clinic service/hooks/useGetClinicService";
 import { useLocation } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 

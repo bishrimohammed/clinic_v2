@@ -7,11 +7,18 @@ import SickleaveNoteTab from "./tabs/SickleaveNoteTab";
 import ReferralNoteTab from "./tabs/ReferralNoteTab";
 import PrescriptionsTab from "./tabs/PrescriptionsTab";
 import { differenceInYears } from "date-fns";
+import useOrdered_Lab_Investigations from "../patient/History/investigation/hooks/useOrdered_Lab_Investigations";
 
 const OverviewDetail = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  // console.log(state);
+  const {
+    data: investigations,
+    isRefetching,
+    refetch,
+  } = useOrdered_Lab_Investigations(state.id);
+
+  console.log(investigations);
   return (
     <div>
       <div className=" p-2  d-flex gap-3 align-items-center">
@@ -46,7 +53,12 @@ const OverviewDetail = () => {
         justify
       >
         <Tab eventKey="Lab result" title="Lab Result">
-          <LabResultTab patient={state.patient} />
+          <LabResultTab
+            patient={state.patient}
+            investigations={investigations.orderedTest}
+            isRefetching={isRefetching}
+            refetch={refetch}
+          />
           {/* <ChiefComplaint /> */}
         </Tab>
         <Tab

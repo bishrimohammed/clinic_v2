@@ -8,7 +8,7 @@ import { Host_URL } from "../../../utils/getHost_URL";
 import { getClinicInformation } from "../../../utils/getClinicInformation";
 
 const LabPrintPreviewModal = ({ show, handleClose, patient, labTests }) => {
-  console.log(labTests);
+  // console.log(labTests);
   return (
     <Modal size="lg" show={show} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -22,12 +22,12 @@ const LabPrintPreviewModal = ({ show, handleClose, patient, labTests }) => {
               <hr className="opacity-100 border-2 mt-4 border-dark" />
               <div className="report-info d-flex px-2 justify-content-between">
                 <div>
-                  <h6>Demography Information</h6>
+                  {/* <h6>Demography Information</h6> */}
 
                   <PatientInfornPrint patient={patient} />
                 </div>
                 <div>
-                  <h6>Routing Information</h6>
+                  {/* <h6>Routing Information</h6> */}
                   <div className="ps-2 mb-1">
                     <span className="fw-bold me-1">Order Time:</span>{" "}
                     {/* {format(props?.labResult?.orderTime)}

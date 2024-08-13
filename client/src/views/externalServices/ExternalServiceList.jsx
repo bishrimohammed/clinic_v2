@@ -15,19 +15,21 @@ import { FaEye, FaSortDown, FaSortUp } from "react-icons/fa";
 import { Spinner, Table } from "react-bootstrap";
 import { useGetCurrentUser } from "../../hooks/useGetCurrentUser";
 import { externalServicePaymentsColumn } from "../Bill/utils/externalServicePaymentsColumn";
+import { useNavigate } from "react-router-dom";
 const ExternalServiceList = () => {
   const user = useGetCurrentUser();
   const { data, isPending } = useGetActiveExternalService({
     role: user.role.name,
   });
 
-  // console.log(data);
+  console.log(data);
   // const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
+  const navigate = useNavigate();
   // const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   // // const [dropdownPosition, setDropdownPosition] = useState({});
   // const handleToggleDropdown = (index, event) => {
@@ -137,7 +139,7 @@ const ExternalServiceList = () => {
                   onClick={() => {
                     // setShowViewEmployee(true);
                     // navigate("addresult", { state: rowEl.original });
-                    console.log("mmmmmmmmmmm");
+                    // console.log("mmmmmmmmmmm");
                   }}
                 >
                   {rowEl.getVisibleCells().map((cellEl, index) => {
@@ -161,13 +163,16 @@ const ExternalServiceList = () => {
                   >
                     <>
                       <div className="px-3">
-                        <FaEye
-                          color="green"
-                          onClick={() => {
-                            alert("sdkjfbewjkvh");
-                            console.log("sdmbcjsdvcdsg");
-                          }}
-                        />
+                        {rowEl.original.service_type === "lab" && (
+                          <FaEye
+                            color="green"
+                            onClick={() => {
+                              // alert("sdkjfbewjkvh");
+                              // console.log("sdmbcjsdvcdsg");
+                              navigate("detail", { state: rowEl.original });
+                            }}
+                          />
+                        )}
                       </div>
                     </>
                   </td>

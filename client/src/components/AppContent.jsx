@@ -6,6 +6,7 @@ import { Spinner } from "react-bootstrap";
 import ExternalLabRequestList from "../views/lab/ExternalLabRequestList";
 import ExternalServicePayments from "../views/Bill/ExternalServicePayments";
 import ExternalServicePaymentDetail from "../views/Bill/ExternalServicePaymentDetail";
+import ViewLabExternalServiceDetail from "../views/externalServices/ViewLabExternalServiceDetail";
 const ExternalService = React.lazy(() =>
   import("../views/externalServices/ExternalService")
 );
@@ -497,6 +498,7 @@ const AppContent = () => {
           </Route>
           <Route path="externalservice" element={<ExternalService />}>
             <Route index element={<ExternalServiceList />} />
+            <Route path="detail" element={<ViewLabExternalServiceDetail />} />
           </Route>
         </Routes>
       </Suspense>

@@ -19,7 +19,9 @@ const PatientInfornPrint = ({ patient }) => {
       </div>
       <div className="ps-2">
         <span className="fw-bold me-1">Age: </span>
-        {differenceInYears(new Date(), patient?.birth_date)} year
+        {patient?.birth_date
+          ? differenceInYears(new Date(), patient?.birth_date) + " year"
+          : ""}
       </div>
       <div className="ps-2">
         <span className="fw-bold me-1">sex:</span> {patient?.gender}

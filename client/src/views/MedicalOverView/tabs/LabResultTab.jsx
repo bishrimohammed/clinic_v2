@@ -6,14 +6,15 @@ import { format } from "date-fns";
 import { IoReloadOutline } from "react-icons/io5";
 import PrintLabResultButton from "../components/PrintLabResultButton";
 
-const LabResultTab = ({ patient }) => {
-  const { state } = useLocation();
-  const {
-    data: investigations,
-    isRefetching,
-    refetch,
-  } = useOrdered_Lab_Investigations(state.id);
-  console.log(investigations);
+const LabResultTab = ({ patient, investigations, isRefetching, refetch }) => {
+  // const { state } = useLocation();
+  // console.log(investigations);
+  // const {
+  //   data: investigations,
+  //   isRefetching,
+  //   refetch,
+  // } = useOrdered_Lab_Investigations(state.id);
+  // console.log(investigations);
   return (
     <div>
       <div className="d-flex justify-content-end gap-2 align-items-center w-100 mb-2  mt-2">
@@ -38,11 +39,9 @@ const LabResultTab = ({ patient }) => {
           Reload
         </button>
         <PrintLabResultButton
-          disabled={investigations?.orderedTest?.some(
-            (test) => test.status === "pending"
-          )}
+          disabled={investigations?.some((test) => test.status === "pending")}
           patient={patient}
-          labTests={investigations?.orderedTest}
+          labTests={investigations}
         />
       </div>
       <Table bordered striped responsive>
@@ -59,14 +58,14 @@ const LabResultTab = ({ patient }) => {
           </tr>
         </thead>
         <tbody>
-          {investigations?.orderedTest
+          {investigations
             ?.filter((i) => !i.test.labTestProfile.isPanel)
             .map((investigation, index) => (
               <tr key={investigation.id}>
                 <td>{index + 1}</td>
                 <td>{investigation.test?.service_name}</td>
                 <td>
-                  {investigation.requestedBy?.employee?.firstName}
+                  {investigation.requestedBy?.employee?.firstName}{" "}
                   {investigation.requestedBy?.employee?.middleName}
                 </td>
                 <td>
