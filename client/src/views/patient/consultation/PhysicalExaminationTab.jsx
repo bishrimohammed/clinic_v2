@@ -88,7 +88,7 @@ const PhysicalExaminationTab = React.forwardRef((props, ref) => {
       // console.log("aejgbakjhvbgh");
       dispatch(unlockTreatment());
     }
-  }, [dispatch, data]);
+  }, [dispatch, data, lab_investigation]);
   React.useImperativeHandle(ref, () => ({
     getSaveForLaterData: () => getValues(),
     resetData: () => reset(),

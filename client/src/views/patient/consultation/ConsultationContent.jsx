@@ -18,6 +18,7 @@ import { useGetPatient } from "../hooks/patientHooks/useGetPatient";
 import PatientGeneralInforamtion from "../patient Detail/PatientGeneralInforamtion";
 import { useGetPatientVisitById } from "../../patient visit/hooks/useGetPatientVisitById";
 import ProcedureTab from "./ProcedureTab";
+import FinishConsultationBtn from "./FinishConsultationBtn";
 // import LabResultTab from "./LabResultTab";
 // import { ConsultationBackButton } from "./ConsultationBackButton";
 const ConsultationContent = ({ changeVisibleContent }) => {
@@ -101,17 +102,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
             {isPending && <Spinner size="sm" />}
             Save for Later
           </Button>
-          <Button
-            form="traigeForm"
-            className="btn-sm"
-            // formTarget="traigeForm"
-            type="submit"
-            variant="success"
-            disabled={disabledFinishButton}
-          >
-            {/* {isPending && <Spinner size="sm" animation="border" />} */}
-            Finish
-          </Button>
+          <FinishConsultationBtn />
         </div>
       </div>
       {visit?.isAdmitted ? (

@@ -10,10 +10,10 @@ import { resetConsultation } from "../../../store/consultationSlice";
 
 const ConsultationPage = () => {
   const { state } = useLocation();
-  console.log(state);
+  // console.log(state);
   // const { data: patient, isPending } = useGetPatient(state.patient_id);
   const dispatch = useDispatch();
-  console.log(state.patient_id);
+  // console.log(state.patient_id);
   React.useEffect(() => {
     return () => {
       dispatch(resetConsultation());

@@ -37,21 +37,20 @@ const progressNoteSchema = yup.object().shape({
     yup.object().shape({
       physicalExaminationId: yup.number().required(),
       name: yup.string(),
-      value: yup
-        .string()
-        .transform((value) => value.trim())
-        .when("name", ([name], schema) => {
-          return schema.required(name + "  is required");
-        }),
+      value: yup.string().transform((value) => value.trim()),
+      // .when("name", ([name], schema) => {
+      //   return schema.required(name + "  is required");
+      // }),
     })
   ),
   vitals: yup.array().of(
     yup.object().shape({
       vitalId: yup.number(),
       name: yup.string(),
-      value: yup.string().when("name", ([name], schema) => {
-        return schema.required(name + "  is required");
-      }),
+      value: yup.string().transform((value) => value.trim()),
+      // .when("name", ([name], schema) => {
+      //   return schema.required(name + "  is required");
+      // }),
     })
   ),
   diagnoses: yup.array().of(
@@ -141,7 +140,7 @@ const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
     //   vitals: VitalSignFields,
     // },
   });
-  console.log(errors);
+  // console.log(errors);
   const { fields, append, remove } = useFieldArray({
     control,
     name: "internal_prescriptions",
@@ -160,7 +159,7 @@ const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
     getSaveForLaterData: () => getValues(),
     resetData: () => reset(),
   }));
-  console.log(errors);
+  // console.log(errors);
   //   console.log(medicines);
   const submitHandler = (data) => {
     console.log(data);
@@ -180,8 +179,12 @@ const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
         problemList: data.problemList,
         currentmanagement: data.currentmanagement,
         plan: data.plan,
-        physicalExaminations: data.physicalExaminations,
-        vitals: data.vitals,
+        physicalExaminations: data.physicalExaminations.some(
+          (phE) => phE.value !== ""
+        )
+          ? data.physicalExaminations
+          : null,
+        vitals: data.vitals.some((v) => v.value !== "") ? data.vitals : null,
         diagnoses: data.diagnoses,
         internal_prescriptions: data.internal_prescriptions,
         investigations,
@@ -189,7 +192,8 @@ const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
       },
       medicalRecordId: state.medicalRecord_id,
     };
-    console.log(Data);
+    // console.log(Data);
+    // return;
     mutateAsync(Data)
       .then((res) => {
         console.log(res);

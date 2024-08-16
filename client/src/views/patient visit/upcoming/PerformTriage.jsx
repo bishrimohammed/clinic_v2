@@ -33,9 +33,10 @@ const traigeSchema = yup.object().shape({
     yup.object().shape({
       vitalId: yup.number(),
       name: yup.string(),
-      value: yup.string().when("name", ([name], schema) => {
-        return schema.required(name + "  is required");
-      }),
+      value: yup.string(),
+      // .when("name", ([name], schema) => {
+      //   return schema.required(name + "  is required");
+      // }),
     })
   ),
   visit: yup.object().shape({
@@ -91,7 +92,7 @@ const PerformTriage = () => {
   });
   // console.log(new Date(`${state.assignment_date}T${state.visit_time}`));
   // const navigate = useNavigate()
-  console.log(state);
+  // console.log(state);
   const [Doctors, setDoctors] = useState([]);
   const [showCancelTriageModal, setShowCancelTriageModal] = useState(false);
   const visitDateWatcher = watch("visit.date");
@@ -444,10 +445,10 @@ const PerformTriage = () => {
             <PatientGeneralInforamtion
               patient={state.patient}
               medicalRecordId={state.medicalRecord_id}
+              patientId={state.patient.id}
             />
           </div>
         </div>
-
         {/* <Row className="vital-signs-section">
           <Col>
             <h2>Vital Signs</h2>

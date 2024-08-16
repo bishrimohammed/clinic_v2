@@ -7,6 +7,7 @@ import ProgressNoteHistoryTab from "./ProgressNoteHistoryTab";
 import ConfirmCancelModal from "./ConfirmCancelModal";
 import { useSaveProgressForLater } from "../hooks/progressNoteHooks/useSaveProgressForLater";
 import { useGetSavedForLaterProgressNote } from "../hooks/progressNoteHooks/useGetSavedForLaterProgressNote";
+import FinishProgressNoteBtn from "./FinishProgressNoteBtn";
 
 const ProgressNotePage = ({ changeVisibleContent }) => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const ProgressNotePage = ({ changeVisibleContent }) => {
             // onClick={() => navigate(-1)}
             onClick={changeVisibleContentHandler}
           />
-          <h5 className="mb-0">Back</h5>
+          <h5 className="mb-0">Back to Consultation</h5>
         </div>
         <div className=" d-flex gap-2">
           <Button
@@ -76,7 +77,7 @@ const ProgressNotePage = ({ changeVisibleContent }) => {
             {isPending && <Spinner size="sm" animation="border" />}
             Save for Later
           </Button>
-          <Button
+          {/* <Button
             // form="traigeForm"
             // formTarget="traigeForm"
             className="btn-sm"
@@ -86,9 +87,10 @@ const ProgressNotePage = ({ changeVisibleContent }) => {
             type="button"
             // onClick={() => set(true)}
           >
-            {/* {isPending && <Spinner size="sm" animation="border" />} */}
+            {isPending && <Spinner size="sm" animation="border" />}
             Finish
-          </Button>
+          </Button> */}
+          <FinishProgressNoteBtn />
         </div>
       </div>
       <Tabs

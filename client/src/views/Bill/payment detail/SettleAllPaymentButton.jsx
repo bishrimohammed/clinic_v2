@@ -69,7 +69,8 @@ const SettleAllPaymentButton = ({
         }}
         disabled={
           !has_advanced_payment ||
-          payments.some((payment) => payment.status === "Unaid")
+          // unpaidPayments.length >0
+          !payments.some((payment) => payment.status === "Unaid")
         }
         className="btn btn-sm btn-success ms-2"
       >

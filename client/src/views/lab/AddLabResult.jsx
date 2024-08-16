@@ -78,6 +78,7 @@ const AddLabResult = () => {
       // if (result.status === 201) {
       //   handleClose();
       // }
+      navigate(-1);
       reset();
     });
   };

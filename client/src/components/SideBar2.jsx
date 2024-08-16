@@ -24,6 +24,7 @@ import {
 } from "react-icons/md";
 import { hasPermission } from "../utils/hasPermission";
 import { GiMedicalThermometer, GiUltrasound } from "react-icons/gi";
+import { IoIosAnalytics } from "react-icons/io";
 
 const SideBar2 = () => {
   const location = useLocation();
@@ -112,6 +113,7 @@ const SideBar2 = () => {
             </CNavLink>
           </CNavGroup>
         )}
+
         {(hasPermission("user", "read") ||
           hasPermission("employee", "read") ||
           hasPermission("role", "read") ||
@@ -323,6 +325,37 @@ const SideBar2 = () => {
             {/* <CNavItem to="/lab/completed" component={NavLink}>
                 Completed Lab
               </CNavItem> */}
+          </CNavGroup>
+        )}
+        {hasPermission("report", "read") && (
+          <CNavGroup
+            idx="report"
+            //   visible={location.pathname.startsWith("/patients")}
+            visible={true}
+            toggler={
+              <>
+                <IoIosAnalytics className="nav-icon" /> Report
+              </>
+            }
+          >
+            <CNavLink as={NavLink} to="/report/financial">
+              <span className="nav-icon">
+                <span className="nav-icon-bullet"></span>
+              </span>{" "}
+              Financial Report
+            </CNavLink>
+            <CNavLink as={NavLink} to="/report/patient">
+              <span className="nav-icon">
+                <span className="nav-icon-bullet"></span>
+              </span>{" "}
+              Patient data report
+            </CNavLink>
+            <CNavLink as={NavLink} to="/report/doctor">
+              <span className="nav-icon">
+                <span className="nav-icon-bullet"></span>
+              </span>{" "}
+              Doctor visit report
+            </CNavLink>
           </CNavGroup>
         )}
         <CNavItem>

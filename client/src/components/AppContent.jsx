@@ -7,6 +7,9 @@ import ExternalLabRequestList from "../views/lab/ExternalLabRequestList";
 import ExternalServicePayments from "../views/Bill/ExternalServicePayments";
 import ExternalServicePaymentDetail from "../views/Bill/ExternalServicePaymentDetail";
 import ViewLabExternalServiceDetail from "../views/externalServices/ViewLabExternalServiceDetail";
+import FinancialReport from "../views/report/FinancialReport";
+import PatientDataReport from "../views/report/PatientDataReport";
+import DoctorPatientVisitReport from "../views/report/DoctorPatientVisitReport";
 const ExternalService = React.lazy(() =>
   import("../views/externalServices/ExternalService")
 );
@@ -323,14 +326,10 @@ const AppContent = () => {
               }
             />
             <Route path="view" element={<PerformTriage />} />
-            {/* <Route path="addpatient" element={<AddpatientToQue />} />
-  <Route path="patientlist" element={<PatientQueList />} /> */}
           </Route>
           {/* profile */}
           <Route path="profile" element={<Profile />}>
             <Route path="changepassword" element={<ChangePassword />} />
-            {/* <Route path="newuser" element={<AddUser />} />
-            <Route path="edit/:id" element={<UpdateUser />} /> */}
           </Route>
           {/* patient */}
           <Route path="patients" element={<Patient />}>
@@ -368,10 +367,6 @@ const AppContent = () => {
             <Route index element={<ApprovalSettingContanier />} />
           </Route>
 
-          {/* <Route path="patientque" element={<PatientQue />}>
-            <Route index path="list" element={<PatientQueList />} />
-            <Route path="addtoque" element={<AddpatientToQue />} />
-          </Route> */}
           <Route path="lab" element={<Lab />}>
             <Route index element={<LabRequestedList />} />
             <Route path="external" element={<ExternalLabRequestList />} />
@@ -481,7 +476,9 @@ const AppContent = () => {
             <Route path="duty/newprogram" element={<CreateNewWeekProgram />} />
           </Route>
           <Route path="report" element={<Report />}>
-            <Route path="billreport" element={<BillReport />} />
+            <Route path="financial" element={<FinancialReport />} />
+            <Route path="patient" element={<PatientDataReport />} />
+            <Route path="doctor" element={<DoctorPatientVisitReport />} />
           </Route>
           <Route path="appointment" element={<Appointment />}>
             <Route index element={<AppointmentList />} />

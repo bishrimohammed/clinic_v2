@@ -31,6 +31,7 @@ import { useGetMedicalBillingById } from "../hooks/useGetMedicalBillingById";
 import AddAdvancedPaymentButton from "../AddAdvancedPaymentButton";
 import SettleAllPaymentButton from "./SettleAllPaymentButton";
 import PaymentsTable from "./PaymentsTable";
+import ReturnLeftAmountBtn from "./ReturnLeftAmountBtn";
 
 const CurrentDuesPaymentTable = ({}) => {
   const { state } = useLocation();
@@ -120,6 +121,7 @@ const CurrentDuesPaymentTable = ({}) => {
           {visit?.isAdmitted && (
             <>
               {" "}
+              <ReturnLeftAmountBtn medicalBilling={medicalBilling} />
               <AddAdvancedPaymentButton
                 billId={medicalBilling?.id}
                 patient={state.patient}
@@ -236,6 +238,7 @@ const CurrentDuesPaymentTable = ({}) => {
               <PaymentsTable
                 tableInstance={tableInstance}
                 visit={visit}
+                // key={visit?.id}
                 patient={state.patient}
               />
             )
