@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Axiosinstance from "../../../api/axiosInstance";
 
 export const useGetVisitSeenPerDoctor = (
-  { report_type, report_target },
+  { report_type },
   triggerFetch,
   setTriggerFetch
 ) => {
@@ -11,7 +11,7 @@ export const useGetVisitSeenPerDoctor = (
     queryFn: async () => {
       return await Axiosinstance.get(
         "/reports/patient-seen-per-doctor",
-        { params: { report_type, report_target } },
+        { params: { report_type } },
         {}
       ).then((res) => {
         setTriggerFetch(false);
@@ -21,7 +21,7 @@ export const useGetVisitSeenPerDoctor = (
 
     // enabled: query
     staleTime: 20 * 60 * 1000,
-    enabled: triggerFetch && !!report_type && !!report_target,
+    enabled: triggerFetch && !!report_type,
     // select:
   });
 };

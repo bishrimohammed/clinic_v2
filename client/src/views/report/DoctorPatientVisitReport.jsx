@@ -4,6 +4,7 @@ import { Col, Form, Row, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useGetVisitSeenPerDoctor } from "./hooks/useGetVisitSeenPerDoctor";
+import PatientSeenPerDoctor from "./patientSeenPerDoctorReport/PatientSeenPerDoctor";
 const FilterReportSchema = yup.object().shape({
   report_type: yup.string().required("Report type is required"),
   // report_target: yup.string().required("Report target is required"),
@@ -99,6 +100,8 @@ const DoctorPatientVisitReport = () => {
           </Row>
         </Form.Group> */}
       </Form>
+      {isFetching && <Spinner />}
+      {data && <PatientSeenPerDoctor patientSeenReport={data} />}
     </div>
   );
 };
