@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { Button, Form, Spinner, Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import { format, formatHour } from "../../../../utils/formatDate";
+// import { format, formatHour } from "../../../../utils/formatDate";
 import UseGetImagingStudiesByHistoryId from "../../hooks/UseGetImagingStudiesByHistoryId";
 import { useAddImagingResult } from "../investigation/hooks/useAddImagingResult";
 

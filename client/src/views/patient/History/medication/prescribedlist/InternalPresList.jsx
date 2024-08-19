@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { Button, Spinner, Table } from "react-bootstrap";
 import { useGetInternalPrescription } from "../hooks/useGetInternalPrescription";
 const PrintMedication = React.lazy(() => import("../../print/PrintMedication"));
-import { format } from "../../../../../utils/formatDate";
+// import { format } from "../../../../../utils/formatDate";
 
 const InternalPresList = () => {
   const { historyId } = useParams();

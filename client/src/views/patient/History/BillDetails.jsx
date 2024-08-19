@@ -3,7 +3,7 @@ import { Accordion, Button, Spinner, Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import AddPaymentModal from "./logic/AddPaymentModal";
 import useHistoryBillDetail from "../hooks/useBill";
-import { format, formatHour } from "../../../utils/formatDate";
+// import { format, formatHour } from "../../../utils/formatDate";
 import { useSelector } from "react-redux";
 
 const BillDetails = () => {

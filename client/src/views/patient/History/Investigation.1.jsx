@@ -3,7 +3,7 @@ import { Button, Tab, Table, Tabs } from "react-bootstrap";
 import OrderLab from "./logic/OrderLab";
 import { useParams } from "react-router-dom";
 import useMedicalHistory from "../hooks/useMedicalhistory";
-import { format, formatHour } from "../../../utils/formatDate";
+// import { format, formatHour } from "../../../utils/formatDate";
 import useOrderedImageInvestigations from "../hooks/useOrderedImageInvestigations";
 const OrderedImageInvestigations = () => {
   const { historyId } = useParams();

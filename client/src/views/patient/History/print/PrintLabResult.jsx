@@ -2,7 +2,7 @@
 import React, { forwardRef, memo, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 // import logo from "../../../../assets/clinicLogo-removebg-preview.png";
-import { format, formatHour } from "../../../../utils/formatDate";
+// import { format, formatHour } from "../../../../utils/formatDate";
 import PrintHeader from "./printComponents/PrintHeader";
 import PatientInfornPrint from "./printComponents/PatientInfornPrint";
 const PrintLabResult = memo(

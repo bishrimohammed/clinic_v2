@@ -3,7 +3,7 @@ import { Button, Table } from "react-bootstrap";
 import { useLocation, useParams } from "react-router-dom";
 import AddLabResultModal from "./AddLabResultModal";
 // import UseLabByHistoryId from "../../hooks/UseLabByHistoryId";
-import { format, formatHour } from "../../../../utils/formatDate";
+// import { format, formatHour } from "../../../../utils/formatDate";
 
 const AddLabResult = () => {
   // const [history, setHistory] = useState(null);

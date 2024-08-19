@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import { Button, Spinner, Tab, Table, Tabs } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { format, formatHour } from "../../../utils/formatDate";
+// import { format, formatHour } from "../../../utils/formatDate";
 
 import useMedicalHistory from "../hooks/useMedicalhistory";
 import useOrdered_Lab_Investigations from "./investigation/hooks/useOrdered_Lab_Investigations";

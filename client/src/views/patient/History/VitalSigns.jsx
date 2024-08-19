@@ -3,7 +3,7 @@ import { Button, Container, Spinner, Table } from "react-bootstrap";
 import AddVitalModal from "./logic/AddVitalModal";
 import useMedicalHistory from "../hooks/useMedicalhistory";
 import { useParams } from "react-router-dom";
-import { format } from "../../../utils/formatDate";
+// import { format } from "../../../utils/formatDate";
 import { useGetHistoryVitals } from "./vitals/hooks/useGetHistoryVitals";
 
 const VitalSigns = () => {
