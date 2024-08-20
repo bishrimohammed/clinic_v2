@@ -99,7 +99,8 @@ const MonthlyReport = ({ monthlyPayments }) => {
   // console.log(payments);
   return (
     <div>
-      <div className="d-flex justify-content-start me-2 mb-3">
+      <h4>Mothly Financial Report</h4>
+      <div className="d-flex justify-content-end me-2 mb-3">
         <button
           className="btn btn-sm btn-success"
           onClick={() =>

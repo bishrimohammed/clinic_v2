@@ -7,20 +7,42 @@ import { useGetFinancialReport } from "./hooks/useGetFinancialReport";
 import WeeklyReport from "./financial/WeeklyReport";
 import MonthlyReport from "./financial/MonthlyReport";
 import YearlyReport from "./financial/YearlyReport";
+import CustomRangeReport from "./financial/CustomRangeReport";
 const financialReportSchema = yup.object().shape({
   report_type: yup.string().required("Report type is required"),
-  start_date: yup.date().when("report_type", ([report_type], schema) => {
-    if (report_type === "custom") {
-      return schema.required("Start date is required");
-    }
-    return schema.nullable();
-  }),
-  end_date: yup.date().when("report_type", ([report_type], schema) => {
-    if (report_type === "custom") {
-      return schema.required("End date is required");
-    }
-    return schema.nullable();
-  }),
+  start_date: yup
+    .date()
+    .transform((value, originalValue) => {
+      if (originalValue === "") {
+        return undefined; // Return undefined for empty string
+      }
+      return value;
+    })
+    .when("report_type", ([report_type], schema) => {
+      if (report_type === "custom") {
+        return schema.required("Start date is required");
+      }
+      return schema.nullable();
+    }),
+  end_date: yup
+    .date()
+    .transform((value, originalValue) => {
+      if (originalValue === "") {
+        return undefined; // Return undefined for empty string
+      }
+      return value;
+    })
+    .when("report_type", ([report_type], schema) => {
+      if (report_type === "custom") {
+        return schema
+          .required("End date is required")
+          .min(
+            yup.ref("start_date"),
+            "End date must be greater than or equal to start date"
+          );
+      }
+      return schema.nullable();
+    }),
 });
 const FinancialReport = () => {
   const {
@@ -76,19 +98,33 @@ const FinancialReport = () => {
                 <Form.Label>Select Date Range:</Form.Label>
                 <div className="d-flex gap-3">
                   <Form.Group>
-                    {/* <Form.Label>Start Date</Form.Label> */}
-                    <Form.Control type="date" {...register("start_date")} />
+                    <Form.Control
+                      type="date"
+                      {...register("start_date")}
+                      isInvalid={errors.start_date}
+                      max={new Date().toISOString().substring(0, 10)}
+                    />
                     <Form.Text>Start Date</Form.Text>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.start_date?.message}
+                    </Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group>
-                    {/* <Form.Label>End Date</Form.Label> */}
-                    <Form.Control type="date" {...register("end_date")} />
+                    <Form.Control
+                      type="date"
+                      {...register("end_date")}
+                      isInvalid={errors.end_date}
+                      max={new Date().toISOString().substring(0, 10)}
+                    />
                     <Form.Text>End Date</Form.Text>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.end_date?.message}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </div>
               </Form.Group>
             </Col>
-          )}{" "}
+          )}
           <Col
             md={2}
             className="d-flex justify-content-center align-items-center "
@@ -128,6 +164,9 @@ const FinancialReport = () => {
       )}
       {formData.report_type === "yearly" && (
         <YearlyReport yearlyPayments={data} />
+      )}
+      {formData.report_type === "custom" && (
+        <CustomRangeReport customRangePayments={data} />
       )}
     </div>
   );

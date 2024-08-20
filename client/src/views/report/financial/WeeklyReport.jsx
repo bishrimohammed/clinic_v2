@@ -50,7 +50,7 @@ const TableDisplay = ({ data }) => {
             <td>{payment.week}</td>
             <td>{payment.week_start.toLocaleDateString()}</td>
             <td>{payment.week_end.toLocaleDateString()}</td>
-            <td>{payment.total_payments}</td>
+            <td>{payment.total_payments} Birr</td>
           </tr>
         ))}
       </tbody>
@@ -109,7 +109,8 @@ const WeeklyReport = ({ weeklyPayments }) => {
   // const {} = useGet
   return (
     <div>
-      <div className="d-flex justify-content-start me-2 mb-3">
+      <h4>Weekly Financial Report</h4>
+      <div className="d-flex justify-content-end me-2 mb-3">
         <button
           className="btn btn-sm btn-success"
           onClick={() =>
