@@ -119,7 +119,7 @@ const DoctorPatientVisitReport = () => {
                 </div>
               </Form.Group>
             </Col>
-          )}{" "}
+          )}
           <Col
             md={2}
             className="d-flex justify-content-center align-items-center "

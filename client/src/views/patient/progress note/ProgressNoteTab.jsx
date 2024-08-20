@@ -92,6 +92,7 @@ const progressNoteSchema = yup.object().shape({
   ),
   selectedLabs: yup.array().of(yup.number()),
   indirectlySelectedLabs: yup.array().of(yup.number()),
+  externalLabReport: yup.mixed(),
 });
 const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
   const { data: PhysicalExaminationFields } =
@@ -164,16 +165,21 @@ const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
   const submitHandler = (data) => {
     console.log(data);
     // return;
-    const investigations = data?.selectedLabs?.map((t) => {
-      const lab = laboratoryTests.find((lab) => lab.id === t);
-      // console.log(lab);
-      return lab?.labTest_id;
-    });
-    const underPanels = data?.indirectlySelectedLabs?.map((t) => {
-      const lab = laboratoryTests.find((lab) => lab.id === t);
-      // console.log(lab);
-      return lab?.labTest_id;
-    });
+    const investigations = data?.selectedLabs;
+    // ?.map((t) => {
+    //   const lab = laboratoryTests.find((lab) => lab.id === t);
+    //   // console.log(lab);
+    //   return lab?.labTest_id;
+    // });
+    const underPanels = data?.indirectlySelectedLabs;
+    // ?.map((t) => {
+    //   const lab = laboratoryTests.find((lab) => lab.id === t);
+    //   // console.log(lab);
+    //   return lab?.labTest_id;
+    // });
+    console.log(investigations);
+    console.log(data.diagnoses);
+    // return;
     const Data = {
       formData: {
         problemList: data.problemList,
@@ -192,9 +198,40 @@ const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
       },
       medicalRecordId: state.medicalRecord_id,
     };
+    const formData = new FormData();
+    formData.append("problemList", data.problemList);
+    formData.append("currentmanagement", data.currentmanagement);
+    formData.append("plan", data.plan);
+    formData.append(
+      "physicalExaminations",
+      data.physicalExaminations.some((phE) => phE.value !== "")
+        ? JSON.stringify(data.physicalExaminations)
+        : null
+    );
+    formData.append(
+      "vitals",
+      data.vitals.some((v) => v.value !== "") ? JSON.stringify(data.vitals) : []
+    );
+    formData.append("diagnoses", JSON.stringify(data.diagnoses));
+    formData.append(
+      "internal_prescriptions",
+      JSON.stringify(
+        data.internal_prescriptions ? data.internal_prescriptions : []
+      )
+    );
+    formData.append(
+      "investigations",
+      JSON.stringify(investigations ? investigations : [])
+    );
+    formData.append(
+      "underPanels",
+      JSON.stringify(underPanels ? underPanels : [])
+    );
+    formData.append("externalLabReport", data?.externalLabReport[0]);
+
     // console.log(Data);
     // return;
-    mutateAsync(Data)
+    mutateAsync({ formData, medicalRecordId: state.medicalRecord_id })
       .then((res) => {
         console.log(res);
         if (res.status === 201) {
@@ -349,9 +386,21 @@ const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
                   </Col>
                 ))}
               </Row>
-              <h5 className="border-bottom border-dark fw-bold py-2 mb-3">
-                Order Lab Investigation
-              </h5>
+              <div className="d-flex justify-content-between">
+                <h5 className="border-bottom border-dark fw-bold py-2 mb-3">
+                  Order Lab Investigation
+                </h5>
+              </div>
+              <Form.Group className="">
+                <Form.Label>External Lab Report</Form.Label>
+                <Form.Control
+                  size="sm"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  {...register("externalLabReport")}
+                />
+                {/* <Form.Text>External Lab Report</Form.Text> */}
+              </Form.Group>
               <Lab setValue={setValue} getValues={getValues} />
             </Accordion.Body>
           </Accordion.Item>
@@ -612,12 +661,12 @@ const ProgressNoteTab = React.forwardRef(({ savedforLaterData }, ref) => {
         </Accordion>
         <div className="d-flex justify-content-end mt-2">
           <Button
-            disabled={isPending}
+            // disabled={isPending}
             variant="primary"
             type="submit"
             className="px-3"
           >
-            {isPending && <Spinner animation="border" size="sm" />}
+            {/* {isPending && <Spinner animation="border" size="sm" />} */}
             Save
           </Button>
         </div>

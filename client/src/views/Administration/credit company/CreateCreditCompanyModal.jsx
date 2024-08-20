@@ -87,7 +87,7 @@ const companySchema = yup.object().shape({
       "conditionalRequired",
       "Agreement Document is required",
       function (value) {
-        console.log(value.length);
+        // console.log(value.length);
         if (value.length == 0) {
           return this.createError({
             path: "agreement.agreement_doc",

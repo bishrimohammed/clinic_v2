@@ -46,6 +46,7 @@ const Lab = ({ setValue, getValues }) => {
         className="bg-gredient text-nowrap width23 border-0  py-2 d-flex justify-content-center align-items-center"
         onClick={() => PanelSalect(labtest)}
         key={index}
+        type="button"
         // disabled={selectedTests.includes(labtest._id)}
       >
         {selectedTests.includes(labtest.labTest_id) && (
@@ -212,6 +213,7 @@ const Lab = ({ setValue, getValues }) => {
         onClick={() => TestSelect(test)}
         key={index}
         disabled={indirecSselectedTests.includes(test?.serviceItem?.id)}
+        type="button"
       >
         {selectedTests.includes(test?.serviceItem?.id) && (
           <FaCheck color="green" className="me-1" />
