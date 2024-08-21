@@ -1,15 +1,28 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-// import { CSpinner } from "@coreui/react";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
-import ExternalLabRequestList from "../views/lab/ExternalLabRequestList";
-import ExternalServicePayments from "../views/Bill/ExternalServicePayments";
-import ExternalServicePaymentDetail from "../views/Bill/ExternalServicePaymentDetail";
-import ViewLabExternalServiceDetail from "../views/externalServices/ViewLabExternalServiceDetail";
-import FinancialReport from "../views/report/FinancialReport";
-import PatientDataReport from "../views/report/PatientDataReport";
-import DoctorPatientVisitReport from "../views/report/DoctorPatientVisitReport";
+const ExternalLabRequestList = React.lazy(() =>
+  import("../views/lab/ExternalLabRequestList")
+);
+const ExternalServicePayments = React.lazy(() =>
+  import("../views/Bill/ExternalServicePayments")
+);
+const ExternalServicePaymentDetail = React.lazy(() =>
+  import("../views/Bill/ExternalServicePaymentDetail")
+);
+const ViewLabExternalServiceDetail = React.lazy(() =>
+  import("../views/externalServices/ViewLabExternalServiceDetail")
+);
+const FinancialReport = React.lazy(() =>
+  import("../views/report/FinancialReport")
+);
+const PatientDataReport = React.lazy(() =>
+  import("../views/report/PatientDataReport")
+);
+const DoctorPatientVisitReport = React.lazy(() =>
+  import("../views/report/DoctorPatientVisitReport")
+);
 const ExternalService = React.lazy(() =>
   import("../views/externalServices/ExternalService")
 );
