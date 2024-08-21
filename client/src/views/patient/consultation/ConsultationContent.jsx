@@ -19,6 +19,7 @@ import PatientGeneralInforamtion from "../patient Detail/PatientGeneralInforamti
 import { useGetPatientVisitById } from "../../patient visit/hooks/useGetPatientVisitById";
 import ProcedureTab from "./ProcedureTab";
 import FinishConsultationBtn from "./FinishConsultationBtn";
+import MedicalRecordDocumentTab from "./MedicalRecordDocumentTab";
 // import LabResultTab from "./LabResultTab";
 // import { ConsultationBackButton } from "./ConsultationBackButton";
 const ConsultationContent = ({ changeVisibleContent }) => {
@@ -211,6 +212,18 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           disabled={planTabLocked}
         >
           <ProcedureTab ref={PlanRefs} />
+        </Tab>
+        <Tab
+          eventKey="MedicalRecordDocument"
+          title={
+            <span className="d-flex justify-content-center align-items-center">
+              Documents
+              {/* {planTabLocked && <LuLock className="ms-1" />} */}
+            </span>
+          }
+          // disabled={planTabLocked}
+        >
+          <MedicalRecordDocumentTab />
         </Tab>
       </Tabs>
     </div>

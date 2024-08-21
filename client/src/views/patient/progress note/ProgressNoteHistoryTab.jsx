@@ -3,6 +3,7 @@ import { useGetProgressNote } from "../hooks/progressNoteHooks/useGetProgressNot
 import { useLocation } from "react-router-dom";
 import { Accordion } from "react-bootstrap";
 import ShowProgressDetailBtn from "./ShowProgressDetailBtn";
+import { format } from "date-fns";
 
 const ProgressNoteHistoryTab = () => {
   const { state } = useLocation();
@@ -22,9 +23,14 @@ const ProgressNoteHistoryTab = () => {
             <Accordion.Header style={{ zIndex: 0 }}>
               <div className="d-flex justify-content-between w-100">
                 <span>
-                  {new Date(progressNote.taken_date)
-                    .toISOString()
-                    .substring(0, 10)}
+                  {
+                    format(
+                      new Date(progressNote.taken_date),
+                      "yyyy-MM-dd h:mm a"
+                    )
+                    // .toISOString()
+                    // .substring(0, 10)
+                  }
                 </span>
                 <span className="pe-4">
                   {progressNote.doctor.employee.firstName}{" "}

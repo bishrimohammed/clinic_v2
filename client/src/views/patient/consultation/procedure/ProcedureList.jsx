@@ -3,6 +3,7 @@ import AddProcedureBtn from "./AddProcedureBtn";
 import { Button, Table } from "react-bootstrap";
 import { useGetProcedureByMedicalRecordId } from "../../hooks/consultationHooks/procedure/useGetProcedureByMedicalRecordId";
 import { useLocation } from "react-router-dom";
+import { format } from "date-fns";
 
 const ProcedureList = () => {
   const { state } = useLocation();
@@ -17,7 +18,7 @@ const ProcedureList = () => {
         <thead>
           <tr>
             <th>#</th>
-            <th>Procuder</th>
+            <th>Procedure</th>
             <th>CreatedBy</th>
             <th>Date</th>
           </tr>
@@ -35,7 +36,9 @@ const ProcedureList = () => {
                 {procedure.createdBy.employee.firstName}{" "}
                 {procedure.createdBy.employee.middleName}
               </td>
-              <td>{procedure.createdAt}</td>
+              <td>
+                {format(new Date(procedure.createdAt), "yyyy-MM-d h:mm a")}
+              </td>
             </tr>
           ))}
 
