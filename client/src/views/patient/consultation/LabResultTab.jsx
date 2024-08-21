@@ -28,7 +28,7 @@ const LabResultTab = () => {
         </thead>
         <tbody>
           {investigations?.orderedTest
-            ?.filter((i) => !i.test.labTestProfile.isPanel)
+            ?.filter((i) => !i.test.labTestProfile?.isPanel)
             .map((investigation, index) => (
               <tr key={investigation.id}>
                 <td>{index + 1}</td>

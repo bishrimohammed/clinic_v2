@@ -122,7 +122,7 @@ const EditClinicInfo = () => {
     const addressArray = matches?.map((match) => match.split(": ")[1]);
     return addressArray;
   };
-  console.log(state);
+  // console.log(state);
   // return;
 
   const {
@@ -150,19 +150,8 @@ const EditClinicInfo = () => {
     resolver: yupResolver(schema),
     reValidateMode: "onBlur",
     shouldFocusError: true,
-
-    // shouldFocusError: true,
-    // validateOnBlur: true,
-    // validateOnMount: true,
-    // validateOnChange: true,
-    // validateOnMount: true,
-    // validationSchema: schema,
-    // validateOnMount: true,
   });
-  // let disAbleFields = getValues("is_Fileds_Disabled");
-  console.log(errors);
-  // console.log("state?.has_triage : " + state?.has_triage);
-  // console.log(watch("has_triage"));
+
   function numberToArray(n) {
     return n && Array(Math.abs(n)).fill(n);
   }
@@ -210,11 +199,18 @@ const EditClinicInfo = () => {
     const { clinc_working_hours } = getValues();
     const startTime = clinc_working_hours[0].start_time;
     const endTime = clinc_working_hours[0].end_time;
-    console.log(endTime);
+    // console.log(state.clinicWorkingHours);
+    console.log(startTime);
     clinc_working_hours.forEach((work_hour, index) => {
       if (index !== 0) {
-        setValue(`clinc_working_hours[${index}].start_time`, startTime);
-        setValue(`clinc_working_hours[${index}].end_time`, endTime);
+        setValue(
+          `clinc_working_hours[${index}].start_time`,
+          startTime ? startTime : state.clinicWorkingHours[0]?.start_time
+        );
+        setValue(
+          `clinc_working_hours[${index}].end_time`,
+          endTime ? endTime : state.clinicWorkingHours[0].end_time
+        );
       }
     });
     // console.log(clinc_working_hours);
