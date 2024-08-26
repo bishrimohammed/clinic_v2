@@ -9,7 +9,10 @@ import {
 import React, { useMemo, useState } from "react";
 import useDebounce from "../../hooks/useDebounce";
 import { UpcomingPatientVisitColumn } from "./utils/UpcomingPatientVisitColumn";
-import { useGetUpcomingPatientVisit } from "./hooks/useGetUpcomingPatientVisit";
+import {
+  fetchUpcomingVisits,
+  useGetUpcomingPatientVisit,
+} from "./hooks/useGetUpcomingPatientVisit";
 import { Button, Dropdown, Spinner, Table } from "react-bootstrap";
 import { RiEditLine } from "react-icons/ri";
 import { MdOutlinePreview } from "react-icons/md";
@@ -26,6 +29,8 @@ import { hasPermission } from "../../utils/hasPermission";
 import AddPatientVisitModal from "./AddPatientVisitModal";
 import PaginationComponent from "../../components/PaginationComponent";
 import { useStartTraige } from "./hooks/useStartTraige";
+import SmartPaginationComponent from "../../components/SmartPaginationComponent";
+import { useQueryClient } from "@tanstack/react-query";
 
 const UpcomingPatientVisitTable = () => {
   let [searchParams, setSearchParams] = useSearchParams();
@@ -49,29 +54,27 @@ const UpcomingPatientVisitTable = () => {
     if (searchParams.get("tab") === "active_visits") {
       setSearchParams((prev) => {
         prev.set("page", 1);
-        prev.set("limit", 1);
+        prev.set("limit", 10);
         prev.set("sortBy", "visit_date");
-        prev.set("order", "asc");
+        prev.set("order", "desc");
         return prev;
-        // page: 1,
-        // limit: 2,
-        // sortBy: "visit_date",
-        // order: "asc",
       });
     }
   }, [tab]);
-  const {
-    data: PatientVisit,
-    isPending,
-    isSuccess,
-  } = useGetUpcomingPatientVisit(filter);
+  const { data, isPending, isPlaceholderData } = useGetUpcomingPatientVisit({
+    ...filter,
+    page: parseInt(searchParams.get("page")),
+    limit: parseInt(searchParams.get("limit")),
+    sortBy: searchParams.get("sortBy"),
+    order: searchParams.get("order"),
+  });
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   // const [dropdownPosition, setDropdownPosition] = useState({});
   const handleToggleDropdown = (index, event) => {
     setOpenDropdownIndex(index === openDropdownIndex ? null : index);
     // setDropdownPosition({ left: event.clientX - 20, top: event.clientY - 200 });
   };
-  const upcomigPatientVisit = useMemo(() => PatientVisit || [], [PatientVisit]);
+  const upcomigPatientVisit = useMemo(() => data?.visits || [], [data]);
   const debouncedValue = useDebounce(search, 500);
   // const employeeData = useMemo(() => Data, []);
   const columns = useMemo(() => UpcomingPatientVisitColumn, []);
@@ -100,6 +103,22 @@ const UpcomingPatientVisitTable = () => {
   });
   const [showAddPatientVisitModal, setShowAddPatientVisitModal] =
     useState(false);
+  const queryClient = useQueryClient();
+  React.useEffect(() => {
+    if (!isPlaceholderData && data?.hasMore) {
+      const query = {
+        ...filter,
+        page: parseInt(searchParams.get("page")) + 1,
+        limit: parseInt(searchParams.get("limit")),
+        sortBy: searchParams.get("sortBy"),
+        order: searchParams.get("order"),
+      };
+      queryClient.prefetchQuery({
+        queryKey: ["UpcomingPatientVisit", query],
+        queryFn: () => fetchUpcomingVisits(query),
+      });
+    }
+  }, [data, isPlaceholderData, searchParams.get("page"), queryClient]);
   const navigate = useNavigate();
   const getSortBy = () => {
     return searchParams.get("sortBy");
@@ -116,6 +135,13 @@ const UpcomingPatientVisitTable = () => {
       } else {
         prev.set("order", searchParams.get("order") === "asc" ? "desc" : "asc");
       }
+      return prev;
+    });
+  };
+  const handlePagination = (page) => {
+    setSearchParams((prev) => {
+      prev.set("page", parseInt(page));
+
       return prev;
     });
   };
@@ -426,7 +452,7 @@ const UpcomingPatientVisitTable = () => {
             })}
         </tbody>
       </Table>
-      {
+      {/* {
         upcomigPatientVisit.length > 0 && !isPending && (
           <PaginationComponent tableInstance={tableInstance} />
         )
@@ -435,7 +461,12 @@ const UpcomingPatientVisitTable = () => {
         //     <span className="text-danger fw-bold">No Active Visit</span>
         //   </div>
         // )
-      }
+      } */}
+      <SmartPaginationComponent
+        currentPage={parseInt(data?.currentPage) || 1}
+        totalPages={parseInt(data?.totalPages)}
+        onPageChange={handlePagination}
+      />
       {/* <div
         style={{ zIndex: 0 }}
         className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2"
