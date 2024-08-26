@@ -20,7 +20,7 @@ import { Button, Dropdown, Spinner, Table } from "react-bootstrap";
 import SearchInput from "../../components/inputs/SearchInput";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { hasPermission } from "../../utils/hasPermission";
-import PaginationComponent from "../../components/PaginationComponent";
+// import PaginationComponent from "../../components/PaginationComponent";
 const PatientTable = ({
   isPending,
   patients,

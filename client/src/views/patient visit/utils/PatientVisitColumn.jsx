@@ -26,10 +26,8 @@ export const PatientVisitColumn = [
   },
   {
     header: "Visit Date",
-    accessorFn: (row) =>
-      row.assignment_date +
-      " " +
-      format(parse(row.visit_time, "HH:mm:ss", new Date()), "h:mm a"),
+    accessorFn: (row) => row.assignment_date,
+    // format(parse(row.visit_time, "HH:mm:ss", new Date()), "h:mm a"),
   },
 
   columnHelper.accessor("stage", {

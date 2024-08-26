@@ -21,13 +21,15 @@ import { LuFilter } from "react-icons/lu";
 import SearchInput from "../../components/inputs/SearchInput";
 import FilterUpcomingVisitModal from "./upcoming/FilterUpcomingVisitModal";
 import ConfirmTraigeModal from "./upcoming/ConfirmTraigeModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { hasPermission } from "../../utils/hasPermission";
 import AddPatientVisitModal from "./AddPatientVisitModal";
 import PaginationComponent from "../../components/PaginationComponent";
 import { useStartTraige } from "./hooks/useStartTraige";
 
 const UpcomingPatientVisitTable = () => {
+  let [searchParams, setSearchParams] = useSearchParams();
+
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = React.useState({
@@ -40,6 +42,24 @@ const UpcomingPatientVisitTable = () => {
     vistiType: "",
   });
   const startTraige = useStartTraige();
+  let tab = searchParams.get("tab") === "active_visits";
+  console.log("upcommi");
+  React.useEffect(() => {
+    // console.log(searchParams.get("tab"));
+    if (searchParams.get("tab") === "active_visits") {
+      setSearchParams((prev) => {
+        prev.set("page", 1);
+        prev.set("limit", 1);
+        prev.set("sortBy", "visit_date");
+        prev.set("order", "asc");
+        return prev;
+        // page: 1,
+        // limit: 2,
+        // sortBy: "visit_date",
+        // order: "asc",
+      });
+    }
+  }, [tab]);
   const {
     data: PatientVisit,
     isPending,
@@ -81,6 +101,24 @@ const UpcomingPatientVisitTable = () => {
   const [showAddPatientVisitModal, setShowAddPatientVisitModal] =
     useState(false);
   const navigate = useNavigate();
+  const getSortBy = () => {
+    return searchParams.get("sortBy");
+  };
+  const getSortDirection = () => {
+    return searchParams.get("order");
+  };
+  const handleSort = (sortby) => {
+    setSearchParams((prev) => {
+      if (searchParams.get("sortBy") !== sortby) {
+        prev.set("order", "asc");
+        prev.set("sortBy", sortby);
+        //  return {...prev, sortBy: sortby, order: searchParams.get("order") === "asc"? "desc" : "asc" }
+      } else {
+        prev.set("order", searchParams.get("order") === "asc" ? "desc" : "asc");
+      }
+      return prev;
+    });
+  };
   return (
     <>
       <div className=" d-flex flex-wrap  gap-2 align-items-center p-1 w-100 mb-1 mt-2">
@@ -122,7 +160,7 @@ const UpcomingPatientVisitTable = () => {
           {tableInstance.getHeaderGroups().map((headerEl) => {
             return (
               <tr key={headerEl.id}>
-                {headerEl.headers.map((columnEl, index) => {
+                {/* {headerEl.headers.map((columnEl, index) => {
                   return (
                     <th key={columnEl.id} colSpan={columnEl.colSpan}>
                       {columnEl.isPlaceholder ? null : (
@@ -156,7 +194,42 @@ const UpcomingPatientVisitTable = () => {
                       )}
                     </th>
                   );
-                })}
+                })} */}
+                <th>Patient Id</th>
+                <th
+                  onClick={() => {
+                    handleSort("patient_name");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Patient
+                  {getSortBy() == "patient_name" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th>Doctor</th>
+                <th
+                  onClick={() => {
+                    handleSort("visit_date");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Visit Date
+                  {getSortBy() == "visit_date" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th>Visit Type</th>
+                <th>Stage</th>
+                <th>Status</th>
 
                 <th>Actions</th>
               </tr>

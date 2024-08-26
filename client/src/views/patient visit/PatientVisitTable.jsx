@@ -16,24 +16,83 @@ import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
 import { TbCalendarCancel } from "react-icons/tb";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { FaSortDown, FaSortUp } from "react-icons/fa";
-import { hasPermission } from "../../utils/hasPermission";
+// import { hasPermission } from "../../utils/hasPermission";
 import PaginationComponent from "../../components/PaginationComponent";
+import {
+  fetchAllVisits,
+  useGetPatientVisits,
+} from "./hooks/useGetPatientVisits";
+import FilterVisitModal from "./FilterVisitModal";
+import CancelPatientVisitModal from "./CancelPatientVisitModal";
+import TransferPatientVisitModal from "./TransferPatientVisitModal";
+import { useSearchParams } from "react-router-dom";
+import SmartPaginationComponent from "../../components/SmartPaginationComponent";
+import { useQueryClient } from "@tanstack/react-query";
 
-const PatientVisitTable = ({
-  patientVisits,
-  isPending,
-  setShowAddPatientVisitModal,
-  setShowFilterModal,
-  setFilter,
-  setShowCancelPatientVisitModal,
-  setShowTransferredPatientVisitModal,
-}) => {
-  const [search, setSearch] = useState("");
-  const [sorting, setSorting] = useState([]);
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
+const PatientVisitTable = (
+  {
+    // patientVisits,
+    // isPending,
+    // setShowAddPatientVisitModal,
+    // setShowFilterModal,
+    // setFilter,
+    // setShowCancelPatientVisitModal,
+    // setShowTransferredPatientVisitModal,
+  }
+) => {
+  let [searchParams, setSearchParams] = useSearchParams();
+
+  const [filter, setFilter] = useState({
+    stage: "",
+    status: "",
+    vistiType: "",
   });
+  let tab = searchParams.get("tab") === "all_visits";
+  // const [showAddPatientVisitModal, setShowAddPatientVisitModal] =
+  //   useState(false);
+  const [showFilterVisitModal, setShowFilterVisitModal] = useState(false);
+  const [showCancelPatientVisitModal, setShowCancelPatientVisitModal] =
+    useState({
+      isShow: false,
+      visitId: null,
+    });
+  const [
+    showTransferredPatientVisitModal,
+    setShowTransferredPatientVisitModal,
+  ] = useState({
+    isShow: false,
+    visit: null,
+  });
+  React.useEffect(() => {
+    // console.log(searchParams.get("tab"));
+    if (searchParams.get("tab") === "all_visits") {
+      setSearchParams((prev) => {
+        prev.set("page", 1);
+        prev.set("limit", 10);
+        prev.set("sortBy", "visit_date");
+        prev.set("order", "desc");
+        return prev;
+        // page: 1,
+        // limit: 2,
+        // sortBy: "visit_date",
+        // order: "asc",
+      });
+    }
+  }, [tab]);
+  const { data, isPending, isPlaceholderData } = useGetPatientVisits({
+    ...filter,
+    page: parseInt(searchParams.get("page")),
+    limit: parseInt(searchParams.get("limit")),
+    sortBy: searchParams.get("sortBy"),
+    order: searchParams.get("order"),
+  });
+  // const { data, isPending } = useGetPatientVisits(filter);
+  const [search, setSearch] = useState("");
+  // const [sorting, setSorting] = useState([]);
+  // const [pagination, setPagination] = React.useState({
+  //   pageIndex: 0,
+  //   pageSize: 10,
+  // });
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   // const [dropdownPosition, setDropdownPosition] = useState({});
   const handleToggleDropdown = (index, event) => {
@@ -43,23 +102,64 @@ const PatientVisitTable = ({
   const debouncedValue = useDebounce(search, 500);
   // const employeeData = useMemo(() => Data, []);
   const columns = useMemo(() => PatientVisitColumn, []);
-
+  const patientVisits = useMemo(() => data?.visits || [], [data]);
   const tableInstance = useReactTable({
     columns: columns,
     data: patientVisits,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
+    // getPaginationRowModel: getPaginationRowModel(),
+    // getSortedRowModel: getSortedRowModel(),
+    // onPaginationChange: setPagination,
+    // onSortingChange: setSorting,
     state: {
       globalFilter: debouncedValue,
-      pagination: pagination,
-      sorting,
+      // pagination: pagination,
+      // sorting,
     },
-    onGlobalFilterChange: setSearch,
+    // onGlobalFilterChange: setSearch,
   });
+  const handlePagination = (page) => {
+    setSearchParams((prev) => {
+      prev.set("page", parseInt(page));
+
+      return prev;
+    });
+  };
+  const queryClient = useQueryClient();
+  React.useEffect(() => {
+    if (!isPlaceholderData && data?.hasMore) {
+      const query = {
+        ...filter,
+        page: parseInt(searchParams.get("page")) + 1,
+        limit: parseInt(searchParams.get("limit")),
+        sortBy: searchParams.get("sortBy"),
+        order: searchParams.get("order"),
+      };
+      queryClient.prefetchQuery({
+        queryKey: ["patient visits", query],
+        queryFn: () => fetchAllVisits(query),
+      });
+    }
+  }, [data, isPlaceholderData, searchParams.get("page"), queryClient]);
+  const getSortBy = () => {
+    return searchParams.get("sortBy");
+  };
+  const getSortDirection = () => {
+    return searchParams.get("order");
+  };
+  const handleSort = (sortby) => {
+    setSearchParams((prev) => {
+      if (searchParams.get("sortBy") !== sortby) {
+        prev.set("order", "asc");
+        prev.set("sortBy", sortby);
+        //  return {...prev, sortBy: sortby, order: searchParams.get("order") === "asc"? "desc" : "asc" }
+      } else {
+        prev.set("order", searchParams.get("order") === "asc" ? "desc" : "asc");
+      }
+      return prev;
+    });
+  };
   return (
     <>
       <div className=" d-flex flex-wrap  gap-2 align-items-center p-1 w-100 mb-1 mt-2">
@@ -68,7 +168,7 @@ const PatientVisitTable = ({
         <Button
           variant="secondary"
           className="d-flex align-items-center gap-1"
-          onClick={() => setShowFilterModal(true)}
+          onClick={() => setShowFilterVisitModal(true)}
         >
           <LuFilter size={16} /> Filter
         </Button>
@@ -92,7 +192,7 @@ const PatientVisitTable = ({
           {tableInstance.getHeaderGroups().map((headerEl) => {
             return (
               <tr key={headerEl.id}>
-                {headerEl.headers.map((columnEl, index) => {
+                {/* {headerEl.headers.map((columnEl, index) => {
                   return (
                     <th key={columnEl.id} colSpan={columnEl.colSpan}>
                       {columnEl.isPlaceholder ? null : (
@@ -126,7 +226,41 @@ const PatientVisitTable = ({
                       )}
                     </th>
                   );
-                })}
+                })} */}
+                <th>Patient Id</th>
+                <th
+                  onClick={() => {
+                    handleSort("patient_name");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Patient
+                  {getSortBy() == "patient_name" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th>Doctor</th>
+                <th
+                  onClick={() => {
+                    handleSort("visit_date");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Visit Date
+                  {getSortBy() == "visit_date" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th>Stage</th>
+                <th>Status</th>
 
                 <th>Actions</th>
               </tr>
@@ -158,10 +292,10 @@ const PatientVisitTable = ({
                   style={{ cursor: "pointer", zIndex: "-1" }}
                   onClick={() => {
                     // setShowViewEmployee(true);
-                    setShowViewAppointment({
-                      isShow: true,
-                      appointment: rowEl.original,
-                    });
+                    // setShowViewAppointment({
+                    //   isShow: true,
+                    //   appointment: rowEl.original,
+                    // });
                   }}
                 >
                   {rowEl.getVisibleCells().map((cellEl, index) => {
@@ -271,77 +405,42 @@ const PatientVisitTable = ({
             })}
         </tbody>
       </Table>
-      {patientVisits?.length > 0 && !isPending && (
+      {/* {patientVisits?.length > 0 && !isPending && (
         <PaginationComponent tableInstance={tableInstance} />
+      )} */}
+      <SmartPaginationComponent
+        currentPage={parseInt(data?.currentPage) || 1}
+        totalPages={parseInt(data?.totalPages)}
+        onPageChange={handlePagination}
+      />
+      {showFilterVisitModal && (
+        <FilterVisitModal
+          show={showFilterVisitModal}
+          handleClose={() => setShowFilterVisitModal(false)}
+          setFilter={setFilter}
+        />
       )}
-      {/* <div
-        style={{ zIndex: 0 }}
-        className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2"
-      >
-        <button
-          className="border-0"
-          style={{ outline: "none" }}
-          onClick={() => tableInstance.firstPage()}
-          disabled={!tableInstance.getCanPreviousPage()}
-        >
-          &lt;&lt;
-        </button>
-        <button
-          // className="btn btn-outline-secondary"
-          onClick={() => tableInstance.previousPage()}
-          disabled={!tableInstance.getCanPreviousPage()}
-        >
-          &lt;
-        </button>
-        <button
-          // className="btn btn-outline-secondary"
-          onClick={() => tableInstance.nextPage()}
-          disabled={!tableInstance.getCanNextPage()}
-        >
-          &gt;
-        </button>
-        <button
-          // className="btn btn-outline-secondary"
-          onClick={() => tableInstance.lastPage()}
-          disabled={!tableInstance.getCanNextPage()}
-        >
-          &gt;&gt;
-        </button>
-        <span className="d-flex align-items-center gap-1">
-          <div>Page</div>
-          <strong className="d-flex align-items-center gap-1">
-            {tableInstance.getState().pagination.pageIndex + 1} of{" "}
-            {tableInstance.getPageCount().toLocaleString()}
-          </strong>
-        </span>
-        <span className="d-flex align-items-center gap-1">
-          | Go to page:
-          <input
-            type="number"
-            value={tableInstance.getState().pagination.pageIndex + 1}
-            // defaultValue={tableInstance.options.state.pagination.pageIndex}
-            onChange={(e) => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
-              tableInstance.setPageIndex(page);
-            }}
-            className="form-control w-25"
-          />
-        </span>
-        <select
-          value={tableInstance.getState().pagination.pageSize}
-          // value={tableInstance.options.state.pagination.pageIndex}
-          onChange={(e) => {
-            tableInstance.setPageSize(Number(e.target.value));
-          }}
-          // className="form-select"
-        >
-          {[10, 20, 30, 40, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
-      </div> */}
+      {showCancelPatientVisitModal.isShow && (
+        <CancelPatientVisitModal
+          show={showCancelPatientVisitModal.isShow}
+          handleClose={() =>
+            setShowCancelPatientVisitModal({ isShow: false, visitId: null })
+          }
+          visitId={showCancelPatientVisitModal.visitId}
+        />
+      )}
+      {showTransferredPatientVisitModal.isShow && (
+        <TransferPatientVisitModal
+          show={showTransferredPatientVisitModal.isShow}
+          handleClose={() =>
+            setShowTransferredPatientVisitModal({
+              isShow: false,
+              visit: null,
+            })
+          }
+          visit={showTransferredPatientVisitModal.visit}
+        />
+      )}
     </>
   );
 };

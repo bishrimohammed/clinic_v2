@@ -112,7 +112,7 @@ const PatientList = () => {
   });
   useEffect(() => {
     // console.log(patients);
-    setSearchParams({ page: 1, limit: 10, sortBy: "name", order: "asc" });
+    setSearchParams({ page: 1, limit: 5, sortBy: "name", order: "asc" });
     // setSearchParams({ search: "test" });
   }, []);
   const { data, isLoading, isError, isFetching, isPending, isPlaceholderData } =
