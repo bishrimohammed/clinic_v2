@@ -1,15 +1,99 @@
 /* eslint-disable react/prop-types */
-import { Container, Spinner } from "react-bootstrap";
+import { Container, Pagination, Spinner } from "react-bootstrap";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import PatientTable from "./PatientTable";
-import { useGetPatients } from "./hooks/patientHooks/useGetPatients";
+import {
+  fetchPatients,
+  useGetPatients,
+} from "./hooks/patientHooks/useGetPatients";
 import ViewPatientModal from "./ViewPatientModal";
 import PatientDeactivateModal from "./PatientDeactivateModal";
 import PatientFilterModal from "./PatientFilterModal";
+import { useSearchParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import SmartPaginationComponent from "../../components/SmartPaginationComponent";
+
+// import React from 'react';
+// import { Pagination } from 'react-bootstrap';
+
+const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
+  const handlePageClick = (page) => {
+    onPageChange(page);
+  };
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(
+          <Pagination.Item
+            key={i}
+            active={currentPage === i}
+            onClick={() => handlePageClick(i)}
+          >
+            {i}
+          </Pagination.Item>
+        );
+      }
+    } else {
+      let startPage = Math.max(currentPage - 2, 1);
+      let endPage = Math.min(currentPage + 2, totalPages);
+
+      if (currentPage - 2 > 1) {
+        pageNumbers.push(<Pagination.Ellipsis key="start-ellipsis" />);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(
+          <Pagination.Item
+            key={i}
+            active={currentPage === i}
+            onClick={() => handlePageClick(i)}
+          >
+            {i}
+          </Pagination.Item>
+        );
+      }
+
+      if (currentPage + 2 < totalPages) {
+        pageNumbers.push(<Pagination.Ellipsis key="end-ellipsis" />);
+      }
+    }
+
+    return pageNumbers;
+  };
+
+  return (
+    <Pagination className="mb-0">
+      <Pagination.First
+        disabled={currentPage === 1}
+        onClick={() => handlePageClick(1)}
+      />
+      <Pagination.Prev
+        disabled={currentPage === 1}
+        onClick={() => handlePageClick(currentPage - 1)}
+      />
+      {renderPageNumbers()}
+      <Pagination.Next
+        disabled={currentPage === totalPages}
+        onClick={() => handlePageClick(currentPage + 1)}
+      />
+      <Pagination.Last
+        disabled={currentPage === totalPages}
+        onClick={() => handlePageClick(totalPages)}
+      />
+    </Pagination>
+  );
+};
+
+// export default PaginationComponent;
 
 const PatientList = () => {
+  let [searchParams, setSearchParams] = useSearchParams();
+  // console.log(searchParams.get("page"));
   const [showViewPatient, setShowViewPatient] = useState({
     isShow: false,
     patient: null,
@@ -26,9 +110,66 @@ const PatientList = () => {
     id: null,
     action: "",
   });
-  const { data, isLoading, isError, isFetching, isPending } =
-    useGetPatients(filter);
-  const patients = useMemo(() => data || [], [data, isFetching, isPending]);
+  useEffect(() => {
+    // console.log(patients);
+    setSearchParams({ page: 1, limit: 10, sortBy: "name", order: "asc" });
+    // setSearchParams({ search: "test" });
+  }, []);
+  const { data, isLoading, isError, isFetching, isPending, isPlaceholderData } =
+    useGetPatients({
+      ...filter,
+      page: parseInt(searchParams.get("page")),
+      limit: parseInt(searchParams.get("limit")),
+      sortBy: searchParams.get("sortBy"),
+      order: searchParams.get("order"),
+    });
+  const queryClient = useQueryClient();
+  React.useEffect(() => {
+    if (!isPlaceholderData && data?.hasMore) {
+      const query = {
+        ...filter,
+        page: parseInt(searchParams.get("page")) + 1,
+        limit: parseInt(searchParams.get("limit")),
+        sortBy: searchParams.get("sortBy"),
+        order: searchParams.get("order"),
+      };
+      queryClient.prefetchQuery({
+        queryKey: ["Patients", query],
+        queryFn: () => fetchPatients(query),
+      });
+    }
+  }, [data, isPlaceholderData, searchParams.get("page"), queryClient]);
+  // const patients = useMemo(
+  //   () => data?.patients || [],
+  //   [data, isFetching, isPending]
+  // );
+  const handlePagination = (page) => {
+    setSearchParams((prev) => {
+      // console.log(prev);
+      //  return {
+      //   ...prev,
+      // if (btn === "first") {
+      //   prev.set("page", 1);
+      // } else if (btn === "previous") {
+      //   prev.set("page", parseInt(prev.get("page")) - 1);
+      // } else if (btn === "next") {
+      //   prev.set("page", parseInt(prev.get("page")) + 1);
+      // } else if (btn === "last") {
+      //   // const totalPages = Math.ceil(data?.total_count / searchParams.get("limit"));
+
+      //   prev.set("page", parseInt(data?.totalPages));
+      // } else {
+      //   prev.set("page", parseInt(page));
+      // }
+      prev.set("page", parseInt(page));
+      // const page = prev.get("page");
+      // console.log(page);
+      // prev.set("page", parseInt(page) + 1);
+      return prev;
+      //  }
+    });
+  };
+  // if (isFetching) return "fetching";
   // console.log(filter);
   return (
     <>
@@ -48,13 +189,155 @@ const PatientList = () => {
           {/* <SearchInput searchvalue={search} setSearch={setSearch} /> */}
           {/* <MemoizedPatientLists searchValue={debouncedValue} /> */}
           <PatientTable
-            patients={patients}
+            patients={data?.patients || []}
             isPending={isPending}
             setShowViewPatient={setShowViewPatient}
             setShowFilterModal={setShowFilterModal}
             setShowDeactivateModal={setShowDeactivateModal}
             setFilter={setFilter}
-          />
+          />{" "}
+          <div className="d-flex gap-2 align-items-center">
+            <SmartPaginationComponent
+              currentPage={parseInt(searchParams.get("page"))}
+              totalPages={parseInt(data?.totalPages)}
+              onPageChange={handlePagination}
+            />
+            {/* <span className="mb-0">
+              page {data?.currentPage} of {data?.totalPages}
+            </span>
+            <select
+              style={{ outline: "none" }}
+              className="p-1"
+              value={searchParams.get("limit")}
+              onChange={(e) => {
+                setSearchParams((prev) => {
+                  prev.set("page", 1);
+                  prev.set("limit", parseInt(e.target.value));
+                  return prev;
+                });
+              }}
+              // className="form-select"
+            >
+              {[1, 10, 20, 30, 40, 50].map((pageSize) => (
+                <option key={pageSize} value={pageSize}>
+                  Show {pageSize}
+                </option>
+              ))}
+            </select> */}
+          </div>
+          {/* <Pagination>
+            <Pagination.First
+              disabled={data?.currentPage === 1}
+              onClick={() => handlePagination("first")}
+            />
+            <Pagination.Prev
+              disabled={data?.currentPage === 1}
+              onClick={() => handlePagination("previous")}
+            />
+            <Pagination.Item
+              // disabled={data?.currentPage === 1}
+              active={data?.currentPage === 1}
+            >
+              {1}
+            </Pagination.Item>
+            {data?.totalPages < 4 &&
+              Array.from(
+                { length: data?.totalPages || 0 },
+                (_, index) => index + 2
+              ).map((page) => (
+                <Pagination.Item
+                  key={page}
+                  active={data?.currentPage === page}
+                  onClick={() => handlePagination("", page)}
+                >
+                  {page}
+                </Pagination.Item>
+              ))}
+            {data?.currentPage <= 3 ? (
+              <>
+                {" "}
+                <Pagination.Item
+                  // key={page}
+                  active={data?.currentPage === 2}
+                  onClick={() => handlePagination("", 2)}
+                >
+                  {2}
+                </Pagination.Item>
+                <Pagination.Item
+                  // key={page}
+                  active={data?.currentPage === 3}
+                  onClick={() => handlePagination("", 3)}
+                >
+                  {3}
+                </Pagination.Item>
+                {data?.currentPage === 3 && (
+                  <Pagination.Item
+                    // key={page}
+                    active={data?.currentPage === 4}
+                    onClick={() => handlePagination("", 4)}
+                  >
+                    {4}
+                  </Pagination.Item>
+                )}
+                <Pagination.Ellipsis />
+                <Pagination.Item
+                  // key={page}
+                  active={data?.currentPage === data?.totalPages}
+                  onClick={() => handlePagination("", data?.totalPages)}
+                >
+                  {data?.totalPages}
+                </Pagination.Item>
+              </>
+            ) : (
+              <>
+                <Pagination.Ellipsis />
+                <Pagination.Item
+                  // key={page}
+                  active={data?.currentPage === data?.currentPage - 1}
+                  onClick={() => handlePagination("", data?.currentPage - 1)}
+                >
+                  {data?.currentPage - 1}
+                </Pagination.Item>
+                <Pagination.Item
+                  // key={page}
+                  active={data?.currentPage === data?.currentPage}
+                  onClick={() => handlePagination("", data?.currentPage)}
+                >
+                  {data?.currentPage}
+                </Pagination.Item>
+                {data?.currentPage !== data?.totalPages && (
+                  <Pagination.Item
+                    // key={page}
+                    active={data?.currentPage === data?.currentPage + 1}
+                    onClick={() => handlePagination("", data?.currentPage + 1)}
+                  >
+                    {data?.currentPage + 1}
+                  </Pagination.Item>
+                )}
+                {data?.currentPage + 1 <= data?.totalPages - 1 && (
+                  <>
+                    <Pagination.Ellipsis />
+                    <Pagination.Item
+                      // key={page}
+                      active={data?.currentPage === data?.totalPages}
+                      onClick={() => handlePagination("", data?.totalPages)}
+                    >
+                      {data?.totalPages}
+                    </Pagination.Item>
+                  </>
+                )}
+              </>
+            )}
+
+            <Pagination.Next
+              onClick={() => handlePagination("next")}
+              disabled={!data?.hasMore}
+            />
+            <Pagination.Last
+              onClick={() => handlePagination("last")}
+              disabled={data?.currentPage === data?.totalPages}
+            />
+          </Pagination> */}
         </div>
         {showViewPatient.isShow && (
           <ViewPatientModal

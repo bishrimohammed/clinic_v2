@@ -13,12 +13,12 @@ import {
 import { FaUserLock } from "react-icons/fa";
 
 import { RiEditLine } from "react-icons/ri";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useDebounce from "../../hooks/useDebounce";
 import { patientColumns } from "./utils/PatientColumn";
 import { Button, Dropdown, Spinner, Table } from "react-bootstrap";
 import SearchInput from "../../components/inputs/SearchInput";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { hasPermission } from "../../utils/hasPermission";
 import PaginationComponent from "../../components/PaginationComponent";
 const PatientTable = ({
@@ -30,6 +30,8 @@ const PatientTable = ({
   setFilter,
 }) => {
   //   console.log("jkjhg");
+  let [searchParams, setSearchParams] = useSearchParams();
+  // console.log(searchParams.get("page"));
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState([]);
@@ -37,6 +39,7 @@ const PatientTable = ({
     pageIndex: 0,
     pageSize: 10,
   });
+
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   // const [dropdownPosition, setDropdownPosition] = useState({});
   const handleToggleDropdown = (index, event) => {
@@ -67,7 +70,25 @@ const PatientTable = ({
     // defaultSortColumn: "Name", // Set the default sort column
     // defaultSortDirection: "asc",
   });
-
+  const getSortBy = () => {
+    return searchParams.get("sortBy");
+  };
+  const getSortDirection = () => {
+    return searchParams.get("order");
+  };
+  const handleSort = (sortby) => {
+    setSearchParams((prev) => {
+      if (searchParams.get("sortBy") !== sortby) {
+        prev.set("order", "asc");
+        prev.set("sortBy", sortby);
+        //  return {...prev, sortBy: sortby, order: searchParams.get("order") === "asc"? "desc" : "asc" }
+      } else {
+        prev.set("order", searchParams.get("order") === "asc" ? "desc" : "asc");
+      }
+      return prev;
+    });
+  };
+  // console.log(getSortBy());
   return (
     <>
       <div className=" d-flex flex-wrap  gap-2 align-items-center p-1 w-100 mb-1 mt-2">
@@ -108,7 +129,7 @@ const PatientTable = ({
           {tableInstance.getHeaderGroups().map((headerEl) => {
             return (
               <tr key={headerEl.id}>
-                {headerEl.headers.map((columnEl, index) => {
+                {/* {headerEl.headers.map((columnEl, index) => {
                   return (
                     <th key={columnEl.id} colSpan={columnEl.colSpan}>
                       {columnEl.isPlaceholder ? null : (
@@ -140,21 +161,82 @@ const PatientTable = ({
                               desc: <FaSortDown />,
                             }[columnEl.column.getIsSorted()]
                           }
-                          {/* {columnEl.column.id === "Name" &&
-                            columnEl.column.() && (
-                              <span>
-                                {columnEl.column.getNextSortingOrder() ===
-                                  "asc" && <FaSortUp />}
-                                {columnEl.column.getNextSortingOrder() ===
-                                  "desc" && <FaSortDown />}
-                              </span>
-                            )} */}
+                          
                         </div>
                       )}
                     </th>
                   );
-                })}
-
+                })} */}
+                <th>Patient Id</th>
+                <th
+                  onClick={() => {
+                    handleSort("name");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Name{" "}
+                  {getSortBy() == "name" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th
+                  className="cursor-pointer"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    handleSort("sex");
+                  }}
+                >
+                  Sex
+                  {getSortBy() == "sex" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th
+                // onClick={() => {
+                //   handleSort("phone");
+                // }}
+                >
+                  Phone
+                </th>
+                <th
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    handleSort("registation_date");
+                  }}
+                >
+                  Registation Date{" "}
+                  {getSortBy() == "registation_date" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    handleSort("age");
+                  }}
+                >
+                  Age{" "}
+                  {getSortBy() == "age" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             );
@@ -284,9 +366,9 @@ const PatientTable = ({
             })}
         </tbody>
       </Table>
-      {patients?.length > 0 && !isPending && (
+      {/* {patients?.length > 0 && !isPending && (
         <PaginationComponent tableInstance={tableInstance} />
-      )}
+      )} */}
       {/* <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
         <button
           className="border-0"
