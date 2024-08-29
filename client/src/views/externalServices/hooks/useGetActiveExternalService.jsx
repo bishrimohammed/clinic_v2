@@ -1,10 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Axiosinstance from "../../../api/axiosInstance";
 import { AxiosHeaders } from "../../../api/useAxiosHeaders";
 export const useGetActiveExternalService = (query) => {
   const { headers } = AxiosHeaders();
   return useQuery({
-    queryKey: ["Active extrenal service"],
+    queryKey: ["Active extrenal service", query],
     queryFn: async () => {
       return await Axiosinstance.get("/externalservices/active", {
         params: query,
@@ -12,5 +12,7 @@ export const useGetActiveExternalService = (query) => {
       }).then((res) => res.data);
     },
     staleTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    enabled: !!query?.page,
   });
 };

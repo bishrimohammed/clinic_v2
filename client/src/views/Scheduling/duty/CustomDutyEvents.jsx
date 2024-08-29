@@ -4,6 +4,7 @@
 // import { useLocation } from "react-router-dom";
 
 const CustomDutyEvents = ({ event }) => {
+  console.log(event);
   const [showAddEmployeeToDuty, setShowEmployeeToDuty] = useState({
     isShow: false,
     employeeId: null,

@@ -1,6 +1,6 @@
 import { format, getDay, parse, startOfWeek } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Calendar, Views, dateFnsLocalizer } from "react-big-calendar";
 import "../calender.css";
 import { FaPlus } from "react-icons/fa";
@@ -56,7 +56,7 @@ const CreateNewWeekProgram = () => {
   const navigate = useNavigate();
   const { data: state, isPending } = useGetDutyProgramById(dutyWeek.id);
   if (isPending) return <Spinner animation="grow" />;
-  // console.log(state);
+  console.log(state);
 
   const EVENTS = state?.dutyAssignments.map((e, index) => {
     return {
@@ -126,9 +126,9 @@ const CreateNewWeekProgram = () => {
     </div>
   );
 };
-let previousDate = "";
-export default CreateNewWeekProgram;
 
+export default CreateNewWeekProgram;
+let previousDate = "";
 const CustomDutyEvents = ({ event }) => {
   const [showAddEmployeeToDuty, setShowEmployeeToDuty] = useState({
     isShow: false,
@@ -136,8 +136,21 @@ const CustomDutyEvents = ({ event }) => {
     duty_date: null,
     dutyAssigments: null,
   });
-  const { state } = useLocation();
+  const [isDifferentDate, setIsDifferentDate] = useState(true);
+  const previousDate = useRef(null);
+  useEffect(() => {
+    if (previousDate.current !== event.duty_date) {
+      previousDate.current = event.duty_date;
+      setIsDifferentDate(true);
+    } else {
+      setIsDifferentDate(false);
+    }
+  }, [event.duty_date]);
 
+  //   // console.log(pDate.current);
+  // }, [isDifferentDate]);
+  const { state } = useLocation();
+  // console.log(state);
   const handleButtonClick = () => {
     setShowEmployeeToDuty({
       isShow: true,
@@ -146,49 +159,67 @@ const CustomDutyEvents = ({ event }) => {
       // dutyAssigments: state.dutyAssignments,
     });
   };
-
+  // console.log(previousDate.current);
   let ButtonComp;
   // let ButtonComp;
-  if (previousDate && previousDate !== event.duty_date) {
-    previousDate = event.duty_date;
-    ButtonComp = (
-      <button
-        style={{ zIndex: 2 }}
-        className={`border-0 bg-transparent ${
-          event.duty_date < new Date().toISOString().substring(0, 10)
-            ? "text-warning"
-            : "text-white"
-        }  p-0`}
-        disabled={event.duty_date < new Date().toISOString().substring(0, 10)}
-        onClick={() => handleButtonClick(event.employee)}
-      >
-        <FaPlus />
-      </button>
-    );
-  }
-  if (!previousDate) {
-    previousDate = event.duty_date;
-    ButtonComp = (
-      <button
-        style={{ zIndex: 2 }}
-        disabled={event.duty_date < new Date().toISOString().substring(0, 10)}
-        className={`border-0 bg-transparent ${
-          event.duty_date < new Date().toISOString().substring(0, 10)
-            ? "text-warning"
-            : "text-white"
-        }  p-0`}
-        onClick={() => handleButtonClick(event.employee)}
-      >
-        <FaPlus />
-      </button>
-    );
-  }
+  // if (previousDate && previousDate.current !== event.duty_date) {
+  //   previousDate = event.duty_date;
+  //   ButtonComp = (
+  //     <button
+  //       style={{ zIndex: 2 }}
+  //       className={`border-0 bg-transparent ${
+  //         event.duty_date < new Date().toISOString().substring(0, 10)
+  //           ? "text-warning"
+  //           : "text-white"
+  //       }  p-0`}
+  //       disabled={event.duty_date < new Date().toISOString().substring(0, 10)}
+  //       onClick={() => handleButtonClick(event.employee)}
+  //     >
+  //       <FaPlus />
+  //     </button>
+  //   );
+  // }
+  // if (!previousDate) {
+  //   previousDate = event.duty_date;
+  //   ButtonComp = (
+  //     <button
+  //       style={{ zIndex: 2 }}
+  //       disabled={event.duty_date < new Date().toISOString().substring(0, 10)}
+  //       className={`border-0 bg-transparent ${
+  //         event.duty_date < new Date().toISOString().substring(0, 10)
+  //           ? "text-warning"
+  //           : "text-white"
+  //       }  p-0`}
+  //       onClick={() => handleButtonClick(event.employee)}
+  //     >
+  //       <FaPlus />
+  //     </button>
+  //   );
+  // }
 
   return (
     <>
       {" "}
       <div key={event.id} className="bg-primary w-100 text-white py-1 px-2">
-        <div className="d-flex justify-content-end mb-1">{ButtonComp}</div>
+        <div className="d-flex justify-content-end mb-1">
+          {/* {ButtonComp} */}
+          {isDifferentDate && (
+            <button
+              style={{ zIndex: 2 }}
+              className={`border-0 bg-transparent ${
+                event.duty_date < new Date().toISOString().substring(0, 10)
+                  ? "text-warning"
+                  : "text-white"
+              }  p-0`}
+              disabled={
+                event.duty_date < new Date().toISOString().substring(0, 10)
+              }
+              onClick={() => handleButtonClick(event.employee)}
+            >
+              <FaPlus />
+            </button>
+          )}
+        </div>
 
         <p className="small mb-0">
           {event?.employee?.firstName} {event?.employee?.middleName}

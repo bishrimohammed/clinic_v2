@@ -15,20 +15,53 @@ import { FaEye, FaSortDown, FaSortUp } from "react-icons/fa";
 import { Spinner, Table } from "react-bootstrap";
 import { useGetCurrentUser } from "../../hooks/useGetCurrentUser";
 import { externalServicePaymentsColumn } from "../Bill/utils/externalServicePaymentsColumn";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 const ExternalServiceList = () => {
   const user = useGetCurrentUser();
-  const { data, isPending } = useGetActiveExternalService({
+  let [searchParams, setSearchParams] = useSearchParams();
+
+  React.useEffect(() => {
+    // console.log(patients);
+    setSearchParams({
+      page: 1,
+      limit: 10,
+      sortBy: "service_date",
+      order: "desc",
+    });
+    // setSearchParams({ search: "test" });
+  }, []);
+  const { data, isPending, isPlaceholderData } = useGetActiveExternalService({
     role: user.role.name,
+    page: parseInt(searchParams.get("page")),
+    limit: parseInt(searchParams.get("limit")),
+    sortBy: searchParams.get("sortBy"),
+    order: searchParams.get("order"),
   });
 
-  console.log(data);
+  const queryClient = useQueryClient();
+  React.useEffect(() => {
+    if (!isPlaceholderData && data?.hasMore) {
+      const query = {
+        role: user.role.name,
+        page: parseInt(searchParams.get("page")) + 1,
+        limit: parseInt(searchParams.get("limit")),
+        sortBy: searchParams.get("sortBy"),
+        order: searchParams.get("order"),
+      };
+      queryClient.prefetchQuery({
+        queryKey: ["Active extrenal service", query],
+        queryFn: () => fetchPatients(query),
+      });
+    }
+  }, [data, isPlaceholderData, searchParams.get("page"), queryClient]);
+  // console.log(data);
   // const [search, setSearch] = useState("");
-  const [sorting, setSorting] = useState([]);
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  // const [sorting, setSorting] = useState([]);
+  // const [pagination, setPagination] = useState({
+  //   pageIndex: 0,
+  //   pageSize: 10,
+  // });
   const navigate = useNavigate();
   // const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   // // const [dropdownPosition, setDropdownPosition] = useState({});
@@ -45,16 +78,16 @@ const ExternalServiceList = () => {
     columns: columns,
     data: externalServiceData,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
-    state: {
-      // globalFilter: debouncedValue,
-      pagination: pagination,
-      sorting,
-    },
+    // getFilteredRowModel: getFilteredRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
+    // getSortedRowModel: getSortedRowModel(),
+    // onPaginationChange: setPagination,
+    // onSortingChange: setSorting,
+    // state: {
+    //   // globalFilter: debouncedValue,
+    //   pagination: pagination,
+    //   sorting,
+    // },
     // onGlobalFilterChange: setSearch,
   });
   return (
@@ -72,7 +105,7 @@ const ExternalServiceList = () => {
           {tableInstance.getHeaderGroups().map((headerEl) => {
             return (
               <tr key={headerEl.id}>
-                {headerEl.headers.map((columnEl, index) => {
+                {/* {headerEl.headers.map((columnEl, index) => {
                   return (
                     <th key={columnEl.id} colSpan={columnEl.colSpan}>
                       {columnEl.isPlaceholder ? null : (
@@ -106,8 +139,13 @@ const ExternalServiceList = () => {
                       )}
                     </th>
                   );
-                })}
-
+                })} */}
+                <th>#</th>
+                <th>Patient Name</th>
+                <th>Service Type</th>
+                <th>Service Date</th>
+                <th>Status</th>
+                {/* <th></th> */}
                 <th>Actions</th>
               </tr>
             );

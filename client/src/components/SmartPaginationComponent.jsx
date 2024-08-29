@@ -82,7 +82,7 @@ const SmartPaginationComponent = ({
       <select
         style={{ outline: "none" }}
         className="p-1"
-        value={searchParams.get("limit")}
+        value={searchParams.get("limit") || 10}
         onChange={(e) => {
           setSearchParams((prev) => {
             prev.set("page", 1);

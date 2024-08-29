@@ -55,7 +55,7 @@ const OverviewDetail = () => {
         <Tab eventKey="Lab result" title="Lab Result">
           <LabResultTab
             patient={state.patient}
-            investigations={investigations.orderedTest}
+            investigations={investigations?.orderedTest}
             isRefetching={isRefetching}
             refetch={refetch}
           />

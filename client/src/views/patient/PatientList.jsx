@@ -15,82 +15,6 @@ import { useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import SmartPaginationComponent from "../../components/SmartPaginationComponent";
 
-// import React from 'react';
-// import { Pagination } from 'react-bootstrap';
-
-const PaginationComponent = ({ currentPage, totalPages, onPageChange }) => {
-  const handlePageClick = (page) => {
-    onPageChange(page);
-  };
-
-  const renderPageNumbers = () => {
-    const pageNumbers = [];
-
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(
-          <Pagination.Item
-            key={i}
-            active={currentPage === i}
-            onClick={() => handlePageClick(i)}
-          >
-            {i}
-          </Pagination.Item>
-        );
-      }
-    } else {
-      let startPage = Math.max(currentPage - 2, 1);
-      let endPage = Math.min(currentPage + 2, totalPages);
-
-      if (currentPage - 2 > 1) {
-        pageNumbers.push(<Pagination.Ellipsis key="start-ellipsis" />);
-      }
-
-      for (let i = startPage; i <= endPage; i++) {
-        pageNumbers.push(
-          <Pagination.Item
-            key={i}
-            active={currentPage === i}
-            onClick={() => handlePageClick(i)}
-          >
-            {i}
-          </Pagination.Item>
-        );
-      }
-
-      if (currentPage + 2 < totalPages) {
-        pageNumbers.push(<Pagination.Ellipsis key="end-ellipsis" />);
-      }
-    }
-
-    return pageNumbers;
-  };
-
-  return (
-    <Pagination className="mb-0">
-      <Pagination.First
-        disabled={currentPage === 1}
-        onClick={() => handlePageClick(1)}
-      />
-      <Pagination.Prev
-        disabled={currentPage === 1}
-        onClick={() => handlePageClick(currentPage - 1)}
-      />
-      {renderPageNumbers()}
-      <Pagination.Next
-        disabled={currentPage === totalPages}
-        onClick={() => handlePageClick(currentPage + 1)}
-      />
-      <Pagination.Last
-        disabled={currentPage === totalPages}
-        onClick={() => handlePageClick(totalPages)}
-      />
-    </Pagination>
-  );
-};
-
-// export default PaginationComponent;
-
 const PatientList = () => {
   let [searchParams, setSearchParams] = useSearchParams();
   // console.log(searchParams.get("page"));
@@ -112,7 +36,7 @@ const PatientList = () => {
   });
   useEffect(() => {
     // console.log(patients);
-    setSearchParams({ page: 1, limit: 5, sortBy: "name", order: "asc" });
+    setSearchParams({ page: 1, limit: 10, sortBy: "name", order: "asc" });
     // setSearchParams({ search: "test" });
   }, []);
   const { data, isLoading, isError, isFetching, isPending, isPlaceholderData } =

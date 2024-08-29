@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from "react";
-import { useGetUpcomingAssignedVisitToDoctor } from "../hooks/useGetUpcomingAssignedVisitToDoctor";
-import { useNavigate } from "react-router-dom";
+import {
+  fetchActiveAssignedVisits,
+  useGetUpcomingAssignedVisitToDoctor,
+} from "../hooks/useGetUpcomingAssignedVisitToDoctor";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { UpcomingPatientVisitColumn } from "../utils/UpcomingPatientVisitColumn";
@@ -14,28 +15,54 @@ import useDebounce from "../../../hooks/useDebounce";
 import { FaRegEye, FaSortDown, FaSortUp } from "react-icons/fa6";
 import { RiEditLine } from "react-icons/ri";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { Button, Dropdown, Modal, Spinner, Table } from "react-bootstrap";
+import { Button, Dropdown, Spinner, Table } from "react-bootstrap";
 import { LuFilter } from "react-icons/lu";
 import SearchInput from "../../../components/inputs/SearchInput";
-import PaginationComponent from "../../../components/PaginationComponent";
-import AdmitVisitModal from "./AdmitVisitModal";
+// import PaginationComponent from "../../../components/PaginationComponent";
+// import AdmitVisitModal from "./AdmitVisitModal";
 import FilterVisitModal from "../FilterVisitModal";
+import { useQueryClient } from "@tanstack/react-query";
+import SmartPaginationComponent from "../../../components/SmartPaginationComponent";
+import { AxiosHeaders } from "../../../api/useAxiosHeaders";
 
 const DoctorAssignedUpcomingVisitTable = () => {
   const [search, setSearch] = useState("");
-  const [sorting, setSorting] = useState([]);
-  // const preLoadData = usePreL
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  let [searchParams, setSearchParams] = useSearchParams();
+
+  // const [sorting, setSorting] = useState([]);
+  // // const preLoadData = usePreL
+  // const [pagination, setPagination] = React.useState({
+  //   pageIndex: 0,
+  //   pageSize: 10,
+  // });
   const [filter, setFilter] = useState({
     stage: "",
     status: "",
     vistiType: "",
   });
-  const { data: PatientVisit, isPending } =
-    useGetUpcomingAssignedVisitToDoctor(filter);
+  let tab = searchParams.get("tab") === "active_visits";
+  // console.log("upcommi");
+  React.useEffect(() => {
+    // console.log(searchParams.get("tab"));
+    if (searchParams.get("tab") === "active_visits") {
+      setSearchParams((prev) => {
+        prev.set("page", 1);
+        prev.set("limit", 10);
+        prev.set("sortBy", "visit_date");
+        prev.set("order", "desc");
+        return prev;
+      });
+    }
+  }, [tab]);
+
+  const { data, isPending, isPlaceholderData } =
+    useGetUpcomingAssignedVisitToDoctor({
+      ...filter,
+      page: parseInt(searchParams.get("page")),
+      limit: parseInt(searchParams.get("limit")),
+      sortBy: searchParams.get("sortBy"),
+      order: searchParams.get("order"),
+    });
   //   const { data: PatientVisit, isPending } = useGetUpcomingPatientVisit(filter);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   // const [dropdownPosition, setDropdownPosition] = useState({});
@@ -43,7 +70,8 @@ const DoctorAssignedUpcomingVisitTable = () => {
     setOpenDropdownIndex(index === openDropdownIndex ? null : index);
     // setDropdownPosition({ left: event.clientX - 20, top: event.clientY - 200 });
   };
-  const upcomigPatientVisit = useMemo(() => PatientVisit || [], [PatientVisit]);
+  // console.log(data);
+  const upcomigPatientVisit = useMemo(() => data?.visits || [], [data]);
   const debouncedValue = useDebounce(search, 500);
   // const employeeData = useMemo(() => Data, []);
   const columns = useMemo(() => UpcomingPatientVisitColumn, []);
@@ -53,24 +81,67 @@ const DoctorAssignedUpcomingVisitTable = () => {
     data: upcomigPatientVisit,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
+    // getPaginationRowModel: getPaginationRowModel(),
+    // getSortedRowModel: getSortedRowModel(),
+    // onPaginationChange: setPagination,
+    // onSortingChange: setSorting,
     state: {
       globalFilter: debouncedValue,
-      pagination: pagination,
-      sorting,
+      // pagination: pagination,
+      // sorting,
     },
     onGlobalFilterChange: setSearch,
   });
   const [showfilterModal, setShowFilterModal] = useState(false);
-  const [showAdmitModal, setShowAdmitModal] = useState({
-    isShow: false,
-    patientVisitId: null,
-    // action: "",
-  });
+  // const [showAdmitModal, setShowAdmitModal] = useState({
+  //   isShow: false,
+  //   patientVisitId: null,
+  //   // action: "",
+  // });
+  // console.log(AxiosHeaders().headers);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  React.useEffect(() => {
+    if (!isPlaceholderData && data?.hasMore) {
+      const query = {
+        ...filter,
+        page: parseInt(searchParams.get("page")) + 1,
+        limit: parseInt(searchParams.get("limit")),
+        sortBy: searchParams.get("sortBy"),
+        order: searchParams.get("order"),
+      };
+      queryClient.prefetchQuery({
+        queryKey: ["UpcomingAssignedVisitToDoctor", query],
+        queryFn: () => fetchActiveAssignedVisits(query, AxiosHeaders().headers),
+      });
+    }
+  }, [data, isPlaceholderData, searchParams.get("page"), queryClient]);
+
+  const getSortBy = () => {
+    return searchParams.get("sortBy");
+  };
+  const getSortDirection = () => {
+    return searchParams.get("order");
+  };
+  const handleSort = (sortby) => {
+    setSearchParams((prev) => {
+      if (searchParams.get("sortBy") !== sortby) {
+        prev.set("order", "asc");
+        prev.set("sortBy", sortby);
+        //  return {...prev, sortBy: sortby, order: searchParams.get("order") === "asc"? "desc" : "asc" }
+      } else {
+        prev.set("order", searchParams.get("order") === "asc" ? "desc" : "asc");
+      }
+      return prev;
+    });
+  };
+  const handlePagination = (page) => {
+    setSearchParams((prev) => {
+      prev.set("page", parseInt(page));
+
+      return prev;
+    });
+  };
   return (
     <>
       <div className=" d-flex flex-wrap  gap-2 align-items-center p-1 w-100 mb-1 mt-2">
@@ -99,7 +170,7 @@ const DoctorAssignedUpcomingVisitTable = () => {
         className="mt-2"
         // style={{ zIndex: 1, overflowY: "hidden" }}
       >
-        <thead>
+        {/* <thead>
           {tableInstance.getHeaderGroups().map((headerEl) => {
             return (
               <tr key={headerEl.id}>
@@ -142,6 +213,65 @@ const DoctorAssignedUpcomingVisitTable = () => {
                     </th>
                   );
                 })}
+
+                <th>Actions</th>
+              </tr>
+            );
+          })}
+        </thead> */}
+        <thead>
+          {tableInstance.getHeaderGroups().map((headerEl) => {
+            return (
+              <tr key={headerEl.id}>
+                <th>Patient Id</th>
+                <th
+                  onClick={() => {
+                    handleSort("patient_name");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Patient
+                  {getSortBy() == "patient_name" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th>Doctor</th>
+                <th
+                  onClick={() => {
+                    handleSort("visit_date");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Visit Date
+                  {getSortBy() == "visit_date" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th
+                  onClick={() => {
+                    handleSort("visit_type");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Visit Type{" "}
+                  {getSortBy() == "visit_type" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th>Stage</th>
+                <th>Status</th>
 
                 <th>Actions</th>
               </tr>
@@ -356,17 +486,21 @@ const DoctorAssignedUpcomingVisitTable = () => {
         </tbody>
       </Table>
 
-      {upcomigPatientVisit?.length > 0 && !isPending && (
+      {/* {upcomigPatientVisit?.length > 0 && !isPending && (
         <PaginationComponent tableInstance={tableInstance} />
-      )}
-
-      {showAdmitModal.isShow && (
+      )} */}
+      <SmartPaginationComponent
+        currentPage={parseInt(data?.currentPage) || 1}
+        totalPages={parseInt(data?.totalPages)}
+        onPageChange={handlePagination}
+      />
+      {/* {showAdmitModal.isShow && (
         <AdmitVisitModal
           show={showAdmitModal.isShow}
           handleClose={() => setShowAdmitModal({ isShow: false })}
           visitId={showAdmitModal.patientVisitId}
         />
-      )}
+      )} */}
       {showfilterModal && (
         <FilterVisitModal
           show={showfilterModal}

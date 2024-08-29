@@ -1,48 +1,63 @@
 import React from "react";
 import { useGetMedicalOverview } from "./hooks/useGetMedicalOverview";
-import { Table } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+// import { Table } from "react-bootstrap";
+import { useSearchParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import ActiveMedicalRecordTable from "./ActiveMedicalRecordTable";
 
 const OverviewList = () => {
-  const { data } = useGetMedicalOverview();
-  console.log(data);
-  const navigate = useNavigate();
+  let [searchParams, setSearchParams] = useSearchParams();
+
+  // console.log(data);
+
+  React.useEffect(() => {
+    // console.log(patients);
+    setSearchParams({
+      page: 1,
+      limit: 10,
+      sortBy: "visit_date",
+      order: "desc",
+    });
+    // setSearchParams({ search: "test" });
+  }, []);
+  const { data, isPending, isPlaceholderData } = useGetMedicalOverview({
+    page: parseInt(searchParams.get("page")),
+    limit: parseInt(searchParams.get("limit")),
+    sortBy: searchParams.get("sortBy"),
+    order: searchParams.get("order"),
+  });
+  // console.log(data);
+  const queryClient = useQueryClient();
+  React.useEffect(() => {
+    if (!isPlaceholderData && data?.hasMore) {
+      const query = {
+        page: parseInt(searchParams.get("page")) + 1,
+        limit: parseInt(searchParams.get("limit")),
+        sortBy: searchParams.get("sortBy"),
+        order: searchParams.get("order"),
+      };
+      queryClient.prefetchQuery({
+        queryKey: ["Patients", query],
+        queryFn: () => fetchPatients(query),
+      });
+    }
+  }, [data, isPlaceholderData, searchParams.get("page"), queryClient]);
+  // const patients = useMemo(
+  //   () => data?.patients || [],
+  //   [data, isFetching, isPending]
+  // );
+  // const handlePagination = (page) => {
+  //   setSearchParams((prev) => {
+  //     prev.set("page", parseInt(page));
+
+  //     return prev;
+  //   });
+  // };
   return (
     <div>
-      <Table striped>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Patient Name</th>
-            <th>Patient Id</th>
-            <th>Phone</th>
-            <th>Gender</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data?.map((medicalrecord, index) => (
-            <tr
-              style={{ cursor: "pointer" }}
-              key={medicalrecord.id}
-              onClick={() => {
-                navigate("view-detail", { state: medicalrecord });
-              }}
-            >
-              <td>{index + 1}</td>
-              <td>
-                {medicalrecord.patient.firstName}{" "}
-                {medicalrecord.patient.middleName}{" "}
-                {medicalrecord.patient.lastName}
-              </td>
-              <td>{medicalrecord.patient.card_number}</td>
-              <td>{medicalrecord.patient.phone}</td>
-              <td>{medicalrecord.patient.gender}</td>
-              <td>{medicalrecord.status ? "Active" : "inactive"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      <h4 className=" mb-0">Active Medical Record List</h4>
+      <hr />
+      <ActiveMedicalRecordTable data={data} />
     </div>
   );
 };

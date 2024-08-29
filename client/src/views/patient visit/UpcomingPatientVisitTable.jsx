@@ -48,7 +48,7 @@ const UpcomingPatientVisitTable = () => {
   });
   const startTraige = useStartTraige();
   let tab = searchParams.get("tab") === "active_visits";
-  console.log("upcommi");
+  // console.log("upcommi");
   React.useEffect(() => {
     // console.log(searchParams.get("tab"));
     if (searchParams.get("tab") === "active_visits") {
