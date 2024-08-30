@@ -162,20 +162,9 @@ const CustomDutyEvents = ({ event }) => {
   });
   // console.log(event);
 
-  const [isDifferentDate, setIsDifferentDate] = useState(true);
-  const previousDate = useRef(null);
-  useEffect(() => {
-    if (previousDate.current !== event.duty_date) {
-      previousDate.current = event.duty_date;
-      setIsDifferentDate(true);
-    } else {
-      setIsDifferentDate(false);
-    }
-  }, [event.duty_date]);
+  // const [isDifferentDate, setIsDifferentDate] = useState(true);
+  // const previousDate = useRef(null);
 
-  //   // console.log(pDate.current);
-  // }, [isDifferentDate]);
-  const { state } = useLocation();
   // console.log(state);
   const handleButtonClick = () => {
     setShowEmployeeToDuty({
@@ -185,43 +174,6 @@ const CustomDutyEvents = ({ event }) => {
       // dutyAssigments: state.dutyAssignments,
     });
   };
-  // console.log(previousDate.current);
-  let ButtonComp;
-  // let ButtonComp;
-  // if (previousDate && previousDate.current !== event.duty_date) {
-  //   previousDate = event.duty_date;
-  //   ButtonComp = (
-  //     <button
-  //       style={{ zIndex: 2 }}
-  //       className={`border-0 bg-transparent ${
-  //         event.duty_date < new Date().toISOString().substring(0, 10)
-  //           ? "text-warning"
-  //           : "text-white"
-  //       }  p-0`}
-  //       disabled={event.duty_date < new Date().toISOString().substring(0, 10)}
-  //       onClick={() => handleButtonClick(event.employee)}
-  //     >
-  //       <FaPlus />
-  //     </button>
-  //   );
-  // }
-  // if (!previousDate) {
-  //   previousDate = event.duty_date;
-  //   ButtonComp = (
-  //     <button
-  //       style={{ zIndex: 2 }}
-  //       disabled={event.duty_date < new Date().toISOString().substring(0, 10)}
-  //       className={`border-0 bg-transparent ${
-  //         event.duty_date < new Date().toISOString().substring(0, 10)
-  //           ? "text-warning"
-  //           : "text-white"
-  //       }  p-0`}
-  //       onClick={() => handleButtonClick(event.employee)}
-  //     >
-  //       <FaPlus />
-  //     </button>
-  //   );
-  // }
 
   return (
     <>
