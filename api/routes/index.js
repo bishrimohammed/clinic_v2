@@ -38,6 +38,11 @@ const ApprovalRequestRoute = require("./ApprovalRequest.router.js");
 
 const TemporarySavedDataRoute = require("./TemporarySavedData.route.js");
 const ConditionsAndMedicationRoute = require("./ConditionsAndMedication.route.js");
+const PatientOverViewRoute = require("./PatientOverView.route.js");
+const NurseTreatmentRoute = require("./NurseTreatment.Route.js");
+const ExternalServiceRoute = require("./ExternalService.route.js");
+const ProcedureRoute = require("./Procedure.route.js");
+const ReportRoute = require("./Report.route.js");
 
 module.exports = {
   userRoute,
@@ -71,4 +76,9 @@ module.exports = {
   AllergyRoute,
   ConditionsAndMedicationRoute,
   ApprovalRequestRoute,
+  PatientOverViewRoute,
+  NurseTreatmentRoute,
+  ExternalServiceRoute,
+  ProcedureRoute,
+  ReportRoute,
 };

@@ -169,7 +169,7 @@ const UserController = {
   }),
   loginUser: asyncHandler(async (req, res) => {
     const { username, password } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     const user = await db.User.findOne({
       where: {
         username: username,

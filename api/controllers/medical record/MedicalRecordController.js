@@ -34,7 +34,51 @@ module.exports = MedicalRecordController = {
     res.json(medicalRecords);
   }),
   getMedicalRecordsOverview: asyncHandler(async (req, res) => {
-    const medicalRecords = await db.MedicalRecord.findAll({
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    let sortDirection;
+    // console.log(where);
+    switch (req.query?.sortBy) {
+      case "patient_name":
+        if (req.query?.order === "asc") {
+          sortDirection = [
+            ["patient", "firstName", "ASC"],
+            ["patient", "lastName", "ASC"],
+            ["patient", "middleName", "ASC"],
+          ];
+        } else {
+          sortDirection = [
+            ["patient", "firstName", "DESC"],
+            ["patient", "lastName", "DESC"],
+            ["patient", "middleName", "DESC"],
+          ];
+        }
+        break;
+      case "visit_date":
+        if (req.query?.order === "asc") {
+          sortDirection = [["visit", "assignment_date", "ASC"]];
+        } else {
+          sortDirection = [["visit", "assignment_date", "DESC"]];
+        }
+        break;
+      case "patientId":
+        if (req.query?.order === "asc") {
+          sortDirection = [["patient", "card_number", "ASC"]];
+        } else {
+          sortDirection = [["patient", "card_number", "DESC"]];
+        }
+        break;
+      // case "registation_date":
+      //   if (req.query?.order === "asc") {
+      //     sortDirection = [["createdAt", "ASC"]];
+      //   } else {
+      //     sortDirection = [["createdAt", "DESC"]];
+      //   }
+      //   break;
+      default:
+        sortDirection = [["createdAt", "DESC"]];
+    }
+    const { count, rows } = await db.MedicalRecord.findAndCountAll({
       where: { status: true },
       include: [
         {
@@ -45,15 +89,32 @@ module.exports = MedicalRecordController = {
             "firstName",
             "middleName",
             "lastName",
-            "birth_date",
+            // "birth_date",
             "gender",
             "card_number",
             "phone",
           ],
         },
+        {
+          model: db.PatientAssignment,
+          as: "visit",
+          attributes: ["assignment_date"],
+        },
       ],
+      order: sortDirection,
+      offset: (page - 1) * limit,
+      limit: limit,
     });
-    res.json(medicalRecords);
+    console.log(req.query);
+    const hasMore = count > page * limit;
+    // console.log(patients);
+    res.status(200).json({
+      visits: rows,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit),
+      totalItems: count,
+      hasMore: hasMore,
+    });
   }),
   getMedicalRecordsOverviewDetail: asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -311,8 +372,10 @@ module.exports = MedicalRecordController = {
             patient_id: medicalRecord.patient_id,
             doctor_id: req.user.id,
             date: Date.now(),
-            start_date: sicknote.start_date,
-            end_date: sicknote.end_date,
+            sick_leave_day: sicknote.sick_leave_day,
+
+            // start_date: sicknote.start_date,
+            // end_date: sicknote.end_date,
             date_of_examination: medicalRecord.createdAt,
           });
 
@@ -361,20 +424,6 @@ module.exports = MedicalRecordController = {
       // );
     }
     if (RefferalNote) {
-      // const ExistingRefferalNote = await db.ReferralNote.findOne({
-      //   where: {
-      //     medical_record_id: medicalRecord.id,
-      //   },
-      // });
-      // let ReferralId;
-      // if (ExistingRefferalNote) {
-      // ExistingRefferalNote.reason_for_referral = RefferalNote.reason;
-      // ExistingRefferalNote.referral_to = RefferalNote.hostipal_name;
-      // ExistingRefferalNote.department = RefferalNote.department_name;
-      // ExistingRefferalNote.clinical_finding = RefferalNote.clinical_finding;
-      // await ExistingRefferalNote.save();
-      // ReferralId = ExistingRefferalNote.id;
-      // }
       await Promise.all(
         RefferalNote.map((referralNotes) => {
           return db.ReferralNote.create({
@@ -389,16 +438,6 @@ module.exports = MedicalRecordController = {
           });
         })
       );
-      // const referralNote = await db.ReferralNote.create({
-      //   medical_record_id: medicalRecord.id,
-      //   patient_id: medicalRecord.patient_id,
-      //   doctor_id: req.user.id,
-      //   referral_date: Date.now(),
-      //   reason_for_referral: RefferalNote.reason,
-      //   referral_to: RefferalNote.hostipal_name,
-      //   department: RefferalNote.department_name,
-      //   clinical_finding: RefferalNote.clinical_finding,
-      // });
     }
     res.json({ message: "Plan added successfully" });
   }),
@@ -734,10 +773,12 @@ module.exports = MedicalRecordController = {
 
     const diagnosis = await db.Diagnosis.findAll({
       where: {
-        medical_record_id: id,
+        medical_record_id: parseInt(id),
         doctor_id: req.user.id,
       },
     });
+    console.log("\n\n" + id + "\n\n");
+    console.log("\n\n" + diagnosis.length + "\n\n");
     res.status(200).json(diagnosis);
   }),
   add_Diagnosis: asyncHandler(async (req, res) => {
@@ -1285,7 +1326,7 @@ module.exports = MedicalRecordController = {
   // @desc add prescriptions
   addPrescription: asyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log(req.body);
+    // console.log(req.body);
     // return;
     const prescription = req.body;
     const medicalRecord = await getMedicalRecordById(id);
@@ -1297,7 +1338,7 @@ module.exports = MedicalRecordController = {
     }
     let prescriptionID;
     if (!prescriptionExist) {
-      console.log("\nPrescription\n");
+      // console.log("\nPrescription\n");
       const prescription = await db.Prescription.create(
         {
           medical_record_id: id,
@@ -1328,6 +1369,8 @@ module.exports = MedicalRecordController = {
             // notes: prescription.notes,
             is_internal: true,
             start_date: prescription.start_date,
+            route: prescription.route,
+            when: prescription.when,
           },
           { userId: req.user.id }
         );
@@ -1432,7 +1475,7 @@ module.exports = MedicalRecordController = {
   }),
   add_External_MedicalRecord_Prescription: asyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log(req.body);
+    // console.log(req.body);
     const medicalRecord = await getMedicalRecordById(id);
     const prescriptionExist = await getMedicalRecordPrescription(id);
     // console.log(prescriptionExist);
@@ -1452,7 +1495,7 @@ module.exports = MedicalRecordController = {
       );
       prescriptionID = prescription.id;
     } else {
-      console.log("\n\nheloo\n\n");
+      // console.log("\n\nheloo\n\n");
       prescriptionID = prescriptionExist.id;
     }
 
@@ -1470,6 +1513,8 @@ module.exports = MedicalRecordController = {
             // notes: prescription.notes,
             is_internal: false,
             start_date: prescription.start_date,
+            route: prescription.route,
+            when: prescription.when,
           },
           { userId: req.user.id }
         );
@@ -1603,5 +1648,79 @@ module.exports = MedicalRecordController = {
 
     await medicalRecordDetail?.destroy({ userId: req.user.id });
     res.status(200).json({ msg: "Medical record cancelled successfully" });
+  }),
+  finishConsultation: asyncHandler(async (req, res) => {
+    const { medicalRecordId } = req.params;
+    const medicalRecord = await getMedicalRecordById(medicalRecordId);
+    if (!medicalRecord) {
+      res.status(404);
+      throw new Error("Medical record not found");
+    }
+    // console.log(medicalRecord);
+    const medicalBilling = await db.MedicalBilling.findOne({
+      where: {
+        medical_record_id: medicalRecord.id,
+      },
+    });
+    const unpaidPayments = await db.Payment.findOne({
+      where: {
+        medical_billing_id: medicalBilling.id,
+        status: "Unpaid",
+      },
+    });
+    if (unpaidPayments) {
+      res.status(400);
+      throw new Error("This History has unpaid billing");
+    }
+    const labInvestigation = await db.InvestigationOrder.findOne({
+      where: { medicalRecord_id: medicalRecord.id },
+    });
+    // console.log(labInvestigation);
+    const uncompletedLabTest = await db.OrderedTest.findOne({
+      where: {
+        result: "",
+        investigationOrder_id: labInvestigation?.id,
+        reported_by: null,
+      },
+    });
+    // console.log(uncompletedLabTest);
+    if (uncompletedLabTest) {
+      res.status(400);
+      throw new Error(
+        "This Medical Record has  has uncompleted lab investigation tests"
+      );
+    }
+    // res.status(200).json({ msg: "Completed" });
+    await db.PatientAssignment.update(
+      {
+        discharge_summary: req.body.discharge_summary,
+        discharged_date: Date.now(),
+        discharged_by: req.user.id,
+        stage: "Done",
+        status: false,
+      },
+      {
+        where: {
+          medicalRecord_id: medicalRecord.id,
+        },
+        userId: req.user.id,
+      }
+    );
+
+    medicalRecord.status = false;
+    // medicalRecord.sta
+    await medicalRecord.save({ userId: req.user.id });
+    medicalBilling.status = false;
+    await medicalBilling.save({ userId: req.user.id });
+    await db.Patient.update(
+      { patient_type: "outpatient" },
+      {
+        where: {
+          id: medicalRecord.patient_id,
+        },
+        userId: req.user.id,
+      }
+    );
+    res.status(200).json({ msg: "Consultation finished successfully" });
   }),
 };

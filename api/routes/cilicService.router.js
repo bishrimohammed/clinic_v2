@@ -23,6 +23,7 @@ router.get(
   clinicServiceController.getImagingServiceCategories
 );
 router.get("/get_lab_service", clinicServiceController.getLaboratoryService);
+router.get("/procedures", clinicServiceController.getProcedures);
 router.get("/:id", clinicServiceController.getClinicServiceById);
 
 router.post("/", clinicServiceController.createClinicService);

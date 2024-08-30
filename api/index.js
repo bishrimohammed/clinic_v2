@@ -5,34 +5,6 @@ require("dotenv").config();
 // const { Sequelize } = require("sequelize");
 const cors = require("cors");
 const sequelize = require("./config/database.js");
-// const db = require("./models");
-// const userRoute = require("./routes/user.router.js");
-// const woredaRoute = require("./routes/address/woreda.router.js");
-// const RegionRoute = require("./routes/address/region.router.js");
-// const CityRoute = require("./routes/address/city.router.js");
-// const SubCityRoute = require("./routes/address/subCity.router.js");
-
-// const patientRoute = require("./routes/patient.router.js");
-// const AppointmentRoute = require("./routes/Appointment.router.js");
-// const visitTypeRoute = require("./routes/visitType.router.js");
-// const assignPatientRoute = require("./routes/PatientAssignment.router.js");
-// const medicalRecordRoute = require("./routes/MedicalRecord.router.js");
-// const serviceRoute = require("./routes/cilicService.router.js");
-// const unitsRoute = require("./routes/unit.router.js");
-// const clinicprofileRoute = require("./routes/ClinicProfile.router.js");
-// const fieldRoute = require("./routes/FieldConfig.router.js");
-// // employye route
-// const employeeRoute = require("./routes/employee.router.js");
-// // role and permission
-// const roleRoute = require("./routes/Role.router.js");
-// const permissionsRoute = require("./routes/permission.router.js");
-
-// const creditCompanyRoute = require("./routes/CreditCompany.router.js");
-// const dutyRoute = require("./routes/Duty.router.js");
-
-// const patientVisitRoute = require("./routes/patientVisit.router.js");
-
-// const BillingRoute = require("./routes/Billing.route.js");
 const { notFound, errorHandler } = require("./middleware/errorMiddleWare.js");
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -69,6 +41,12 @@ const {
   AllergyRoute,
   ConditionsAndMedicationRoute,
   ApprovalRequestRoute,
+  PatientOverViewRoute,
+  NurseTreatmentRoute,
+  ExternalServiceRoute,
+  ProcedureRoute,
+  ReportRoute,
+  // ExternalServiceRoute,
 } = require("./routes/index.js");
 const db = require("./models/index.js");
 const { Sequelize } = require("sequelize");
@@ -138,6 +116,11 @@ app.use("/api/v1/investigation", InvestigationRoute);
 app.use("/api/v1/approval-settings", ApprovalSettingRoute);
 app.use("/api/v1/approvalrequests", ApprovalRequestRoute);
 app.use("/api/v1/temporarydata", TemporarySavedDataRoute);
+app.use("/api/v1/patientoverview", PatientOverViewRoute);
+app.use("/api/v1/nursetreatments", NurseTreatmentRoute);
+app.use("/api/v1/externalservices", ExternalServiceRoute);
+app.use("/api/v1/procedures", ProcedureRoute);
+app.use("/api/v1/reports", ReportRoute);
 
 app.use("/models", async (req, res) => {
   // log

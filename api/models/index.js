@@ -20,6 +20,7 @@ const {
   paymentAssociation,
   prescriptionAssociation,
   ApprovalSettingAssocoation,
+  externalServiceAssociation,
 } = require("./associations/index.js");
 // const { medicalRecordDetailAssocations } = require("./associations/medicalRecordDetailAssocations.js");
 
@@ -28,6 +29,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   port: 3306,
   dialect: dbConfig.dialect,
+  logging: false,
   // operatorsAliases: false,
 
   // pool: {
@@ -55,7 +57,7 @@ db.sequelize = sequelize;
 db.ClinicProfile = require("./CliinicProfile.js")(sequelize, DataTypes);
 db.Schedule = require("./Schedule.js")(sequelize, DataTypes);
 // clinic services
-
+// Appro
 db.ClinicService = require("./clinicService.js")(sequelize, DataTypes);
 db.ServiceCategory = require("./serviceCategory.js")(sequelize, DataTypes);
 db.ServiceItem = require("./serviceItem.js")(sequelize, DataTypes);
@@ -96,6 +98,10 @@ db.Appointment = require("./Appointment.js")(sequelize, DataTypes);
 db.PatientAssignment = require("./PatientAssignment.js")(sequelize, DataTypes);
 db.VisitType = require("./visitType.js")(sequelize, DataTypes);
 db.MedicalRecord = require("./MedicalRecord.js")(sequelize, DataTypes);
+db.MedicalRecordDocument = require("./medicalRecords/MedicalRecordDocument.js")(
+  sequelize,
+  DataTypes
+);
 db.Diagnosis = require("./medicalRecords/Diagnosis.js")(sequelize, DataTypes);
 db.SickLeaveNote = require("./medicalRecords/SickLeaveNote.js")(
   sequelize,
@@ -175,6 +181,10 @@ db.DutyAssignment = require("./DutyAssignment.js")(sequelize, DataTypes);
 // billing
 
 db.MedicalBilling = require("./MedicalBilling.js")(sequelize, DataTypes);
+db.ReturnPrepaidMedicalBilling = require("./ReturnPrepaidMedicalBilling.js")(
+  sequelize,
+  DataTypes
+);
 db.Payment = require("./Payment.js")(sequelize, DataTypes);
 db.AdvancedPayment = require("./AdvancedPayment.js")(sequelize, DataTypes);
 
@@ -191,6 +201,8 @@ db.ApprovalSettingApprover = require("./ApprovalSettingApprovers.js")(
   DataTypes
 );
 db.ApprovalRequest = require("./ApprovalRequest.js")(sequelize, DataTypes);
+db.ApprovalRequestApproverAction =
+  require("./ApprovalRequestApproverAction.js")(sequelize, DataTypes);
 // temporary tables
 db.Temporary_ProgressNote =
   require("./temporaryTables/Temporary_ProgressNote.js")(sequelize, DataTypes);
@@ -318,6 +330,15 @@ db.MedicalBillingAudit = require("./audit/MedicalBillingsAudit.js")(
   DataTypes
 );
 db.PaymentAudit = require("./audit/PaymentsAudit.js")(sequelize, DataTypes);
+
+//ExternalService
+db.ExternalService = require("./ExternalService.js")(sequelize, DataTypes);
+db.ExternalServiceAudit = require("./audit/ExternalServiceAudit.js")(
+  sequelize,
+  DataTypes
+);
+db.Procedure = require("./medicalRecords/Procedure.js")(sequelize, DataTypes);
+
 db.sequelize.sync({ force: false, alter: false }).then(() => {
   console.log("yes re-sync done!");
 });
@@ -335,6 +356,7 @@ patientAssocation(db);
 paymentAssociation(db);
 prescriptionAssociation(db);
 ApprovalSettingAssocoation(db);
+externalServiceAssociation(db);
 
 db.ClinicProfile.belongsTo(db.Address, {
   foreignKey: "address_id",

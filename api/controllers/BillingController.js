@@ -15,15 +15,19 @@ module.exports = BillingController = {
     if (req.query.visit_type) {
       where.visit_type = req.query.visit_type;
     }
-    console.log(where);
-    console.log("\n\n bljhbjh\n\n");
-    console.log(req.query);
+    // console.log(where);
+    // console.log("\n\n bljhbjh\n\n");
+    // console.log(req.query);
     const billings = await db.MedicalBilling.findAll({
+      where: {
+        ...where,
+        status: true,
+      },
       include: [
         {
           model: db.Payment,
           as: "payments",
-          where: { status: "Unpaid" },
+          // where: { status: "Unpaid" },
           include: [
             { model: db.ServiceItem, as: "item" },
             {
@@ -57,6 +61,9 @@ module.exports = BillingController = {
         {
           model: db.MedicalRecord,
           as: "medicalRecord",
+          // where: {
+          //   status: true,
+          // },
           // include: [
           //   {
           //     model: db.PatientAssignment,
@@ -93,6 +100,55 @@ module.exports = BillingController = {
       ],
     });
     res.json(billings);
+  }),
+  getExternalServiceOutStandingPayments: asyncHandler(async (req, res) => {
+    const medicalBillings = await db.MedicalBilling.findAll({
+      where: {
+        status: true,
+        is_internal_service: false,
+      },
+      include: [
+        // {
+        //   model: db.Payment,
+        //   as: "payments",
+        //   where: { status: "Unpaid" },
+        //   include: [
+        //     { model: db.ServiceItem, as: "item" },
+        //     {
+        //       model: db.User,
+        //       as: "cashier",
+        //       include: {
+        //         model: db.Employee,
+        //         as: "employee",
+        //         attributes: ["id", "firstName", "middleName", "lastName"],
+        //       },
+        //       attributes: ["id"],
+        //     },
+        //   ],
+        // },
+        {
+          model: db.ExternalService,
+          as: "externalService",
+        },
+      ],
+    });
+    res.json(medicalBillings);
+  }),
+  getMedicalBillingById: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const billing = await db.MedicalBilling.findByPk(id, {
+      include: [
+        {
+          model: db.AdvancedPayment,
+          as: "advancedPayments",
+          where: {
+            status: "Open",
+          },
+          limit: 1,
+        },
+      ],
+    });
+    res.json(billing);
   }),
   getBillingDetialByPatientId: asyncHandler(async (req, res) => {
     const { patientId } = req.params;
@@ -203,7 +259,7 @@ module.exports = BillingController = {
     await newAdvancedPayment.save({ hooks: false });
     billing.has_advanced_payment = true;
     billing.is_advanced_payment_amount_completed = false;
-    await billing.save();
+    await billing.save({ userId: req.user.id });
     await db.PatientAssignment.update(
       { stage: "Admitted" },
       {
@@ -277,6 +333,66 @@ module.exports = BillingController = {
     // });
     res.json(Payment);
   }),
+  settleAllPayments: asyncHandler(async (req, res) => {
+    const { medicalBillingId } = req.params;
+    const { paymentIds } = req.body;
+    console.log(req.body);
+    // res.status(400).json({ m: "sdkfnksjd" });
+    // return;
+    const medicalBilling = await db.MedicalBilling.findByPk(medicalBillingId);
+    if (!medicalBilling) {
+      res.status(400);
+      throw new Error("Medical billing not found");
+    }
+    const openAdvancedPayment = await db.AdvancedPayment.findOne({
+      where: {
+        medical_billing_id: medicalBilling.id,
+        status: "Open",
+      },
+    });
+    // {
+
+    //   cashier_id: req.user.id,
+    //   payment_date: new Date(),
+    //   status: "Paid",
+    // },
+    const payments = await db.Payment.findAll({
+      where: {
+        // medical_billing_id: medicalBilling.id,
+        id: paymentIds,
+        status: "Unpaid",
+      },
+      include: [
+        {
+          model: db.ServiceItem,
+          as: "item",
+        },
+      ],
+    });
+    const totalPrice = payments?.reduce(
+      (sum, payment) => sum + payment.item.price,
+      0
+    );
+    if (openAdvancedPayment.remaining_amount > totalPrice) {
+      for (const payment of payments) {
+        payment.status = "Paid";
+        payment.cashier_id = req.user.id;
+        payment.payment_date = Date.now();
+        await payment.save({ userId: req.user.id });
+      }
+      openAdvancedPayment.remaining_amount -= totalPrice;
+      await openAdvancedPayment.save({ userId: req.user.id });
+    } else {
+      medicalBilling.is_advanced_payment_amount_completed = true;
+      await medicalBilling.save({ userId: req.user.id });
+      res.status(400);
+      throw new Error("Insufficient funds for settlement");
+    }
+
+    medicalBilling.status = true;
+    await medicalBilling.save({ userId: req.user.id });
+    res.status(200).json({ message: "All payments settled" });
+  }),
   voidPayment: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const payment = await db.Payment.findByPk(id);
@@ -287,5 +403,37 @@ module.exports = BillingController = {
     payment.status = "Void";
     await payment.save({ userId: req.user.id });
     res.status(200).json({ message: "Payment voided" });
+  }),
+  returnRemainingAmountToPatient: asyncHandler(async (req, res) => {
+    const { medicalBillingId } = req.params;
+    const medicalBilling = await db.MedicalBilling.findByPk(medicalBillingId);
+    const advancedPayment = await db.AdvancedPayment.findOne({
+      where: {
+        medical_billing_id: medicalBillingId,
+        status: "Open",
+      },
+    });
+    if (!advancedPayment) {
+      res.status(400);
+      throw new Error("No open advanced payment found");
+    }
+    if (advancedPayment.remaining_amount > 0) {
+      await db.ReturnPrepaidMedicalBilling.create({
+        medical_billing_id: medicalBillingId,
+        amount_returned: advancedPayment?.remaining_amount,
+        returned_by: req.user.id,
+        return_date: Date.now(),
+        // return_reason: req.body.returnReason,
+      });
+    }
+
+    advancedPayment.status = "Closed";
+    await advancedPayment.save({ userId: req.user.id });
+    medicalBilling.is_advanced_payment_amount_completed = true;
+    medicalBilling.status = false;
+    await medicalBilling.save({ userId: req.user.id });
+    res
+      .status(200)
+      .json({ message: " Prepaid returned to patient successfully " });
   }),
 };

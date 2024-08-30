@@ -55,7 +55,7 @@ module.exports = ApprovalRequestController = {
     ) {
       hasNextApprover = false;
     } else if (
-      approvalSetting.approval_level < approvalRequest.current_approval_level
+      approvalSetting.approval_level > approvalRequest.current_approval_level
     ) {
       hasNextApprover = true;
       nextApprover = await db.ApprovalSettingApprover.findOne({
@@ -65,7 +65,7 @@ module.exports = ApprovalRequestController = {
         },
       });
     }
-    const resData = await processApproval(
+    const approvalProcessResult = await processApproval(
       approvalRequest.audit_tableName,
       approvalRequest.audit_targetId,
       hasNextApprover,
@@ -73,6 +73,8 @@ module.exports = ApprovalRequestController = {
       req.user,
       approvalRequest
     );
+    console.log(approvalProcessResult);
+    res.json(approvalProcessResult);
   }),
   rejectRequest: asyncHandler(async (req, res) => {}),
   getModelName: asyncHandler(async (req, res) => {}),

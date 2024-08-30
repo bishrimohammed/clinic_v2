@@ -26,6 +26,11 @@ module.exports = (sequelize, DataTypes) => {
       progressNote_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        references: {
+          model: "progress_notes",
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
       // value: {
       //   type: DataTypes.STRING,

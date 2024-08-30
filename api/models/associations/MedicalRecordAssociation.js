@@ -1,4 +1,4 @@
-const db = require("..");
+// const db = require("..");
 
 module.exports.MedicalRecordAssociation = (db) => {
   // medical record and patient as`
@@ -6,6 +6,14 @@ module.exports.MedicalRecordAssociation = (db) => {
     foreignKey: "patient_id",
     as: "patient",
   });
+  db.MedicalRecord.hasMany(db.MedicalRecordDocument, {
+    foreignKey: "medical_record_id",
+    as: "documents",
+  });
+  // db.MedicalRecord.hasOne(db.Prescription, {
+  //   foreignKey: "medical_record_id",
+  //   as: "prescriptions",
+  // });
   // medical record and doctor patient Assignments
   db.MedicalRecord.hasOne(db.PatientAssignment, {
     foreignKey: "medicalRecord_id",
@@ -44,6 +52,10 @@ module.exports.MedicalRecordAssociation = (db) => {
     as: "referralNote",
   });
 
+  db.PatientAssignment.belongsTo(db.User, {
+    foreignKey: "discharged_by",
+    as: "dischargedBy",
+  });
   // db.MedicalRecord.hasMany(db.Vital, {
   //   foreignKey: "medicalRecord_id",
   //   as: "vitals",
@@ -129,6 +141,10 @@ module.exports.MedicalRecordAssociation = (db) => {
   db.ReferralNote.belongsTo(db.Patient, {
     foreignKey: "patient_id",
     as: "patient",
+  });
+  db.MedicalRecordDocument.belongsTo(db.User, {
+    foreignKey: "created_by",
+    as: "createdBy",
   });
   // db.RefferalNote.hasMany(db.Diagnosis, {
   //   foreignKey: "refferal_note_id",

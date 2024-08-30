@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../models");
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 
 module.exports.clinicServiceController = {
   getClinicServices: asyncHandler(async (req, res) => {
@@ -29,7 +29,7 @@ module.exports.clinicServiceController = {
   }),
   getServiceGroup: asyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log(req.query);
+    // console.log(req.query);
     // console.log(id);
     const clinicService = await db.ClinicService.findByPk(id);
     if (!clinicService) {
@@ -52,7 +52,7 @@ module.exports.clinicServiceController = {
   }),
   addServiceGroup: asyncHandler(async (req, res) => {
     const { name, clinicService_id } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     // return;
     const serviceGroup = await db.ServiceCategory.create({
       name,
@@ -121,7 +121,7 @@ module.exports.clinicServiceController = {
         where.price = {
           [Op.gte]: 500,
         };
-        console.log("llllllmlkmnkj");
+        // console.log("llllllmlkmnkj");
         // return;
       } else {
         let minPrice = parseInt(req.query.price.split("-")[0]);
@@ -147,7 +147,7 @@ module.exports.clinicServiceController = {
     // if (req.query.gender) {
     //   where.gender = req.query.gender;
     // }
-    console.log(req.query);
+    // console.log(req.query);
     const clinicService = await db.ClinicService.findByPk(id);
     if (!clinicService) {
       res.status(404);
@@ -649,5 +649,25 @@ module.exports.clinicServiceController = {
       ],
     });
     res.json(labcategories);
+  }),
+  getProcedures: asyncHandler(async (req, res) => {
+    const service = await db.ClinicService.findOne({
+      where: {
+        service_name: "procedure",
+      },
+      include: [
+        {
+          model: db.ServiceCategory,
+          as: "serviceCategory",
+        },
+      ],
+    });
+    console.log("\n\n" + service + "\n\n");
+    const serviceItems = await db.ServiceItem.findAll({
+      where: {
+        serviceCategory_id: service.serviceCategory[0].id,
+      },
+    });
+    res.json(serviceItems);
   }),
 };

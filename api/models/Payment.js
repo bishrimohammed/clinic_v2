@@ -1,5 +1,3 @@
-// const { sequelize } = require(".");
-
 module.exports = (sequelize, DataTypes) => {
   const Payment = sequelize.define(
     "payment",

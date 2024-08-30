@@ -1,4 +1,3 @@
-const { sequelize } = require(".");
 module.exports = (sequelize, DataTypes) => {
   const MedicalBilling = sequelize.define(
     "medicalbilling",
@@ -11,25 +10,43 @@ module.exports = (sequelize, DataTypes) => {
       },
       patient_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
+        references: {
+          model: "patients",
+          key: "id",
+        },
+        onDelete: "SET NULL",
       },
       visit_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: "patientassignments",
           key: "id",
         },
-        onDelete: "CASCADE",
+        onDelete: "SET NULL",
       },
       medical_record_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: "medicalrecords",
           key: "id",
         },
         onDelete: "CASCADE",
+      },
+      externalService_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "external_services",
+          key: "id",
+        },
+        onDelete: "SET NULL",
+      },
+      is_internal_service: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
       },
       date: {
         type: DataTypes.DATE,
@@ -43,26 +60,29 @@ module.exports = (sequelize, DataTypes) => {
       is_advanced_payment_amount_completed: {
         type: DataTypes.BOOLEAN,
         allowNull: true,
+        default: false,
       },
       status: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: false,
+        defaultValue: true,
       },
     },
     {
       hooks: {
-        afterCreate: async (biiling, options) => {
+        afterCreate: async (billings, options) => {
           await sequelize.models.medical_billings_audit.create({
-            medicalBilling_id: biiling.id,
-            patient_id: biiling.patient_id,
-            visit_id: biiling.visit_id,
-            medical_record_id: biiling.medical_record_id,
-            date: biiling.date,
-            has_advanced_payment: biiling.has_advanced_payment,
+            medicalBilling_id: billings.id,
+            patient_id: billings.patient_id,
+            visit_id: billings.visit_id,
+            medical_record_id: billings.medical_record_id,
+            externalService_id: billings.externalService_id,
+            is_internal_service: billings.is_internal_service,
+            date: billings.date,
+            has_advanced_payment: billings.has_advanced_payment,
             is_advanced_payment_amount_completed:
-              biiling.is_advanced_payment_amount_completed,
-            status: biiling.status,
+              billings.is_advanced_payment_amount_completed,
+            status: billings.status,
             operation_type: "I",
             changed_by: options.userId,
             changed_at: Date.now(),
@@ -75,6 +95,8 @@ module.exports = (sequelize, DataTypes) => {
             patient_id: previousValue.patient_id,
             visit_id: previousValue.visit_id,
             medical_record_id: previousValue.medical_record_id,
+            externalService_id: previousValue.externalService_id,
+            is_internal_service: previousValue.is_internal_service,
             date: previousValue.date,
             has_advanced_payment: previousValue.has_advanced_payment,
             is_advanced_payment_amount_completed:
@@ -87,15 +109,17 @@ module.exports = (sequelize, DataTypes) => {
         },
         beforeDestroy: async (billings, options) => {
           await sequelize.models.medical_billings_audit.create({
-            medicalBilling_id: biiling.id,
-            patient_id: biiling.patient_id,
-            visit_id: biiling.visit_id,
-            medical_record_id: biiling.medical_record_id,
-            date: biiling.date,
-            has_advanced_payment: biiling.has_advanced_payment,
+            medicalBilling_id: billings.id,
+            patient_id: billings.patient_id,
+            visit_id: billings.visit_id,
+            medical_record_id: billings.medical_record_id,
+            externalService_id: billings.externalService_id,
+            is_internal_service: billings.is_internal_service,
+            date: billings.date,
+            has_advanced_payment: billings.has_advanced_payment,
             is_advanced_payment_amount_completed:
-              biiling.is_advanced_payment_amount_completed,
-            status: biiling.status,
+              billings.is_advanced_payment_amount_completed,
+            status: billings.status,
             operation_type: "I",
             changed_by: options.userId,
             changed_at: Date.now(),

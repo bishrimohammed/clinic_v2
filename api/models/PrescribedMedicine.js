@@ -55,6 +55,27 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      route: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      when: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      is_excuted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
+      excuted_by: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      excutedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       hooks: {
@@ -71,6 +92,11 @@ module.exports = (sequelize, DataTypes) => {
             duration: prescribedMedicine.duration,
             drug_name: prescribedMedicine.drug_name,
             start_date: prescribedMedicine.start_date,
+            route: prescribedMedicine.route,
+            when: prescribedMedicine.when,
+            is_excuted: prescribedMedicine.is_excuted,
+            excutedBy: prescribedMedicine.excuted_by,
+            excutedAt: prescribedMedicine.excutedAt,
             operation_type: "I",
             changed_by: options.userId,
             changed_at: Date.now(),
@@ -90,6 +116,11 @@ module.exports = (sequelize, DataTypes) => {
             duration: previousValue.duration,
             drug_name: previousValue.drug_name,
             start_date: previousValue.start_date,
+            route: previousValue.route,
+            when: previousValue.when,
+            is_excuted: previousValue.is_excuted,
+            excutedBy: previousValue.excuted_by,
+            excutedAt: previousValue.excutedAt,
             operation_type: "U",
             changed_by: options.userId,
             changed_at: Date.now(),

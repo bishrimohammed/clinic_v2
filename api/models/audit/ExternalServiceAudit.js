@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-  const InvestigationOrderAudit = sequelize.define(
-    "investigation_orders_audit",
+  const ExternalServiceAudit = sequelize.define(
+    "external_service_audit",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -8,36 +8,37 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         allowNull: false,
       },
-      investigationOrder_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: "investigationorders",
-          key: "id",
-        },
-        onDelete: "CASCADE",
-      },
-      medicalRecord_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
       externalService_id: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      patient_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      examiner: {
+        type: DataTypes.INTEGER,
         allowNull: true,
-        references: {
-          model: "external_services",
-          key: "id",
-        },
-        onDelete: "CASCADE",
       },
-      is_internal_service: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
+      service_type: {
+        type: DataTypes.ENUM,
+        values: ["procedure", "lab"],
+        allowNull: false,
       },
-      // clinical_finding: DataTypes.STRING,
+      reason: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      service_time: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      orderd_by: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       status: {
         type: DataTypes.BOOLEAN,
-        allowNull: true,
         defaultValue: true,
       },
       operation_type: {
@@ -72,9 +73,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       timestamps: false,
-      freezeTableName: true,
     }
   );
-  InvestigationOrderAudit.sync({ alter: false });
-  return InvestigationOrderAudit;
+  ExternalServiceAudit.sync({ alter: false, force: false });
+  return ExternalServiceAudit;
 };

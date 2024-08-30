@@ -16,7 +16,7 @@ router.get(
   PatientVisitController.getPreviousPatientVisitByDoctorId
 );
 
-// router.get("/:id", PatientVisitController.getPatientVisit);
+router.get("/:id", PatientVisitController.getPatientVisitById);
 
 router.post("/", protect, PatientVisitController.createPatientVisit);
 

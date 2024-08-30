@@ -20,11 +20,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     start_date: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
     },
     end_date: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
     },
     doctor_id: {
       type: DataTypes.INTEGER,
@@ -33,6 +33,10 @@ module.exports = (sequelize, DataTypes) => {
     date_of_examination: {
       type: DataTypes.DATEONLY,
       allowNull: false,
+    },
+    sick_leave_day: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
   });
   SickLeaveNote.sync({ alter: false, force: false });

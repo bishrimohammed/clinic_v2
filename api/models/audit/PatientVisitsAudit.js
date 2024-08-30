@@ -100,12 +100,27 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: false,
       },
+      admission_date: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
       status: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
       },
-
+      discharge_summary: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      discharged_by: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      discharged_date: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
       operation_type: {
         type: DataTypes.ENUM,
         values: ["I", "U", "D"],

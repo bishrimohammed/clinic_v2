@@ -5,7 +5,11 @@ const { protect } = require("../middleware/authMiddleWare");
 const router = express.Router();
 
 router.get("/outstanding", BillingController.getOutStandingBillings);
-
+router.get(
+  "/externalservice/outstanding",
+  BillingController.getExternalServiceOutStandingPayments
+);
+router.get("/:id", BillingController.getMedicalBillingById);
 router.get("/:id/payments", BillingController.getBillPaymentsByBillId);
 router.get(
   "/:patientId/patient-payments",
@@ -20,5 +24,14 @@ router.post(
 );
 
 router.patch("/:id/void", protect, BillingController.voidPayment);
-
+router.patch(
+  "/:medicalBillingId/settlepayments",
+  protect,
+  BillingController.settleAllPayments
+);
+router.patch(
+  "/:medicalBillingId/return-remaining-amount",
+  protect,
+  BillingController.returnRemainingAmountToPatient
+);
 module.exports = router;

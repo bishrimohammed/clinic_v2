@@ -23,10 +23,11 @@ module.exports = (sequelize, DataTypes) => {
       serviceItem_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        //   references: {
-        //     model: db.ServiceItem,
-        //     key: "id",
-        //   },
+        // references: {
+        //   model: "serviceitems",
+        //   key: "id",
+        // },
+        // onDelete: "SET NULL",
       },
       order_time: {
         type: DataTypes.DATE,

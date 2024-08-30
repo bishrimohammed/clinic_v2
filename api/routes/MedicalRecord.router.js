@@ -122,6 +122,11 @@ router.patch(
   protect,
   MedicalRecordController.Ruled_out_Diagnosis
 );
+router.patch(
+  "/:medicalRecordId/finish-consultation",
+  protect,
+  MedicalRecordController.finishConsultation
+);
 router.delete(
   "/:id/cancel-medical-record",
   protect,

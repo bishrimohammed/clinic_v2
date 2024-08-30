@@ -58,6 +58,27 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      route: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      when: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      is_excuted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: true,
+      },
+      excutedBy: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      excutedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
       operation_type: {
         type: DataTypes.ENUM,
         values: ["I", "U", "D"],
@@ -93,6 +114,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true,
     }
   );
-  PrescribedMedicinesAudit.sync({ alter: false });
+  PrescribedMedicinesAudit.sync({ alter: true });
   return PrescribedMedicinesAudit;
 };

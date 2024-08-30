@@ -4,8 +4,12 @@ const { Op, where } = require("sequelize");
 const { getPaddedName } = require("../utils/getPaddedName");
 module.exports = PatientController = {
   getAllPatients: expressAsyncHandler(async (req, res) => {
-    console.log(req.query);
+    // console.log(req.query);
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
     let where = {};
+
+    let sortDirection;
     if (req.query?.status !== "") {
       if (req.query.status === "true") {
         where.status = true;
@@ -32,7 +36,84 @@ module.exports = PatientController = {
     if (req.query?.gender) {
       where.gender = req.query?.gender;
     }
-    const patients = await db.Patient.findAll({
+    // sort
+    switch (req.query?.sortBy) {
+      case "name":
+        if (req.query?.order === "asc") {
+          sortDirection = [
+            ["firstName", "ASC"],
+            ["middleName", "ASC"],
+            ["lastName", "ASC"],
+          ];
+        } else {
+          sortDirection = [
+            ["lastName", "DESC"],
+            ["firstName", "DESC"],
+            ["middleName", "DESC"],
+          ];
+        }
+        break;
+      case "age":
+        if (req.query?.order === "asc") {
+          sortDirection = [["birth_date", "ASC"]];
+        } else {
+          sortDirection = [["birth_date", "DESC"]];
+        }
+        break;
+      case "sex":
+        if (req.query?.order === "asc") {
+          sortDirection = [["gender", "ASC"]];
+        } else {
+          sortDirection = [["gender", "DESC"]];
+        }
+        break;
+      case "registation_date":
+        if (req.query?.order === "asc") {
+          sortDirection = [["createdAt", "ASC"]];
+        } else {
+          sortDirection = [["createdAt", "DESC"]];
+        }
+        break;
+      default:
+        sortDirection = [
+          ["firstName", "ASC"],
+          ["middleName", "ASC"],
+          ["lastName", "ASC"],
+        ];
+    }
+    // if (req.query?.sortBy === "name") {
+    //   if (req.query?.order === "asc") {
+    //     order = [
+    //       ["firstName", "ASC"],
+    //       ["middleName", "ASC"],
+    //       ["lastName", "ASC"],
+    //     ];
+    //   } else {
+    //     order = [
+    //       ["lastName", "DESC"],
+    //       ["firstName", "DESC"],
+    //       ["middleName", "DESC"],
+    //     ];
+    //   }
+
+    //   // order = [[db.Patient, "lastName", "ASC"], [db.Patient, "firstName", "ASC"]];
+    // }
+    // console.log(where);
+    // console.log(order);
+    // console.log(req.query);
+    // const patients = await db.Patient.findAll({ where: where, order: order });
+    // const patients = await db.Patient.findAll({ where: where });
+    // const patients = await db.Patient.findAll({
+    //   where: where,
+    //   include: [
+    //     {
+    //       model: db.Address,
+    //       as: "address",
+    //       attributes: ["id", "phone_1"],
+    //     },
+    //   ],
+    //   attributes: ["id", "
+    const { count, rows } = await db.Patient.findAndCountAll({
       where: where,
       include: [
         {
@@ -54,14 +135,24 @@ module.exports = PatientController = {
         "createdAt",
         "card_number",
       ],
-      order: [
-        ["firstName", "ASC"],
-        ["middleName", "ASC"],
-        ["lastName", "ASC"],
-      ],
+      // order: [
+      //   ["firstName", "ASC"],
+      //   ["middleName", "ASC"],
+      //   ["lastName", "ASC"],
+      // ],
+      order: sortDirection,
+      offset: (page - 1) * limit,
+      limit: limit,
     });
+    const hasMore = count > page * limit;
     // console.log(patients);
-    res.status(200).json(patients);
+    res.status(200).json({
+      patients: rows,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit),
+      totalItems: count,
+      hasMore: hasMore,
+    });
   }),
   getPatients: expressAsyncHandler(async (req, res) => {}),
   getLastPatientId: expressAsyncHandler(async (req, res) => {

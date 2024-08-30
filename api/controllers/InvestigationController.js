@@ -1,10 +1,12 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../models");
+const { Op } = require("sequelize");
 module.exports = InvestigationController = {
   getPendingLabRequests: asyncHandler(async (req, res) => {
     const labs = await db.InvestigationOrder.findAll({
       where: {
         status: true,
+        is_internal_service: true,
       },
 
       include: [
@@ -43,8 +45,46 @@ module.exports = InvestigationController = {
     });
     res.json(labs);
   }),
+  getExternalLabRequests: asyncHandler(async (req, res) => {
+    const labs = await db.InvestigationOrder.findAll({
+      where: {
+        status: true,
+        is_internal_service: false,
+      },
+      include: [
+        // {
+        //   model: db.InvestigationOrder,
+        //   as: "investigation",
+        //   include: [
+        {
+          model: db.OrderedTest,
+          as: "orderedTests",
+          include: [
+            {
+              model: db.User,
+              as: "requestedBy",
+              include: {
+                model: db.Employee,
+                as: "employee",
+                attributes: ["id", "firstName", "middleName", "lastName"],
+              },
+            },
+          ],
+          // attributes: ["id", "name", "price"],
+        },
+        {
+          model: db.ExternalService,
+          as: "externalService",
+        },
+        //   ],
+        // },
+      ],
+    });
+    res.json(labs);
+  }),
   getInvestigationLabTests: asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const investigation = await db.InvestigationOrder.findByPk(id);
     const labtests = await db.OrderedTest.findAll({
       where: {
         investigationOrder_id: id,
@@ -58,28 +98,59 @@ module.exports = InvestigationController = {
               model: db.LabTestProfile,
               as: "labTestProfile",
 
-              where: {
-                isPanel: false,
-              },
-              //   include: [
-              //     {
-              //       model: db.PanelUnderpanel,
-              //       as: "underPanels",
-              //       //   include: [
-              //       //     {
-              //       //       model: db.ServiceItem,
-              //       //       as: "serviceItem",
-              //       //       attributes: ["id", "service_name", "serviceCategory_id"],
-              //       //     },
-              //       //   ],
-              //      },
-              //   ],
+              // where: {
+              //   isPanel: false,
+              // },
+              // include: [
+              //   {
+              //     model: db.PanelUnderpanel,
+              //     as: "underPanels",
+              //     //   include: [
+              //     //     {
+              //     //       model: db.ServiceItem,
+              //     //       as: "serviceItem",
+              //     //       attributes: ["id", "service_name", "serviceCategory_id"],
+              //     //     },
+              //     //   ],
+              //   },
+              // ],
             },
           ],
         },
       ],
     });
-    res.json(labtests);
+    // console.log(investigation);
+    let medicalBilling;
+    if (db.is_internal_service) {
+      medicalBilling = await db.MedicalBilling.findOne({
+        where: {
+          medical_record_id: investigation.medicalRecord_id,
+        },
+      });
+    } else {
+      medicalBilling = await db.MedicalBilling.findOne({
+        where: {
+          externalService_id: investigation.externalService_id,
+        },
+      });
+    }
+    // console.log(medicalBilling);
+    const payments = await db.Payment.findAll({
+      where: {
+        medical_billing_id: medicalBilling.id,
+      },
+    });
+    // console.log(labtests);
+    let ll = labtests.map((test) => {
+      return {
+        ...test.dataValues,
+        isPaid:
+          payments.find((payment) => payment.item_id === test.serviceItem_id)
+            ?.status === "Paid",
+      };
+    });
+    // console.log(ll);
+    res.json(ll);
   }),
   getCompletedLabRequests: asyncHandler(async (req, res) => {
     const labs = await db.InvestigationOrder.findAll({
@@ -123,9 +194,9 @@ module.exports = InvestigationController = {
     res.json(labs);
   }),
   addLabResult: asyncHandler(async (req, res) => {
-    const { results } = req.body;
+    const { results, panels } = req.body;
     const { id } = req.params;
-    // console.log(results);
+    console.log(panels);
     await Promise.all(
       results.map(async (value) => {
         return db.OrderedTest.update(
@@ -145,7 +216,32 @@ module.exports = InvestigationController = {
           }
         );
       })
-    ).then(async (result) => {
+    );
+    const labResult = await db.OrderedTest.findOne({
+      where: {
+        id: { [Op.notIn]: panels },
+        investigationOrder_id: id,
+        status: "pending",
+      },
+    });
+    console.log(labResult);
+    // .then(async (result) => {
+    // });
+    if (!labResult) {
+      await db.OrderedTest.update(
+        {
+          report_time: Date.now(),
+          status: "completed",
+          reported_by: req.user.id,
+        },
+        {
+          where: {
+            id: panels,
+          },
+          individualHooks: true,
+          userId: req.user.id,
+        }
+      );
       await db.InvestigationOrder.update(
         {
           status: false,
@@ -158,9 +254,32 @@ module.exports = InvestigationController = {
           userId: req.user.id,
         }
       );
-      res.status(200).json({
-        message: "success",
-      });
+    }
+
+    res.status(200).json({
+      message: "success",
     });
+  }),
+  getMedicalRecordDocuments: asyncHandler(async (req, res) => {
+    const { medicalRecordId } = req.params;
+    const documents = await db.MedicalRecordDocument.findAll({
+      where: {
+        medical_record_id: medicalRecordId,
+      },
+      include: [
+        {
+          model: db.User,
+          as: "createdBy",
+          include: {
+            model: db.Employee,
+            as: "employee",
+            attributes: ["id", "firstName", "middleName", "lastName"],
+          },
+          attributes: ["id"],
+        },
+      ],
+      order: [["created_at", "DESC"]],
+    });
+    res.json(documents);
   }),
 };

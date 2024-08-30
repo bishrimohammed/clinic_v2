@@ -66,11 +66,11 @@ module.exports.AppointementController = {
         approval_setting_id: req.approvalSetting.id,
         audit_tableName: "appointments_audit",
         audit_targetId: audit.id,
-        current_approval_level:1,
+        current_approval_level: 1,
         current_approval_user: req.approvalSetting?.approvers[0]?.user_id,
         requested_by: req.user.id,
       });
-      res.json({
+      res.status(201).json({
         message: "Appointment sent to Approvers",
         model: approvalrequest,
       });
@@ -85,7 +85,7 @@ module.exports.AppointementController = {
         "Friday",
         "Saturday",
       ];
-      console.log(req.body);
+      // console.log(req.body);
       const Weekdate = new Date(date).getDay();
       // console.log(Weekdate);
       // console.log(daysOfWeek[Weekdate]);

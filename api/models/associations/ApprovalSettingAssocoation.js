@@ -25,4 +25,12 @@ module.exports.ApprovalSettingAssocoation = (db) => {
     foreignKey: "requested_by",
     as: "requestedBy",
   });
+  db.ApprovalRequest.hasMany(db.ApprovalRequestApproverAction, {
+    foreignKey: "approval_request_id",
+    as: "approverActions",
+  });
+  db.ApprovalRequestApproverAction.belongsTo(db.User, {
+    foreignKey: "created_by",
+    as: "createdBy",
+  });
 };
