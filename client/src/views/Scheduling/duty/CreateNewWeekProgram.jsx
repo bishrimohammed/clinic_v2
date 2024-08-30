@@ -56,35 +56,59 @@ const CreateNewWeekProgram = () => {
   const navigate = useNavigate();
   const { data: state, isPending } = useGetDutyProgramById(dutyWeek.id);
   if (isPending) return <Spinner animation="grow" />;
-  console.log(state);
+  // console.log(state);
 
-  const EVENTS = state?.dutyAssignments.map((e, index) => {
-    return {
-      ...e,
-      title: "helllo",
-      start: new Date(e.duty_date + "T10:00"),
-      end: new Date(e.duty_date + "T14:00"),
-    };
-  });
+  const EVENTS = new Array();
+  // state?.dutyAssignments.map((e, index) => {
+  //   return {
+  //     ...e,
+  //     title: "helllo",
+  //     start: new Date(e.duty_date + "T10:00"),
+  //     end: new Date(e.duty_date + "T14:00"),
+  //   };
+  // });
+  const groupDutyAssignmentByDutyDate = Object.groupBy(
+    state?.dutyAssignments,
+    ({ duty_date }) => duty_date
+  );
+  // console.log(groupDutyAssignmentByDutyDate);
+  const result = Object.entries(groupDutyAssignmentByDutyDate).map(
+    ([duty_date, employees]) => ({
+      duty_date,
+      employees: employees.map((emp) => emp.employee),
+    })
+  );
+  // console.log(result);
 
   const SevenDateOfWeek = getWeekDaysStartingFromDate(state?.weekStartDate);
   // console.log(SevenDateOfWeek);
   SevenDateOfWeek.map((day) => {
-    const event = state?.dutyAssignments.filter(
-      (d) => d.duty_date === day.date
-    );
+    const event = result.find((d) => d.duty_date === day.date);
+    // console.log(event);
+
     // console.log(event.length);
-    if (event.length === 0) {
+    if (!event) {
+      // if there is no any duty is assigned we will create empty event
       const EVENT = {
         title: "",
         duty_date: day.date,
-        employee: null,
+        employees: [],
         start: new Date(day.date + "T10:00"),
         end: new Date(day.date + "T14:00"),
       };
       EVENTS.push(EVENT);
+    } else {
+      EVENTS.push({
+        title: "",
+        duty_date: day.date,
+        employees: event.employees,
+        start: new Date(day.date + "T10:00"),
+        end: new Date(day.date + "T14:00"),
+      });
     }
   });
+  // console.log(EVENTS);
+
   // console.log(new Date(new Date("2024-05-13T10:00")));
 
   return (
@@ -128,7 +152,7 @@ const CreateNewWeekProgram = () => {
 };
 
 export default CreateNewWeekProgram;
-let previousDate = "";
+
 const CustomDutyEvents = ({ event }) => {
   const [showAddEmployeeToDuty, setShowEmployeeToDuty] = useState({
     isShow: false,
@@ -136,6 +160,8 @@ const CustomDutyEvents = ({ event }) => {
     duty_date: null,
     dutyAssigments: null,
   });
+  // console.log(event);
+
   const [isDifferentDate, setIsDifferentDate] = useState(true);
   const previousDate = useRef(null);
   useEffect(() => {
@@ -200,30 +226,34 @@ const CustomDutyEvents = ({ event }) => {
   return (
     <>
       {" "}
-      <div key={event.id} className="bg-primary w-100 text-white py-1 px-2">
+      <div key={event.id} className="bg-primary w-100 text-white py-1 px-1">
         <div className="d-flex justify-content-end mb-1">
           {/* {ButtonComp} */}
-          {isDifferentDate && (
-            <button
-              style={{ zIndex: 2 }}
-              className={`border-0 bg-transparent ${
-                event.duty_date < new Date().toISOString().substring(0, 10)
-                  ? "text-warning"
-                  : "text-white"
-              }  p-0`}
-              disabled={
-                event.duty_date < new Date().toISOString().substring(0, 10)
-              }
-              onClick={() => handleButtonClick(event.employee)}
-            >
-              <FaPlus />
-            </button>
-          )}
+          {/* {isDifferentDate && ( */}
+          <button
+            style={{ zIndex: 2 }}
+            className={`border-0 bg-transparent ${
+              event.duty_date < new Date().toISOString().substring(0, 10)
+                ? "text-warning"
+                : "text-white"
+            }  p-0`}
+            disabled={
+              event.duty_date < new Date().toISOString().substring(0, 10)
+            }
+            onClick={() => handleButtonClick(event.employee)}
+          >
+            <FaPlus />
+          </button>
+          {/* )} */}
         </div>
-
-        <p className="small mb-0">
+        {event?.employees.map((employee, index) => (
+          <p key={employee.id} className="small mb-0 ">
+            {index + 1}.{employee.firstName} {employee.middleName}
+          </p>
+        ))}
+        {/* <p className="small mb-0">
           {event?.employee?.firstName} {event?.employee?.middleName}
-        </p>
+        </p> */}
       </div>
       {showAddEmployeeToDuty.isShow && (
         <AddEmployeeToDutyModal

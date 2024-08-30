@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { endOfWeek, getISOWeek, differenceInDays } from "date-fns";
+import { endOfWeek, getISOWeek, differenceInDays, startOfWeek } from "date-fns";
 import React, { useEffect } from "react";
 import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
@@ -52,7 +52,9 @@ const AddDutyProgramModal = ({ show, handleClose }) => {
     setValue,
   } = useForm({
     defaultValues: {
-      start_date: new Date().toISOString().substring(0, 10),
+      start_date: new Date(startOfWeek(new Date(), { weekStartsOn: 2 }))
+        .toISOString()
+        .substring(0, 10),
       end_date: new Date(endOfWeek(new Date(), { weekStartsOn: 1 }))
         .toISOString()
         .substring(0, 10),

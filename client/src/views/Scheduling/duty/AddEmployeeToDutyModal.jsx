@@ -32,7 +32,7 @@ const AddEmployeeToDutyModal = ({ show, handleClose, duty_date }) => {
     }
   }, [errorState]);
 
-  console.log(errors);
+  // console.log(errors);
   const submitHandler = (data) => {
     console.log(data);
     const Data = {
@@ -109,7 +109,7 @@ const AddEmployeeToDutyModal = ({ show, handleClose, duty_date }) => {
               className="btn btn-primary"
               disabled={isPending}
             >
-              {isPending && <Spinner animation="border" />}
+              {isPending && <Spinner animation="border" size="sm" />}
               Save
             </button>
           </Modal.Footer>
