@@ -9,7 +9,7 @@ const DutyManagement = () => {
   const navigate = useNavigate();
   const [showAddDutyModal, setShowAddDutyModal] = useState(false);
   const { data } = useGetDutyProgram();
-  console.log(data);
+  // console.log(data);
   return (
     <div>
       <div className="d-flex justify-content-end mb-2">

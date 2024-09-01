@@ -1,7 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { endOfWeek, getISOWeek, differenceInDays, startOfWeek } from "date-fns";
 import React, { useEffect } from "react";
-import { Alert, Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { Alert, Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useAddWeekDutyProgram } from "../hooks/useAddWeekDutyProgram";
@@ -213,7 +213,8 @@ const AddDutyProgramModal = ({ show, handleClose }) => {
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
-            <Button type="submit" variant="primary">
+            <Button disabled={isPending} type="submit" variant="primary">
+              {isPending && <Spinner size="sm" />}
               Save
             </Button>
           </Modal.Footer>

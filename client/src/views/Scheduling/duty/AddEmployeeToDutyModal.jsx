@@ -34,13 +34,13 @@ const AddEmployeeToDutyModal = ({ show, handleClose, duty_date }) => {
 
   // console.log(errors);
   const submitHandler = (data) => {
-    console.log(data);
+    // console.log(data);
     const Data = {
       employee_id: data.employeeId,
       duty_date,
       duty_id: state.id,
     };
-    console.log(Data);
+    // console.log(Data);
     // handleClose();
     mutateAsync(Data)
       .then((res) => {
