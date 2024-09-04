@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setlogin } from "../../../store/authSlice";
+import doctorImage from "../../../assets/Doctors-amico.png";
 //import { login } from "../store/authSlice";
 import {
   Button,
@@ -11,6 +12,7 @@ import {
   Col,
   Container,
   Form,
+  Image,
   InputGroup,
   Row,
   Spinner,
@@ -102,7 +104,7 @@ const Login = () => {
                         {...register("username")}
                         isInvalid={errors.username}
                         id="exampleFormControlInput1"
-                        placeholder="user-****"
+                        placeholder="username"
                       />
                       <Form.Control.Feedback type="invalid">
                         {errors.username?.message}
@@ -147,12 +149,13 @@ const Login = () => {
                 </CardBody>
               </Card>
               <Card
-                className="text-white  py-5"
+                className="text-white  "
                 style={{ width: "100%", backgroundColor: "#9007b6" }}
               >
-                <CardBody className="p-4">
+                <CardBody className="">
                   <div>
-                    <h4>Sofnet Clinic System</h4>
+                    {/* <h4>Sofnet Clinic System</h4> */}
+                    <Image src={doctorImage} fluid alt="" />
                   </div>
                 </CardBody>
               </Card>

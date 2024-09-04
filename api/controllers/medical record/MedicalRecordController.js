@@ -89,7 +89,7 @@ module.exports = MedicalRecordController = {
             "firstName",
             "middleName",
             "lastName",
-            // "birth_date",
+            "birth_date",
             "gender",
             "card_number",
             "phone",
@@ -777,8 +777,8 @@ module.exports = MedicalRecordController = {
         doctor_id: req.user.id,
       },
     });
-    console.log("\n\n" + id + "\n\n");
-    console.log("\n\n" + diagnosis.length + "\n\n");
+    // console.log("\n\n" + id + "\n\n");
+    // console.log("\n\n" + diagnosis.length + "\n\n");
     res.status(200).json(diagnosis);
   }),
   add_Diagnosis: asyncHandler(async (req, res) => {
@@ -967,7 +967,7 @@ module.exports = MedicalRecordController = {
       attributes: ["id"],
     });
     const labcategory_ids = labcategory.serviceCategory.map((c) => c.id);
-    console.log(labcategory_ids);
+    // console.log(labcategory_ids);
     const investigation = await db.InvestigationOrder.findOne({
       where: {
         medicalRecord_id: id,

@@ -217,7 +217,7 @@ const EditClinicInfo = () => {
   };
   return (
     <Container className="p-3  mb-5">
-      {/* <h1>Edit Clinic Profile</h1> */}
+      <h4 className="pb-2 mb-2 border-bottom">Clinic Profile Configuration</h4>
       <div className="d-flex justify-content-end">
         <Button
           disabled={!hasPermission("clinic profile", "update")}

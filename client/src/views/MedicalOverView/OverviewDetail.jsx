@@ -18,7 +18,7 @@ const OverviewDetail = () => {
     refetch,
   } = useOrdered_Lab_Investigations(state.id);
 
-  console.log(investigations);
+  // console.log(state);
   return (
     <div>
       <div className=" p-2  d-flex gap-3 align-items-center">

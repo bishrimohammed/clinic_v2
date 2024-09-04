@@ -63,7 +63,7 @@ const ClinicServiceTable = ({
   return (
     <div className="p-3">
       {" "}
-      <h5>Clinic Service List</h5>
+      <h5>Clinic Services</h5>
       <hr />
       <div className=" d-flex flex-wrap gap-2 align-items-center w-100 mb-2">
         <SearchInput searchvalue={search} setSearch={setSearch} />

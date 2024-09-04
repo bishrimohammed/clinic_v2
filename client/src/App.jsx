@@ -7,8 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./ProtectedRoute";
-import Login2 from "./views/pages/Login2";
-import ChangePassword from "./views/pages/ChangePassword";
+const Login2 = React.lazy(() => import("./views/pages/Login2"));
+const ChangePassword = React.lazy(() => import("./views/pages/ChangePassword"));
 
 const loading = (
   <div className="pt-3 text-center">

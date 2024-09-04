@@ -215,7 +215,7 @@ module.exports = PatientController = {
   }),
   searchPatient: expressAsyncHandler(async (req, res) => {
     // const { query } = req.query;
-    console.log(req.query);
+    // console.log(req.query);
     let where = {};
     if (req.query.patientId) {
       where.card_number = { [Op.like]: `%${req.query.patientId}%` };
@@ -261,7 +261,7 @@ module.exports = PatientController = {
   }),
   getPatient: expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log("\n\nlkhljgfxdgchjgcf\n\n");
+    // console.log("\n\nlkhljgfxdgchjgcf\n\n");
     const address = {
       model: db.Address,
       as: "address",
@@ -380,7 +380,7 @@ module.exports = PatientController = {
       });
       // console.log(agreements);
       const agreement = agreements?.map((a) => a.id);
-      console.log(agreement);
+      // console.log(agreement);
       const employee = await db.CreditPatient.findOne({
         where: {
           patient_id: patient.id,
@@ -396,10 +396,10 @@ module.exports = PatientController = {
     // console.log(patient);
     // const pp = JSON.parse(patient);
     // console.log(patient);
-    const PATIENT = !patient.is_credit
-      ? patient
-      : { ...patient.dataValues, hello: "kjhljhgkut" };
-    console.log(JSON.stringify(PATIENT));
+    // const PATIENT = !patient.is_credit
+    //   ? patient
+    //   : { ...patient.dataValues, hello: "kjhljhgkut" };
+    // console.log(JSON.stringify(PATIENT));
     // patient.hello = "kjhljhgkut";
     res.json(Patient);
   }),

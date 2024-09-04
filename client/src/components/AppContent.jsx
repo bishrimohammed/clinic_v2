@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Spinner } from "react-bootstrap";
+// React.lazy(() =>  import())
 const ExternalLabRequestList = React.lazy(() =>
   import("../views/lab/ExternalLabRequestList")
 );
@@ -32,8 +33,6 @@ const ExternalServiceList = React.lazy(() =>
 const NurseTreatmentList = React.lazy(() =>
   import("../views/nurseTreatment/NurseTreatmentList")
 );
-
-// React.lazy(() =>  import())
 
 const NurseTreatment = React.lazy(() =>
   import("../views/nurseTreatment/NurseTreatment")

@@ -1,38 +1,44 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { Fragment, Suspense, useRef, useState } from "react";
 import { Button, Spinner, Tab, Tabs } from "react-bootstrap";
-import { IoMdArrowRoundBack } from "react-icons/io";
+// import { IoMdArrowRoundBack } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
-import ChiefComplaint from "./ChiefComplaint";
-import PhysicalExaminationTab from "./PhysicalExaminationTab";
-import TreatmentTab from "./TreatmentTab";
-import PlanTab from "./PlanTab";
-import InvestigationTab from "./InvestigationTab";
+const ChiefComplaint = React.lazy(() => import("./ChiefComplaint"));
+const PhysicalExaminationTab = React.lazy(() =>
+  import("./PhysicalExaminationTab")
+);
+const TreatmentTab = React.lazy(() => import("./TreatmentTab"));
+const PlanTab = React.lazy(() => import("./PlanTab"));
+// import InvestigationTab from "./InvestigationTab";
 import { LuLock } from "react-icons/lu";
 import { useSelector } from "react-redux";
 import CancelCunsultaionButton from "./CancelCunsultaionButton";
 import ConsultationBackButton from "./ConsultationBackButton";
-import LabResultTab from "./LabResultTab";
+const LabResultTab = React.lazy(() => import("./LabResultTab"));
 import { useConsultationSaveForLater } from "../hooks/consultationHooks/useConsultationSaveForLater";
-import HistoryTab from "./HistoryTab";
+const HistoryTab = React.lazy(() => import("./HistoryTab"));
 import { useGetPatient } from "../hooks/patientHooks/useGetPatient";
 import PatientGeneralInforamtion from "../patient Detail/PatientGeneralInforamtion";
 import { useGetPatientVisitById } from "../../patient visit/hooks/useGetPatientVisitById";
-import ProcedureTab from "./ProcedureTab";
+const ProcedureTab = React.lazy(() => import("./ProcedureTab"));
 import FinishConsultationBtn from "./FinishConsultationBtn";
-import MedicalRecordDocumentTab from "./MedicalRecordDocumentTab";
+const MedicalRecordDocumentTab = React.lazy(() =>
+  import("./MedicalRecordDocumentTab")
+);
 // import LabResultTab from "./LabResultTab";
 // import { ConsultationBackButton } from "./ConsultationBackButton";
 const ConsultationContent = ({ changeVisibleContent }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
+  const [key, setKey] = React.useState("History");
+
   const { mutateAsync, isPending } = useConsultationSaveForLater();
   const examTabLocked = useSelector((state) => state.consultation.examLocked);
   const treatmentTabLocked = useSelector(
     (state) => state.consultation.treatmentLocked
   );
   const planTabLocked = useSelector((state) => state.consultation.planLocked);
-  const disabledFinishButton = useSelector(
-    (state) => state.consultation.finishButtonDisabled
-  );
+  // const disabledFinishButton = useSelector(
+  //   (state) => state.consultation.finishButtonDisabled
+  // );
 
   // console.log(disabledFinishButton);
   // const [childData, setChildData] = useState([]);
@@ -44,6 +50,8 @@ const ConsultationContent = ({ changeVisibleContent }) => {
   const { data: patient, isPending: patientLoading } = useGetPatient(
     state.patient_id
   );
+  console.log(visit);
+
   // console.log(state);
   const handleSaveForLater = () => {
     const chiefComplaintData = chiefComplaintRef.current.getSaveForLaterData();
@@ -106,7 +114,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           <FinishConsultationBtn />
         </div>
       </div>
-      {visit?.isAdmitted ? (
+      {/* {visit?.isAdmitted ? (
         <div className="d-flex justify-content-end mt-2">
           <button
             onClick={changeVisibleContentHandler}
@@ -115,7 +123,7 @@ const ConsultationContent = ({ changeVisibleContent }) => {
             View Progress Note Page
           </button>
         </div>
-      ) : null}
+      ) : null} */}
       <div className="d-md-none d-block mt-2 border ps-1">
         {patientLoading ? (
           <Spinner animation="grow" />
@@ -127,11 +135,13 @@ const ConsultationContent = ({ changeVisibleContent }) => {
         )}
       </div>
       <Tabs
-        defaultActiveKey="History"
-        id="uncontrolled-tab-example"
+        // defaultActiveKey="History"
+        // id="uncontrolled-tab-example"
         className="mb-3 mt-2 border-bottom"
         variant="underline"
         justify
+        onSelect={(k) => setKey(k)}
+        activeKey={key}
       >
         <Tab
           eventKey="History"
@@ -141,7 +151,9 @@ const ConsultationContent = ({ changeVisibleContent }) => {
             </span>
           }
         >
-          <HistoryTab />
+          <Suspense fallback={<Spinner color="primary" />}>
+            {key === "History" && <HistoryTab />}
+          </Suspense>
         </Tab>
         <Tab
           eventKey="Symptoms"
@@ -151,7 +163,10 @@ const ConsultationContent = ({ changeVisibleContent }) => {
             </span>
           }
         >
-          <ChiefComplaint ref={chiefComplaintRef} />
+          <Suspense fallback={<Spinner color="primary" />}>
+            {" "}
+            <ChiefComplaint ref={chiefComplaintRef} />
+          </Suspense>
         </Tab>
         <Tab
           eventKey="Examination"
@@ -162,7 +177,10 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           }
           disabled={examTabLocked}
         >
-          <PhysicalExaminationTab ref={ExaminationRef} />
+          <Suspense fallback={<Spinner color="primary" />}>
+            {" "}
+            <PhysicalExaminationTab ref={ExaminationRef} />
+          </Suspense>
         </Tab>{" "}
         <Tab
           eventKey="LabResultTab"
@@ -175,7 +193,9 @@ const ConsultationContent = ({ changeVisibleContent }) => {
 
           // disabled={treatmentTabLocked}
         >
-          <LabResultTab />
+          <Suspense fallback={<Spinner color="primary" />}>
+            {key === "LabResultTab" && <LabResultTab />}
+          </Suspense>
         </Tab>
         <Tab
           eventKey="Treatment"
@@ -187,7 +207,10 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           }
           disabled={treatmentTabLocked}
         >
-          <TreatmentTab />
+          <Suspense fallback={<Spinner color="primary" />}>
+            {" "}
+            <TreatmentTab />
+          </Suspense>
         </Tab>
         <Tab
           eventKey="Plan"
@@ -199,7 +222,10 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           }
           disabled={planTabLocked}
         >
-          <PlanTab ref={PlanRefs} />
+          <Suspense fallback={<Spinner color="primary" />}>
+            {" "}
+            <PlanTab ref={PlanRefs} />
+          </Suspense>
         </Tab>
         <Tab
           eventKey="Procedure"
@@ -211,20 +237,29 @@ const ConsultationContent = ({ changeVisibleContent }) => {
           }
           disabled={planTabLocked}
         >
-          <ProcedureTab ref={PlanRefs} />
+          <Suspense fallback={<Spinner color="primary" />}>
+            {" "}
+            <ProcedureTab ref={PlanRefs} />
+          </Suspense>
         </Tab>
-        <Tab
-          eventKey="MedicalRecordDocument"
-          title={
-            <span className="d-flex justify-content-center align-items-center">
-              Documents
-              {/* {planTabLocked && <LuLock className="ms-1" />} */}
-            </span>
-          }
-          // disabled={planTabLocked}
-        >
-          <MedicalRecordDocumentTab />
-        </Tab>
+        {visit?.isAdmitted && (
+          <Tab
+            eventKey="MedicalRecordDocument"
+            title={
+              <span className="d-flex justify-content-center align-items-center">
+                Documents
+                {/* {planTabLocked && <LuLock className="ms-1" />} */}
+              </span>
+            }
+            // disabled={planTabLocked}
+          >
+            <Suspense fallback={<Spinner color="primary" />}>
+              {" "}
+              {key === "MedicalRecordDocument" && <MedicalRecordDocumentTab />}
+            </Suspense>
+            {/* <MedicalRecordDocumentTab /> */}
+          </Tab>
+        )}
       </Tabs>
     </div>
   );

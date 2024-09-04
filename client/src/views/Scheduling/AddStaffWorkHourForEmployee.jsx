@@ -171,7 +171,7 @@ const AddStaffWorkHourForEmployee = () => {
           onClick={() => navigate(-1)}
         />
         <h5 className="mb-0">
-          {state.employee.firstName} {state.employee.middleName}{" "}
+          Dr. {state.employee.firstName} {state.employee.middleName}{" "}
           {state.employee.lastName} working hour
         </h5>
       </div>
