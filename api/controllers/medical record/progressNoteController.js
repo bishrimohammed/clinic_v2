@@ -59,7 +59,7 @@ module.exports = progressNoteController = {
       underPanels,
       investigations,
     } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     const investigationsParsed = investigations
       ? JSON.parse(investigations)
       : null;

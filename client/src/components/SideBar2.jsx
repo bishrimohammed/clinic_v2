@@ -358,13 +358,12 @@ const SideBar2 = () => {
             </CNavLink>
           </CNavGroup>
         )}
-        <CNavItem>
+        {/* <CNavItem>
           <CNavLink to="/approvalrequests" as={NavLink}>
-            {/* <CIcon icon={cilSpeedometer} customClassName="nav-icon" /> */}
             <MdSpaceDashboard className="nav-icon" />
             Approval Requests
           </CNavLink>
-        </CNavItem>
+        </CNavItem> */}
 
         {hasPermission("View lab Result", "read") && (
           <CNavItem>

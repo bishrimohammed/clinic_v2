@@ -1562,6 +1562,22 @@ module.exports = MedicalRecordController = {
     );
     res.status(201).json({ msg: "Sick leave note added successfully" });
   }),
+  uploadDocument: asyncHandler(async (req, res) => {
+    const { document_name } = req.body;
+    // console.log(req.file);
+    if (!req.file) {
+      res.status(404);
+      throw new Error("No file provided");
+    }
+    const document = await db.MedicalRecordDocument.create({
+      medical_record_id: req.params.id,
+      document_name: document_name,
+      document_url: "uploads/" + req.file.filename,
+      // document_type: req.file.mimetype,
+      created_by: req.user.id,
+    });
+    res.status(201).json({ msg: "Document uploaded successfully", document });
+  }),
   cancelMedicalRecord: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const medicalRecord = await getMedicalRecordById(id);

@@ -1,6 +1,7 @@
 const express = require("express");
 const MedicalRecordController = require("../controllers/medical record/MedicalRecordController");
 const { protect } = require("../middleware/authMiddleWare");
+const upload = require("../config/multerConfig");
 const router = express.Router();
 router.get("/", MedicalRecordController.getMedicalRecords);
 router.get("/overview", MedicalRecordController.getMedicalRecordsOverview);
@@ -110,7 +111,12 @@ router.post(
   protect,
   MedicalRecordController.addSickLeaveNote
 );
-
+router.post(
+  "/:id/document",
+  protect,
+  upload.single("document_file"),
+  MedicalRecordController.uploadDocument
+);
 router.patch(
   "/diagnosis/:diagnosis_id/confirm",
   protect,
