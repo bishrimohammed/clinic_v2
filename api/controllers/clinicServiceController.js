@@ -114,7 +114,7 @@ module.exports.clinicServiceController = {
     // console.log(id);
     let where = {};
     if (req.query.status) {
-      where.status = Boolean(req.query.status);
+      where.status = req.query.status === "true" ? true : false;
     }
     if (req.query.price) {
       if (req.query.price === "500+") {

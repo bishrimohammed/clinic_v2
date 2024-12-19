@@ -7,11 +7,11 @@ export const completedLab_columns = [
   {
     header: "Patient Name",
     accessorFn: (row) =>
-      row.medicalRecord.patient.firstName +
+      row.medicalRecord?.patient?.firstName +
       " " +
-      row.medicalRecord.patient.middleName +
+      row.medicalRecord?.patient?.middleName +
       " " +
-      row.medicalRecord.patient.lastName,
+      row.medicalRecord?.patient?.lastName,
   },
   {
     header: "Requested By",

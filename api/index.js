@@ -46,6 +46,7 @@ const {
   ExternalServiceRoute,
   ProcedureRoute,
   ReportRoute,
+  printRoute,
   // ExternalServiceRoute,
 } = require("./routes/index.js");
 const db = require("./models/index.js");
@@ -121,6 +122,7 @@ app.use("/api/v1/nursetreatments", NurseTreatmentRoute);
 app.use("/api/v1/externalservices", ExternalServiceRoute);
 app.use("/api/v1/procedures", ProcedureRoute);
 app.use("/api/v1/reports", ReportRoute);
+app.use("/api/v1/print", printRoute);
 
 app.use("/models", async (req, res) => {
   // log

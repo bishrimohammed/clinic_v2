@@ -1,5 +1,11 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { endOfWeek, getISOWeek, differenceInDays, startOfWeek } from "date-fns";
+import {
+  endOfWeek,
+  getISOWeek,
+  differenceInDays,
+  startOfWeek,
+  format,
+} from "date-fns";
 import React, { useEffect } from "react";
 import { Alert, Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
@@ -50,11 +56,16 @@ const AddDutyProgramModal = ({ show, handleClose }) => {
     clearErrors,
     watch,
     setValue,
+    getValues,
   } = useForm({
     defaultValues: {
-      start_date: new Date(startOfWeek(new Date(), { weekStartsOn: 2 }))
-        .toISOString()
-        .substring(0, 10),
+      start_date: format(
+        startOfWeek(new Date(), { weekStartsOn: 1 }),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ).substring(0, 10),
+      //  startOfWeek(new Date(), { weekStartsOn: 0 })
+      //   .toISOString()
+      //   .substring(0, 10),
       end_date: new Date(endOfWeek(new Date(), { weekStartsOn: 1 }))
         .toISOString()
         .substring(0, 10),
@@ -65,7 +76,7 @@ const AddDutyProgramModal = ({ show, handleClose }) => {
   const startTimeWatcher = watch("start_date");
   const endTimeWatcher = watch("end_date");
   //   .toISOString().substring(0, 10)
-  //   console.log(errors);
+  // console.log(getValues("start_date"));
   useEffect(() => {
     if (errorState) {
       const timeOut = setTimeout(() => {
@@ -80,10 +91,17 @@ const AddDutyProgramModal = ({ show, handleClose }) => {
   const submitHandler = (data) => {
     // console.log(data);
     const Data = {
-      weekStartDate: data.start_date,
-      weekEndDate: data.end_date,
+      weekStartDate: format(data.start_date, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
+      // weekStartDate: startOfWeek(data.start_date, {
+      //   weekStartsOn: 0,
+      // }),
+      // weekEndDate: data.end_date,
+      weekEndDate: format(data.end_date, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
       week: data.week,
     };
+    console.log(Data);
+    // return;
+
     mutateAsync(Data)
       .then((res) => {
         if (res.status === 201) {

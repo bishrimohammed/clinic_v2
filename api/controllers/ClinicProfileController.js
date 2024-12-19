@@ -114,7 +114,7 @@ module.exports = ClinicProfileController = {
     // return;
     // const { name, card_valid_date, website_url, address } = req.body;
     const addressData = JSON.parse(address);
-    console.log(req.body);
+    // console.log(req.body);
     const updatedClinic = await db.ClinicProfile.update(
       {
         name,
@@ -166,7 +166,7 @@ module.exports = ClinicProfileController = {
       // }
     );
     const CliicWorkingHours = JSON.parse(req.body?.clinc_working_hours);
-    console.log(CliicWorkingHours);
+    // console.log(CliicWorkingHours);
     await Promise.all(
       CliicWorkingHours.map(async (workHour) => {
         return await db.Schedule.update(

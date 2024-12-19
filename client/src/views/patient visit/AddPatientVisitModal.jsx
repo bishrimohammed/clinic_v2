@@ -83,6 +83,8 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
   const vistiTypeWatcher = watch("type");
   // console.log(visitDateWatcher);
   const DoctorList = useMemo(() => {
+    console.log(visitDateWatcher);
+
     if (visitDateWatcher) {
       const weekdayNumber = new Date(visitDateWatcher).getDay();
       const weekday = [
@@ -106,6 +108,8 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
         );
       });
     } else {
+      console.log(visitDateWatcher);
+
       return [];
     }
   }, [visitDateWatcher]);
@@ -209,6 +213,7 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                       handleSearchQueryChange("patientName", e.target.value)
                     }
                   />
+                  {/* <Form.Text>jhvkhgvh</Form.Text> */}
                 </Form.Group>
               </Col>
               <Col md={4} sm={12} className="mb-2">
@@ -241,6 +246,7 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                     isInvalid={errors.date}
                     min={new Date().toISOString().substring(0, 16)}
                   />
+
                   <Form.Control.Feedback type="invalid">
                     {errors.date?.message}
                   </Form.Control.Feedback>
@@ -262,6 +268,12 @@ const AddPatientVisitModal = ({ show, handleClose }) => {
                       </option>
                     ))}
                   </Form.Select>
+                  {DoctorList?.length === 0 && (
+                    <Form.Text className="text-danger">
+                      Doctor is not avialable at this time
+                    </Form.Text>
+                  )}
+
                   <Form.Control.Feedback type="invalid">
                     {errors.doctor_id?.message}
                   </Form.Control.Feedback>

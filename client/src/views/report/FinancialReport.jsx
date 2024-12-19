@@ -71,6 +71,8 @@ const FinancialReport = () => {
   // //   successRef.current.value ===0 ?setTriggerFetch(false) :successRef.current.value = 0
   //   setTriggerFetch(false)
   //   }
+  console.log(data);
+
   return (
     <div>
       <Form onSubmit={handleSubmit(submitHandler)}>

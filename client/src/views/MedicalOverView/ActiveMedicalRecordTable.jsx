@@ -1,41 +1,56 @@
 import React from "react";
-import { Table } from "react-bootstrap";
+import { Spinner, Table } from "react-bootstrap";
 import { FaSortDown, FaSortUp } from "react-icons/fa";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import SmartPaginationComponent from "../../components/SmartPaginationComponent";
+import {
+  fetchActiveMedicalRecord,
+  useGetMedicalOverview,
+} from "./hooks/useGetMedicalOverview";
+import { useQueryClient } from "@tanstack/react-query";
+import { AxiosHeaders } from "../../api/useAxiosHeaders";
+import { useURLPagination } from "../../hooks/useURLPagination";
 
-const ActiveMedicalRecordTable = ({ data }) => {
-  let [searchParams, setSearchParams] = useSearchParams();
-
+const ActiveMedicalRecordTable = () => {
   const navigate = useNavigate();
-  const handlePagination = (page) => {
-    setSearchParams((prev) => {
-      prev.set("page", parseInt(page));
+  const {
+    page,
+    limit,
+    order,
+    sortBy,
+    changePage,
+    changePageLimit,
+    changePageSortBy,
+  } = useURLPagination({
+    page: 1,
+    limit: 10,
+    sortBy: "visit_date",
+    order: "desc",
+  });
+  const { data, isPending, isPlaceholderData } = useGetMedicalOverview({
+    page: parseInt(page),
+    limit: parseInt(limit),
+    sortBy,
+    order,
+  });
+  const queryClient = useQueryClient();
+  React.useEffect(() => {
+    if (!isPlaceholderData && data?.hasMore) {
+      const query = {
+        page: parseInt(page) + 1,
+        limit: parseInt(limit),
+        sortBy,
+        order,
+      };
+      queryClient.prefetchQuery({
+        queryKey: ["Medical Record Overviews", query],
+        queryFn: () => fetchActiveMedicalRecord(query, AxiosHeaders().headers),
+      });
+    }
+  }, [data, isPlaceholderData, page, queryClient]);
 
-      return prev;
-    });
-  };
-  const getSortBy = () => {
-    return searchParams.get("sortBy");
-  };
-  const getSortDirection = () => {
-    return searchParams.get("order");
-  };
-  const handleSort = (sortby) => {
-    setSearchParams((prev) => {
-      if (searchParams.get("sortBy") !== sortby) {
-        prev.set("order", "asc");
-        prev.set("sortBy", sortby);
-        //  return {...prev, sortBy: sortby, order: searchParams.get("order") === "asc"? "desc" : "asc" }
-      } else {
-        prev.set("order", searchParams.get("order") === "asc" ? "desc" : "asc");
-      }
-      return prev;
-    });
-  };
   return (
     <>
-      {" "}
       <Table striped responsive bordered hover>
         <thead>
           <tr>
@@ -43,12 +58,20 @@ const ActiveMedicalRecordTable = ({ data }) => {
             <th
               style={{ cursor: "pointer" }}
               onClick={() => {
-                handleSort("patient_name");
+                // handleSort("patient_name");
+                changePageSortBy("patient_name");
               }}
             >
               Patient Name{" "}
-              {getSortBy() == "patient_name" ? (
+              {/* {getSortBy() == "patient_name" ? (
                 getSortDirection() === "asc" ? (
+                  <FaSortUp />
+                ) : (
+                  <FaSortDown />
+                )
+              ) : null} */}
+              {sortBy == "patient_name" ? (
+                order === "asc" ? (
                   <FaSortUp />
                 ) : (
                   <FaSortDown />
@@ -58,12 +81,20 @@ const ActiveMedicalRecordTable = ({ data }) => {
             <th
               style={{ cursor: "pointer" }}
               onClick={() => {
-                handleSort("patientId");
+                // handleSort("patientId");
+                changePageSortBy("patientId");
               }}
             >
               Patient Id{" "}
-              {getSortBy() == "patientId" ? (
+              {/* {getSortBy() == "patientId" ? (
                 getSortDirection() === "asc" ? (
+                  <FaSortUp />
+                ) : (
+                  <FaSortDown />
+                )
+              ) : null} */}
+              {sortBy == "patientId" ? (
+                order === "asc" ? (
                   <FaSortUp />
                 ) : (
                   <FaSortDown />
@@ -74,12 +105,20 @@ const ActiveMedicalRecordTable = ({ data }) => {
             <th
               style={{ cursor: "pointer" }}
               onClick={() => {
-                handleSort("visit_date");
+                // handleSort("visit_date");
+                changePageSortBy("visit_date");
               }}
             >
               Visit Date{" "}
-              {getSortBy() == "visit_date" ? (
+              {/* {getSortBy() == "visit_date" ? (
                 getSortDirection() === "asc" ? (
+                  <FaSortUp />
+                ) : (
+                  <FaSortDown />
+                )
+              ) : null} */}
+              {sortBy == "visit_date" ? (
+                order === "asc" ? (
                   <FaSortUp />
                 ) : (
                   <FaSortDown />
@@ -91,6 +130,15 @@ const ActiveMedicalRecordTable = ({ data }) => {
           </tr>
         </thead>
         <tbody>
+          {isPending && (
+            <tr>
+              <td className=" align-items-center" colSpan="8">
+                <span>
+                  <Spinner animation="border" size="sm" />
+                </span>
+              </td>
+            </tr>
+          )}
           {data?.visits?.map((medicalrecord, index) => (
             <tr
               style={{ cursor: "pointer" }}
@@ -99,7 +147,8 @@ const ActiveMedicalRecordTable = ({ data }) => {
                 navigate("view-detail", { state: medicalrecord });
               }}
             >
-              <td>{index + 1}</td>
+              {/* <td>{index + 1}</td> */}
+              <td>{(page - 1) * limit + index + 1}</td>
               <td>
                 {medicalrecord.patient.firstName}{" "}
                 {medicalrecord.patient.middleName}{" "}
@@ -129,7 +178,8 @@ const ActiveMedicalRecordTable = ({ data }) => {
       <SmartPaginationComponent
         currentPage={parseInt(data?.currentPage) || 1}
         totalPages={parseInt(data?.totalPages)}
-        onPageChange={handlePagination}
+        onPageChange={changePage}
+        onPageLimitChange={changePageLimit}
       />
     </>
   );

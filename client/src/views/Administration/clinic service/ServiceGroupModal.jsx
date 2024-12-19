@@ -22,7 +22,7 @@ const schema = yup.object().shape({
 });
 const ServiceGroupModal = ({ show, handleClose }) => {
   const { state } = useLocation();
-  // console.log(state);
+  console.log(state);
   const [action, setAction] = useState("Save");
   const [selectedServiceGroup, setSelectedServiceGroup] = useState(null);
   const { data: services } = useGetClinicService();
@@ -47,6 +47,7 @@ const ServiceGroupModal = ({ show, handleClose }) => {
   } = useForm({
     defaultValues: {
       //   name: action === "Save" ? "" : selectedServiceGroup.name,
+      serviceType: state.id,
     },
     resolver: yupResolver(schema),
   });
@@ -156,7 +157,7 @@ const ServiceGroupModal = ({ show, handleClose }) => {
                 setAction("Save");
                 // setValue( name: "", serviceType: "" );
                 setValue("name", "");
-                setValue("serviceType", "");
+                // setValue("serviceType", "");
               }}
             >
               Add +

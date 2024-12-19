@@ -24,7 +24,7 @@ const AppFooter = ({ sidebarShow }) => {
       </div>
       <div className="">
         <span className="me-1">Powered by</span>
-        Softnet
+        Bishri
       </div>
     </div>
   );

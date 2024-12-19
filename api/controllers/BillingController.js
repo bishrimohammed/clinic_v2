@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../models");
 const getClinicInformation = require("../helpers/getClinicInformation");
-// const { default: AddAdvancedPayment } = require("../../client/src/views/Bill/AddAdvancedPayment");
+const { Op } = require("sequelize");
 module.exports = BillingController = {
   getOutStandingBillings: asyncHandler(async (req, res) => {
     const {} = req.query;
@@ -21,7 +21,13 @@ module.exports = BillingController = {
     const billings = await db.MedicalBilling.findAll({
       where: {
         ...where,
-        status: true,
+        [Op.or]: [
+          { status: true },
+          {
+            has_advanced_payment: true,
+            is_advanced_payment_amount_completed: false,
+          },
+        ],
       },
       include: [
         {
@@ -434,6 +440,6 @@ module.exports = BillingController = {
     await medicalBilling.save({ userId: req.user.id });
     res
       .status(200)
-      .json({ message: " Prepaid returned to patient successfully " });
+      .json({ message: "Prepaid returned to patient successfully " });
   }),
 };

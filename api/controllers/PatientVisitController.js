@@ -24,7 +24,7 @@ module.exports = PatientVisitController = {
     if (req.query.visitType) {
       where.visit_type = req.query.visitType;
     }
-    console.log(req.query);
+    // console.log(req.query);
 
     switch (req.query?.sortBy) {
       case "patient_name":

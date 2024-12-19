@@ -25,6 +25,7 @@ const SettleAllPaymentButton = ({
   const unpaidPayments = payments.filter(
     (payment) => payment.status === "Unpaid"
   );
+  console.log(has_advanced_payment);
 
   const { mutateAsync, isPending } = useSettlePayments();
   const queryClient = useQueryClient();
@@ -38,7 +39,7 @@ const SettleAllPaymentButton = ({
   // console.log(payments);
   // console.log(unpaidPayments);
   const submitHandler = (data) => {
-    console.log(data);
+    // console.log(data);
     const formData = data.unpaidPayments
       .filter((payment) => {
         return payment.value;
@@ -68,9 +69,8 @@ const SettleAllPaymentButton = ({
           setShowConfirmModal(true);
         }}
         disabled={
-          !has_advanced_payment ||
-          // unpaidPayments.length >0
-          !payments.some((payment) => payment.status === "Unaid")
+          !has_advanced_payment || unpaidPayments.length === 0
+          // !payments.some((payment) => payment.status === "UnPaid")
         }
         className="btn btn-sm btn-success ms-2"
       >

@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Axiosinstance from "../../../api/axiosInstance";
 import { AxiosHeaders } from "../../../api/useAxiosHeaders";
-const fetchActiveMedicalRecord = async (query, headers) => {
+export const fetchActiveMedicalRecord = async (query, headers) => {
   // const { headers } = AxiosHeaders();
   return await Axiosinstance.get(`/medicalrecords/overview`, {
     params: query,

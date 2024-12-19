@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Spinner } from "react-bootstrap";
 import { useActivatePatient } from "./hooks/patientHooks/useActivatePatient";
 import { useDeactivatePatient } from "./hooks/patientHooks/useDeactivatePatient";
 
@@ -40,7 +40,11 @@ const PatientDeactivateModal = ({ show, handleClose, patientId, action }) => {
         <Button
           variant={action === "Deactivate" ? "danger" : "success"}
           onClick={handleSubmit}
+          disabled={activatePatient.isPending || deactivatePatient.isPending}
         >
+          {(activatePatient.isPending || deactivatePatient.isPending) && (
+            <Spinner size="sm" />
+          )}
           {action}
         </Button>
       </div>

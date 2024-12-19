@@ -10,6 +10,7 @@ import {
 import { FaSortDown, FaSortUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useGetDoctors } from "./hooks/useGetDoctors";
+import PaginationComponent from "../../components/PaginationComponent";
 
 const StaffWorkingHour = () => {
   const [pagination, setPagination] = React.useState({
@@ -45,10 +46,10 @@ const StaffWorkingHour = () => {
         row.role.name.charAt(0).toUpperCase() + row.role.name.slice(1),
     },
   ];
-  const employeeData = useMemo(() => data || [], [data]);
+  const doctorList = useMemo(() => data || [], [data]);
   const tableInstance = useReactTable({
     columns: columns,
-    data: employeeData,
+    data: doctorList,
 
     getCoreRowModel: getCoreRowModel(),
     // getFilteredRowModel: getFilteredRowModel(),
@@ -240,7 +241,11 @@ const StaffWorkingHour = () => {
             })}
         </tbody>
       </Table>
-      <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
+      {doctorList.length > 0 && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
+
+      {/* <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
         <button
           className="border-0"
           style={{ outline: "none" }}
@@ -304,7 +309,7 @@ const StaffWorkingHour = () => {
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
     </>
   );
 };

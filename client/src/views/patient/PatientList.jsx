@@ -110,8 +110,6 @@ const PatientList = () => {
             )} */}
           </div>
           <hr />
-          {/* <SearchInput searchvalue={search} setSearch={setSearch} /> */}
-          {/* <MemoizedPatientLists searchValue={debouncedValue} /> */}
           <PatientTable
             patients={data?.patients || []}
             isPending={isPending}

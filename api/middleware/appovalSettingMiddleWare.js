@@ -15,6 +15,7 @@ const approvalSettingMiddleWare = (permission_name, action_type) => {
         where: {
           permission_id: permission?.id,
           action: action_type,
+          status: true,
         },
         include: ["approvers"],
       });

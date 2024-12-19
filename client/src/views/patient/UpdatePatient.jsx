@@ -1,35 +1,29 @@
-import { yupResolver } from "@hookform/resolvers/yup";
-
-import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
-import { useForm } from "react-hook-form";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import * as yup from "yup";
-import TextInput from "../../components/inputs/TextInput";
-import NumberInput from "../../components/inputs/NumberInput";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Axiosinstance from "../../api/axiosInstance";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useGetPatient } from "./hooks/patientHooks/useGetPatient";
 import PatientForm from "./forms/PatientForm";
 import { IoMdArrowRoundBack } from "react-icons/io";
-const schema = yup.object().shape({
-  firstName: yup.string().required("first Name is required"),
-  middleName: yup.string().required("middle Name is required"),
-  lastName: yup.string().required(" lastName is required"),
-  phone: yup.string().required("phone Number is required"),
-  gender: yup.string().required("gender is required"),
-});
+import { useGetWoredas } from "../../hooks/useGetWoredas";
+import { useGetRegions } from "../../hooks/useGetRegions";
+import { useGetCities } from "../../hooks/useGetCities";
+import { useGetSubCities } from "../../hooks/useGetSubCities";
+
 const UpdatePatient = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { id } = useParams();
+
   const { data, isPending } = useGetPatient(state.id);
+
+  const { isPending: wp } = useGetWoredas();
+  const { isPending: rp } = useGetRegions();
+  const { isPending: cp } = useGetCities();
+  const { isPending: sp } = useGetSubCities();
   // const { state } = useLocation();
   //console.log(id);
   // let name = state.name.split(" ");
   // console.log(name);
-  if (isPending) return <Spinner animation="border" />;
+  if (isPending || wp || rp || cp || sp) return <Spinner animation="border" />;
 
   return (
     <Container className="p-3 mb-5">

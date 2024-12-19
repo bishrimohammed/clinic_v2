@@ -39,6 +39,6 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
     }
   );
-  MedicalRecordDocument.sync({ alter: true });
+  MedicalRecordDocument.sync({ alter: false });
   return MedicalRecordDocument;
 };

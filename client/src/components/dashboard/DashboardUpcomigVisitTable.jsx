@@ -47,9 +47,9 @@ const DashboardUpcomigVisitTable = () => {
                     padding: "0.2rem 0.5rem",
                     fontSize: 13,
 
-                    backgroundColor: "rgb(10,10,255)",
+                    backgroundColor: "#ffc107",
                   }}
-                  className=" text-white text-center   d-inline-flex align-items-center justify-content-center"
+                  className=" text-white text-center d-inline-flex align-items-center justify-content-center"
                 >
                   {visit.stage}
                 </span>

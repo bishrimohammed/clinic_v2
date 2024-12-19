@@ -52,7 +52,7 @@ const Login = () => {
       // console.log(data);
       if (data.is_new) {
         dispatch(setlogin(data));
-        toast.success("success");
+        // toast.success("success");
         // window.location.replace("/changePassword");
         // <Navigate to="/changepassword" replace="true" />;
         navigate("/changepassword", { state: data, replace: true });
@@ -60,7 +60,7 @@ const Login = () => {
       } else {
         // console.log("not new");
         dispatch(setlogin(data));
-        toast.success("success");
+        // toast.success("success");
         navigate("/", { replace: true });
       }
     },
@@ -149,13 +149,17 @@ const Login = () => {
                 </CardBody>
               </Card>
               <Card
-                className="text-white  "
+                className="text-white h-auto "
                 style={{ width: "100%", backgroundColor: "#9007b6" }}
               >
-                <CardBody className="">
-                  <div>
-                    {/* <h4>Sofnet Clinic System</h4> */}
-                    <Image src={doctorImage} fluid alt="" />
+                <CardBody>
+                  <div style={{ height: "100px" }}>
+                    <Image
+                      src={doctorImage}
+                      style={{ objectFit: "cover" }}
+                      fluid
+                      alt=""
+                    />
                   </div>
                 </CardBody>
               </Card>

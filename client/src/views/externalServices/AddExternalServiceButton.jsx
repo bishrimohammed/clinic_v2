@@ -9,7 +9,7 @@ const AddExternalServiceButton = () => {
         {" "}
         <button
           onClick={() => setShowAddModal(true)}
-          className="btn btn-primary btn-sm"
+          className="btn btn-primary btn-sm px-3"
         >
           +Add
         </button>

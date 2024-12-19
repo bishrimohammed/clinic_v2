@@ -101,31 +101,10 @@ const getWeeklyPayments = async () => {
       {
         model: db.ServiceItem,
         as: "item",
-        attributes: ["price"],
+        attributes: ["id", "price", "service_name"],
       },
     ],
-    attributes: [
-      [db.sequelize.fn("YEARWEEK", db.sequelize.col("payment_date")), "week"],
-      [
-        db.sequelize.fn("SUM", db.sequelize.col("item.price")),
-        "total_payments",
-      ],
-      //   [
-      //     db.sequelize.literal(
-      //       "DATE_SUB(payment_date, INTERVAL (DAYOFWEEK(payment_date) - 1) DAY)"
-      //     ),
-      //     "week_start",
-      //   ],
-      //   // Calculate end date of the week
-      //   [
-      //     db.sequelize.literal(
-      //       "DATE_ADD(DATE_SUB(payment_date, INTERVAL (DAYOFWEEK(payment_date) - 1) DAY), INTERVAL 6 DAY)"
-      //     ),
-      //     "week_end",
-      //   ],
-      // { exclude: ["item"] },
-      // { attributes: { exclude: ["item"] } },
-    ],
+
     where: {
       status: "Paid",
       payment_date: {
@@ -133,9 +112,17 @@ const getWeeklyPayments = async () => {
       },
     },
     group: [db.sequelize.fn("YEARWEEK", db.sequelize.col("payment_date"))],
-    order: [
-      [db.sequelize.fn("YEARWEEK", db.sequelize.col("payment_date")), "ASC"],
+    attributes: [
+      [db.sequelize.fn("YEARWEEK", db.sequelize.col("payment_date")), "week"],
+      [
+        db.sequelize.fn("SUM", db.sequelize.col("item.price")),
+        "total_payments",
+      ],
     ],
+    // group: ["item_id"],
+    // order: [
+    //   [db.sequelize.fn("YEARWEEK", db.sequelize.col("payment_date")), "ASC"],
+    // ],
   });
   //   console.log(weeklyPayments);
   return await weeklyPayments;

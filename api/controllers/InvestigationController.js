@@ -156,6 +156,7 @@ module.exports = InvestigationController = {
     const labs = await db.InvestigationOrder.findAll({
       where: {
         status: false,
+        is_internal_service: true,
       },
       include: [
         {
@@ -196,7 +197,7 @@ module.exports = InvestigationController = {
   addLabResult: asyncHandler(async (req, res) => {
     const { results, panels } = req.body;
     const { id } = req.params;
-    console.log(panels);
+    // console.log(panels);
     await Promise.all(
       results.map(async (value) => {
         return db.OrderedTest.update(

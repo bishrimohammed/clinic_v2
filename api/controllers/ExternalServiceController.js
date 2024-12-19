@@ -3,7 +3,11 @@ const db = require("../models");
 
 module.exports = ExternalServiceController = {
   getActiveExternalServices: asyncHandler(async (req, res) => {
-    console.log(req.query);
+    // console.log(req.query);
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+
+    let sortDirection;
     let where = {
       status: true,
     };
@@ -13,7 +17,35 @@ module.exports = ExternalServiceController = {
     if (req.query.role === "laboratorian") {
       where.service_type = "lab";
     }
-    const externalServices = await db.ExternalService.findAll({
+    switch (req.query?.sortBy) {
+      case "patient_name":
+        if (req.query?.order === "asc") {
+          sortDirection = [["patient_name", "ASC"]];
+        } else {
+          sortDirection = [["patient_name", "DESC"]];
+        }
+        break;
+      case "service_date":
+        if (req.query?.order === "asc") {
+          sortDirection = [["service_time", "ASC"]];
+        } else {
+          sortDirection = [["service_time", "DESC"]];
+        }
+        break;
+      case "service_type":
+        if (req.query?.order === "asc") {
+          sortDirection = [["service_type", "ASC"]];
+        } else {
+          sortDirection = [["service_type", "DESC"]];
+        }
+        break;
+
+      default:
+        sortDirection = [["service_time", "ASC"]];
+    }
+    // console.log(sortDirection);
+
+    const { count, rows } = await db.ExternalService.findAndCountAll({
       where,
       include: [
         {
@@ -22,8 +54,19 @@ module.exports = ExternalServiceController = {
           //   required: false,
         },
       ],
+      order: sortDirection,
+      offset: (page - 1) * limit,
+      limit: limit,
     });
-    res.json(externalServices);
+    const hasMore = count > page * limit;
+    // console.log(patients);
+    res.status(200).json({
+      results: rows,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit),
+      totalItems: count,
+      hasMore: hasMore,
+    });
   }),
   getExternalServiceLabTests: asyncHandler(async (req, res) => {
     const { externalServiceId } = req.params;
@@ -34,8 +77,8 @@ module.exports = ExternalServiceController = {
       where: { externalService_id: externalServiceId },
     });
     // console.log(externalService);
-    console.log(externalServiceId);
-    console.log(labInvestigation);
+    // console.log(externalServiceId);
+    // console.log(labInvestigation);
     const labTests = await db.OrderedTest.findAll({
       where: {
         investigationOrder_id: labInvestigation?.id,

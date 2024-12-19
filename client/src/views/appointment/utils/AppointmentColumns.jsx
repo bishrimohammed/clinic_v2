@@ -3,10 +3,10 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { format, parse } from "date-fns";
 const columHelper = createColumnHelper();
 export const AppointmentColumns = [
-  {
-    header: "#",
-    accessorFn: (row, index) => index + 1,
-  },
+  // {
+  //   header: "#",
+  //   accessorFn: (row, index) => index + 1,
+  // },
 
   {
     header: "Patient",

@@ -12,6 +12,7 @@ export const useTerminateAgreement = () => {
     mutationFn: async (id) => {
       return await Axiosinstance.patch(
         `/creditcompany/agreement/${id}/terminate`,
+        {},
         { headers }
       );
     },

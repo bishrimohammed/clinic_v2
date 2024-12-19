@@ -105,7 +105,7 @@ module.exports = MedicalRecordController = {
       offset: (page - 1) * limit,
       limit: limit,
     });
-    console.log(req.query);
+    // console.log(req.query);
     const hasMore = count > page * limit;
     // console.log(patients);
     res.status(200).json({
@@ -998,46 +998,50 @@ module.exports = MedicalRecordController = {
       // ],
     });
     // console.log(investigation);
-    const orderedTest = await db.OrderedTest.findAll({
-      where: {
-        investigationOrder_id: investigation.id,
-      },
-      include: [
-        {
-          model: db.ServiceItem,
-          as: "test",
+    let orderedTest = null;
+    if (investigation) {
+      orderedTest = await db.OrderedTest.findAll({
+        where: {
+          investigationOrder_id: investigation.id,
+        },
+        include: [
+          {
+            model: db.ServiceItem,
+            as: "test",
 
-          attributes: ["id", "service_name", "serviceCategory_id"],
-          include: [
-            {
-              model: db.LabTestProfile,
-              as: "labTestProfile",
+            attributes: ["id", "service_name", "serviceCategory_id"],
+            include: [
+              {
+                model: db.LabTestProfile,
+                as: "labTestProfile",
+              },
+            ],
+          },
+          {
+            model: db.User,
+            as: "requestedBy",
+            include: {
+              model: db.Employee,
+              as: "employee",
+              attributes: ["firstName", "lastName", "middleName"],
             },
-          ],
-        },
-        {
-          model: db.User,
-          as: "requestedBy",
-          include: {
-            model: db.Employee,
-            as: "employee",
-            attributes: ["firstName", "lastName", "middleName"],
+            attributes: ["id"],
           },
-          attributes: ["id"],
-        },
-        {
-          model: db.User,
-          as: "reportedBy",
-          include: {
-            model: db.Employee,
-            as: "employee",
-            attributes: ["firstName", "lastName", "middleName"],
+          {
+            model: db.User,
+            as: "reportedBy",
+            include: {
+              model: db.Employee,
+              as: "employee",
+              attributes: ["firstName", "lastName", "middleName"],
+            },
+            attributes: ["id"],
           },
-          attributes: ["id"],
-        },
-      ],
-    });
-
+        ],
+      });
+    } else {
+      orderedTest = [];
+    }
     res.json({ orderedTest, labcategoryIDS: labcategory_ids });
   }),
   // @desc    add investigation ordered result a MedicalRecord

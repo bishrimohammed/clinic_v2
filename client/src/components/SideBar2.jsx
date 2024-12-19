@@ -1,21 +1,17 @@
 import {
-  CBadge,
   CNavGroup,
   CNavItem,
   CNavLink,
-  CNavTitle,
   CSidebar,
   CSidebarBrand,
-  CSidebarHeader,
   CSidebarNav,
-  CSidebarToggler,
 } from "@coreui/react";
 import React from "react";
 import { FaKitMedical } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { changeSidebarShow } from "../store/sidebarSlice";
-import SimpleBar from "simplebar-react";
+// import SimpleBar from "simplebar-react";
 import {
   MdAdminPanelSettings,
   MdOutlineMoneyOffCsred,
@@ -67,7 +63,8 @@ const SideBar2 = () => {
         className="d-none d-md-flex text-white fw-bold justify-content-center align-items-center"
         to="/"
       >
-        Softnet Clinic System
+        {/* Softnet Clinic System */}
+        HealthCare System
       </CSidebarBrand>
       {/* </CSidebarHeader> */}
       <CSidebarNav>

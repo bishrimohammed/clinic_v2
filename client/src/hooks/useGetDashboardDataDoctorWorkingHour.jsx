@@ -5,7 +5,7 @@ import { AxiosHeaders } from "../api/useAxiosHeaders";
 export const useGetDashboardDataDoctorWorkingHour = () => {
   const { headers } = AxiosHeaders();
   return useQuery({
-    queryKey: ["dadhboard data", "doctor working hour"],
+    queryKey: ["dashboard", "doctor working hour"],
     queryFn: async () =>
       Axiosinstance.get("/dashboard/doctor-work-hour", { headers }).then(
         (res) => res.data

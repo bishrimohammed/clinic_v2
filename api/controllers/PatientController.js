@@ -1,6 +1,6 @@
 const expressAsyncHandler = require("express-async-handler");
 const db = require("../models");
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 const { getPaddedName } = require("../utils/getPaddedName");
 module.exports = PatientController = {
   getAllPatients: expressAsyncHandler(async (req, res) => {

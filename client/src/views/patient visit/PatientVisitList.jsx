@@ -22,6 +22,10 @@ const PatientVisitList = () => {
   }, [activeTab]);
   return (
     <div>
+      <div className=" d-flex justify-content-between align-items-center w-100 mb-1">
+        <h5 className="mb-0"> Patient Visits </h5>
+      </div>
+      <hr />
       <Tabs
         id="controlled-tab-example"
         activeKey={activeTab}

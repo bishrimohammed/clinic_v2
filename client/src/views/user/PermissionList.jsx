@@ -51,26 +51,6 @@ const PermissionList = ({
   const password = useMemo(() => generatePassword(8), []);
   const { mutate, mutateAsync, isPending } = useAddUser();
   console.log(defaultPermissions);
-  // const defaultPermission = useMemo(
-  //   () =>
-  //     permissions.map((p) => ({
-  //       permissionId: p.id,
-  //       admin: false,
-  //       create: defaultPermissions.some(
-  //         (permission) => permission.permission_id === p.id && permission.create
-  //       ),
-  //       read: defaultPermissions.some(
-  //         (permission) => permission.permission_id === p.id && permission.read
-  //       ),
-  //       update: defaultPermissions.some(
-  //         (permission) => permission.permission_id === p.id && permission.update
-  //       ),
-  //       delete: defaultPermissions.some(
-  //         (permission) => permission.permission_id === p.id && permission.delete
-  //       ),
-  //     })),
-  //   [defaultPermissions]
-  // );
   const {
     register,
     formState: { errors },
@@ -125,6 +105,7 @@ const PermissionList = ({
       // console.log(index);
     });
   }, [roleWatcher]);
+  console.log(errors);
 
   const handleRoleChange = (e) => {
     // console.log("saklcnldskjcb DVHKSJJJJJJJJJJJJJJJJJJJ");
@@ -158,11 +139,6 @@ const PermissionList = ({
     setDefaultPermissions([]);
   };
 
-  // useEffect(() => {
-  //   setValue("permissions", []);
-  // }, [roleWatcher]);
-  //   console.log(watchPermissions);
-  //   console.log(roles);
   const handleAdminCheck = (index, permissionId) => {
     let isAdmin = watchPermissions && watchPermissions[index].admin;
     // isAdmin = isAdmin === undefined ? true : isAdmin;
@@ -229,17 +205,6 @@ const PermissionList = ({
         .flat(),
     [roleWatcher]
   );
-  // const rolepermissions = roles
-  //   // ?.filter((r) => r.id === parseInt(roleWatcher))
-  //   ?.map((item) =>
-  //     item.permissions.map((permission) => permission.rolepermission)
-  //   )
-  //   .flat();
-
-  // console.log(roleWatcher);
-  // console.log(rolepermissions);
-
-  // console.log(watchPermissions);
   const isDisabled = (permissionId, index) => {
     const permission = rolepermissions?.filter(
       (p) => p.permission_id == permissionId
@@ -286,23 +251,23 @@ const PermissionList = ({
       role: data.role,
       permissions: selectedPermissions,
     };
-    console.log(user);
-    return;
+    // console.log(user);
+    // return;
     // // mutate(user);
     // return;
     mutateAsync(user)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res.status === 201) {
-          handleClose();
+          // handleClose();
         }
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
         const errors = err.response.data.message;
         errors.map((err) => {
           const msg = err.message;
-          console.log(err.message);
+          // console.log(err.message);
           // setError(err.path, msg.join(""));
           setError(err.path, {
             type: "server",

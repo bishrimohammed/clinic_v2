@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import SearchInput from "../../components/inputs/SearchInput";
 import { Button, Dropdown, Spinner, Table } from "react-bootstrap";
 import { LuFilter } from "react-icons/lu";
@@ -8,8 +8,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import useDebounce from "../../hooks/useDebounce";
@@ -19,52 +17,131 @@ import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
 import { FaSortDown, FaSortUp } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { hasPermission } from "../../utils/hasPermission";
-import PaginationComponent from "../../components/PaginationComponent";
+import SmartPaginationComponent from "../../components/SmartPaginationComponent";
 
-const AppointmentTable = ({
-  appointments,
-  isPending,
-  setShowAddAppointmentModal,
-  setShowFilterModal,
-  setFilter,
-  setShowCancleAppointmentModal,
-  setShowUpdateAppointmentModal,
-  setShowDeleteAppointmentModal,
-  setShowViewAppointment,
-}) => {
-  const [search, setSearch] = useState("");
-  const [sorting, setSorting] = useState([]);
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
+import {
+  fetchAppointments,
+  useGetAppointments,
+} from "./hooks/useGetAppointments";
+import { useSearchParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import FilterAppointmentModal from "./FilterAppointmentModal";
+import { useURLPagination } from "../../hooks/useURLPagination";
+import AddAppointmentBtn from "./AddAppointmentBtn";
+import ViewAppointmentModal from "./ViewAppointmentModal";
+import DeleteAppointmentModal from "./DeleteAppointmentModal";
+import UpdateAppointmentModal from "./UpdateAppointmentModal";
+import CancelAppointmantModal from "./CancelAppointmantModal";
+
+const AppointmentTable = (
+  {
+    // data,
+    // isPending,
+    // setShowAddAppointmentModal,
+    // setShowFilterModal,
+    // setFilter,
+    // setShowCancleAppointmentModal,
+    // setShowUpdateAppointmentModal,
+    // setShowDeleteAppointmentModal,
+    // setShowViewAppointment,
+  }
+) => {
+  // let [searchParams, setSearchParams] = useSearchParams([{ page: 1 }]);
+  const [filter, setFilter] = useState({ status: "" });
+  const [showFilterAppointmentModal, setShowFilterAppointmentModal] =
+    useState(false);
+
+  // const { paginate, handlePageChange, handleLimitChange, handleSortByChange } =
+  //   usePagination({
+  //     page: 1,
+  //     limit: 10,
+  //     sortBy: "appointment_date",
+  //     order: "desc",
+  //   });
+  const {
+    page,
+    limit,
+    order,
+    sortBy,
+    changePage,
+    changePageLimit,
+    changePageSortBy,
+  } = useURLPagination({
+    page: 1,
+    limit: 10,
+    sortBy: "appointment_date",
+    order: "desc",
   });
+  const { data, isPending, isPlaceholderData } = useGetAppointments({
+    ...filter,
+    page: parseInt(page),
+    limit: parseInt(limit),
+    sortBy,
+    order,
+  });
+  const [search, setSearch] = useState("");
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   // const [dropdownPosition, setDropdownPosition] = useState({});
   const handleToggleDropdown = (index, event) => {
     setOpenDropdownIndex(index === openDropdownIndex ? null : index);
-    // setDropdownPosition({ left: event.clientX - 20, top: event.clientY - 200 });
   };
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (!isPlaceholderData && data?.hasMore) {
+      const query = {
+        ...filter,
+        page: parseInt(page) + 1,
+        limit: parseInt(limit),
+        sortBy,
+        order,
+      };
+      queryClient.prefetchQuery({
+        queryKey: ["appointments", query],
+        queryFn: () => fetchAppointments(query),
+      });
+    }
+  }, [data, isPlaceholderData, page, queryClient]);
   // console.log(appointments);
   const debouncedValue = useDebounce(search, 500);
-  // const employeeData = useMemo(() => Data, []);
   const columns = useMemo(() => AppointmentColumns, []);
+  const appointments = useMemo(() => data?.results || [], [data?.results]);
+  // console.log(appointments);
 
   const tableInstance = useReactTable({
     columns: columns,
     data: appointments,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
     state: {
       globalFilter: debouncedValue,
-      pagination: pagination,
-      sorting,
     },
     onGlobalFilterChange: setSearch,
   });
+  const [showCancleAppointmentModal, setShowCancleAppointmentModal] = useState({
+    isShow: false,
+    appointmentId: null,
+  });
+  const [showUpdateAppointmentModal, setShowUpdateAppointmentModal] = useState({
+    isShow: false,
+    appointment: null,
+  });
+  const [showViewAppointment, setShowViewAppointment] = useState({
+    isShow: false,
+    appointment: null,
+  });
+  const [showDeleteAppointmentModal, setShowDeleteAppointmentModal] = useState({
+    isShow: false,
+    appointmentId: null,
+  });
+  // const handlePagination = (page) => {
+  //   handlePageChange(page);
+  //   // setPagination((prev) => {
+  //   //   // console.log(prev);
+  //   //   return { ...prev, page: page };
+  //   // });
+  // };
+  // console.log(paginate.sortBy);
+
   return (
     <>
       <div className=" d-flex flex-wrap  gap-2 align-items-center p-1 w-100 mb-1 mt-2">
@@ -73,7 +150,7 @@ const AppointmentTable = ({
         <Button
           variant="secondary"
           className="d-flex align-items-center gap-1"
-          onClick={() => setShowFilterModal(true)}
+          onClick={() => setShowFilterAppointmentModal(true)}
         >
           <LuFilter size={16} /> Filter
         </Button>
@@ -81,16 +158,7 @@ const AppointmentTable = ({
           Reset
         </Button>
       </div>
-      <div className="d-flex justify-content-between gap-2 align-items-center w-100 mb-1 mt-2">
-        {hasPermission("Appointment", "create") && (
-          <Button
-            className="btn btn-primary ms-auto"
-            onClick={() => setShowAddAppointmentModal(true)}
-          >
-            +Add Appointment
-          </Button>
-        )}
-      </div>
+      <AddAppointmentBtn />
 
       <Table
         striped
@@ -101,7 +169,7 @@ const AppointmentTable = ({
         // style={{ zIndex: 1, overflowY: "hidden" }}
       >
         <thead>
-          {tableInstance.getHeaderGroups().map((headerEl) => {
+          {/* {tableInstance.getHeaderGroups().map((headerEl) => {
             return (
               <tr key={headerEl.id}>
                 {headerEl.headers.map((columnEl, index) => {
@@ -143,7 +211,46 @@ const AppointmentTable = ({
                 <th>Actions</th>
               </tr>
             );
-          })}
+          })} */}
+          <tr>
+            <th>#</th>
+            <th
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                // handleSortByChange("patient_name");
+                changePageSortBy("patient_name");
+              }}
+            >
+              Patient{" "}
+              {sortBy == "patient_name" ? (
+                order === "asc" ? (
+                  <FaSortUp />
+                ) : (
+                  <FaSortDown />
+                )
+              ) : null}
+            </th>
+            <th>Assigned Doctor</th>
+            <th
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                // handleSortByChange("appointment_date");
+                changePageSortBy("appointment_date");
+              }}
+            >
+              Date{" "}
+              {sortBy == "appointment_date" ? (
+                order === "asc" ? (
+                  <FaSortUp />
+                ) : (
+                  <FaSortDown />
+                )
+              ) : null}
+            </th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
         </thead>
         <tbody>
           {isPending && (
@@ -155,199 +262,194 @@ const AppointmentTable = ({
               </td>
             </tr>
           )}
-          {!isPending &&
-            tableInstance.getRowModel().rows.map((rowEl) => {
-              return (
-                <tr
-                  key={rowEl.id}
-                  style={{ cursor: "pointer", zIndex: "-1" }}
-                  onClick={() => {
-                    // setShowViewEmployee(true);
-                    setShowViewAppointment({
-                      isShow: true,
-                      appointment: rowEl.original,
-                    });
-                  }}
-                >
-                  {rowEl.getVisibleCells().map((cellEl, index) => {
-                    return (
+          {tableInstance?.getRowModel()?.rows?.map((rowEl, index) => {
+            return (
+              <tr
+                key={rowEl.id}
+                style={{ cursor: "pointer", zIndex: "-1" }}
+                onClick={() => {
+                  // setShowViewEmployee(true);
+                  setShowViewAppointment({
+                    isShow: true,
+                    appointment: rowEl.original,
+                  });
+                }}
+              >
+                <td>{(page - 1) * limit + index + 1}</td>
+                {rowEl.getVisibleCells().map((cellEl, index) => {
+                  return (
+                    <>
                       <td key={cellEl.id}>
                         {flexRender(
                           cellEl.column.columnDef.cell,
                           cellEl.getContext()
                         )}
                       </td>
-                    );
-                  })}
-                  <td
-                    className="p-0"
-                    onClick={(e) => e.stopPropagation()}
-                    style={
-                      {
-                        // zIndex: 8,
-                        // overflow: "hidden",
-                      }
+                    </>
+                  );
+                })}
+                <td
+                  className="p-0"
+                  onClick={(e) => e.stopPropagation()}
+                  style={
+                    {
+                      // zIndex: 8,
+                      // overflow: "hidden",
                     }
+                  }
+                >
+                  <Dropdown
+                    id={rowEl.original.id + "dropdown"}
+                    autoClose="outside"
+                    drop="centered"
+                    as="div"
+                    //
+                    // show={openDropdowns[rowEl.original.id]}
+                    onToggle={(event) => handleToggleDropdown(null, event)}
+                    show={openDropdownIndex === rowEl.original.id}
                   >
-                    <Dropdown
-                      id={rowEl.original.id + "dropdown"}
-                      autoClose="outside"
-                      drop="centered"
-                      as="div"
-                      //
-                      // show={openDropdowns[rowEl.original.id]}
-                      onToggle={(event) => handleToggleDropdown(null, event)}
-                      show={openDropdownIndex === rowEl.original.id}
+                    <Dropdown.Toggle
+                      caret="false"
+                      className="employee-dropdown px-3 border-0"
+                      style={{ backgroundColor: "transparent" }}
+                      // style={{ zIndex: 6 }}
+                      id={`dropdown-${rowEl.original.id}`}
+                      onClick={(event) =>
+                        handleToggleDropdown(rowEl.original.id, event)
+                      }
                     >
-                      <Dropdown.Toggle
-                        caret="false"
-                        className="employee-dropdown px-3 border-0"
-                        style={{ backgroundColor: "transparent" }}
-                        // style={{ zIndex: 6 }}
-                        id={`dropdown-${rowEl.original.id}`}
-                        onClick={(event) =>
-                          handleToggleDropdown(rowEl.original.id, event)
-                        }
+                      <span
+                        // style={{ color: "red", zIndex: -1 }}
+                        className="text-dark"
                       >
-                        <span
-                          // style={{ color: "red", zIndex: -1 }}
-                          className="text-dark"
-                        >
-                          <BsThreeDotsVertical />
-                        </span>
-                      </Dropdown.Toggle>
-                      {/* {(rowEl.original.status === "upcoming") & 7} */}
-                      <Dropdown.Menu style={{ zIndex: 55 }}>
-                        <Dropdown.Item
-                          className="d-flex gap-2 align-items-center"
-                          role="button"
-                          disabled={rowEl.original.status !== "upcoming"}
-                          style={{ zIndex: "50" }}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            // setData_to_be_Edited(rowEl.original);
-                            // handleShowEdit();
-                            setShowUpdateAppointmentModal({
-                              isShow: true,
-                              appointment: rowEl.original,
-                            });
-                          }}
-                        >
-                          <RiEditLine /> Edit
-                        </Dropdown.Item>
+                        <BsThreeDotsVertical />
+                      </span>
+                    </Dropdown.Toggle>
+                    {/* {(rowEl.original.status === "upcoming") & 7} */}
+                    <Dropdown.Menu style={{ zIndex: 55 }}>
+                      <Dropdown.Item
+                        className="d-flex gap-2 align-items-center"
+                        role="button"
+                        disabled={rowEl.original.status !== "upcoming"}
+                        style={{ zIndex: "50" }}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          // setData_to_be_Edited(rowEl.original);
+                          // handleShowEdit();
+                          setShowUpdateAppointmentModal({
+                            isShow: true,
+                            appointment: rowEl.original,
+                          });
+                        }}
+                      >
+                        <RiEditLine /> Edit
+                      </Dropdown.Item>
 
+                      <Dropdown.Item
+                        className="d-flex gap-2 align-items-center"
+                        role="button"
+                        disabled={rowEl.original.status === "cancelled"}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setShowCancleAppointmentModal({
+                            isShow: true,
+                            appointmentId: rowEl.original.id,
+                          });
+                          // setSelectedEmployee({
+                          //   id: rowEl.original.id,
+                          //   selectedFor: "deactivate",
+                          // });
+                          // setShowDelete(true);
+                        }}
+                      >
+                        <TbCalendarCancel color="red" /> Cancel
+                      </Dropdown.Item>
+                      {hasPermission("Appointment", "delete") && (
                         <Dropdown.Item
-                          className="d-flex gap-2 align-items-center"
                           role="button"
-                          disabled={rowEl.original.status === "cancelled"}
                           onClick={(event) => {
                             event.stopPropagation();
-                            setShowCancleAppointmentModal({
+                            setShowDeleteAppointmentModal({
                               isShow: true,
                               appointmentId: rowEl.original.id,
                             });
-                            // setSelectedEmployee({
-                            //   id: rowEl.original.id,
-                            //   selectedFor: "deactivate",
-                            // });
-                            // setShowDelete(true);
                           }}
+                          className="d-flex gap-2 align-items-center"
                         >
-                          <TbCalendarCancel color="red" /> Cancel
+                          <RiDeleteBin6Line color="red" /> Delete
                         </Dropdown.Item>
-                        {hasPermission("Appointment", "create") && (
-                          <Dropdown.Item
-                            role="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              setShowDeleteAppointmentModal({
-                                isShow: true,
-                                appointmentId: rowEl.original.id,
-                              });
-                            }}
-                            className="d-flex gap-2 align-items-center"
-                          >
-                            <RiDeleteBin6Line color="red" /> Delete
-                          </Dropdown.Item>
-                        )}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </td>
-                </tr>
-              );
-            })}
+                      )}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </Table>
-      {/* <div
-        style={{ zIndex: 0 }}
-        className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2"
-      >
-        <button
-          className="border-0"
-          style={{ outline: "none" }}
-          onClick={() => tableInstance.firstPage()}
-          disabled={!tableInstance.getCanPreviousPage()}
-        >
-          &lt;&lt;
-        </button>
-        <button
-          // className="btn btn-outline-secondary"
-          onClick={() => tableInstance.previousPage()}
-          disabled={!tableInstance.getCanPreviousPage()}
-        >
-          &lt;
-        </button>
-        <button
-          // className="btn btn-outline-secondary"
-          onClick={() => tableInstance.nextPage()}
-          disabled={!tableInstance.getCanNextPage()}
-        >
-          &gt;
-        </button>
-        <button
-          // className="btn btn-outline-secondary"
-          onClick={() => tableInstance.lastPage()}
-          disabled={!tableInstance.getCanNextPage()}
-        >
-          &gt;&gt;
-        </button>
-        <span className="d-flex align-items-center gap-1">
-          <div>Page</div>
-          <strong className="d-flex align-items-center gap-1">
-            {tableInstance.getState().pagination.pageIndex + 1} of{" "}
-            {tableInstance.getPageCount().toLocaleString()}
-          </strong>
-        </span>
-        <span className="d-flex align-items-center gap-1">
-          | Go to page:
-          <input
-            type="number"
-            value={tableInstance.getState().pagination.pageIndex + 1}
-            // defaultValue={tableInstance.options.state.pagination.pageIndex}
-            onChange={(e) => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0;
-              tableInstance.setPageIndex(page);
-            }}
-            className="form-control w-25"
-          />
-        </span>
-        <select
-          value={tableInstance.getState().pagination.pageSize}
-          // value={tableInstance.options.state.pagination.pageIndex}
-          onChange={(e) => {
-            tableInstance.setPageSize(Number(e.target.value));
-          }}
-          // className="form-select"
-        >
-          {[10, 20, 30, 40, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
-      </div> */}
-      {appointments?.length > 0 && !isPending && (
-        <PaginationComponent tableInstance={tableInstance} />
+
+      <SmartPaginationComponent
+        currentPage={parseInt(data?.currentPage) || 1}
+        totalPages={parseInt(data?.totalPages) || 1}
+        onPageChange={changePage}
+        // paginate={paginate}
+        // handleLimitChange={handleLimitChange}
+      />
+      {showFilterAppointmentModal && (
+        <FilterAppointmentModal
+          show={showFilterAppointmentModal}
+          handleClose={() => setShowFilterAppointmentModal(false)}
+          filter={filter}
+          setFilter={setFilter}
+        />
+      )}
+      {showCancleAppointmentModal.isShow && (
+        <CancelAppointmantModal
+          show={showCancleAppointmentModal.isShow}
+          handleClose={() =>
+            setShowCancleAppointmentModal({
+              isShow: false,
+              appointmentId: null,
+            })
+          }
+          appointmentId={showCancleAppointmentModal.appointmentId}
+        />
+      )}
+      {showUpdateAppointmentModal.isShow && (
+        <UpdateAppointmentModal
+          show={showUpdateAppointmentModal.isShow}
+          handleClose={() =>
+            setShowUpdateAppointmentModal({
+              isShow: false,
+              appointment: null,
+            })
+          }
+          appointment={showUpdateAppointmentModal.appointment}
+        />
+      )}
+      {showDeleteAppointmentModal.isShow && (
+        <DeleteAppointmentModal
+          show={showDeleteAppointmentModal.isShow}
+          handleClose={() =>
+            setShowDeleteAppointmentModal({
+              isShow: false,
+              appointmentId: null,
+            })
+          }
+          appointmentId={showDeleteAppointmentModal.appointmentId}
+        />
+      )}
+      {showViewAppointment.isShow && (
+        <ViewAppointmentModal
+          show={showViewAppointment.isShow}
+          handleClose={() =>
+            setShowViewAppointment({
+              isShow: false,
+              appointment: null,
+            })
+          }
+          appointment={showViewAppointment.appointment}
+        />
       )}
     </>
   );

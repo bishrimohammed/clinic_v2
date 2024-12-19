@@ -6,7 +6,7 @@ import { AxiosHeaders } from "../api/useAxiosHeaders";
 export const useGetDashBoardData = () => {
   const { headers } = AxiosHeaders();
   return useQuery({
-    queryKey: ["dadhboard data"],
+    queryKey: ["dashboard data"],
     queryFn: async () =>
       Axiosinstance.get("/dashboard", { headers }).then((res) => res.data),
     refetchOnWindowFocus: true,

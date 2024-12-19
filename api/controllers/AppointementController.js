@@ -9,13 +9,35 @@ module.exports.createappointment = (data) => {
 module.exports.AppointementController = {
   getAppointments: asyncHandler(async (req, res) => {
     const {} = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    let sortDirection;
     let where = {};
     if (req.query.status) {
       where.status = req.query.status;
     }
-    const appointments = await db.Appointment.findAll({
+    switch (req.query?.sortBy) {
+      case "patient_name":
+        if (req.query?.order === "asc") {
+          sortDirection = [["patient_name", "ASC"]];
+        } else {
+          sortDirection = [["patient_name", "DESC"]];
+        }
+        break;
+      case "appointment_date":
+        if (req.query?.order === "asc") {
+          sortDirection = [["appointment_date", "ASC"]];
+        } else {
+          sortDirection = [["appointment_date", "DESC"]];
+        }
+        break;
+
+      default:
+        sortDirection = [["appointment_date", "DESC"]];
+    }
+    const { count, rows } = await db.Appointment.findAndCountAll({
       where: where,
-      order: [["createdAt", "DESC"]],
+      // order: [["createdAt", "DESC"]],
       include: [
         {
           model: db.Patient,
@@ -35,8 +57,18 @@ module.exports.AppointementController = {
           attributes: ["id"],
         },
       ],
+      order: sortDirection,
+      offset: (page - 1) * limit,
+      limit: limit,
     });
-    res.json(appointments);
+    const hasMore = count > page * limit;
+    res.json({
+      hasMore,
+      results: rows,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit),
+      totalItems: count,
+    });
   }),
   getAppointment: asyncHandler(async (req, res) => {
     const { id } = req.params;

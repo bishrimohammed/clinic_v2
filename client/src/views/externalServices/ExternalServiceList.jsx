@@ -4,19 +4,18 @@ import { useGetActiveExternalService } from "./hooks/useGetActiveExternalService
 import {
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { externalServiceColumn } from "./utils/externalServiceColumn";
-import PaginationComponent from "../../components/PaginationComponent";
+// import PaginationComponent from "../../components/PaginationComponent";
 import { FaEye, FaSortDown, FaSortUp } from "react-icons/fa";
 import { Spinner, Table } from "react-bootstrap";
 import { useGetCurrentUser } from "../../hooks/useGetCurrentUser";
-import { externalServicePaymentsColumn } from "../Bill/utils/externalServicePaymentsColumn";
+// import { externalServicePaymentsColumn } from "../Bill/utils/externalServicePaymentsColumn";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import SmartPaginationComponent from "../../components/SmartPaginationComponent";
+import { hasPermission } from "../../utils/hasPermission";
 const ExternalServiceList = () => {
   const user = useGetCurrentUser();
   let [searchParams, setSearchParams] = useSearchParams();
@@ -73,7 +72,7 @@ const ExternalServiceList = () => {
   // const debouncedValue = useDebounce(search, 500);
   // const employeeData = useMemo(() => Data, []);
   const columns = useMemo(() => externalServiceColumn, []);
-  const externalServiceData = useMemo(() => data || [], [data]);
+  const externalServiceData = useMemo(() => data?.results || [], [data]);
   const tableInstance = useReactTable({
     columns: columns,
     data: externalServiceData,
@@ -90,9 +89,57 @@ const ExternalServiceList = () => {
     // },
     // onGlobalFilterChange: setSearch,
   });
+  const getSortBy = () => {
+    return searchParams.get("sortBy");
+  };
+  const getSortDirection = () => {
+    return searchParams.get("order");
+  };
+  const handleSort = (sortby) => {
+    setSearchParams((prev) => {
+      if (searchParams.get("sortBy") !== sortby) {
+        prev.set("order", "asc");
+        prev.set("sortBy", sortby);
+        //  return {...prev, sortBy: sortby, order: searchParams.get("order") === "asc"? "desc" : "asc" }
+      } else {
+        prev.set("order", searchParams.get("order") === "asc" ? "desc" : "asc");
+      }
+      return prev;
+    });
+  };
+  const handlePagination = (page) => {
+    setSearchParams((prev) => {
+      // console.log(prev);
+      //  return {
+      //   ...prev,
+      // if (btn === "first") {
+      //   prev.set("page", 1);
+      // } else if (btn === "previous") {
+      //   prev.set("page", parseInt(prev.get("page")) - 1);
+      // } else if (btn === "next") {
+      //   prev.set("page", parseInt(prev.get("page")) + 1);
+      // } else if (btn === "last") {
+      //   // const totalPages = Math.ceil(data?.total_count / searchParams.get("limit"));
+
+      //   prev.set("page", parseInt(data?.totalPages));
+      // } else {
+      //   prev.set("page", parseInt(page));
+      // }
+      prev.set("page", parseInt(page));
+      // const page = prev.get("page");
+      // console.log(page);
+      // prev.set("page", parseInt(page) + 1);
+      return prev;
+      //  }
+    });
+  };
   return (
     <div>
-      <AddExternalServiceButton />
+      <h4 className=" mb-0">External Service List</h4>
+      <hr />
+      {hasPermission("External Service", "create") && (
+        <AddExternalServiceButton />
+      )}
       <Table
         striped
         bordered
@@ -141,9 +188,51 @@ const ExternalServiceList = () => {
                   );
                 })} */}
                 <th>#</th>
-                <th>Patient Name</th>
-                <th>Service Type</th>
-                <th>Service Date</th>
+                <th
+                  onClick={() => {
+                    handleSort("patient_name");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Patient Name{" "}
+                  {getSortBy() == "patient_name" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th
+                  onClick={() => {
+                    handleSort("service_type");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Service Type{" "}
+                  {getSortBy() == "service_type" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
+                <th
+                  onClick={() => {
+                    handleSort("service_date");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  Service Date{" "}
+                  {getSortBy() == "service_date" ? (
+                    getSortDirection() === "asc" ? (
+                      <FaSortUp />
+                    ) : (
+                      <FaSortDown />
+                    )
+                  ) : null}
+                </th>
                 <th>Status</th>
                 {/* <th></th> */}
                 <th>Actions</th>
@@ -219,9 +308,16 @@ const ExternalServiceList = () => {
             })}
         </tbody>
       </Table>
-      {data?.length > 0 && !isPending && (
+      <div className="d-flex gap-2 align-items-center">
+        <SmartPaginationComponent
+          currentPage={parseInt(data?.currentPage)}
+          totalPages={parseInt(data?.totalPages)}
+          onPageChange={handlePagination}
+        />
+      </div>
+      {/* {data?.length > 0 && !isPending && (
         <PaginationComponent tableInstance={tableInstance} />
-      )}
+      )} */}
     </div>
   );
 };

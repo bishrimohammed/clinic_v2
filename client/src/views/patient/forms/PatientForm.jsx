@@ -61,7 +61,7 @@ const PatientForm = ({ patient }) => {
             5,
             "0"
           );
-          setValue("patientId", nextNumber);
+          setValue("patientId", `P-${nextNumber}`);
         }
       } else {
         setValue("patientId", patient.card_number);
@@ -90,6 +90,7 @@ const PatientForm = ({ patient }) => {
   const { data: regions } = useGetRegions();
   const { data: cities } = useGetCities();
   const { data: subcities } = useGetSubCities();
+  // console.log(patient);
 
   const {
     register,
@@ -275,6 +276,7 @@ const PatientForm = ({ patient }) => {
   const EmergencyregionWatcher = watch("emergency.region_id");
   const EmergencycityWatcher = watch("emergency.city_id");
   const EmergencySubCityWatcher = watch("emergency.subcity_id");
+  // console.log(errors);
 
   const companyIdWatcher = watch("company_id");
   const employeeSelectWatcher = watch("employeeId");
@@ -1381,41 +1383,5 @@ const PatientForm = ({ patient }) => {
     </>
   );
 };
-
-// async function generatePatientID() {
-//   // Retrieve the last used patient ID from your data store (e.g., local storage, database)
-//   let lastID = localStorage.getItem("LastPatientID");
-//   // console.log(lastID);
-//   // Extract the numeric part of the last ID and increment it
-//   let nextNumber;
-//   if (lastID) {
-//     nextNumber = String(parseInt(lastID?.split("-")[1]) + 1).padStart(5, "0");
-
-//     return `P-${nextNumber}`;
-//   } else {
-//     const res = await Axiosinstance.get("patient/lastPatientID");
-//     //  .then((res) => {
-//     //   console.log(res.data);
-//     nextNumber = String(parseInt(res.data?.split("-")[1]) + 1).padStart(5, "0");
-//     // });
-//     if (!res.data) {
-//       localStorage.setItem("LastPatientID", "P-00001");
-//       return "P-00001";
-//     }
-//     localStorage.setItem(
-//       "LastPatientID",
-//       "P-" + String(parseInt(res.data?.split("-")[1])).padStart(5, "0")
-//     );
-//     return `P-${nextNumber}`;
-//     console.log(nextNumber);
-//   }
-//   // Combine the prefix and the new number
-//   let newID = `P-${nextNumber}`;
-
-//   // Store the new last used patient ID
-//   // localStorage.setItem('LastPatientID', newID);
-
-//   return newID;
-// }
 
 export default PatientForm;

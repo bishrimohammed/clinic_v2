@@ -5,11 +5,13 @@ const SmartPaginationComponent = ({
   currentPage,
   totalPages,
   onPageChange,
+  paginate,
+  handleLimitChange,
 }) => {
   let [searchParams, setSearchParams] = useSearchParams();
 
   const handlePageClick = (page) => {
-    onPageChange(page);
+    onPageChange(parseInt(page));
   };
 
   const renderPageNumbers = () => {
@@ -82,13 +84,19 @@ const SmartPaginationComponent = ({
       <select
         style={{ outline: "none" }}
         className="p-1"
-        value={searchParams.get("limit") || 10}
+        value={
+          handleLimitChange ? paginate.limit : searchParams.get("limit") || 10
+        }
         onChange={(e) => {
-          setSearchParams((prev) => {
-            prev.set("page", 1);
-            prev.set("limit", parseInt(e.target.value));
-            return prev;
-          });
+          if (handleLimitChange) {
+            handleLimitChange(parseInt(e.target.value));
+          } else {
+            setSearchParams((prev) => {
+              prev.set("page", 1);
+              prev.set("limit", parseInt(e.target.value));
+              return prev;
+            });
+          }
         }}
         // className="form-select"
       >

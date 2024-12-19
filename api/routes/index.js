@@ -43,6 +43,7 @@ const NurseTreatmentRoute = require("./NurseTreatment.Route.js");
 const ExternalServiceRoute = require("./ExternalService.route.js");
 const ProcedureRoute = require("./Procedure.route.js");
 const ReportRoute = require("./Report.route.js");
+const printRoute = require("./print.route.js");
 
 module.exports = {
   userRoute,
@@ -81,4 +82,5 @@ module.exports = {
   ExternalServiceRoute,
   ProcedureRoute,
   ReportRoute,
+  printRoute,
 };

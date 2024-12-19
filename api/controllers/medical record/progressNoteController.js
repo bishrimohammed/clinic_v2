@@ -220,7 +220,7 @@ module.exports = progressNoteController = {
           })
         );
       }
-      is_Invetigated.status = false;
+      is_Invetigated.status = true;
       await is_Invetigated.save({ userId: req.user.id });
     }
 
@@ -320,7 +320,7 @@ module.exports = progressNoteController = {
         })
       );
     }
-    if (vitalsParsed.length > 0) {
+    if (vitalsParsed?.length > 0) {
       const vital = await db.Vital.create(
         {
           medicalRecord_id: medicalRecord.id,

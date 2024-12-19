@@ -5,13 +5,7 @@ import { CompanyEmployeeColumns } from "../utils/CompanyEmployeeColumn";
 import { useGetCompanyEmployees } from "../hooks/useGetCompanyEmployees";
 import { useLocation } from "react-router-dom";
 
-import {
-  FaLock,
-  FaSortDown,
-  FaSortUp,
-  FaUnlock,
-  FaUserLock,
-} from "react-icons/fa6";
+import { FaSortDown, FaSortUp, FaUnlock, FaUserLock } from "react-icons/fa6";
 import {
   flexRender,
   getCoreRowModel,
@@ -24,13 +18,15 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import UpdateCompanyEmployeeModal from "./UpdateCompanyEmployeeModal";
 import DeactivateEmaployeeModal from "./DeactivateEmaployeeModal";
 import ViewCompanyEmployeeDetail from "./ViewCompanyEmployeeDetail";
+import PaginationComponent from "../../../../components/PaginationComponent";
+
 const CompanyEmployee = () => {
   const [showAddCompanyEmployeeModal, setShowAddCompanyEmployeeModal] =
     useState(false);
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const { state } = useLocation();
   const { data: employees, isPending } = useGetCompanyEmployees(state.id);
-  const emplooyesData = useMemo(() => employees || [], [employees, isPending]);
+  const employeesData = useMemo(() => employees || [], [employees, isPending]);
   const columns = useMemo(() => CompanyEmployeeColumns, []);
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = React.useState({
@@ -50,14 +46,12 @@ const CompanyEmployee = () => {
     isShow: false,
     employee: null,
   });
-  // const [showRenewAgreement, setShowRenewAgreement] = useState(false);
   const handleToggleDropdown = (index, event) => {
     setOpenDropdownIndex(index === openDropdownIndex ? null : index);
-    // setDropdownPosition({ left: event.clientX - 20, top: event.clientY - 200 });
   };
   const tableInstance = useReactTable({
     columns: columns,
-    data: emplooyesData,
+    data: employeesData,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -68,7 +62,6 @@ const CompanyEmployee = () => {
       sorting,
     },
   });
-  // console.log(emplooyesData);
   return (
     <div>
       <div className="d-flex justify-content-end py-2">
@@ -267,7 +260,10 @@ const CompanyEmployee = () => {
             })}
         </tbody>
       </Table>
-      <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
+      {employeesData?.length > 0 && (
+        <PaginationComponent tableInstance={tableInstance} />
+      )}
+      {/* <div className="d-flex flex-wrap justify-content-center mt-md-1 mt-2 align-items-center gap-2">
         <button
           className="border-0"
           style={{ outline: "none" }}
@@ -331,7 +327,7 @@ const CompanyEmployee = () => {
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
       {showAddCompanyEmployeeModal && (
         <AddCompanyEmployeeModal
           handleClose={setShowAddCompanyEmployeeModal}

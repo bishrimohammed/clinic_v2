@@ -32,6 +32,9 @@ const data = [
   },
 ];
 const TableDisplay = ({ data }) => {
+  console.log(data);
+  // return;
+
   return (
     <Table striped bordered responsive>
       <thead>

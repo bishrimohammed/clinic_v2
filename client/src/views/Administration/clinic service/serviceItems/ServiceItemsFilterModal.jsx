@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 // import { useGetEmployeePositions } from "./hooks/useGetEmployeePositions";
 import { useGetServiceGroups } from "../hooks/useGetServiceGroups";
+import { useLocation } from "react-router-dom";
 const FilterSchema = yup.object().shape({
   status: yup.string(),
   groups: yup.array().of(yup.string()),
@@ -38,6 +39,9 @@ const ServiceItemsFilterModal = ({
   serviceId,
 }) => {
   const { data: groups } = useGetServiceGroups(serviceId);
+  const { state } = useLocation();
+  console.log(state);
+
   // console.log(positions);
   // console.log("ServiceItemsFilterModal");
   // console.log(groups);
@@ -89,7 +93,7 @@ const ServiceItemsFilterModal = ({
   return (
     <Modal size="md" show={show} onHide={() => handleClose(false)} centered>
       <Modal.Header closeButton>
-        <Modal.Title>Filter Employees</Modal.Title>
+        <Modal.Title>Filter {state?.service_name} Items</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit(submitHamder)}>
