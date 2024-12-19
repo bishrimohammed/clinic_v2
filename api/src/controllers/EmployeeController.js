@@ -1,7 +1,7 @@
 const asynHandler = require("express-async-handler");
 const db = require("../models");
 const { format, parse } = require("date-fns");
-const { fromZonedTime } = require("date-fns-tz");
+// const { fromZonedTime } = require("date-fns-tz");
 // import { zonedTimeToUtc } from 'date-fns-tz';
 // const e = require("express");
 // const { Op, Sequelize } = require("sequelize");
@@ -119,7 +119,7 @@ module.exports = EmployeeController = {
       ],
     });
     const employee = employees.filter((e) => e.user === null);
-    console.log(employees[5].user);
+    // console.log(employees[5].user);
     res.json(employee);
   }),
   getEmployeePostions: asynHandler(async (req, res) => {
@@ -222,11 +222,11 @@ module.exports = EmployeeController = {
       },
       { userId: req.user.id }
     );
-    const DATEOFBIRTH = new Date(date_of_birth).toISOString();
-    const DATEOFHIRE = new Date(date_of_hire).toISOString();
+    const DATEOFBIRTH = new Date(date_of_birth);
+    const DATEOFHIRE = new Date(date_of_hire);
 
-    const convertedBirthDate = fromZonedTime(DATEOFBIRTH, "Africa/Nairobi");
-    const convertedHireDate = fromZonedTime(DATEOFHIRE, "Africa/Nairobi");
+    // const convertedBirthDate = fromZonedTime(DATEOFBIRTH, "Africa/Nairobi");
+    // const convertedHireDate = fromZonedTime(DATEOFHIRE, "Africa/Nairobi");
     const newEmployee = await db.Employee.create(
       {
         firstName,
@@ -235,8 +235,8 @@ module.exports = EmployeeController = {
         position: position,
         other_position: position === "Other" ? other_position : null,
         gender,
-        date_of_birth: format(convertedBirthDate, "yyyy-MM-dd"),
-        date_of_hire: format(convertedHireDate, "yyyy-MM-dd"),
+        date_of_birth: format(DATEOFBIRTH, "yyyy-MM-dd"),
+        date_of_hire: format(DATEOFHIRE, "yyyy-MM-dd"),
         photo:
           req.files["photo"] && "uploads/" + req.files["photo"][0]?.filename,
         digital_signature:
@@ -281,23 +281,19 @@ module.exports = EmployeeController = {
       throw new Error(`Employee not found`);
     }
     // console.log(position);
-    const DATEOFBIRTH = new Date(date_of_birth).toISOString();
-    const DATEOFHIRE = new Date(date_of_hire).toISOString();
-    // photo: req.files["photo"] && "uploads/" + req.files["photo"][0]?.filename,
-    // digital_signature:
-    //   req.files["digital_signature"] &&
-    //   "uploads/" + req.files["digital_signature"][0]?.filename,
+    const DATEOFBIRTH = new Date(date_of_birth);
+    const DATEOFHIRE = new Date(date_of_hire);
 
-    const convertedBirthDate = fromZonedTime(DATEOFBIRTH, "Africa/Nairobi");
-    const convertedHireDate = fromZonedTime(DATEOFHIRE, "Africa/Nairobi");
+    // const convertedBirthDate = fromZonedTime(DATEOFBIRTH, "Africa/Nairobi");
+    // const convertedHireDate = fromZonedTime(DATEOFHIRE, "Africa/Nairobi");
     empExist.firstName = firstName;
     empExist.middleName = middleName;
     empExist.lastName = lastName;
     empExist.position = position;
     empExist.other_position = other_position ? other_position : "";
     empExist.gender = gender;
-    empExist.date_of_birth = format(convertedBirthDate, "yyyy-MM-dd");
-    empExist.date_of_hire = format(convertedHireDate, "yyyy-MM-dd");
+    empExist.date_of_birth = format(DATEOFBIRTH, "yyyy-MM-dd");
+    empExist.date_of_hire = format(DATEOFHIRE, "yyyy-MM-dd");
     empExist.photo = req.files["photo"]
       ? "uploads/" + req.files["photo"][0]?.filename
       : empExist.photo;

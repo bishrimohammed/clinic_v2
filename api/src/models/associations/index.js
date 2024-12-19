@@ -1,7 +1,7 @@
-const { MedicalRecordAssociation } = require("./MedicalRecordAssociation");
+const { MedicalRecordAssociation } = require("./MedicalRecordAssociation.js");
 const {
   MedicalRecordDetailAssocations,
-} = require("./medicalRecordDetailAssocations");
+} = require("./medicalRecordDetailAssocations.js");
 const { InvestiagtionAssocation } = require("./investiagtionAssocation.js");
 const { employeeAssociation } = require("./employeeAssociation.js");
 const { roleAssociation } = require("./roleAssociation.js");

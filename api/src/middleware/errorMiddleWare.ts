@@ -1,22 +1,27 @@
-const { Sequelize } = require("sequelize");
-
-module.exports.notFound = (req, res, next) => {
+import { Sequelize, ValidationError } from "sequelize";
+import { NextFunction, Request, Response } from "express";
+export const notFound = (req: Request, res: Response, next: NextFunction) => {
   const error = new Error(`URL is not found: ${req.originalUrl}`);
   res.status(404);
   next(error);
 };
 
-module.exports.errorHandler = (err, req, res, next) => {
+export const errorHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   let message = err.message;
 
   // res.status(500);
-  if (err instanceof Sequelize.ValidationError) {
+  if (err instanceof ValidationError) {
     let errors = err.errors.map((err) => err.message);
     statusCode = 400;
     console.log(errors);
     console.log(err);
-    message = err.errors;
+    message = "Validation Error" + err.errors;
     // res.status(400).json({ errors });
   }
   res.status(statusCode);

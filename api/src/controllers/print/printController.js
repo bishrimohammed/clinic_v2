@@ -3,7 +3,7 @@ const fs = require("fs");
 const asyncHandler = require("express-async-handler");
 const getClinicInformation = require("../../helpers/getClinicInformation");
 const getLocalFile = require("../../utils/getLocalFile");
-const puppeteer = require("puppeteer");
+// const puppeteer = require("puppeteer");
 const path = require("path");
 
 // const fs = require("fs");
@@ -13,7 +13,7 @@ const getBase64Image = (filePath) => {
   return `data:image/png;base64,${image.toString("base64")}`; // Change the mime type if needed
 };
 const printLabResult = asyncHandler(async (req, res) => {
-  // const pdfService = new PdfService();
+  const pdfService = new PdfService();
   const data = [
     { name: "John Doe", age: "34", marital: "married" },
     { name: "Jane Smith", age: "28", marital: "single" },
@@ -86,82 +86,82 @@ const printLabResult = asyncHandler(async (req, res) => {
   const logoBase64 = getBase64Image(logoFullPath);
   // let filePath
 
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  let tableBody = "";
-  data.map(
-    (item) =>
-      (tableBody += `
-    <tr>
-      <td>${item.name}</td>
-      <td>${item.age}</td>
-      <td>${item.marital}</td>
-    </tr>`)
-  );
-  await page.setContent(`
-  <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+  //   const browser = await puppeteer.launch();
+  //   const page = await browser.newPage();
+  //   let tableBody = "";
+  //   data.map(
+  //     (item) =>
+  //       (tableBody += `
+  //     <tr>
+  //       <td>${item.name}</td>
+  //       <td>${item.age}</td>
+  //       <td>${item.marital}</td>
+  //     </tr>`)
+  //   );
+  //   await page.setContent(`
+  //   <!DOCTYPE html>
+  // <html lang="en">
+  //   <head>
+  //     <meta charset="UTF-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
-    />
-    <title>pdf test</title>
-  </head>
-  <body>
-    <div class="">
-      <header class="d-flex align-items-center">
-      <img src="${logoBase64}" width="60" height="60"/>
-        <h3 class="">${clinic?.name}</h3>
-      </header>
-      <hr/>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Marital</th>
-          </tr>
-        </thead>
-        <tbody>
-       ${tableBody}
-        </tbody>
-      </table>
-      
-    </div>
-  </body>
-</html>`);
-  const filePath = `${process.cwd()}/output.pdf`;
-  await page.pdf({
-    path: filePath,
-    format: "A4",
-    printBackground: true,
+  //     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  //     <link
+  //       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+  //       rel="stylesheet"
+  //       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+  //       crossorigin="anonymous"
+  //     />
+  //     <title>pdf test</title>
+  //   </head>
+  //   <body>
+  //     <div class="">
+  //       <header class="d-flex align-items-center">
+  //       <img src="${logoBase64}" width="60" height="60"/>
+  //         <h3 class="">${clinic?.name}</h3>
+  //       </header>
+  //       <hr/>
+  //       <table class="table table-bordered">
+  //         <thead>
+  //           <tr>
+  //             <th>Name</th>
+  //             <th>Age</th>
+  //             <th>Marital</th>
+  //           </tr>
+  //         </thead>
+  //         <tbody>
+  //        ${tableBody}
+  //         </tbody>
+  //       </table>
 
-    displayHeaderFooter: true,
-    headerTemplate: "",
-    footerTemplate: `
-    <div style="font-size: 10px; width: 100%; text-align: center;">
-          <span class="pageNumber"></span> / <span class="totalPages"></span>
-        </div>
-        <div style="font-size: 10px; width: 100%; text-align: center; position: absolute; bottom: 10px; left: 0; right: 0;">
-          Clinic Address: 123 Health St, Wellness City, HC 12345
-        </div>
-  
-      `,
-    margin: {
-      bottom: 100,
-      left: 10,
-      right: 10,
-      top: 20,
-    },
-  });
-  // const filePath = await pdfService.render();
-  await browser.close();
+  //     </div>
+  //   </body>
+  // </html>`);
+  //   const filePath = `${process.cwd()}/output.pdf`;
+  //   await page.pdf({
+  //     path: filePath,
+  //     format: "A4",
+  //     printBackground: true,
+
+  //     displayHeaderFooter: true,
+  //     headerTemplate: "",
+  //     footerTemplate: `
+  //     <div style="font-size: 10px; width: 100%; text-align: center;">
+  //           <span class="pageNumber"></span> / <span class="totalPages"></span>
+  //         </div>
+  //         <div style="font-size: 10px; width: 100%; text-align: center; position: absolute; bottom: 10px; left: 0; right: 0;">
+  //           Clinic Address: 123 Health St, Wellness City, HC 12345
+  //         </div>
+
+  //       `,
+  //     margin: {
+  //       bottom: 100,
+  //       left: 10,
+  //       right: 10,
+  //       top: 20,
+  //     },
+  //   });
+  const filePath = await pdfService.render();
+  // await browser.close();
   // console.log(filePat);
   res.setHeader("Content-disposition", "attachment; filename=output.pdf");
   res.setHeader("Content-type", "application/pdf");

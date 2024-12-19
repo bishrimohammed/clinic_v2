@@ -1,4 +1,4 @@
-const userRoute = require("./user.router.js");
+import userRoute from "./user.router";
 const woredaRoute = require("./address/woreda.router.js");
 const RegionRoute = require("./address/region.router.js");
 const CityRoute = require("./address/city.router.js");
@@ -45,7 +45,7 @@ const ProcedureRoute = require("./Procedure.route.js");
 const ReportRoute = require("./Report.route.js");
 const printRoute = require("./print.route.js");
 
-module.exports = {
+export {
   userRoute,
   woredaRoute,
   RegionRoute,

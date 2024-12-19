@@ -1,6 +1,7 @@
-const express = require("express");
+// const express = require("express");
+import express from "express";
 const UserController = require("../controllers/User.Controller.js");
-const { protect } = require("../middleware/authMiddleWare.js");
+const { protect } = require("../middleware/authMiddleWare");
 const router = express.Router();
 router.get("/reset", UserController.resetPassword);
 router.get("/", UserController.getUsers);
@@ -20,4 +21,4 @@ router.patch("/:id/activate", UserController.activateUser);
 router.patch("/:id/deactivate", UserController.deactivateUser);
 router.patch("/:id/changepassword", UserController.changePassword);
 
-module.exports = router;
+export default router;
