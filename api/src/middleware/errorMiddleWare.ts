@@ -1,32 +1,38 @@
-import { Sequelize, ValidationError } from "sequelize";
+import { ValidationError } from "sequelize";
 import { NextFunction, Request, Response } from "express";
+import { ApiError } from "../shared/error/ApiError";
+import configs from "../config/configs";
+
 export const notFound = (req: Request, res: Response, next: NextFunction) => {
-  const error = new Error(`URL is not found: ${req.originalUrl}`);
-  res.status(404);
+  const error = new ApiError(404, `URL is not found: ${req.originalUrl}`);
   next(error);
 };
 
 export const errorHandler = (
-  err: Error,
+  err: any,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   let message = err.message;
-
-  // res.status(500);
+  let error = err;
   if (err instanceof ValidationError) {
-    let errors = err.errors.map((err) => err.message);
+    let errors = err.errors.map((err) => ({
+      message: err.message,
+      path: [err.path],
+    }));
     statusCode = 400;
-    console.log(errors);
-    console.log(err);
-    message = "Validation Error" + err.errors;
+
+    // message = "Validation Error" + err.errors;
+    error = new ApiError(400, err.message, errors, err.stack);
     // res.status(400).json({ errors });
   }
-  res.status(statusCode);
-  res.json({
-    message,
-    stack: process.env.NODE_DEV === "development" ? err.stack : null,
-  });
+  const response = {
+    ...error,
+    // error: error.message,
+    ...(configs.NODE_DEV === "development" ? { stack: error.stack } : {}), // Error stack traces should be visible in development for debugging
+  };
+  res.status(error.statusCode || 500);
+  res.json(response);
 };

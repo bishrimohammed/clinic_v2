@@ -63,6 +63,7 @@
 
 import { Sequelize, DataTypes, Model, Optional } from "sequelize";
 import bcrypt from "bcryptjs";
+import sequelize from "../db/index";
 import { UserEntity } from "./types";
 
 // Optional attributes for creation
@@ -75,14 +76,14 @@ class User
   extends Model<UserEntity, UserCreationAttributes>
   implements UserEntity
 {
-  public id!: number;
-  public username!: string;
-  public email?: string;
-  public password!: string;
-  public employee_id!: number;
-  public role_id!: number;
-  public is_new: boolean = true; // Default value
-  public status: boolean = true; // Default value
+  declare id: number;
+  declare username: string;
+  declare email?: string;
+  declare password: string;
+  declare employee_id: number;
+  declare role_id: number;
+  declare is_new: boolean; // Default value
+  declare status: boolean; // Default value
 
   // Hash password before saving
   public setPassword(password: string) {
@@ -91,63 +92,118 @@ class User
     this.setDataValue("password", hashPassword);
   }
 
-  public static initModel(sequelize: Sequelize) {
-    User.init(
-      {
-        id: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          primaryKey: true,
-          autoIncrement: true,
-        },
-        username: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          unique: {
-            name: "username",
-            msg: "Username is taken",
-          },
-        },
-        email: {
-          type: DataTypes.STRING,
-          allowNull: true,
-          validate: {
-            isEmail: true,
-          },
-        },
-        password: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          // Set the password using the method defined
-          set(value: string) {
-            this.setPassword(value);
-          },
-        },
-        employee_id: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-        },
-        role_id: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-        },
-        is_new: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: true,
-        },
-        status: {
-          type: DataTypes.BOOLEAN,
-          defaultValue: true,
-        },
-      },
-      {
-        sequelize,
-        modelName: "user",
-        tableName: "users", // Specify the actual table name
-        timestamps: true, // Set to true if you have createdAt and updatedAt fields
-      }
-    );
-  }
+  // public static initModel(sequelize: Sequelize) {
+  //   User.init(
+  //     {
+  //       id: {
+  //         type: DataTypes.INTEGER,
+  //         allowNull: false,
+  //         primaryKey: true,
+  //         autoIncrement: true,
+  //       },
+  //       username: {
+  //         type: DataTypes.STRING,
+  //         allowNull: false,
+  //         unique: {
+  //           name: "username",
+  //           msg: "Username is taken",
+  //         },
+  //       },
+  //       email: {
+  //         type: DataTypes.STRING,
+  //         allowNull: true,
+  //         validate: {
+  //           isEmail: true,
+  //         },
+  //       },
+  //       password: {
+  //         type: DataTypes.STRING,
+  //         allowNull: false,
+  //         // Set the password using the method defined
+  //         set(value: string) {
+  //           this.setPassword(value);
+  //         },
+  //       },
+  //       employee_id: {
+  //         type: DataTypes.INTEGER,
+  //         allowNull: false,
+  //       },
+  //       role_id: {
+  //         type: DataTypes.INTEGER,
+  //         allowNull: false,
+  //       },
+  //       is_new: {
+  //         type: DataTypes.BOOLEAN,
+  //         defaultValue: true,
+  //       },
+  //       status: {
+  //         type: DataTypes.BOOLEAN,
+  //         defaultValue: true,
+  //       },
+  //     },
+  //     {
+  //       sequelize,
+  //       modelName: "user",
+  //       tableName: "users", // Specify the actual table name
+  //       timestamps: true, // Set to true if you have createdAt and updatedAt fields
+  //     }
+  //   );
+  // }
 }
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: {
+        name: "username",
+        msg: "Username is taken",
+      },
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isEmail: true,
+      },
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      // Set the password using the method defined
+      set(value: string) {
+        this.setPassword(value);
+      },
+    },
+    employee_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    role_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    is_new: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+  },
+  {
+    sequelize,
+    modelName: "user",
+    tableName: "users", // Specify the actual table name
+    timestamps: true,
+  }
+);
 
 export default User;

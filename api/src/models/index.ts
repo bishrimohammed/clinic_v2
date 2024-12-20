@@ -434,9 +434,10 @@
 //#region
 // import dbConfig from "../config/dbConfig";
 // import { Sequelize } from "sequelize";
-import { ClinicProfile } from "./ClinicProfile";
+import ClinicProfile from "./ClinicProfile";
 import User from "./User";
-
+import Employee from "./Employee";
+import Role from "./Role";
 // const sequelize = new Sequelize(
 //   dbConfig.DB!,
 //   dbConfig.USER!,
@@ -448,7 +449,7 @@ import User from "./User";
 //     logging: false,
 //   }
 // );
-
+// Role
 // ClinicProfile.initModel(sequelize);
 // User.initModel(sequelize);
 
@@ -461,4 +462,4 @@ import User from "./User";
 
 //#endregion
 // export default db; // Export the db object
-export { User, ClinicProfile };
+export { User, ClinicProfile, Employee, Role };

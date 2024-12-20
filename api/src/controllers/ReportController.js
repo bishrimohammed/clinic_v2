@@ -15,7 +15,7 @@ const {
   getMonthlyVisitSeenPerDoctor,
   getYearlyVisitSeenPerDoctor,
   getCustomRangeVisitSeenPerDoctor,
-} = require("../service/Report.service");
+} = require("../services/Report.service");
 const { format } = require("date-fns");
 
 module.exports = ReportController = {

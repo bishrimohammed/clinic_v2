@@ -1,4 +1,4 @@
-const { PdfService } = require("../../service/pdfService");
+const { PdfService } = require("../../services/pdfService");
 const fs = require("fs");
 const asyncHandler = require("express-async-handler");
 const getClinicInformation = require("../../helpers/getClinicInformation");

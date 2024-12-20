@@ -7,6 +7,7 @@ const loaders = async (app: Application) => {
   // logger.info('Mongoose initiated.');
 
   await expressLoader(app);
+
   // logger.info('Express app initiated.');
 };
 

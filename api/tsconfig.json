@@ -10,6 +10,6 @@
     "rootDir": "./src",
     "typeRoots": ["node_modules/@types", "./src/types"] // Include custom types directory
   },
-  "include": ["src/**/*", "src/types/*.d.ts"], // Ensure types are included
+  "include": ["src/**/*"], // Ensure types are included
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

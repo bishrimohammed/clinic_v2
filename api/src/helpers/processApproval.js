@@ -2,8 +2,8 @@ const db = require("../models");
 const {
   createAppointment,
   updateAppointment,
-} = require("../service/appointment.Service");
-const { createApprovalRequestAction } = require("../service/approvalService");
+} = require("../services/appointment.Service");
+const { createApprovalRequestAction } = require("../services/approvalService");
 const {
   appointmentApprovalHelper,
 } = require("./approvalHelper/approvalHelper");

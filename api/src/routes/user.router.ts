@@ -1,6 +1,6 @@
 // const express = require("express");
 import express from "express";
-const UserController = require("../controllers/User.Controller.js");
+import * as UserController from "../controllers/User.Controller";
 const { protect } = require("../middleware/authMiddleWare");
 const router = express.Router();
 router.get("/reset", UserController.resetPassword);

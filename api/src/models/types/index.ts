@@ -1,3 +1,3 @@
-import UserEntity from "./user";
+import { UserEntity, EmployeeEntity, RoleEntity } from "./user";
 
-export { UserEntity };
+export { UserEntity, EmployeeEntity, RoleEntity };

@@ -1,10 +1,9 @@
 import sequelize from ".";
 
 export const connectDb = async () => {
-  const connection = sequelize.authenticate();
   sequelize
     .authenticate()
-    .then(() => {
+    .then((se) => {
       console.log("Connected to the database.");
     })
     .catch((err: Error) => {

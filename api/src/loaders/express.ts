@@ -67,8 +67,8 @@ const expressLoader = async (app: Application) => {
     express.static(path.join(currentDirname, "public/uploads"))
   );
   // app.use(upload.any());
-  app.use(cors({ origin: "*" }));
-  app.use("/api/v1/user", userRoute);
+  app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+  app.use("/api/v1/users", userRoute);
   // app.use("/api/v1/dashboard", DashbordDataRoute);
 
   // app.use("/api/v1/patient", patientRoute);
