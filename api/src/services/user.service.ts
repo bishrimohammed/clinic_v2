@@ -11,6 +11,12 @@ interface permissionType {
   edit: boolean;
   delete: boolean;
 }
+/**
+ * Create user permission
+ * @param {number} userId - user id
+ * @param {permissionType[]} permissions - permissions to be created
+ * @returns created permissions
+ */
 const createUserPermission = async (
   userId: number,
   permissions: permissionType[]
