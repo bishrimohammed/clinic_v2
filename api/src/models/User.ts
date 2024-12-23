@@ -1,89 +1,45 @@
-// const { Sequelize, DataTypes } = require("sequelize");
-//#region
-// const { sequelize } = require(".");
-// const db = require(".");
-
-// const bcrypt = require("bcryptjs");
-// module.exports = (sequelize, DataTypes) => {
-//   const User = sequelize.define("user", {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//       primaryKey: true,
-//       autoIncrement: true,
-//     },
-//     username: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//       unique: {
-//         msg: "Username is taken",
-//       },
-//     },
-//     email: {
-//       type: DataTypes.STRING,
-//       allowNull: true,
-//       // unique: true,
-//       validate: {
-//         isEmail: true,
-//       },
-//     },
-//     password: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//       set(password) {
-//         const salt = bcrypt.genSaltSync(10);
-//         const hashPassword = bcrypt.hashSync(password, salt);
-//         // const hashPassword = bcryptjs.
-//         this.setDataValue("password", hashPassword);
-//       },
-//     },
-//     employee_id: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//     },
-//     role_id: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//     },
-//     is_new: {
-//       type: DataTypes.BOOLEAN,
-//       defaultValue: true,
-//     },
-//     status: {
-//       type: DataTypes.BOOLEAN,
-//       defaultValue: true,
-//     },
-//   });
-//   User.sync({ force: false, alter: false });
-
-//   return User;
-// };
-
-//#endregion
-
-import { Sequelize, DataTypes, Model, Optional } from "sequelize";
-import bcrypt from "bcryptjs";
-import sequelize from "../db/index";
-import { UserEntity } from "./types";
-
 // Optional attributes for creation
-type UserCreationAttributes = Optional<
-  UserEntity,
-  "id" | "email" | "is_new" | "status"
->;
+// type UserCreationAttributes = Optional<
+//   UserEntity,
+//   "id" | "email" | "is_new" | "status"
+// >;
 
-class User
-  extends Model<UserEntity, UserCreationAttributes>
-  implements UserEntity
-{
-  declare id: number;
+// extends Model<UserEntity, UserCreationAttributes>
+// implements UserEntity
+import {
+  DataTypes,
+  Model,
+  Optional,
+  BelongsToGetAssociationMixin,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+  ForeignKey,
+  NonAttribute,
+  Association,
+} from "sequelize";
+import bcrypt from "bcryptjs";
+import sequelize from "../db";
+import { UserEntity } from "./types";
+import Role from "./Role";
+import Employee from "./Employee";
+
+class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+  declare id: CreationOptional<number>;
   declare username: string;
-  declare email?: string;
+  declare email: string | null;
   declare password: string;
-  declare employee_id: number;
-  declare role_id: number;
-  declare is_new: boolean; // Default value
-  declare status: boolean; // Default value
+  declare employee_id: ForeignKey<Employee["id"]>;
+  declare role_id: ForeignKey<Role["id"]>;
+  declare is_new?: boolean; // Default value
+  declare status?: boolean; // Default value
+  declare createdAt: CreationOptional<Date>;
+  declare updatedAt: CreationOptional<Date>;
+
+  declare getRole: BelongsToGetAssociationMixin<Role>;
+  declare getEmployee: BelongsToGetAssociationMixin<Employee>;
+  declare role?: NonAttribute<Role>;
+  declare employee?: NonAttribute<Employee>;
 
   // Hash password before saving
   public setPassword(password: string) {
@@ -91,64 +47,10 @@ class User
     const hashPassword = bcrypt.hashSync(password, salt);
     this.setDataValue("password", hashPassword);
   }
-
-  // public static initModel(sequelize: Sequelize) {
-  //   User.init(
-  //     {
-  //       id: {
-  //         type: DataTypes.INTEGER,
-  //         allowNull: false,
-  //         primaryKey: true,
-  //         autoIncrement: true,
-  //       },
-  //       username: {
-  //         type: DataTypes.STRING,
-  //         allowNull: false,
-  //         unique: {
-  //           name: "username",
-  //           msg: "Username is taken",
-  //         },
-  //       },
-  //       email: {
-  //         type: DataTypes.STRING,
-  //         allowNull: true,
-  //         validate: {
-  //           isEmail: true,
-  //         },
-  //       },
-  //       password: {
-  //         type: DataTypes.STRING,
-  //         allowNull: false,
-  //         // Set the password using the method defined
-  //         set(value: string) {
-  //           this.setPassword(value);
-  //         },
-  //       },
-  //       employee_id: {
-  //         type: DataTypes.INTEGER,
-  //         allowNull: false,
-  //       },
-  //       role_id: {
-  //         type: DataTypes.INTEGER,
-  //         allowNull: false,
-  //       },
-  //       is_new: {
-  //         type: DataTypes.BOOLEAN,
-  //         defaultValue: true,
-  //       },
-  //       status: {
-  //         type: DataTypes.BOOLEAN,
-  //         defaultValue: true,
-  //       },
-  //     },
-  //     {
-  //       sequelize,
-  //       modelName: "user",
-  //       tableName: "users", // Specify the actual table name
-  //       timestamps: true, // Set to true if you have createdAt and updatedAt fields
-  //     }
-  //   );
-  // }
+  declare static associations: {
+    role: Association<User, Role>;
+    employee: Association<User, Employee>;
+  };
 }
 User.init(
   {
@@ -197,13 +99,26 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     sequelize,
-    modelName: "user",
+    // modelName: "user",
     tableName: "users", // Specify the actual table name
     timestamps: true,
   }
 );
+
+User.belongsTo(Role, { foreignKey: "role_id", as: "role" });
+User.belongsTo(Employee, { foreignKey: "employee_id", as: "employee" });
+
+User.sync({ alter: false });
 
 export default User;

@@ -7,7 +7,7 @@ class ApiError extends Error {
   public statusCode: number;
   public message: string;
   public status: string;
-  public isOperational: boolean = true;
+  // public isOperational: boolean = true;
   public stack?: string | undefined;
   public errors?: any[] = [];
 
@@ -15,7 +15,8 @@ class ApiError extends Error {
     statusCode: number,
     message: string,
     errors?: any[],
-    stack: string = ""
+    stack: string = "",
+    isOperational: boolean = true
   ) {
     super(message);
     this.message = message;

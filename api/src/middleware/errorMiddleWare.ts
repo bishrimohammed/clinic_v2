@@ -30,7 +30,7 @@ export const errorHandler = (
   }
   const response = {
     ...error,
-    // error: error.message,
+    message: error.message,
     ...(configs.NODE_DEV === "development" ? { stack: error.stack } : {}), // Error stack traces should be visible in development for debugging
   };
   res.status(error.statusCode || 500);

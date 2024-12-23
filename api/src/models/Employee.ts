@@ -151,35 +151,61 @@
 // };
 
 //#endregion
-import { Sequelize, DataTypes, Model, Optional } from "sequelize";
+import {
+  Sequelize,
+  DataTypes,
+  Model,
+  Optional,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+  HasOneGetAssociationMixin,
+  NonAttribute,
+  Association,
+} from "sequelize";
 import { EmployeeEntity } from "./types";
 import sequelize from "../db";
-type EmployeeAttributes = Optional<EmployeeEntity, "id" | "digital_signature">;
-class Employee
-  extends Model<EmployeeEntity, EmployeeAttributes>
-  implements EmployeeEntity
-{
-  declare id?: number;
+import User from "./User";
+// import User from "./User";
+// type EmployeeAttributes = Optional<EmployeeEntity, "id" | "digital_signature">;
+
+class Employee extends Model<
+  InferAttributes<Employee, { omit: "user" }>,
+  InferCreationAttributes<Employee, { omit: "user" }>
+> {
+  declare id?: CreationOptional<number>;
   declare firstName: string;
   declare middleName: string;
-  declare lastName?: string | null;
+  declare lastName: string | null;
   declare gender: "Male" | "Female";
   declare date_of_birth: Date;
   declare date_of_hire: Date;
   declare position: "Doctor" | "Nurse" | "Laboratorian" | "Cashier" | "Other";
-  declare other_position?: string | null;
-  declare photo?: string | null;
+  declare other_position: string | null;
+  declare photo: string | null;
   declare address_id: number;
   declare emergence_contact_id: number;
   declare has_digital_signature: boolean;
-  declare digital_signature?: string | null;
-  declare doctor_titer?: string | null;
-  declare status: boolean;
+  declare digital_signature: string | null;
+  declare doctor_titer: string | null;
+  declare status?: boolean;
   declare deletedAt?: Date | null;
+  declare createdAt: CreationOptional<Date>;
+  declare updatedAt: CreationOptional<Date>;
+
+  declare getUser: HasOneGetAssociationMixin<User>;
+  declare user?: NonAttribute<User>;
+
   getFullName() {
     return `${this.firstName} ${this.middleName} ${this.lastName}`;
   }
+
+  declare static associations: {
+    user: Association<Employee, User>;
+    // employee: Association<User, Employee>;
+  };
 }
+
 Employee.init(
   {
     firstName: {
@@ -250,8 +276,25 @@ Employee.init(
       allowNull: true,
       defaultValue: null,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
-  { sequelize, timestamps: true }
+  { sequelize, tableName: "employees", timestamps: true }
 );
-
+// sequelize.sync();
+// Employee.hasOne(User, {
+//   foreignKey: "employee_id",
+//   as: "userE",
+// });
+// Employee.belongsTo(User, {
+//   foreignKey: "employee_id",
+//   as: "userE",
+// });
+// Employee.sync({ alter: true });
 export default Employee;
