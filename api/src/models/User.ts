@@ -1,11 +1,3 @@
-// Optional attributes for creation
-// type UserCreationAttributes = Optional<
-//   UserEntity,
-//   "id" | "email" | "is_new" | "status"
-// >;
-
-// extends Model<UserEntity, UserCreationAttributes>
-// implements UserEntity
 import {
   DataTypes,
   Model,
@@ -17,12 +9,16 @@ import {
   ForeignKey,
   NonAttribute,
   Association,
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManyRemoveAssociationMixin,
+  BelongsToManySetAssociationsMixin,
 } from "sequelize";
 import bcrypt from "bcryptjs";
 import sequelize from "../db";
-import { UserEntity } from "./types";
 import Role from "./Role";
 import Employee from "./Employee";
+import Permission from "./Permission";
+import UserPermission from "./UserPermissions";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
@@ -38,8 +34,18 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
 
   declare getRole: BelongsToGetAssociationMixin<Role>;
   declare getEmployee: BelongsToGetAssociationMixin<Employee>;
+  declare getUserPermissions: BelongsToManyGetAssociationsMixin<Permission>;
+  declare setUsersPermissions: BelongsToManySetAssociationsMixin<
+    Permission,
+    number
+  >;
+  declare removeUserPermissions: BelongsToManyRemoveAssociationMixin<
+    Permission,
+    number
+  >;
   declare role?: NonAttribute<Role>;
   declare employee?: NonAttribute<Employee>;
+  declare userPermissions?: NonAttribute<Permission[]>;
 
   // Hash password before saving
   public setPassword(password: string) {
@@ -110,7 +116,7 @@ User.init(
   },
   {
     sequelize,
-    // modelName: "user",
+    modelName: "User",
     tableName: "users", // Specify the actual table name
     timestamps: true,
   }
@@ -118,6 +124,12 @@ User.init(
 
 User.belongsTo(Role, { foreignKey: "role_id", as: "role" });
 User.belongsTo(Employee, { foreignKey: "employee_id", as: "employee" });
+User.belongsToMany(Permission, {
+  through: UserPermission,
+  foreignKey: "user_id",
+  otherKey: "permission_id",
+  as: "userPermissions",
+});
 
 User.sync({ alter: false });
 

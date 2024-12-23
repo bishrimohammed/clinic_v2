@@ -5,6 +5,7 @@ const dbLoader = async () => {
     .authenticate()
     .then(() => {
       console.log("Connected to the database.");
+      sequelize.sync({ alter: false });
     })
     .catch((err: Error) => {
       console.log("Error: " + err.message);

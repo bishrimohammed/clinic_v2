@@ -1,7 +1,8 @@
 import { Request, RequestHandler, Response } from "express";
-import { authService, clinicService } from "../services";
+import { authService, clinicService, userService } from "../services";
 import { Employee, Role } from "../models";
 import configs from "../config/configs";
+import { UserRegisterInput, UserUpdateInput } from "../types/user";
 
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
@@ -100,31 +101,32 @@ export const getUserById = asyncHandler(async (req: Request, res: Response) => {
   res.json(user);
 });
 export const registerUser = asyncHandler(
-  async (req: Request, res: Response) => {
+  async (req: Request<{}, {}, {}>, res: Response) => {
     // return;
-    const { employeeId, password, role, username, permissions } = req.body;
+    // const { employeeId, password, role, username, permissions } = req.body;
+    const body = req.body as UserRegisterInput;
     // return;
     // console.log(req.body);
-    const isUserExist = await db.User.findOne({
-      where: {
-        username: username.toLowerCase(),
-      },
-    });
-
+    // const isUserExist = await db.User.findOne({
+    //   where: {
+    //     username: username.toLowerCase(),
+    //   },
+    // });
+    const user = await userService.registerUser(body);
     // if (isUserExist) {
     //   res.status(500);
     //   throw new Error("Username was taken. Please try another one.");
     // }
 
-    const user = await db.User.create({
-      password: password,
-      employee_id: employeeId,
-      username: username,
-      role_id: role,
-    });
+    // const user = await db.User.create({
+    //   password: password,
+    //   employee_id: employeeId,
+    //   username: username,
+    //   role_id: role,
+    // });
     // const username1 = getPaddedName(user.id, 4, "user-");
     // user.username = username;
-    await user.save();
+    // await user.save();
     // await Promise.all(
     //   permissions.map((p) => {
     //     return db.UserPermission.create({
@@ -215,36 +217,40 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   // res.status(201).json(user);
   // console.log(req.body.userData);
 });
-export const updateUser = asyncHandler(async (req: Request, res: Response) => {
-  const user = await db.User.findByPk(req.params.id);
-  if (!user) {
-    res.status(404);
-    throw new Error("User not found");
+export const updateUser = asyncHandler(
+  async (req: Request<{ id: string }>, res: Response) => {
+    const body = req.body as UserUpdateInput;
+    const user = await userService.updateUser(req.params.id, body);
+    // const user = await db.User.findByPk(req.params.id);
+    // if (!user) {
+    //   res.status(404);
+    //   throw new Error("User not found");
+    // }
+    // const updatedUser = await db.User.update(req.body);
+    // user.password = req.body.password;
+    // user.email = req.body.email;
+    // const Otheruser = await db.User.findOne({
+    //   where: {
+    //     username: req.body.username,
+    //   },
+    // });
+    // console.log(Otheruser?.id !== user.id);
+    // if (Otheruser && Otheruser?.id !== user.id) {
+    //   res.status(400);
+    //   throw new Error("Username was taken. Please try another one.");
+    // }
+    // if (req.body.isUpdatePasswordNeeded) {
+    //   user.password = req.body.password;
+    // }
+    // user.role_id = req.body.role;
+    // user.username = req.body.username;
+    // await user.save();
+    // await user.setUserPermissions([]);
+    // await db.UserPermission.bulkCreate(req.body.permissions);
+    res.json({ msg: "success", user });
+    // console.log(req.body);
   }
-  // const updatedUser = await db.User.update(req.body);
-  // user.password = req.body.password;
-  // user.email = req.body.email;
-  const Otheruser = await db.User.findOne({
-    where: {
-      username: req.body.username,
-    },
-  });
-  // console.log(Otheruser?.id !== user.id);
-  // if (Otheruser && Otheruser?.id !== user.id) {
-  //   res.status(400);
-  //   throw new Error("Username was taken. Please try another one.");
-  // }
-  if (req.body.isUpdatePasswordNeeded) {
-    user.password = req.body.password;
-  }
-  user.role_id = req.body.role;
-  user.username = req.body.username;
-  await user.save();
-  await user.setUserPermissions([]);
-  await db.UserPermission.bulkCreate(req.body.permissions);
-  res.json({ msg: "success" });
-  // console.log(req.body);
-});
+);
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   console.log(req.body.userData);
 });

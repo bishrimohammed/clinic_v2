@@ -9,10 +9,10 @@ export const login = async (username: string, password: string) => {
     const errors = [{ message: "User not found", path: ["username"] }];
     throw new ApiError(404, "User not found", errors);
   }
-  const employee = await user.getEmployee();
-  // const eU = await employee.getUser();
-  // console.log("getRole: " + user.getEmployee());
-  console.log(employee);
+  // const employee = await user.getUserPermissions();
+  // // const eU = await employee.getUser();
+  // // console.log("getRole: " + user.getEmployee());
+  // console.log(employee[0].dataValues);
 
   // console.log(eU);
 

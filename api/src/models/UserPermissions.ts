@@ -81,10 +81,18 @@ UserPermission.init(
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+      },
     },
     permission_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: Permission,
+        key: "id",
+      },
     },
     create: {
       type: DataTypes.BOOLEAN,
@@ -110,5 +118,14 @@ UserPermission.init(
     timestamps: false, // Disable timestamps
   }
 );
+
+UserPermission.belongsTo(Permission, {
+  foreignKey: "permission_id",
+  as: "permission",
+});
+// UserPermission.belongsTo(User, {
+//   foreignKey: "user_id",
+//   as: "user",
+// });
 // UserPermission.create({})
 export default UserPermission;

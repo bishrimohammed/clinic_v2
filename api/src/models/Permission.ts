@@ -1,4 +1,5 @@
 import {
+  Association,
   CreationOptional,
   DataTypes,
   InferAttributes,
@@ -6,28 +7,9 @@ import {
   Model,
 } from "sequelize";
 
-// module.exports = (sequelize, DataTypes) => {
-//   const Permission = sequelize.define("permission", {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//       allowNull: false,
-//     },
-//     name: {
-//       type: DataTypes.STRING,
-//       required: true,
-//       unique: true,
-//     },
-//     status: {
-//       type: DataTypes.BOOLEAN,
-//       defaultValue: true,
-//     },
-//   });
-//   Permission.sync({ alter: false, force: false });
-//   return Permission;
-// };
 import sequelize from "../db";
+import { User, UserPermission } from ".";
+// import UserPermission from "./UserPermissions";
 class Permission extends Model<
   InferAttributes<Permission>,
   InferCreationAttributes<Permission>
@@ -35,6 +17,11 @@ class Permission extends Model<
   declare id: CreationOptional<number>;
   declare name: string;
   declare status?: boolean;
+
+  declare static associations: {
+    users: Association<Permission, User>;
+    // employee: Association<User, Employee>;
+  };
 }
 // Permission.create({})
 Permission.init(
@@ -58,4 +45,9 @@ Permission.init(
   { sequelize }
 );
 
+// Permission.belongsToMany(, {
+//   through: "UserPermission",
+//   foreignKey: "permission_id",
+//   otherKey: "user_id",
+// });
 export default Permission;
