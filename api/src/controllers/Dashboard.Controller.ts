@@ -5,6 +5,7 @@ import {
   InvestigationOrder,
   Patient,
   PatientAssignment,
+  Permission,
   Role,
   User,
 } from "../models";
@@ -24,7 +25,7 @@ export const getDashboardData: RequestHandler = asyncHandler(
     let totalUser;
     let totalDoctor;
     let totalPatient;
-
+    const permissions = await Permission.findAll();
     // const role = await db.Role.findByPk(req.user.role_id);
     const totalCompletedLab = await InvestigationOrder.count({
       where: { status: false },
@@ -131,6 +132,7 @@ export const getDashboardData: RequestHandler = asyncHandler(
     });
     totalPatient = await Patient.count();
     res.json({
+      permissions,
       totalCompletedLab,
       totalUpcomingAppointment,
       totalUpcomingPatientVisit,

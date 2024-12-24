@@ -2,10 +2,16 @@ const express = require("express");
 import { DashboardController } from "../controllers";
 // import * as DashboardController from "../controllers/Dashboard.Controller";
 import { protect } from "../middleware/authMiddleWare";
+import { permissionGuard } from "../middleware/permissionGuard";
 
 const router = express.Router();
 
-router.get("/", protect, DashboardController.getDashboardData);
+router.get(
+  "/",
+  protect,
+  permissionGuard("Patient", "create"),
+  DashboardController.getDashboardData
+);
 router.get(
   "/doctor-work-hour",
   // protect,
