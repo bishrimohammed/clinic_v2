@@ -115,6 +115,8 @@ import {
   InferCreationAttributes,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
+import Patient from "./Patient";
+import User from "./User";
 
 class Appointment extends Model<
   InferAttributes<Appointment>,
@@ -184,4 +186,14 @@ Appointment.init(
   },
   { sequelize, paranoid: true }
 );
+Appointment.belongsTo(Patient, {
+  foreignKey: "patient_id",
+  targetKey: "id",
+  as: "patient",
+});
+Appointment.belongsTo(User, {
+  foreignKey: "doctor_id",
+  targetKey: "id",
+  as: "doctor",
+});
 export default Appointment;

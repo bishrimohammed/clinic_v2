@@ -1,107 +1,145 @@
+import { Request, RequestHandler, Response } from "express";
+import {
+  Appointment,
+  Employee,
+  InvestigationOrder,
+  Patient,
+  PatientAssignment,
+  Role,
+  User,
+} from "../models";
+import sequelize from "sequelize";
+
 const asyncHandler = require("express-async-handler");
 const db = require("../models");
 const { Op } = require("sequelize");
 const { format } = require("date-fns");
-module.exports = DashboardController = {
-  getDashboardData: asyncHandler(async (req, res) => {
+// module.exports = DashboardController = {
+export const getDashboardData: RequestHandler = asyncHandler(
+  async (req: Request, res: Response) => {
     const {} = req.query;
     let where = {};
-    let totalUpcomingAppointment;
-    let totalUpcomingPatientVisit;
+    // let totalUpcomingAppointment;
+    // let totalUpcomingPatientVisit;
     let totalUser;
     let totalDoctor;
     let totalPatient;
 
-    const role = await db.Role.findByPk(req.user.role_id);
-    totalUpcomingAppointment = await db.Appointment.count({
-      where: {
+    // const role = await db.Role.findByPk(req.user.role_id);
+    const totalCompletedLab = await InvestigationOrder.count({
+      where: { status: false },
+    });
+    const { count: totalUpcomingAppointment, rows: appointments } =
+      await Appointment.findAndCountAll({
+        // where: {
         // appointment_date: {
         //   [Op.gte]: new Date(),
         // },
-        appointment_date: new Date().toISOString().substring(0, 10),
-        status: "upcoming",
-      },
-      include: [
-        {
-          model: db.Patient,
-          as: "patient",
-          attributes: ["firstName", "middleName", "lastName", "id"],
-        },
-        {
-          model: db.User,
-          as: "doctor",
-          include: [
-            {
-              model: db.Employee,
-              as: "employee",
-              attributes: ["firstName", "middleName", "lastName", "id"],
-            },
-          ],
-          attributes: ["id"],
-        },
-      ],
-    });
-    // let where = {}
-    if (req.user.role_id === 2) {
-      where.doctor_id = req.user.id;
-    }
-    totalUpcomingPatientVisit = await db.PatientAssignment.count({
-      where: {
-        ...where,
-        [Op.or]: [
+        // appointment_date: new Date().toISOString().substring(0, 10),
+        // status: "upcoming",
+        // },
+        include: [
           {
-            assignment_date: new Date().toISOString().substring(0, 10),
-            visit_time: {
-              [Op.gte]: format(new Date(), "HH:mm:ss"),
-            },
+            model: db.Patient,
+            as: "patient",
+            attributes: ["firstName", "middleName", "lastName", "id"],
           },
           {
-            assignment_date: {
-              [Op.gt]: new Date().toISOString().substring(0, 10),
-            },
+            model: User,
+            as: "doctor",
+            include: [
+              {
+                model: Employee,
+                as: "employee",
+                attributes: ["firstName", "middleName", "lastName", "id"],
+              },
+            ],
+            attributes: ["id"],
           },
         ],
-      },
-      // where: where,
-      include: [
-        {
-          model: db.Patient,
-          as: "patient",
-          attributes: [
-            "id",
-            "firstName",
-            "lastName",
-            "middleName",
-            "card_number",
-            "birth_date",
-            "gender",
-          ],
+      });
+    // let where = {}
+    // if (req.user.role_id === 2) {
+    //   where.doctor_id = req.user.id;
+    // }
+
+    const { count: totalUpcomingPatientVisit, rows: active_Visits } =
+      await PatientAssignment.findAndCountAll({
+        where: {
+          ...where,
+          // [Op.or]: [
+          //   {
+          //     visit_date: new Date().toISOString().substring(0, 10),
+          //     visit_time: {
+          //       [Op.gte]: format(new Date(), "HH:mm:ss"),
+          //     },
+          //   },
+          //   {
+          //     visit_date: {
+          //       [Op.gt]: new Date().toISOString().substring(0, 10),
+          //     },
+          //   },
+          // ],
+          status: true,
         },
-        {
-          model: db.User,
-          as: "doctor",
-          include: {
-            model: db.Employee,
-            as: "employee",
-            attributes: ["id", "firstName", "middleName", "lastName"],
+        // where: where,
+        include: [
+          {
+            model: Patient,
+            as: "patient",
+            attributes: [
+              "id",
+              "firstName",
+              "lastName",
+              "middleName",
+              "card_number",
+              "birth_date",
+              "gender",
+            ],
           },
-          attributes: ["id"],
-        },
-      ],
-    });
-    totalUser = await db.User.count();
-    totalDoctor = await db.User.count({
+          {
+            model: User,
+            as: "doctor",
+            include: [
+              {
+                model: Employee,
+                as: "employee",
+                attributes: ["id", "firstName", "middleName", "lastName"],
+              },
+            ],
+            attributes: ["id"],
+          },
+        ],
+      });
+    totalUser = await User.count();
+    totalDoctor = await User.count({
       where: {
         role_id: 2,
       },
     });
-    totalPatient = await db.Patient.count();
+    // return group by role.name [{role_name: "Doctor", count: 2}, {role_name: "Patient", count: 2}]
+    const userGroupByRoleAndCount = await User.findAll({
+      attributes: [[sequelize.fn("count", sequelize.col("role_id")), "count"]],
+      include: [
+        {
+          model: Role,
+          as: "role",
+          attributes: ["name"],
+        },
+      ],
+      group: ["role_id"],
+    });
+    totalPatient = await Patient.count();
     res.json({
+      totalCompletedLab,
       totalUpcomingAppointment,
       totalUpcomingPatientVisit,
       totalUser,
       totalDoctor,
       totalPatient,
+      userGroupByRoleAndCount,
+      active_Visits,
+      appointments,
     });
     // console.log(totalUpcomingAppointment);
     // // if (req.query.status) {
@@ -111,10 +149,16 @@ module.exports = DashboardController = {
     // console.log(req.user);
     // console.log("\n\n bljhbjh\n\n");
     // res.json({ msg: totalUpcomingAppointment });
-  }),
-  getUpcomingAppointmentData: asyncHandler(async (req, res) => {
-    const { appintmentDate } = req.query;
-    let where = {};
+  }
+);
+export const getUpcomingAppointmentData: RequestHandler = asyncHandler(
+  async (
+    req: Request<{}, {}, {}, { appintmentDate: string }>,
+    res: Response
+  ) => {
+    const {} = req.query;
+
+    let where: any = {};
     if (req.query.appintmentDate) {
       where.appointment_date = new Date(req.query.appintmentDate)
         .toISOString()
@@ -151,13 +195,15 @@ module.exports = DashboardController = {
       ],
     });
     res.json(appointments);
-  }),
-  //get upcomig patient visit
-  getUpcomingPatientVisitData: asyncHandler(async (req, res) => {
+  }
+);
+//get upcomig patient visit
+export const getUpcomingPatientVisitData = asyncHandler(
+  async (req: Request, res: Response) => {
     let where = {};
-    if (req.user.role_id === 2) {
-      where.doctor_id = req.user.id;
-    }
+    // if (req.user.role_id === 2) {
+    //   where.doctor_id = req.user.id;
+    // }
     const visits = await db.PatientAssignment.findAll({
       where: {
         ...where,
@@ -203,9 +249,11 @@ module.exports = DashboardController = {
       ],
     });
     res.json(visits);
-  }),
-  //get doctor working hour
-  getDoctorWorkingHourData: asyncHandler(async (req, res) => {
+  }
+);
+//get doctor working hour
+export const getDoctorWorkingHourData = asyncHandler(
+  async (req: Request, res: Response) => {
     // 7 day of week
     const days = [
       "Sunday",
@@ -247,5 +295,6 @@ module.exports = DashboardController = {
     //   group: "day_of_week",
     // });
     res.json(DoctorsWorkingHour);
-  }),
-};
+  }
+);
+// };

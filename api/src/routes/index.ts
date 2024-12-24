@@ -1,4 +1,5 @@
 import userRoute from "./user.router";
+import DashbordDataRoute from "./DashboardData.route";
 const woredaRoute = require("./address/woreda.router.js");
 const RegionRoute = require("./address/region.router.js");
 const CityRoute = require("./address/city.router.js");
@@ -32,7 +33,6 @@ const BillingRoute = require("./Billing.route.js");
 const InventoryRoute = require("./Inventory.router.js");
 
 const InvestigationRoute = require("./Investigation.route.js");
-const DashbordDataRoute = require("./DashboardData.route.js");
 const ApprovalSettingRoute = require("./ApprovalSetting.route.js");
 const ApprovalRequestRoute = require("./ApprovalRequest.router.js");
 

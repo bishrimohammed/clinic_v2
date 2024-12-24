@@ -5,6 +5,7 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  NonAttribute,
 } from "sequelize";
 
 import sequelize from "../db";
@@ -17,7 +18,7 @@ class Permission extends Model<
   declare id: CreationOptional<number>;
   declare name: string;
   declare status?: boolean;
-
+  declare UserPermission?: NonAttribute<UserPermission>;
   declare static associations: {
     users: Association<Permission, User>;
     // employee: Association<User, Employee>;

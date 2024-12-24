@@ -1,13 +1,14 @@
 const express = require("express");
-const DashboardController = require("../controllers/DashboardController");
-const { protect } = require("../middleware/authMiddleWare");
+import { DashboardController } from "../controllers";
+// import * as DashboardController from "../controllers/Dashboard.Controller";
+import { protect } from "../middleware/authMiddleWare";
 
 const router = express.Router();
 
 router.get("/", protect, DashboardController.getDashboardData);
 router.get(
   "/doctor-work-hour",
-  protect,
+  // protect,
   DashboardController.getDoctorWorkingHourData
 );
 router.get(
@@ -21,5 +22,4 @@ router.get(
   DashboardController.getUpcomingAppointmentData
 );
 // router.get("/", protect, DashboardController.getDashboardData);
-
-module.exports = router;
+export default router;

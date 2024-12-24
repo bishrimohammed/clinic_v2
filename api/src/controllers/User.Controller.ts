@@ -1,6 +1,6 @@
 import { Request, RequestHandler, Response } from "express";
 import { authService, clinicService, userService } from "../services";
-import { Employee, Role } from "../models";
+import { Employee, Role, User } from "../models";
 import configs from "../config/configs";
 import { UserRegisterInput, UserUpdateInput } from "../types/user";
 
@@ -9,12 +9,13 @@ const bcrypt = require("bcryptjs");
 const db = require("../models");
 const { generateToken } = require("../utils/generateToken");
 const { Op, where } = require("sequelize");
-const getClinicInformation = require("../helpers/getClinicInformation");
+// const getClinicInformation = require("../helpers/getClinicInformation");
 // const db = require("../models/index.js");
 // const { getPaddedName } = require("../utils/getPaddedName.js");
-const User = db.User;
+// const User = db.User;
 // req.user.id;
 // const UserController = {
+
 export const getUsers = asyncHandler(async (req: Request, res: Response) => {
   const users = await User.findAll({
     attributes: { exclude: ["password"] },
@@ -94,12 +95,14 @@ export const getDoctors = asyncHandler(async (req: Request, res: Response) => {
   });
   res.json(doctors);
 });
-export const getUserById = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
+export const getUserById = asyncHandler(
+  async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
 
-  const user = await User.findByPk(id);
-  res.json(user);
-});
+    const user = await userService.getUserById(id);
+    res.json(user);
+  }
+);
 export const registerUser = asyncHandler(
   async (req: Request<{}, {}, {}>, res: Response) => {
     // return;
@@ -255,26 +258,20 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   console.log(req.body.userData);
 });
 export const deactivateUser = asyncHandler(
-  async (req: Request, res: Response) => {
-    console.log(req.body.userData);
-    const { id } = req.params;
-    const updatedUser = await db.User.update(
-      { status: false },
-      { where: { id: id } }
-    );
-    // .then(([rowsUpdated, [updatedUser]]) => {
-    //   res.status(200).json(updatedUser);
-    // })
+  async (req: Request<{ id: string }>, res: Response) => {
+    // console.log(req.body.userData);
+    const user = await userService.deactivateUser(req.params.id);
     res.status(200).json({ msg: "success" });
   }
 );
 export const activateUser = asyncHandler(
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const updatedUser = await db.User.update(
-      { status: true },
-      { where: { id: id } }
-    );
+  async (req: Request<{ id: string }>, res: Response) => {
+    const user = await userService.activateUser(req.params.id);
+    // const { id } = req.params;
+    // const updatedUser = await db.User.update(
+    //   { status: true },
+    //   { where: { id: id } }
+    // );
     // .then(([rowsUpdated, [updatedUser]]) => {
     //   res.status(200).json(updatedUser);
     // })

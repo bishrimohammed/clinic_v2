@@ -205,6 +205,8 @@ import {
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 import { Op } from "sequelize"; // Import Op for query operations
+import Patient from "./Patient";
+import User from "./User";
 
 class PatientAssignment extends Model<
   InferAttributes<PatientAssignment>,
@@ -449,8 +451,14 @@ PatientAssignment.init(
   }
 );
 
-// Syncing the model is generally done in the database initialization
-// Commented out to avoid potential issues during migrations
+PatientAssignment.belongsTo(Patient, {
+  foreignKey: "patient_id",
+  as: "patient",
+});
+PatientAssignment.belongsTo(User, {
+  foreignKey: "doctor_id",
+  as: "doctor",
+});
 // PatientAssignment.sync({ force: false, alter: false });
 
 export default PatientAssignment;

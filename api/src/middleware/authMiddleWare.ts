@@ -3,6 +3,7 @@ import expressAsyncHandler from "express-async-handler";
 import { User } from "../models/index";
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express-serve-static-core";
+import { ApiError } from "../shared/error/ApiError";
 // const jwt = require(JsonWebTokenError)
 // module.exports.isAuthenticated = (req, res, next) => {};
 
@@ -29,34 +30,63 @@ export const protect = expressAsyncHandler(
     //   throw new Error("Not authorized, no token");
     // }
     // console.log(req.headers.authorization);
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      try {
-        // console.log("hbghvjygh");
-        token = req.headers.authorization.split(" ")[1];
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-          userId: string;
-        };
+    // if (
+    //   req.headers.authorization &&
+    //   req.headers.authorization.startsWith("Bearer")
+    // ) {
+    try {
+      // console.log("hbghvjygh");
+      // req.cookies?.token ||
+      token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+      // console.log(token);
 
-        // console.log(token);
-        const user = await User.findByPk(decoded.userId);
-        if (!user) {
-        }
-        req.user = { id: user?.dataValues.id! };
-
-        // console.log(uu);
-        next();
-      } catch (error) {
-        res.status(401);
-        throw new Error("Not Authorized, token failed");
+      if (!token) {
+        next(new ApiError(401, "Not Authorized, no token"));
       }
-    }
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+        userId: string;
+      };
 
-    if (!token) {
-      res.status(401);
-      throw new Error("Not Authorized, no token");
+      const user = await User.findByPk(decoded.userId);
+
+      if (!user) {
+        next(new ApiError(401, "Not Authorized, user not found"));
+        return;
+      }
+      // console.log(user);
+      const role = await user.getRole({ attributes: ["name"] });
+      const permissions = await user.getUserPermissions();
+
+      const processedPermissions = permissions.map((p) => {
+        return {
+          name: p.name,
+          permissionId: p.UserPermission?.dataValues.permission_id as number,
+          create: p.UserPermission?.dataValues.create!,
+          read: p.UserPermission?.dataValues.read!,
+          edit: p.UserPermission?.dataValues.edit!,
+          delete: p.UserPermission?.dataValues.delete!,
+        };
+      });
+
+      req.user = {
+        id: user?.id,
+        role: role?.name,
+        permissions: processedPermissions,
+      };
+      next();
+    } catch (error) {
+      if (error instanceof jwt.JsonWebTokenError) {
+        // console.log(error);
+        throw new ApiError(401, "Not Authorized, token failed");
+      }
+      next(error);
+      // console.log(error);
     }
+    // }
+
+    // if (!token) {
+    //   res.status(401);
+    //   throw new Error("Not Authorized, no token");
+    // }
   }
 );
