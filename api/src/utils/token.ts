@@ -9,7 +9,7 @@ type permission = {
   edit: boolean;
   delete: boolean;
 };
-interface TokenPayload extends JwtPayload {
+export interface TokenPayload extends JwtPayload {
   id: number;
   name: string;
   is_new: boolean;
@@ -39,4 +39,14 @@ export const generateAccessToken = (payload: TokenPayload): string => {
 export const generateRefreshToken = (payload: TokenPayload): string => {
   const secret = configs.JWT.REFRESH_TOKEN_SECRET!;
   return jwt.sign(payload, secret, REFRESS_TOKEN_OPTIONS);
+};
+
+export const verifyAccessToken = (token: string) => {
+  const secret = configs.JWT.ACCESS_TOKEN_SECRET!;
+  return jwt.verify(token, secret) as TokenPayload;
+};
+
+export const verifyRefreshToken = (token: string) => {
+  const secret = configs.JWT.REFRESH_TOKEN_SECRET!;
+  return jwt.verify(token, secret) as TokenPayload;
 };
