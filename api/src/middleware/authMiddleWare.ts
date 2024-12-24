@@ -4,6 +4,7 @@ import { User } from "../models/index";
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express-serve-static-core";
 import { ApiError } from "../shared/error/ApiError";
+import { permissionService } from "../services";
 // const jwt = require(JsonWebTokenError)
 // module.exports.isAuthenticated = (req, res, next) => {};
 
@@ -55,19 +56,21 @@ export const protect = expressAsyncHandler(
       }
       // console.log(user);
       const role = await user.getRole({ attributes: ["name"] });
-      const permissions = await user.getUserPermissions();
+      // const permissions = await user.getUserPermissions();
 
-      const processedPermissions = permissions.map((p) => {
-        return {
-          name: p.name,
-          permissionId: p.UserPermission?.dataValues.permission_id as number,
-          create: p.UserPermission?.dataValues.create!,
-          read: p.UserPermission?.dataValues.read!,
-          edit: p.UserPermission?.dataValues.edit!,
-          delete: p.UserPermission?.dataValues.delete!,
-        };
-      });
-
+      // const processedPermissions = permissions.map((p) => {
+      //   return {
+      //     name: p.name,
+      //     permissionId: p.UserPermission?.dataValues.permission_id as number,
+      //     create: p.UserPermission?.dataValues.create!,
+      //     read: p.UserPermission?.dataValues.read!,
+      //     edit: p.UserPermission?.dataValues.edit!,
+      //     delete: p.UserPermission?.dataValues.delete!,
+      //   };
+      // });
+      const processedPermissions = await permissionService.formatUserPermission(
+        user
+      );
       req.user = {
         id: user?.id,
         role: role?.name,

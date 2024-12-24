@@ -8,9 +8,12 @@ import Appointment from "./Appointment";
 import Patient from "./Patient";
 import PatientAssignment from "./PatientAssignment";
 import InvestigationOrder from "./medicalRecords/InvestigationOrder";
+import Schedule from "./Schedule";
+import MedicalBilling from "./MedicalBilling";
 
 // InvestigationOrder
-
+// Schedule
+// MedicalBilling
 Role.hasMany(User, {
   foreignKey: "role_id",
   sourceKey: "id",
@@ -28,4 +31,6 @@ export {
   Patient,
   PatientAssignment,
   InvestigationOrder,
+  Schedule,
+  MedicalBilling,
 };

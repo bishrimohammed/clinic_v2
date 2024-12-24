@@ -10,7 +10,7 @@ export default async function middleware(request: NextRequest) {
     const isPublicRoute = publicRoutes.includes(path);
     const isProtectedRoute = protectedRoutes.includes(path);
 
-    const token = request.cookies.get("token")?.value;
+    const accessToken = request.cookies.get("accessToken")?.value;
 
     //  if (!isPublicRoute && !token) {
     //   return NextResponse.redirect(new URL("/", request.nextUrl));
@@ -20,11 +20,11 @@ export default async function middleware(request: NextRequest) {
     // }
 
     // return NextResponse.next();
-    if (isProtectedRoute && !token) {
+    if (isProtectedRoute && !accessToken) {
       return NextResponse.redirect(new URL("/", request.nextUrl));
     }
 
-    if (isPublicRoute && token) {
+    if (isPublicRoute && accessToken) {
       return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
     }
 

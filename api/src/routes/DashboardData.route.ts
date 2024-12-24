@@ -1,4 +1,4 @@
-const express = require("express");
+import express from "express";
 import { DashboardController } from "../controllers";
 // import * as DashboardController from "../controllers/Dashboard.Controller";
 import { protect } from "../middleware/authMiddleWare";
@@ -26,6 +26,18 @@ router.get(
   "/appointment",
   protect,
   DashboardController.getUpcomingAppointmentData
+);
+router.get(
+  "/lab-investigation",
+  protect,
+  permissionGuard("Lab Result", "read"),
+  DashboardController.getLabInvestigationData
+);
+router.get(
+  "/payments",
+  protect,
+  permissionGuard("Payments", "read"),
+  DashboardController.getPaymentData
 );
 // router.get("/", protect, DashboardController.getDashboardData);
 export default router;

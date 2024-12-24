@@ -19,6 +19,7 @@ import Role from "./Role";
 import Employee from "./Employee";
 import Permission from "./Permission";
 import UserPermission from "./UserPermissions";
+import Schedule from "./Schedule";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
@@ -131,6 +132,10 @@ User.belongsToMany(Permission, {
   as: "userPermissions",
 });
 
+User.hasMany(Schedule, {
+  foreignKey: "doctor_id",
+  as: "schedules",
+});
 User.sync({ alter: false });
 
 export default User;

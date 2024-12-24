@@ -1,8 +1,14 @@
-import { Request, RequestHandler, Response } from "express";
-import { authService, clinicService, userService } from "../services";
+import { Request, RequestHandler, Response } from "express-serve-static-core";
+import {
+  authService,
+  clinicService,
+  permissionService,
+  userService,
+} from "../services";
 import { Employee, Role, User } from "../models";
 import configs from "../config/configs";
 import { UserRegisterInput, UserUpdateInput } from "../types/user";
+import { generateAccessToken, generateRefreshToken } from "../utils/token";
 
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
@@ -153,72 +159,42 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     Employee.findByPk(user.dataValues.employee_id),
     Role.findByPk(user.dataValues.role_id),
   ]);
-  // const user = await db.User.findOne({
-  //   where: {
-  //     username: username,
-  //   },
-  //   // include: ["role", "employee", "userPermissions"],
-  //   include: [
-  //     {
-  //       model: db.Role,
-  //       as: "role",
-  //       // include: ["permissions"],
-  //     },
-  //     {
-  //       model: db.Employee,
-  //       as: "employee",
-  //     },
-  //     {
-  //       model: db.Permission,
-  //       as: "userPermissions",
-  //     },
-  //   ],
-  // });
 
-  // if (!user) {
-  //   res.status(404);
-  //   throw new Error("User not found");
-  // }
-  // const isMatch = await bcrypt.compare(password, user.password);
-  // // console.log("isMatch: " + isMatch);
-  // if (!isMatch) {
-  //   res.status(400);
-  //   throw new Error("Invalid password");
-  // }
-  const {
-    id: userId,
+  const permissions = await permissionService.formatUserPermission(user);
 
-    role_id,
-
-    // role,
-  } = user;
-  const token = generateToken(user.id);
+  // const token = generateToken(user.id);
+  const userData = {
+    id: user.id as number,
+    is_new: user.is_new!,
+    name: employee?.getFullName().trim()!,
+    digital_signature: employee?.digital_signature || null,
+    doctor_titer: employee?.doctor_titer || null,
+    role: role?.name!,
+    permissions: permissions,
+  };
+  const accessToken = generateAccessToken(userData);
+  const refreshToken = generateRefreshToken(userData);
   const clinicInfo = await clinicService.getClinics();
   // console.log(token);
   // const permissions = user.userPermissions;
-  res.cookie("token", token, {
+  res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: configs.NODE_DEV === "production",
     sameSite: "strict",
-    maxAge: 3 * 60 * 60 * 24,
+    maxAge: 60 * 60,
+  });
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: configs.NODE_DEV === "production",
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 30,
   });
   res.status(200).json({
-    user: {
-      id: userId,
-      is_new: user.is_new,
-      name: employee?.getFullName().trim(),
-      digital_signature: employee?.digital_signature,
-      doctor_titer: employee?.doctor_titer,
-      role: role?.name,
-    },
-    token,
-    // permissions: user.userPermissions,
+    user: userData,
+    accessToken,
+    refreshToken,
     clinicInfo: clinicInfo,
-    // user,
-    // address: user.address,
   });
-  // res.status(201).json(user);
-  // console.log(req.body.userData);
 });
 export const updateUser = asyncHandler(
   async (req: Request<{ id: string }>, res: Response) => {

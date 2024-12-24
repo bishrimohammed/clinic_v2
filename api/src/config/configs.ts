@@ -8,7 +8,9 @@ const configs = {
     NAME: process.env.DATABASE_NAME,
   },
   JWT: {
-    SECRET: process.env.JWT_SECRET,
+    REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
+    ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
+
     EXPIRES: "1d",
   },
 };

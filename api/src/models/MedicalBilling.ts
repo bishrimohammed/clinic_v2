@@ -222,9 +222,9 @@ MedicalBilling.init(
       defaultValue: false,
     },
     status: {
-      type: DataTypes.STRING,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: "active", // Changed to string to match the type
+      defaultValue: true, // Changed to string to match the type
     },
     createdAt: {
       type: DataTypes.DATE,
