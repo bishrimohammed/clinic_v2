@@ -1,180 +1,251 @@
 "use client";
-import React, { useState } from "react";
+
+import * as React from "react";
 import {
-  ChevronsUpDown,
-  EllipsisIcon,
-  Home,
-  Loader,
-  Lock,
-  LogOut,
-  MoonIcon,
-  MoonStarIcon,
-  Settings,
-  SunIcon,
-  User,
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  Frame,
+  GalleryVerticalEnd,
+  LucideIcon,
+  Map,
+  PieChart,
+  Settings2,
+  SquareTerminal,
 } from "lucide-react";
-import Link from "next/link";
+
+import { NavMain } from "@/components/nav-main";
+import { NavProjects } from "@/components/nav-projects";
+import { NavUser } from "@/components/nav-user";
+import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
-  SidebarHeader,
   SidebarContent,
-  SidebarGroupContent,
-  SidebarGroup,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
   SidebarFooter,
+  SidebarHeader,
   SidebarRail,
-  useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-// import Logo from "@/components/logo";
-// import { useAuthContext } from "@/context/auth-provider";
-// import LogoutDialog from "./_common/LogoutDialog";
-// import { useTheme } from "next-themes";
-const ASidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+import { NavItem, PermissionName } from "@/types/global";
 
-  const { open } = useSidebar();
-  const items = [
+// This is sample data.
+const data = {
+  user: {
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  },
+  teams: [
     {
-      title: "Home",
-      url: "/home",
-      icon: Home,
+      name: "Acme Inc",
+      logo: GalleryVerticalEnd,
+      plan: "Enterprise",
     },
     {
-      title: "Sessions",
-      url: "/sessions",
-      icon: Lock,
+      name: "Acme Corp.",
+      logo: AudioWaveform,
+      plan: "Startup",
     },
     {
-      title: "Account",
-      url: "#",
-      icon: User,
+      name: "Evil Corp.",
+      logo: Command,
+      plan: "Free",
     },
+  ],
 
+  projects: [
     {
-      title: "Settings",
+      name: "Design Engineering",
       url: "#",
-      icon: Settings,
+      icon: Frame,
     },
-  ];
+    {
+      name: "Sales & Marketing",
+      url: "#",
+      icon: PieChart,
+    },
+    {
+      name: "Travel",
+      url: "#",
+      icon: Map,
+    },
+  ],
+};
+
+const navMain: NavItem[] = [
+  {
+    title: "Patient Management",
+    url: "#",
+    icon: SquareTerminal,
+    isActive: true,
+    permissions: ["Patient", "Appointment", "Visit"],
+    items: [
+      {
+        title: "Patients",
+        url: "#",
+        permission: "Patient",
+      },
+      {
+        title: "Appointments",
+        url: "#",
+        permission: "Appointment",
+      },
+      {
+        title: "Visits",
+        url: "#",
+        permission: "Visit",
+      },
+    ],
+  },
+  {
+    title: "User Management",
+    url: "#",
+    icon: SquareTerminal,
+    isActive: true,
+    permissions: ["Employee", "Role", "User"],
+    items: [
+      {
+        title: "Employees Management",
+        url: "#",
+        permission: "Employee",
+      },
+      {
+        title: "Role Management",
+        url: "#",
+        permission: "Role",
+      },
+      {
+        title: "Account Managment",
+        url: "#",
+        permission: "User",
+      },
+    ],
+  },
+  {
+    title: "Lab Investigation",
+    url: "#",
+    icon: SquareTerminal,
+    isActive: true,
+    permissions: [
+      "Lab Result",
+      "External Lab Service Result",
+      "View Lab Result",
+    ],
+    items: [
+      {
+        title: "Pending  Investigation",
+        url: "#",
+        permission: "Lab Result",
+      },
+      {
+        title: "Pending External Investigation",
+        url: "#",
+        permission: "External Lab Service Result",
+      },
+      {
+        title: "Completedd Investigation",
+        url: "#",
+        permission: "View Lab Result",
+      },
+    ],
+  },
+  {
+    title: "Clinic Configurations",
+    url: "#",
+    icon: Bot,
+    isActive: true,
+    permissions: [
+      "Clinic Profile",
+      "Clinic Services",
+      "Clinic Field Configuration",
+      "Credit Service",
+    ],
+    items: [
+      {
+        title: "Clinic Profile Management",
+        url: "#",
+        permission: "Clinic Profile",
+      },
+      {
+        title: "Clinic Services Management",
+        url: "#",
+        permission: "Clinic Services",
+      },
+      {
+        title: "Clinic Field Configuration",
+        url: "#",
+        permission: "Clinic Field Configuration",
+      },
+      {
+        title: "Clinic Credit Service",
+        url: "#",
+        permission: "Credit Service",
+      },
+    ],
+  },
+  // {
+  //   title: "Documentation",
+  //   url: "#",
+  //   icon: BookOpen,
+  //   items: [
+  //     {
+  //       title: "Introduction",
+  //       url: "#",
+  //     },
+  //     {
+  //       title: "Get Started",
+  //       url: "#",
+  //     },
+  //     {
+  //       title: "Tutorials",
+  //       url: "#",
+  //     },
+  //     {
+  //       title: "Changelog",
+  //       url: "#",
+  //     },
+  //   ],
+  // },
+  // {
+  //   title: "Settings",
+  //   url: "#",
+  //   icon: Settings2,
+  //   items: [
+  //     {
+  //       title: "General",
+  //       url: "#",
+  //     },
+  //     {
+  //       title: "Team",
+  //       url: "#",
+  //     },
+  //     {
+  //       title: "Billing",
+  //       url: "#",
+  //     },
+  //     {
+  //       title: "Limits",
+  //       url: "#",
+  //     },
+  //   ],
+  // },
+];
+const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   return (
-    <>
-      <Sidebar collapsible="offcanvas">
-        <SidebarHeader className="!pt-0 dark:bg-background">
-          <div className="flex h-[60px] items-center">
-            {/* <Logo fontSize="20px" size="30px" url="/home" /> */}
-            {/* {open && (
-              <Link
-                href="/home"
-                className="hidden md:flex ml-2 text-xl tracking-[-0.16px] text-black dark:text-[#fcfdffef] font-bold mb-0"
-              >
-                Squeezy
-              </Link>
-            )} */}
-            p
-          </div>
-        </SidebarHeader>
-        <SidebarContent className="dark:bg-background">
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <a href={item.url} className="!text-[15px]">
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <a href="#" className="!text-[15px]">
-                      <MoonIcon />
-                      <span>Dark mode</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-        {/* <SidebarFooter className="dark:bg-background">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              {isLoading ? (
-                <Loader
-                  size="24px"
-                  className="place-self-center self-center animate-spin"
-                />
-              ) : (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton
-                      size="lg"
-                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                    >
-                      <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarFallback className="rounded-lg">
-                          {user?.name?.split(" ")?.[0]?.charAt(0)}
-                          {user?.name?.split(" ")?.[1]?.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">
-                          {user?.name}
-                        </span>
-                        <span className="truncate text-xs">{user?.email}</span>
-                      </div>
-                      <EllipsisIcon className="ml-auto size-4" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                    side={"bottom"}
-                    align="start"
-                    sideOffset={4}
-                  >
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          setTheme(theme === "light" ? "dark" : "light")
-                        }
-                      >
-                        {theme === "light" ? <MoonStarIcon /> : <SunIcon />}
-                        Toggle theme
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setIsOpen(true)}>
-                      <LogOut />
-                      Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter> */}
-        <SidebarRail />
-      </Sidebar>
-
-      {/* <LogoutDialog isOpen={isOpen} setIsOpen={setIsOpen} /> */}
-    </>
+    <Sidebar collapsible="offcanvas" {...props}>
+      <SidebarHeader>
+        <TeamSwitcher teams={data.teams} />
+      </SidebarHeader>
+      <SidebarContent>
+        <NavMain items={navMain} />
+        {/* <NavProjects projects={data.projects} /> */}
+      </SidebarContent>
+      <SidebarFooter>
+        <NavUser />
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
   );
 };
 
-export default ASidebar;
+export default AppSidebar;
