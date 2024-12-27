@@ -10,7 +10,7 @@ export const hasPermission = (
     (p) => p.name === permission_name
   );
   const hasAccess = permissionFound ? permissionFound[action] : false;
-  console.log(hasAccess);
+  //   console.log(hasAccess);
 
   return hasAccess;
 };

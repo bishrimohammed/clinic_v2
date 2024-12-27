@@ -13,7 +13,7 @@ export default function MainLayout({
       <SidebarProvider>
         <ASidebar />
         <SidebarInset>
-          <main className="w-full">
+          <main className="w-full min-h-[100vh] bg-muted/90">
             <Header />
             {children}
           </main>

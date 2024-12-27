@@ -18,7 +18,7 @@ export const protect = expressAsyncHandler(
       // req.cookies?.token ||
       accessToken =
         req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
-      // console.log(token);
+      // console.log(req.cookies?.accessToken);
 
       if (!accessToken) {
         next(new ApiError(401, "Not Authorized, no token"));
@@ -26,7 +26,7 @@ export const protect = expressAsyncHandler(
       // const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       //   userId: string;
       // };
-      const decoded = verifyAccessToken(accessToken);
+      const decoded = verifyAccessToken(JSON.parse(accessToken));
 
       const user = await User.findByPk(decoded.id);
 

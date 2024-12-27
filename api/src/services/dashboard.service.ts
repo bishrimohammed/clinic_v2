@@ -14,12 +14,13 @@ import sequelize from "sequelize";
 /**
  * @param req
  *
+ *
  */
 export const getDashboardData = async (req: Request) => {
   const role = req.user?.role;
   const permissions = req.user?.permissions;
   let totalUser;
-  let totalDoctor;
+  // let totalDoctor;
   //   let totalPatient;
   // const permissions = await Permission.findAll();
   // const role = await db.Role.findByPk(req.user.role_id);
@@ -35,24 +36,30 @@ export const getDashboardData = async (req: Request) => {
       where: {
         ...where,
       },
+      attributes: [
+        "id",
+        "appointment_time",
+        "appointment_date",
+        "patient_name",
+      ],
       include: [
-        {
-          model: Patient,
-          as: "patient",
-          attributes: ["firstName", "middleName", "lastName", "id"],
-        },
-        {
-          model: User,
-          as: "doctor",
-          include: [
-            {
-              model: Employee,
-              as: "employee",
-              attributes: ["firstName", "middleName", "lastName", "id"],
-            },
-          ],
-          attributes: ["id"],
-        },
+        // {
+        //   model: Patient,
+        //   as: "patient",
+        //   attributes: ["firstName", "middleName", "lastName", "id"],
+        // },
+        // {
+        //   model: User,
+        //   as: "doctor",
+        //   include: [
+        //     {
+        //       model: Employee,
+        //       as: "employee",
+        //       attributes: ["firstName", "middleName", "lastName", "id"],
+        //     },
+        //   ],
+        //   attributes: ["id"],
+        // },
       ],
     });
 
@@ -73,60 +80,59 @@ export const getDashboardData = async (req: Request) => {
             "lastName",
             "middleName",
             "card_number",
-            "birth_date",
             "gender",
           ],
         },
-        {
-          model: User,
-          as: "doctor",
-          include: [
-            {
-              model: Employee,
-              as: "employee",
-              attributes: ["id", "firstName", "middleName", "lastName"],
-            },
-          ],
-          attributes: ["id"],
-        },
+        // {
+        //   model: User,
+        //   as: "doctor",
+        //   include: [
+        //     {
+        //       model: Employee,
+        //       as: "employee",
+        //       attributes: ["id", "firstName", "middleName", "lastName"],
+        //     },
+        //   ],
+        //   attributes: ["id"],
+        // },
       ],
+      attributes: ["id", "visit_date", "visit_time", "status"],
     });
   totalUser = await User.count();
-  totalDoctor = await User.count({
-    where: {
-      role_id: 2,
-    },
-  });
+  // totalDoctor = await User.count({
+  //   where: {
+  //     role_id: 2,
+  //   },
+  // });
 
   let userGroupByRoleAndCount: any[] = [];
-  if (permissions?.find((p) => p.name.toLowerCase() === "user" && p.read))
-    userGroupByRoleAndCount = await User.count({
-      attributes: [[sequelize.fn("count", sequelize.col("role_id")), "count"]],
-      include: [
-        {
-          model: Role,
-          as: "role",
-          attributes: ["name"],
-        },
-      ],
-      group: ["role_id"],
-    });
-  let totalPatient: any[] = [];
-  if (permissions?.find((p) => p.name.toLowerCase() === "patient" && p.read)) {
-    totalPatient = await Patient.count({
-      attributes: [[sequelize.fn("count", sequelize.col("gender")), "count"]],
-      group: ["gender"],
-    });
-  }
+  // if (permissions?.find((p) => p.name.toLowerCase() === "user" && p.read))
+
+  userGroupByRoleAndCount = await User.findAll({
+    attributes: [[sequelize.fn("count", sequelize.col("role_id")), "count"]],
+    include: [
+      {
+        model: Role,
+        as: "role",
+        attributes: ["name"],
+      },
+    ],
+    group: ["role_id"],
+  });
+  console.log(userGroupByRoleAndCount);
+
+  // if (permissions?.find((p) => p.name.toLowerCase() === "patient" && p.read)) {
+  const totalPatient = await Patient.count();
+  // }
   return {
     totalCompletedLab,
     totalUpcomingAppointment,
     totalUpcomingPatientVisit,
     totalUser,
-    totalDoctor,
     totalPatient,
     userGroupByRoleAndCount,
     active_Visits,
+    appointments,
   };
 };
 
@@ -242,17 +248,24 @@ export const getDoctorWorkingHours = async () => {
   });
   return DoctorsWorkingHours;
 };
-
-export const getLabInvestigationData = async () => {
+/**
+ * Get Lab Investigation Data
+ * @returns {Promise<[{count: number; status: "Completed" | "Pending"}]>}
+ *
+ */
+export const getLabInvestigationData = async (): Promise<
+  { count: number; status: "Completed" | "Pending" }[]
+> => {
   const totalLabs = await InvestigationOrder.count({
     attributes: [[sequelize.fn("count", sequelize.col("status")), "count"]],
     // where: { status: false },
     group: ["status"],
   });
-  const totalLabsData = totalLabs.map((i) => {
-    const { count, status } = i as { count: number; status: 0 | 1 };
-    return { count: i.count, status: status === 0 ? "Completed" : "Pending" };
-  });
+  const totalLabsData: { count: number; status: "Completed" | "Pending" }[] =
+    totalLabs.map((i) => {
+      const { count, status } = i as { count: number; status: 0 | 1 };
+      return { count: i.count, status: status === 0 ? "Completed" : "Pending" };
+    });
   //   const [totalCompletedLab] = await Promise.all([
   //     InvestigationOrder.count({
   //       attributes: [[sequelize.fn("count", sequelize.col("status")), "count"]],
@@ -263,16 +276,23 @@ export const getLabInvestigationData = async () => {
   //   ]);
   return totalLabsData;
 };
-
-export const getPaymentData = async () => {
+/**
+ * Get Payment Data
+ * @returns {Promise<[{count: number; status: "Completed" | "Pending"}]>}
+ *
+ */
+export const getPaymentData = async (): Promise<
+  { count: number; status: "Completed" | "Pending" }[]
+> => {
   const totalBilling = await MedicalBilling.count({
     attributes: [[sequelize.fn("count", sequelize.col("status")), "count"]],
     // where: { status: false },
     group: ["status"],
   });
-  const totalBillingData = totalBilling.map((i) => {
-    const { count, status } = i as { count: number; status: 0 | 1 };
-    return { count: count, status: status === 0 ? "Completed" : "Pending" };
-  });
+  const totalBillingData: { count: number; status: "Completed" | "Pending" }[] =
+    totalBilling.map((i) => {
+      const { count, status } = i as { count: number; status: 0 | 1 };
+      return { count: count, status: status === 0 ? "Completed" : "Pending" };
+    });
   return totalBillingData;
 };

@@ -5,9 +5,13 @@ import {
   AudioWaveform,
   BookOpen,
   Bot,
+  Calendar,
+  ChevronRight,
   Command,
   Frame,
   GalleryVerticalEnd,
+  Home,
+  Inbox,
   LucideIcon,
   Map,
   PieChart,
@@ -23,18 +27,27 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { NavItem, PermissionName } from "@/types/global";
+import { hasPermission } from "@/lib/hasPermission";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 // This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   teams: [
     {
       name: "Acme Inc",
@@ -231,15 +244,102 @@ const navMain: NavItem[] = [
   // },
 ];
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+  const items = [
+    {
+      title: "Home",
+      url: "#",
+      icon: Home,
+    },
+    {
+      title: "Inbox",
+      url: "#",
+      icon: Inbox,
+    },
+    {
+      title: "Calendar",
+      url: "#",
+      icon: Calendar,
+    },
+  ];
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+      <SidebarHeader className="py-2 flex items-center border-b shadow-sm border-[#3f3f4126] bg-violet-600 text-white justify-center  gap-2">
+        <div className="grid flex-1 text-left text-lg leading-tight">
+          <span className="truncate font-semibold">Healthcare Management</span>
+          <span className="truncate text-sm">System</span>
+        </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navMain} />
-        {/* <NavProjects projects={data.projects} /> */}
+        {/* <NavMain items={navMain} /> */}
+        <SidebarGroup>
+          <SidebarMenu>
+            {navMain.map((item) => {
+              const hasAccess = item.permissions?.some((permission) =>
+                hasPermission(permission)
+              );
+              if (hasAccess) {
+                return (
+                  <Collapsible
+                    key={item.title}
+                    asChild
+                    defaultOpen={false}
+                    className="group/collapsible"
+                    // data-state={item.isActive ? "open" : "closed"}
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip={item.title} className="">
+                          {item.icon && <item.icon />}
+                          <span>{item.title}</span>
+                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {item.items?.map((subItem) => {
+                            if (hasPermission(subItem.permission)) {
+                              return (
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton asChild>
+                                    <a href={subItem.url}>
+                                      <span>{subItem.title}</span>
+                                    </a>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              );
+                            } else {
+                              return null;
+                            }
+                          })}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                );
+              } else {
+                return null;
+              }
+            })}
+          </SidebarMenu>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <a href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
+      {/* <SidebarGroupContent> */}
+
+      {/* </SidebarGroupContent> */}
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>

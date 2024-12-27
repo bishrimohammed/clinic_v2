@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 import {
   Collapsible,
@@ -23,7 +23,7 @@ import { hasPermission } from "@/lib/hasPermission";
 export function NavMain({ items }: { items: NavItem[] }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel></SidebarGroupLabel>
+      {/* <SidebarGroupLabel className="my-1"></SidebarGroupLabel> */}
       <SidebarMenu>
         {items.map((item) => {
           const hasAccess = item.permissions?.some((permission) =>
@@ -34,12 +34,13 @@ export function NavMain({ items }: { items: NavItem[] }) {
               <Collapsible
                 key={item.title}
                 asChild
-                defaultOpen={item.isActive}
+                defaultOpen={false}
                 className="group/collapsible"
+                // data-state={item.isActive ? "open" : "closed"}
               >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title}>
+                    <SidebarMenuButton tooltip={item.title} className="">
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />

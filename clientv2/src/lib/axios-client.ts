@@ -8,7 +8,7 @@ const options = {
 };
 // console.log(options);
 
-const API = axios.create(options);
+const API = axios.create({ ...options });
 
 export const APIRefresh = axios.create(options);
 APIRefresh.interceptors.response.use((response) => response);

@@ -9,6 +9,7 @@ const dbLoader = async () => {
     })
     .catch((err: Error) => {
       console.log("Error: " + err.message);
+      process.exit(1);
     });
 };
 

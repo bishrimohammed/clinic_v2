@@ -9,7 +9,7 @@ const router = express.Router();
 router.get(
   "/",
   protect,
-  permissionGuard("Patient", "create"),
+  // permissionGuard("Patient", "create"),
   DashboardController.getDashboardData
 );
 router.get(
