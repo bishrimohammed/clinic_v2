@@ -15,7 +15,9 @@ export default function MainLayout({
         <SidebarInset>
           <main className="w-full min-h-[100vh] bg-muted/90">
             <Header />
-            {children}
+            <div className="p-2 max-h-[calc(100vh-80px)] overflow-y-auto  ">
+              {children}
+            </div>
           </main>
         </SidebarInset>
       </SidebarProvider>

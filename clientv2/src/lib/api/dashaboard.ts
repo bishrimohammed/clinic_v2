@@ -27,6 +27,7 @@ export interface appointmentT {
   appointment_date: Date;
   appointment_time: string;
   patient_name: string;
+  status: "upcoming" | "overdue" | "cancelled";
 }
 interface ApiResponse {
   totalCompletedLab: number;

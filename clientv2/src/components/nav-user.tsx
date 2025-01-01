@@ -49,7 +49,7 @@ export function NavUser() {
   const logoutHandler = async () => {
     //   window.location.href = "/";
     await clearSession();
-    router.replace("/");
+    router.push("/login");
   };
   return (
     <SidebarMenu>

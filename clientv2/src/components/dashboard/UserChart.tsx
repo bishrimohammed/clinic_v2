@@ -29,7 +29,10 @@ const UserChart = ({ data }: { data?: UserGroupByRole[] }) => {
   // console.log(users);
 
   return (
-    <ChartContainer config={chartConfig} className="my-auto w-full">
+    <ChartContainer
+      config={chartConfig}
+      className="mx-auto aspect-square h-[200px] w-full"
+    >
       <BarChart accessibilityLayer data={users} margin={{ top: 30 }}>
         <XAxis
           dataKey="role"

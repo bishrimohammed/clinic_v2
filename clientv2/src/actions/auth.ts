@@ -1,26 +1,13 @@
 "use server";
+import API from "@/lib/axios-client";
 import { SessionData, userInterface } from "@/store/auth";
+import { loginData } from "@/types/auth";
 import { cookies } from "next/headers";
 import { z } from "zod";
 
-// const userSchema = z.object({
-//   id: z.number().int(),
-//   name: z.string(),
-//   role: z.string(),
-//   is_new: z.boolean(),
-//   digital_signature: z.string().nullable(),
-//   doctor_titer: z.string().nullable(),
-//   permissions: z.array(
-//     z.object({
-//       name: z.string(),
-//       permissionId: z.number(),
-//       create: z.boolean(),
-//       read: z.boolean(),
-//       edit: z.boolean(),
-//       delete: z.boolean(),
-//     })
-//   ),
-// });
+export const loginAction = async (data: loginData) =>
+  await API.post<SessionData>("/users/login", data);
+
 export const createUserSession = async (sessionData: SessionData) => {
   try {
     const cookieStore = await cookies();

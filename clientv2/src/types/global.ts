@@ -38,3 +38,34 @@ export type NavItem = {
     permission: PermissionName;
   }[];
 };
+
+type region = {
+  id: number;
+  name: string;
+};
+type city = {
+  id: number;
+  name: string;
+  region?: region;
+};
+type subcity = {
+  id: number;
+  name: string;
+  city?: city;
+};
+type woreda = {
+  id: number;
+  name: string;
+  subcity?: subcity;
+};
+
+export type Taddress = {
+  id: number;
+  phone_1: string;
+  woreda_id: number;
+  phone_2?: string | null;
+  email?: string;
+  street?: string;
+  house_number: string | null;
+  woreda?: woreda;
+};
