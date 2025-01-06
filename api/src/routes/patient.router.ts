@@ -1,6 +1,6 @@
 const express = require("express");
 const PatientController = require("../controllers/PatientController");
-const upload = require("../config/multerConfig");
+import upload from "../config/multerConfig";
 const { protect } = require("../middleware/authMiddleWare");
 const router = express.Router();
 

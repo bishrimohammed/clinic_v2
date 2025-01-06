@@ -11,17 +11,17 @@ router.get("/positions", EmployeeController.getEmployeePostions);
 // router.get("/search", PatientController.searchPatient);
 router.post(
   "/",
-  upload.fields([
-    { name: "photo" },
-    { name: "digital_signature" },
-    { name: "doctor_titer" },
-  ]),
+  // upload.fields([
+  //   { name: "photo" },
+  //   { name: "digital_signature" },
+  //   { name: "doctor_titer" },
+  // ]),
   protect,
   EmployeeController.createEmployee
 );
 router.put(
   "/:id",
-  upload.fields([{ name: "photo" }, { name: "digital_signature" }]),
+  // upload.fields([{ name: "photo" }, { name: "digital_signature" }]),
   protect,
   EmployeeController.updateEmployee
 );

@@ -26,7 +26,7 @@ export const protect = expressAsyncHandler(
       // const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       //   userId: string;
       // };
-      const decoded = verifyAccessToken(JSON.parse(accessToken));
+      const decoded = verifyAccessToken(accessToken);
 
       const user = await User.findByPk(decoded.id);
 

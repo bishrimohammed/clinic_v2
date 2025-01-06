@@ -1,10 +1,27 @@
 import { Request, Response, NextFunction } from "express";
-import { ZodSchema } from "zod";
+import { TypeOf, z, ZodSchema } from "zod";
 import { ApiError } from "../shared/error/ApiError";
+import { TypedRequest } from "../types/TypedRequest";
+
+type TransformationMap = { [key: string]: (value: any) => any };
+
 export const validate =
-  <T>(schema: ZodSchema<T>) =>
+  <T extends ZodSchema<any>>(schema: T, transformations?: TransformationMap) =>
   (req: Request, res: Response, next: NextFunction) => {
-    const result = schema.safeParse(req.body);
+    const formData = { ...req.body };
+
+    let requiresTransformation = false;
+
+    // Apply transformations if provided and if there are matching keys
+    if (transformations) {
+      Object.entries(transformations).forEach(([key, transformFn]) => {
+        if (formData[key] !== undefined) {
+          formData[key] = transformFn(formData[key]);
+          requiresTransformation = true;
+        }
+      });
+    }
+    const result = schema.safeParse(formData);
     if (!result.success) {
       const errors = result.error.errors.map((error) => ({
         message: error.message,
@@ -12,5 +29,20 @@ export const validate =
       }));
       throw new ApiError(400, "Required field", errors);
     }
+    const validatedData: TypeOf<T> = schema.parse(formData);
+
+    // Attach the validated data to the request object if transformations were applied
+    if (requiresTransformation) {
+    }
+    (req as TypedRequest<TypeOf<T>>).validatedData = validatedData;
+
+    // const result = schema.safeParse(req.body);
+    // if (!result.success) {
+    //   const errors = result.error.errors.map((error) => ({
+    //     message: error.message,
+    //     path: error.path,
+    //   }));
+    //   throw new ApiError(400, "Required field", errors);
+    // }
     next();
   };

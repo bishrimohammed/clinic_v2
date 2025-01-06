@@ -1,7 +1,5 @@
-// const { sequelize } = require("..");
-
 // module.exports = (sequelize, DataTypes) => {
-//   const Woreda = sequelize.define("woreda", {
+//   const City = sequelize.define("city", {
 //     id: {
 //       type: DataTypes.INTEGER,
 //       primaryKey: true,
@@ -11,17 +9,23 @@
 //       type: DataTypes.STRING,
 //       allowNull: false,
 //     },
-//     subCity_id: {
+//     region_id: {
 //       type: DataTypes.INTEGER,
 //       allowNull: false,
 //       // references: {
-//       //   model: "SubCity",
+//       //   model: "Region",
 //       //   key: "id",
 //       // },
 //     },
 //   });
-//   return Woreda;
+//   City.associate = function (models) {
+//     City.belongsTo(models.Region, {
+//       foreignKey: "region_id",
+//     });
+//   };
+//   return City;
 // };
+
 import {
   Model,
   DataTypes,
@@ -31,18 +35,15 @@ import {
   InferCreationAttributes,
 } from "sequelize";
 import sequelize from "../../db"; // Ensure the correct path
-import SubCity from "./SubCity";
+import Region from "./Region";
 
-class Woreda extends Model<
-  InferAttributes<Woreda>,
-  InferCreationAttributes<Woreda>
-> {
+class City extends Model<InferAttributes<City>, InferCreationAttributes<City>> {
   declare id: CreationOptional<number>;
   declare name: string;
-  declare subCity_id: number;
+  declare region_id: number;
 }
 
-Woreda.init(
+City.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -54,7 +55,7 @@ Woreda.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    subCity_id: {
+    region_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       // references: {
@@ -65,10 +66,8 @@ Woreda.init(
   },
   { sequelize }
 );
-
-Woreda.belongsTo(SubCity, {
-  foreignKey: "subCity_id",
-  as: "subcity",
+City.belongsTo(Region, {
+  foreignKey: "region_id",
+  as: "region",
 });
-
-export default Woreda;
+export default City;

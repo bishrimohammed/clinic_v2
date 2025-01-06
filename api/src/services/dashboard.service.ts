@@ -41,6 +41,7 @@ export const getDashboardData = async (req: Request) => {
         "appointment_time",
         "appointment_date",
         "patient_name",
+        "status",
       ],
       include: [
         // {
@@ -119,7 +120,7 @@ export const getDashboardData = async (req: Request) => {
     ],
     group: ["role_id"],
   });
-  console.log(userGroupByRoleAndCount);
+  // console.log(userGroupByRoleAndCount);
 
   // if (permissions?.find((p) => p.name.toLowerCase() === "patient" && p.read)) {
   const totalPatient = await Patient.count();

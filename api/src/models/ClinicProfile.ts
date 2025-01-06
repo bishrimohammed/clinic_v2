@@ -1,29 +1,19 @@
-import { Sequelize, DataTypes, Model, Optional } from "sequelize";
+import {
+  DataTypes,
+  Model,
+  CreationOptional,
+  InferAttributes,
+  InferCreationAttributes,
+} from "sequelize";
 import sequelize from "../db";
-interface ClinicProfileAttributes {
-  id?: number; // Optional if you are using auto-increment
-  name: string;
-  logo: string;
-  card_valid_date: number;
-  website_url: string;
-  address_id: number;
-  brand_color?: string;
-  motto?: string;
-  number_of_branch?: number;
-  branch_addresses?: string;
-  clinic_type?: string;
-  has_triage?: boolean;
-  clinic_seal?: string | null;
-}
+import Address from "./address/Address";
+import Schedule from "./Schedule";
 
-// Optional attributes for creation
-type ClinicProfileCreationAttributes = Optional<ClinicProfileAttributes, "id">;
-
-class ClinicProfile
-  extends Model<ClinicProfileAttributes, ClinicProfileCreationAttributes>
-  implements ClinicProfileAttributes
-{
-  declare id: number;
+class ClinicProfile extends Model<
+  InferAttributes<ClinicProfile>,
+  InferCreationAttributes<ClinicProfile>
+> {
+  declare id: CreationOptional<number>;
   declare name: string;
   declare logo: string;
   declare card_valid_date: number;
@@ -39,10 +29,12 @@ class ClinicProfile
 }
 ClinicProfile.init(
   {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+
+      // unique: true,
     },
     logo: {
       type: DataTypes.STRING,
@@ -54,9 +46,9 @@ ClinicProfile.init(
     },
     website_url: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
-        isUrl: true,
+        isUrl: { msg: "Not valid URL" },
       },
     },
     address_id: {
@@ -71,6 +63,7 @@ ClinicProfile.init(
     },
     number_of_branch: {
       type: DataTypes.INTEGER,
+      defaultValue: 0,
     },
     branch_addresses: {
       type: DataTypes.STRING,
@@ -93,4 +86,12 @@ ClinicProfile.init(
   }
 );
 
+ClinicProfile.belongsTo(Address, {
+  foreignKey: "address_id",
+  as: "address",
+});
+ClinicProfile.hasMany(Schedule, {
+  foreignKey: "clinic_id",
+  as: "working_hours",
+});
 export default ClinicProfile;

@@ -70,6 +70,8 @@ const expressLoader = async (app: Application) => {
   app.use(cors({ origin: "http://localhost:3000", credentials: true }));
   app.use("/api/v1/users", userRoute);
   app.use("/api/v1/dashboards", DashbordDataRoute);
+  app.use("/api/v1/clinic-profiles", clinicprofileRoute);
+  app.use("/api/v1/addresses", RegionRoute);
 
   // app.use("/api/v1/patient", patientRoute);
   // app.use("/api/v1/allergies", AllergyRoute);

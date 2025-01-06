@@ -11,14 +11,21 @@ import InvestigationOrder from "./medicalRecords/InvestigationOrder";
 import Schedule from "./Schedule";
 import MedicalBilling from "./MedicalBilling";
 
+// Adresss
+import Region from "./address/Region";
+import City from "./address/City";
+import SubCity from "./address/SubCity";
+import Woreda from "./address/Woreda";
+import Address from "./address/Address";
+
 // InvestigationOrder
 // Schedule
 // MedicalBilling
-Role.hasMany(User, {
-  foreignKey: "role_id",
-  sourceKey: "id",
-  as: "users",
-});
+// Role.hasMany(User, {
+//   foreignKey: "role_id",
+//   sourceKey: "id",
+//   as: "users",
+// });
 
 export {
   User,
@@ -33,4 +40,9 @@ export {
   InvestigationOrder,
   Schedule,
   MedicalBilling,
+  Address,
+  Region,
+  City,
+  SubCity,
+  Woreda,
 };

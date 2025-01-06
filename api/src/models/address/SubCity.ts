@@ -1,52 +1,53 @@
+// const { DataTypes } = require("sequelize");
+// const sequelize = require("../../config/database.js");
+// const City = require("./City.js");
+// const Woreda = require("./Woreda.js");
+
 // const { sequelize } = require("..");
 
 // module.exports = (sequelize, DataTypes) => {
-//   const Woreda = sequelize.define("woreda", {
+//   const SubCity = sequelize.define("subcity", {
 //     id: {
 //       type: DataTypes.INTEGER,
 //       primaryKey: true,
 //       autoIncrement: true,
 //     },
-//     name: {
+//     Subcity_name: {
 //       type: DataTypes.STRING,
 //       allowNull: false,
 //     },
-//     subCity_id: {
+//     city_id: {
 //       type: DataTypes.INTEGER,
 //       allowNull: false,
-//       // references: {
-//       //   model: "SubCity",
-//       //   key: "id",
-//       // },
 //     },
 //   });
-//   return Woreda;
+
+//   return SubCity;
 // };
+
 import {
   Model,
   DataTypes,
   CreationOptional,
-  ForeignKey,
   InferAttributes,
   InferCreationAttributes,
 } from "sequelize";
 import sequelize from "../../db"; // Ensure the correct path
-import SubCity from "./SubCity";
+import City from "./City";
 
-class Woreda extends Model<
-  InferAttributes<Woreda>,
-  InferCreationAttributes<Woreda>
+class SubCity extends Model<
+  InferAttributes<SubCity>,
+  InferCreationAttributes<SubCity>
 > {
   declare id: CreationOptional<number>;
   declare name: string;
-  declare subCity_id: number;
+  declare city_id: number;
 }
 
-Woreda.init(
+SubCity.init(
   {
     id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       primaryKey: true,
       autoIncrement: true,
     },
@@ -54,21 +55,15 @@ Woreda.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    subCity_id: {
+    city_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      // references: {
-      //   model: "SubCity",
-      //   key: "id",
-      // },
     },
   },
   { sequelize }
 );
-
-Woreda.belongsTo(SubCity, {
-  foreignKey: "subCity_id",
-  as: "subcity",
+SubCity.belongsTo(City, {
+  foreignKey: "city_id",
+  as: "city",
 });
-
-export default Woreda;
+export default SubCity;

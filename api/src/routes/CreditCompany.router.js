@@ -23,20 +23,20 @@ router.get(
 
 router.post(
   "/",
-  upload.single("agreement_doc"),
+  // upload.single("agreement_doc"),
   protect,
   CreditCompanyProfileController.createCreditCompany
 );
 
 router.post(
   "/agreement",
-  upload.single("agreement_doc"),
+  // upload.single("agreement_doc"),
   protect,
   CreditCompanyProfileController.createAgreement
 );
 router.post(
   "/employee",
-  upload.single("photo"),
+  // upload.single("photo"),
   protect,
   CreditCompanyProfileController.createEmployeeCompany
 );
@@ -46,13 +46,13 @@ router.post(
 router.put(
   "/:id",
   protect,
-  upload.single("agreement_doc"),
+  // upload.single("agreement_doc"),
   CreditCompanyProfileController.updateCreditCompany
 );
 router.put(
   "/employee/:id",
   protect,
-  upload.single("agreement_doc"),
+  // upload.single("agreement_doc"),
   CreditCompanyProfileController.updateEmployeeCompany
 );
 

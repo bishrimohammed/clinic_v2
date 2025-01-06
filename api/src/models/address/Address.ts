@@ -106,6 +106,7 @@ import {
   InferCreationAttributes,
 } from "sequelize";
 import sequelize from "../../db/index"; // Ensure the correct path
+import Woreda from "./Woreda";
 
 class Address extends Model<
   InferAttributes<Address>,
@@ -169,5 +170,9 @@ Address.init(
   },
   { sequelize }
 );
+Address.belongsTo(Woreda, {
+  foreignKey: "woreda_id",
+  as: "woreda",
+});
 
 export default Address;

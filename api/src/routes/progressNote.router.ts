@@ -1,7 +1,7 @@
 const express = require("express");
 const progressNoteController = require("../controllers/medical record/progressNoteController");
 const { protect } = require("../middleware/authMiddleWare");
-const upload = require("../config/multerConfig");
+import upload from "../config/multerConfig";
 const router = express.Router();
 
 router.get(

@@ -1,22 +1,22 @@
 import userRoute from "./user.router";
 import DashbordDataRoute from "./DashboardData.route";
 const woredaRoute = require("./address/woreda.router.js");
-const RegionRoute = require("./address/region.router.js");
+import RegionRoute from "./address/region.router";
 const CityRoute = require("./address/city.router.js");
 const SubCityRoute = require("./address/subCity.router.js");
 
-const patientRoute = require("./patient.router.js");
+const patientRoute = require("./patient.router.ts");
 const AllergyRoute = require("./Allergy.route.js");
 const AppointmentRoute = require("./Appointment.router.js");
 const visitTypeRoute = require("./visitType.router.js");
 const assignPatientRoute = require("./PatientAssignment.router.js");
-const medicalRecordRoute = require("./MedicalRecord.router.js");
+const medicalRecordRoute = require("./MedicalRecord.router.ts");
 const MedicalRecordConsultaionRoute = require("./MedicalRecordConsultaion.router.js");
-const progressNoteRoute = require("./progressNote.router.js");
+const progressNoteRoute = require("./progressNote.router.ts");
 
 const serviceRoute = require("./cilicService.router.js");
 const unitsRoute = require("./unit.router.js");
-const clinicprofileRoute = require("./ClinicProfile.router.js");
+const clinicprofileRoute = require("./ClinicProfile.router.ts");
 const fieldRoute = require("./FieldConfig.router.js");
 // employye route
 const employeeRoute = require("./employee.router.js");
