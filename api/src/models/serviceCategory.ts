@@ -32,7 +32,7 @@ import {
   ForeignKey,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
-import ClinicService from "./clinicService";
+import ClinicService from "./ClinicService";
 
 class ServiceCategory extends Model<
   InferAttributes<ServiceCategory>,
@@ -41,7 +41,7 @@ class ServiceCategory extends Model<
   declare id: CreationOptional<number>;
   declare name: string;
   declare clinicService_id: ForeignKey<ClinicService["id"]>;
-  declare status: boolean;
+  declare status?: boolean;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
 }

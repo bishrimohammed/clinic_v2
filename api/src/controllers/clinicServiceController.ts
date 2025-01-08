@@ -4,6 +4,14 @@ import { RequestHandler } from "express";
 import { ClinicService } from "../models";
 import { clinicserviceService } from "../services";
 import asyncHandler from "../utils/asyncHandler";
+import {
+  createClinicServiceSchema,
+  createClinicServiceT,
+  createServiceCategorySchema,
+  updateClinicServiceSchema,
+  updateServiceCategorySchema,
+} from "../types/clinic-services";
+import { ApiError } from "../shared/error/ApiError";
 const db = require("../models");
 const { Op } = require("sequelize");
 
@@ -19,67 +27,120 @@ export const getClinicServices = asyncHandler(async (req, res) => {
   const clinicServices = await clinicserviceService.getClinicServices(filter);
   res.json(clinicServices);
 });
-export const getServiceCategories = asyncHandler(async (req, res) => {
+// export const getServiceCategories = asyncHandler(async (req, res) => {
+export const getClinicServiceCategoriesByServiceId = asyncHandler(
+  async (req, res) => {
+    const { id } = req.params;
+
+    const serviceCategories =
+      await clinicserviceService.getClinicServiceCategoriesByServiceId(id);
+    res.json(serviceCategories);
+  }
+);
+
+export const getServiceCategoryById = asyncHandler(async (req, res) => {
+  // export const getClinicServiceCategoriesByServiceId = asyncHandler(async (req, res) => {
+  const { category_id } = req.params;
+
+  const serviceCategory = await clinicserviceService.getServiceCategoryById(
+    category_id
+  );
+  res.json(serviceCategory);
+});
+export const createServiceCategory = asyncHandler<{
+  validatedData: typeof createServiceCategorySchema._type;
+}>(async (req, res) => {
   const { id } = req.params;
 
-  const serviceCategories =
-    await clinicserviceService.getClinicServiceCategoriesByServiceId(id);
-  res.json(serviceCategories);
-});
-export const createServiceCategory = asyncHandler(async (req, res) => {
-  const { name, clinicService_id } = req.body;
-  // console.log(req.body);
-  // return;
-  const serviceGroup = await db.ServiceCategory.create({
-    name,
-    clinicService_id: parseInt(clinicService_id),
-  });
-  res.status(201).json(serviceGroup);
-});
-export const updateServiceGroup = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { name, clinicService_id } = req.body;
-  const serviceGroup = await db.ServiceCategory.update(
-    {
-      name,
-      clinicService_id: parseInt(clinicService_id),
-    },
-    {
-      where: {
-        id,
-      },
-    }
+  const clinicService = await clinicserviceService.getClinicServiceById(id);
+  const totaltServiceCategories = await clinicService.countServiceCategories();
+
+  if (!clinicService.hasManyCategory && totaltServiceCategories > 0) {
+    throw new ApiError(
+      400,
+      `${clinicService.service_name} already has ${totaltServiceCategories} service categories`
+    );
+  }
+  const serviceCategory = await clinicserviceService.createServiceCategory(
+    clinicService.id,
+    req.validatedData
   );
-  res.json(serviceGroup);
+  // return;
+  // const serviceGroup = await db.ServiceCategory.create({
+  //   name,
+  //   clinicService_id: parseInt(clinicService_id),
+  // });
+  res.status(201).json({
+    success: true,
+    message: `created successfully`,
+    data: serviceCategory,
+  });
+});
+export const updateServiceCategory = asyncHandler<{
+  validatedData: typeof updateServiceCategorySchema._type;
+}>(async (req, res) => {
+  const { category_id } = req.params;
+  const serviceCategory = await clinicserviceService.updateServiceCategory(
+    category_id,
+    req.validatedData
+  );
+
+  res.json({
+    success: true,
+    message: `${serviceCategory.name} is updated successfully`,
+    data: serviceCategory,
+  });
 });
 // @desk activate service group
-export const activateServiceGroup = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const serviceGroup = await db.ServiceCategory.update(
-    {
-      status: true,
-    },
-    {
-      where: {
-        id,
-      },
-    }
+export const activateServiceCategory = asyncHandler(async (req, res) => {
+  const { category_id } = req.params;
+  const serviceCategory = await clinicserviceService.activateClinicCategory(
+    category_id
   );
-  res.json(serviceGroup);
+  // const serviceGroup = await db.ServiceCategory.update(
+  //   {
+  //     status: true,
+  //   },
+  //   {
+  //     where: {
+  //       id,
+  //     },
+  //   }
+  // );
+  res.json({
+    success: true,
+    message: `${serviceCategory.name} is activated successfully`,
+    data: serviceCategory,
+  });
 });
 
 // @desk deactivate service group
-export const deactiveServiceGroup = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const serviceGroup = await db.ServiceCategory.update(
-    {
-      status: false,
-    },
-    {
-      where: {
-        id,
-      },
-    }
+export const deactiveServiceCategory = asyncHandler(async (req, res) => {
+  const { category_id } = req.params;
+  const serviceCategory = await clinicserviceService.deactivateClinicCategory(
+    category_id
+  );
+  // const serviceGroup = await db.ServiceCategory.update(
+  //   {
+  //     status: false,
+  //   },
+  //   {
+  //     where: {
+  //       id,
+  //     },
+  //   }
+  // );
+  res.json({
+    success: true,
+    message: `${serviceCategory.name} is deactivated successfully`,
+    data: serviceCategory,
+  });
+});
+
+export const deleteServiceCategory = asyncHandler(async (req, res) => {
+  const { category_id } = req.params;
+  const serviceGroup = await clinicserviceService.deleteServiceCategory(
+    category_id
   );
   res.json(serviceGroup);
 });
@@ -486,11 +547,14 @@ export const updateImagingServiceItem = asyncHandler(async (req, res) => {
 // @desc delete imaging service items
 
 export const getClinicServiceById = asyncHandler(async (req, res) => {
-  const clinicService = await db.ServiceItem.find(req.params.id);
-  if (!clinicService) {
-    throw new Error("ClinicService not found");
-  }
-  res.json(clinicService);
+  const { id } = req.params;
+  const clinicService = await clinicserviceService.getClinicServiceById(id);
+
+  res.json({
+    success: true,
+
+    data: clinicService,
+  });
 });
 export const getClinicServiceDetail = asyncHandler(async (req, res) => {
   const { query } = req.query;
@@ -518,65 +582,100 @@ export const getClinicServiceDetail = asyncHandler(async (req, res) => {
   }
   res.json(clinicService);
 });
-export const createClinicService = asyncHandler(async (req, res) => {
-  const { service_name } = req.body;
-  const clinicService = await db.ClinicService.create({
-    service_name,
-  });
-  res.json(clinicService);
-});
-export const updateClinicService = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { service_name, status } = req.body;
-  const clinicService = await db.ClinicService.update(
-    {
-      service_name,
-      status,
-    },
-    {
-      where: {
-        id,
-      },
-    }
+// <{
+//   ValidatedData: createClinicServiceT;
+// }>
+export const createClinicService = asyncHandler<{
+  validatedData: typeof createClinicServiceSchema._type;
+}>(async (req, res) => {
+  const validatedData = req.validatedData;
+
+  // const { service_name } = req.body;
+  // const clinicService = await db.ClinicService.create({
+  //   service_name,
+  // });
+  const clinicService = await clinicserviceService.createClinicService(
+    validatedData
   );
-  res.json(clinicService);
+  // console.log(validatedData);
+
+  res.json({ success: true, data: clinicService });
+});
+export const updateClinicService = asyncHandler<{
+  validatedData: typeof updateClinicServiceSchema._type;
+}>(async (req, res) => {
+  const { id } = req.params;
+  // const { service_name, status } = req.body;
+  const validatedData = req.validatedData;
+  const updatedClinicService = await clinicserviceService.updateClinicService(
+    id,
+    validatedData
+  );
+  // const clinicService = await db.ClinicService.update(
+  //   {
+  //     service_name,
+  //     status,
+  //   },
+  //   {
+  //     where: {
+  //       id,
+  //     },
+  //   }
+  // );
+  res.json({ success: true, data: updatedClinicService });
 });
 export const deleteClinicService = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const clinicService = await db.ClinicService.destroy({
-    where: {
-      id,
-    },
+  const clinicService = await clinicserviceService.deleteClinicService(id);
+  //  await db.ClinicService.destroy({
+  //   where: {
+  //     id,
+  //   },
+  // });
+
+  res.json({
+    success: true,
+    message: `${clinicService.service_name} updated successfully`,
+    // data: clinicService,
   });
-  res.json(clinicService);
 });
 export const deactiveClinicService = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const clinicService = await db.ClinicService.update(
-    {
-      status: false,
-    },
-    {
-      where: {
-        id,
-      },
-    }
-  );
-  res.json(clinicService);
+  const clinicService = await clinicserviceService.deactivateClinicService(id);
+  // await db.ClinicService.update(
+  //   {
+  //     status: false,
+  //   },
+  //   {
+  //     where: {
+  //       id,
+  //     },
+  //   }
+  // );
+  res.json({
+    success: true,
+    message: `${clinicService.service_name} updated successfully`,
+    data: clinicService,
+  });
 });
 export const activateClinicService = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const clinicService = await db.ClinicService.update(
-    {
-      status: true,
-    },
-    {
-      where: {
-        id,
-      },
-    }
-  );
-  res.json(clinicService);
+  const clinicService = await clinicserviceService.activateClinicService(id);
+  //  await db.ClinicService.update(
+  //   {
+  //     status: true,
+  //   },
+  //   {
+  //     where: {
+  //       id,
+  //     },
+  //   }
+  // );
+  res.json({
+    success: true,
+    message: `${clinicService.service_name} updated successfully`,
+    data: clinicService,
+  });
 });
 // @desc deactivate  service items
 export const deactiveServiceItem = asyncHandler(async (req, res) => {

@@ -40,6 +40,7 @@ import {
   InferCreationAttributes,
   HasManyGetAssociationsMixin,
   NonAttribute,
+  HasManyCountAssociationsMixin,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 import ServiceCategory from "./serviceCategory";
@@ -50,14 +51,15 @@ class ClinicService extends Model<
 > {
   declare id: CreationOptional<number>;
   declare service_name: string;
-  declare is_laboratory: boolean;
-  declare is_imaging: boolean;
-  declare is_registration: boolean;
-  declare is_others: boolean;
-  declare status: boolean;
-  declare hasManyCategory: boolean;
+  declare is_laboratory?: boolean;
+  declare is_imaging?: boolean;
+  declare is_registration?: boolean;
+  declare is_others?: boolean;
+  declare status?: boolean;
+  declare hasManyCategory?: boolean;
 
   declare getServiceCategories: HasManyGetAssociationsMixin<ServiceCategory>;
+  declare countServiceCategories: HasManyCountAssociationsMixin;
 
   declare serviceCategories?: NonAttribute<ServiceCategory[]>;
 }

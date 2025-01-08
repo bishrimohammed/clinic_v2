@@ -35,6 +35,6 @@ export const errorHandler = (
     ...(configs.NODE_DEV === "development" ? { stack: error.stack } : {}), // Error stack traces should be visible in development for debugging
   };
   removeUnusedMulterImageFilesOnError(req);
-  res.status(error.statusCode || 500);
-  res.json(response);
+  // res.status(error.statusCode || 500);
+  res.status(error.statusCode || 500).json(response);
 };

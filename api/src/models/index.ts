@@ -1,5 +1,6 @@
 import ClinicProfile from "./ClinicProfile";
-import ClinicService from "./clinicService";
+import ClinicService from "./ClinicService";
+import ServiceCategory from "./serviceCategory";
 
 import User from "./User";
 import Employee from "./Employee";
@@ -48,4 +49,5 @@ export {
   SubCity,
   Woreda,
   ClinicService,
+  ServiceCategory,
 };

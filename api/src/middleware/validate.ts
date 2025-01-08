@@ -11,10 +11,12 @@ export const validate =
     const formData = { ...req.body };
 
     let requiresTransformation = false;
-    // console.log(req.files);
+    // console.log(req.body);
 
     // Apply transformations if provided and if there are matching keys
     if (transformations) {
+      console.log(true);
+
       Object.entries(transformations).forEach(([key, transformFn]) => {
         if (formData[key] !== undefined) {
           formData[key] = transformFn(formData[key]);
@@ -31,6 +33,7 @@ export const validate =
       throw new ApiError(400, "Valiadtion error", errors);
     }
     const validatedData: TypeOf<T> = schema.parse(formData);
+    // console.log(validatedData);
 
     // Attach the validated data to the request object if transformations were applied
     if (requiresTransformation) {

@@ -1,9 +1,23 @@
-const express = require("express");
+import express from "express";
 import * as clinicServiceController from "../controllers/clinicServiceController";
+import { validate } from "../middleware/validate";
+import {
+  createClinicServiceSchema,
+  createServiceCategorySchema,
+  updateClinicServiceSchema,
+  updateServiceCategorySchema,
+} from "../types/clinic-services";
 const router = express.Router();
 
 router.get("/", clinicServiceController.getClinicServices);
-router.get("/:id/servicegroup", clinicServiceController.getServiceCategories);
+router.get(
+  "/:id/servicegroup",
+  clinicServiceController.getClinicServiceCategoriesByServiceId
+);
+router.get(
+  "/service-category/:category_id",
+  clinicServiceController.getServiceCategoryById
+);
 router.get("/:id/serviceitems", clinicServiceController.getClinicServiceItems);
 // router.get("/:id/gggg", clinicServiceController.ggggg);
 router.get("/withdetail", clinicServiceController.getClinicServiceDetail);
@@ -24,14 +38,26 @@ router.get("/get_lab_service", clinicServiceController.getLaboratoryService);
 router.get("/procedures", clinicServiceController.getProcedures);
 router.get("/:id", clinicServiceController.getClinicServiceById);
 
-router.post("/", clinicServiceController.createClinicService);
+router.post(
+  "/",
+  validate(createClinicServiceSchema),
+  clinicServiceController.createClinicService
+);
 
 // router.post("/createLabService", clinicServiceController.createLabServiceItem);
 router.post("/serviceitem", clinicServiceController.addServiceItems);
-router.post("/servicegroup", clinicServiceController.createServiceCategory);
+router.post(
+  "/:id/service-category",
+  validate(createServiceCategorySchema),
+  clinicServiceController.createServiceCategory
+);
 
 router.put("/serviceitem/:id", clinicServiceController.updateServiceItems);
-router.put("/servicegroup/:id", clinicServiceController.updateServiceGroup);
+router.put(
+  "/service-category/:category_id",
+  validate(updateServiceCategorySchema),
+  clinicServiceController.updateServiceCategory
+);
 router.put(
   "/:id/updateLabService",
   clinicServiceController.updateLabServiceItem
@@ -41,8 +67,12 @@ router.put(
   clinicServiceController.updateImagingServiceItem
 );
 
-router.put("/:id", clinicServiceController.updateClinicService);
-router.patch("/:id/deactive", clinicServiceController.deactiveClinicService);
+router.put(
+  "/:id",
+  validate(updateClinicServiceSchema),
+  clinicServiceController.updateClinicService
+);
+router.patch("/:id/deactivate", clinicServiceController.deactiveClinicService);
 router.patch("/:id/activate", clinicServiceController.activateClinicService);
 
 // service items
@@ -59,14 +89,19 @@ router.patch(
 //service group
 
 router.patch(
-  "/servicegroup/:id/deactivate",
-  clinicServiceController.deactiveServiceGroup
+  "/service-category/:category_id/deactivate",
+  clinicServiceController.deactiveServiceCategory
 );
 router.patch(
-  "/servicegroup/:id/activate",
-  clinicServiceController.activateServiceGroup
+  "/service-category/:category_id/activate",
+  clinicServiceController.activateServiceCategory
 );
 
 router.delete("/:id", clinicServiceController.deleteClinicService);
+router.delete(
+  "/service-category/:category_id",
+  clinicServiceController.deleteServiceCategory
+);
+// router.delete("/:id", clinicServiceController.deleteClinicService);
 
 export default router;
