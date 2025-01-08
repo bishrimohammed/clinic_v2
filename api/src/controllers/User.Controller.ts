@@ -1,7 +1,8 @@
 import { Request, RequestHandler, Response } from "express-serve-static-core";
 import {
   authService,
-  clinicService,
+  clinicProfileService,
+  // clinicService,
   permissionService,
   userService,
 } from "../services";
@@ -174,7 +175,7 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   };
   const accessToken = generateAccessToken(userData);
   const refreshToken = generateRefreshToken(userData);
-  const clinicInfo = await clinicService.getClinics();
+  const clinicInfo = await clinicProfileService.getClinicInfo();
   // console.log(token);
   // const permissions = user.userPermissions;
   res.cookie("accessToken", accessToken, {

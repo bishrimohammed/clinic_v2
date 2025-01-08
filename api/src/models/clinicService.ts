@@ -38,8 +38,11 @@ import {
   ForeignKey,
   InferAttributes,
   InferCreationAttributes,
+  HasManyGetAssociationsMixin,
+  NonAttribute,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
+import ServiceCategory from "./serviceCategory";
 
 class ClinicService extends Model<
   InferAttributes<ClinicService>,
@@ -52,6 +55,11 @@ class ClinicService extends Model<
   declare is_registration: boolean;
   declare is_others: boolean;
   declare status: boolean;
+  declare hasManyCategory: boolean;
+
+  declare getServiceCategories: HasManyGetAssociationsMixin<ServiceCategory>;
+
+  declare serviceCategories?: NonAttribute<ServiceCategory[]>;
 }
 
 ClinicService.init(
@@ -78,12 +86,20 @@ ClinicService.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    hasManyCategory: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
     status: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
   },
-  { sequelize, tableName: "clinicservice" }
+  { sequelize, modelName: "clinicservice", tableName: "clinicservices" }
 );
-
+ClinicService.hasMany(ServiceCategory, {
+  foreignKey: "clinicService_id",
+  as: "serviceCategories",
+});
+ClinicService.sync({ alter: false });
 export default ClinicService;

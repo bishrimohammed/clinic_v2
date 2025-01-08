@@ -1,4 +1,6 @@
 import ClinicProfile from "./ClinicProfile";
+import ClinicService from "./clinicService";
+
 import User from "./User";
 import Employee from "./Employee";
 import Role from "./Role";
@@ -45,4 +47,5 @@ export {
   City,
   SubCity,
   Woreda,
+  ClinicService,
 };

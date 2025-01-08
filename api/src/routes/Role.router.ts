@@ -1,5 +1,5 @@
 const express = require("express");
-const RoleController = require("../controllers/RoleController");
+import * as RoleController from "../controllers/RoleController";
 // const PermissionController = require("../controllers/PermissionController");
 // const PermissionController =
 
@@ -17,4 +17,4 @@ router.patch("/:id/activate", RoleController.activateRole);
 
 router.delete("/:id", RoleController.deleteRole);
 
-module.exports = router;
+export default router;

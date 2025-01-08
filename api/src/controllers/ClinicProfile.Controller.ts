@@ -107,20 +107,31 @@ export const createClinicProfile = asyncHandler(async (req, res) => {
   res.status(201).json(clinic);
 });
 // updateClinicProfileSchema
+
+// <{
+//   validatedData: typeof updateClinicProfileSchema._type;
+// }>
+
 // export const updateClinicProfile: RequestHandler = asyncHandler(async (req, res) => {
 // const request:TypedRequest<typeof updateClinicProfileSchema> = req
 export const updateClinicProfile = asyncHandler<{
-  validatedData: typeof updateClinicProfileSchema;
-}>(async (req: Request, res: Response, next: NextFunction) => {
-  const r = req as TypedRequest<typeof updateClinicProfileSchema>;
-
-  const validatedData = r.validatedData;
+  validatedData: typeof updateClinicProfileSchema._type;
+}>(async (req, res: Response, next: NextFunction) => {
+  // const r = req as TypedRequest<typeof updateClinicProfileSchema>;
+  const validatedData = req;
+  // console.log(validatedData);
 
   const { id } = req.params;
-  const {} = req.body;
-  const body = req.body as updateClinicProfileT;
-  console.log(body);
-  console.log(validatedData);
+  // const {} = req.body;
+  // const body = req.body as updateClinicProfileT;
+  // console.log(body);
+  // console.log(req.files);
+  // console.log(req.validatedData);
+  // console.log(req.file);
+
+  await clinicProfileService.updateClinicProfile(id, req.validatedData);
+  const clinic = await clinicProfileService.getClinicDetails();
+  // console.log(req.validatedData);
 
   // const updatedClinic = await clinicProfileService.updateClinicProfile(
   //   id,
@@ -204,7 +215,9 @@ export const updateClinicProfile = asyncHandler<{
   //     );
   //   })
   // );
-  res.status(201).json({ success: true, data: validatedData });
+  res
+    .status(201)
+    .json({ success: true, message: "Updated successfully", data: clinic });
 });
 export const deleteClinicProfile = asyncHandler(async (req, res) => {
   const { id } = req.params;

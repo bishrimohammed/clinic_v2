@@ -1,4 +1,5 @@
-// module.exports = (sequelize, DataTypes) => {
+//
+//  module.exports = (sequelize, DataTypes) => {
 //   const Address = sequelize.define(
 //     "address",
 //     {
@@ -170,6 +171,7 @@ Address.init(
   },
   { sequelize }
 );
+
 Address.belongsTo(Woreda, {
   foreignKey: "woreda_id",
   as: "woreda",

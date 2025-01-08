@@ -1,12 +1,12 @@
 import express from "express";
 import * as ClinicProfileController from "../controllers/ClinicProfile.Controller";
-import upload from "../config/multerConfig";
+
 import { protect } from "../middleware/authMiddleWare";
 import { validate } from "../middleware/validate";
 import { updateClinicProfileSchema } from "../types/clinic-profile";
-import { TypedRequest } from "../types/TypedRequest";
-import asyncHandler from "../utils/asyncHandler";
+
 import { parseJSON } from "../utils/helpers";
+import upload from "../config/multerConfig";
 
 // import { parseJSON } from "date-fns";
 const router = express.Router();
@@ -28,7 +28,7 @@ router.get("/:id", ClinicProfileController.getClinicProfileById);
 //   ClinicProfileController.createClinicProfile
 // );
 
-// PUT /clinicprofile/:id
+// PUT /clinic-profile/:id
 
 router.put(
   "/:id",
@@ -36,6 +36,7 @@ router.put(
   upload.fields([{ name: "logo" }, { name: "clinic_seal" }]),
   validate(updateClinicProfileSchema, {
     address: parseJSON,
+    working_hours: parseJSON,
   }),
   ClinicProfileController.updateClinicProfile
 );

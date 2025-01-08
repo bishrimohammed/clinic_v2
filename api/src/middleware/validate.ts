@@ -11,6 +11,7 @@ export const validate =
     const formData = { ...req.body };
 
     let requiresTransformation = false;
+    // console.log(req.files);
 
     // Apply transformations if provided and if there are matching keys
     if (transformations) {
@@ -27,14 +28,19 @@ export const validate =
         message: error.message,
         path: error.path,
       }));
-      throw new ApiError(400, "Required field", errors);
+      throw new ApiError(400, "Valiadtion error", errors);
     }
     const validatedData: TypeOf<T> = schema.parse(formData);
 
     // Attach the validated data to the request object if transformations were applied
     if (requiresTransformation) {
+      // (req as TypedRequest<TypeOf<T>>).validatedData = validatedData;
     }
-    (req as TypedRequest<TypeOf<T>>).validatedData = validatedData;
+    (
+      req as Request & {
+        validatedData: TypeOf<T>;
+      }
+    ).validatedData = validatedData;
 
     // const result = schema.safeParse(req.body);
     // if (!result.success) {

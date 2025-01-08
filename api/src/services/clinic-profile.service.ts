@@ -1,4 +1,4 @@
-import { addressService } from ".";
+import { addressService, scheduleService } from ".";
 import {
   City,
   ClinicProfile,
@@ -63,6 +63,13 @@ export const getClinicProfileById = async (id: string) => {
   }
   return clinicProfile;
 };
+export const getClinicInfo = async () => {
+  const clinicProfile = await ClinicProfile.findOne();
+  if (!clinicProfile) {
+    throw new ApiError(404, "clinic Profile not found");
+  }
+  return clinicProfile;
+};
 
 export const updateClinicProfile = async (
   id: string,
@@ -79,16 +86,29 @@ export const updateClinicProfile = async (
     website_url,
     brand_color,
   } = data;
-  const clinicProfile = await getClinicProfileById(id);
-  // const updatedAdress = await addressService.updateAdress(address);
-  const updatedClinicProfile = await clinicProfile.update({
-    name,
-    brand_color,
-    card_valid_date,
-    clinic_type,
-    has_triage,
-    motto,
-    website_url,
-  });
+  // const clinicProfile = await getClinicProfileById(id);
+  const updatedAdress = await addressService.updateAdress(address);
+  await Promise.all(
+    data.working_hours.map((workHour) => {
+      return scheduleService.updateWorkingHour(workHour);
+    })
+  );
+  const updatedClinicProfile = await ClinicProfile.update(
+    {
+      name,
+      brand_color,
+      card_valid_date,
+      clinic_type,
+      has_triage,
+      motto,
+      website_url,
+    },
+    {
+      where: {
+        id: id,
+      },
+    }
+  );
+
   return updatedClinicProfile;
 };

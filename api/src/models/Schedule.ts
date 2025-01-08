@@ -129,6 +129,7 @@ class Schedule extends Model<
   InferAttributes<Schedule>,
   InferCreationAttributes<Schedule>
 > {
+  declare id: CreationOptional<number>;
   declare clinic_id?: number | null; // Can be null
   declare doctor_id?: number | null; // Can be null
   declare day_of_week:
@@ -180,6 +181,12 @@ class Schedule extends Model<
 
 Schedule.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
     clinic_id: {
       type: DataTypes.INTEGER,
       allowNull: true,

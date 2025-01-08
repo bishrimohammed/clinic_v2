@@ -1,11 +1,9 @@
 const express = require("express");
-const {
-  clinicServiceController,
-} = require("../controllers/clinicServiceController");
+import * as clinicServiceController from "../controllers/clinicServiceController";
 const router = express.Router();
 
 router.get("/", clinicServiceController.getClinicServices);
-router.get("/:id/servicegroup", clinicServiceController.getServiceGroup);
+router.get("/:id/servicegroup", clinicServiceController.getServiceCategories);
 router.get("/:id/serviceitems", clinicServiceController.getClinicServiceItems);
 // router.get("/:id/gggg", clinicServiceController.ggggg);
 router.get("/withdetail", clinicServiceController.getClinicServiceDetail);
@@ -30,7 +28,7 @@ router.post("/", clinicServiceController.createClinicService);
 
 // router.post("/createLabService", clinicServiceController.createLabServiceItem);
 router.post("/serviceitem", clinicServiceController.addServiceItems);
-router.post("/servicegroup", clinicServiceController.addServiceGroup);
+router.post("/servicegroup", clinicServiceController.createServiceCategory);
 
 router.put("/serviceitem/:id", clinicServiceController.updateServiceItems);
 router.put("/servicegroup/:id", clinicServiceController.updateServiceGroup);
@@ -71,4 +69,4 @@ router.patch(
 
 router.delete("/:id", clinicServiceController.deleteClinicService);
 
-module.exports = router;
+export default router;

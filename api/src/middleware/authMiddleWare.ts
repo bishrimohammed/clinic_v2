@@ -19,6 +19,7 @@ export const protect = expressAsyncHandler(
       accessToken =
         req.cookies?.accessToken || req.headers.authorization?.split(" ")[1];
       // console.log(req.cookies?.accessToken);
+      // console.log(req.headers.authorization);
 
       if (!accessToken) {
         next(new ApiError(401, "Not Authorized, no token"));
@@ -28,22 +29,22 @@ export const protect = expressAsyncHandler(
       // };
       const decoded = verifyAccessToken(accessToken);
 
-      const user = await User.findByPk(decoded.id);
+      const user = await User.findByPk(decoded.id, { attributes: ["id"] });
 
       if (!user) {
         next(new ApiError(401, "Not Authorized, user not found"));
         return;
       }
       // console.log(user);
-      const role = await user.getRole({ attributes: ["name"] });
+      // const role = await user.getRole({ attributes: ["name"] });
 
-      const processedPermissions = await permissionService.formatUserPermission(
-        user
-      );
+      // const processedPermissions = await permissionService.formatUserPermission(
+      //   user
+      // );
       req.user = {
         id: user?.id,
-        role: role?.name,
-        permissions: processedPermissions,
+        role: decoded?.name,
+        permissions: decoded.permissions,
       };
       next();
     } catch (error) {

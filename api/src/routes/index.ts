@@ -14,14 +14,14 @@ const medicalRecordRoute = require("./MedicalRecord.router.ts");
 const MedicalRecordConsultaionRoute = require("./MedicalRecordConsultaion.router.js");
 const progressNoteRoute = require("./progressNote.router.ts");
 
-const serviceRoute = require("./cilicService.router.js");
+import serviceRoute from "./cilicService.router";
 const unitsRoute = require("./unit.router.js");
 const clinicprofileRoute = require("./ClinicProfile.router.ts");
 const fieldRoute = require("./FieldConfig.router.js");
 // employye route
 const employeeRoute = require("./employee.router.js");
 // role and permission
-const roleRoute = require("./Role.router.js");
+import roleRoute from "./Role.router";
 const permissionsRoute = require("./permission.router.js");
 
 const creditCompanyRoute = require("./CreditCompany.router.js");
