@@ -33,6 +33,8 @@ import {
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 import ClinicService from "./ClinicService";
+import ServiceItem from "./serviceItem";
+import { HasManyCountAssociationsMixin } from "sequelize";
 
 class ServiceCategory extends Model<
   InferAttributes<ServiceCategory>,
@@ -41,9 +43,12 @@ class ServiceCategory extends Model<
   declare id: CreationOptional<number>;
   declare name: string;
   declare clinicService_id: ForeignKey<ClinicService["id"]>;
+  declare has_many_items: boolean;
   declare status?: boolean;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
+
+  declare countItems: HasManyCountAssociationsMixin;
 }
 
 ServiceCategory.init(
@@ -67,6 +72,10 @@ ServiceCategory.init(
       //   key: "id",
       // },
     },
+    has_many_items: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
     status: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
@@ -82,7 +91,7 @@ ServiceCategory.init(
   },
   {
     sequelize,
-    modelName: "servicecategory",
+    modelName: "ServiceCategory",
     tableName: "servicecategories",
     timestamps: true,
   }
@@ -90,6 +99,10 @@ ServiceCategory.init(
 
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// ServiceCategory.sync({ alert: false });
+ServiceCategory.sync({ alter: false });
 
+ServiceCategory.hasMany(ServiceItem, {
+  foreignKey: "serviceCategory_id",
+  as: "items",
+});
 export default ServiceCategory;

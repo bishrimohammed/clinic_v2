@@ -1,19 +1,21 @@
 import { RequestHandler } from "express";
 
 // import asyncHandler from "express-async-handler";
-import { ClinicService } from "../models";
+import { ClinicService, ServiceItem } from "../models";
 import { clinicserviceService } from "../services";
 import asyncHandler from "../utils/asyncHandler";
 import {
   createClinicServiceSchema,
   createClinicServiceT,
   createServiceCategorySchema,
+  createServiceItemSchema,
   updateClinicServiceSchema,
   updateServiceCategorySchema,
 } from "../types/clinic-services";
 import { ApiError } from "../shared/error/ApiError";
 const db = require("../models");
-const { Op } = require("sequelize");
+import { Op } from "sequelize";
+import { serviceItemFilterType } from "../services/clinic-service.service";
 
 // module.exports.clinicServiceController = {
 export const getClinicServices = asyncHandler(async (req, res) => {
@@ -146,91 +148,43 @@ export const deleteServiceCategory = asyncHandler(async (req, res) => {
 });
 // @desk delete service group
 // @desc get clinic service by id
-export const getClinicServiceItems = asyncHandler(async (req, res) => {
+export const getServiceItemById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { price } = req.query as { price: string };
-  // console.log(id);
-  let where: any = {};
-  if (req.query.status) {
-    where.status = req.query.status === "true" ? true : false;
-  }
-  if (req.query.price) {
-    if (req.query.price === "500+") {
-      where.price = {
-        [Op.gte]: 500,
-      };
-      // console.log("llllllmlkmnkj");
-      // return;
-    } else {
-      let minPrice = parseInt(price.split("-")[0]);
-      let maxPrice = parseInt(price.split("-")[1]);
-      console.log("minPrice: " + minPrice);
-      console.log("maxPrice: " + maxPrice);
 
-      // price range between minprice and maxprice
-      where.price = {
-        [Op.gte]: minPrice,
-        [Op.lte]: maxPrice,
-      };
-    }
-
-    // where.price = {
-    //   [Op.gte]: req.query.price
-    // }
-
-    // where.price = {
-    //   [Op.gte]: req.query.price
-    // }
-  }
-  // if (req.query.gender) {
-  //   where.gender = req.query.gender;
-  // }
-  // console.log(req.query);
-  const clinicService = await db.ClinicService.findByPk(id);
-  if (!clinicService) {
-    res.status(404);
-    throw new Error("Clinic service not found");
-  }
-  // console.log("sjdbkajcvdgh");
-  // let items = [];
-  const categorys = await clinicService.getServiceCategory();
-  const categoryIds = categorys.map((category: any) => category.id);
-  if (req.query.groups) {
-    where.serviceCategory_id = req.query.groups;
-  } else {
-    where.serviceCategory_id = categoryIds;
-  }
-  const items = await db.ServiceItem.findAll({
-    where: where,
-    order: [["service_name", "ASC"]],
-    include: [
-      {
-        model: db.ServiceCategory,
-        as: "serviceCategory",
-        attributes: ["name", "id"],
-      },
-      {
-        model: db.LabTestProfile,
-        as: "labTestProfile",
-        // attributes: ["id"],
-        include: [
-          {
-            model: db.PanelUnderpanel,
-            as: "underPanels",
-            include: [
-              {
-                model: db.LabTestProfile,
-                as: "ParentPanel",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  });
-  res.json(items);
+  const clinicItem = await clinicserviceService.getServiceItemById(id, [
+    {
+      model: ServiceItem,
+      as: "underPanels",
+      attributes: ["id", "service_name"],
+    },
+  ]);
+  res.json(clinicItem);
 });
+export const getServiceItems = asyncHandler(async (req, res) => {
+  const query = req.query as serviceItemFilterType;
+  const serviceItems = await clinicserviceService.getServiceItems(query);
+  res.json({
+    success: true,
+    data: serviceItems,
+  });
+});
+export const getServiceItemsByClinicServiceId = asyncHandler(
+  async (req, res) => {
+    const { id: clinicService_id } = req.params;
+    const query = req.query as serviceItemFilterType;
+    // console.log(q);
 
+    const serviceItems =
+      await clinicserviceService.getServiceItemsByClinicServiceId(
+        clinicService_id,
+        query
+      );
+    res.json({
+      success: true,
+      data: serviceItems,
+    });
+  }
+);
 // @desc get all laboratory services
 export const getLabServiceItems = asyncHandler(async (req, res) => {
   const labServiceItems = await db.ServiceItem.findAll({
@@ -278,55 +232,76 @@ export const ggggg = asyncHandler(async (req, res) => {
   );
 });
 // @desc add service items
-export const addServiceItems = asyncHandler(async (req, res) => {
-  const { service_name, price, unit, isFixed, islab, lab } = req.body;
-  console.log(req.body);
-  // return;
-  const labServiceItem = await db.ServiceItem.create({
-    service_name: service_name,
-    price,
-    isFixed: isFixed,
-    // is_laboratory: true,
-    unit: unit,
-    serviceCategory_id: parseInt(req.body.serviceGroup),
-  });
-  if (islab) {
-    const labProfile = await db.LabTestProfile.create({
-      labTest_id: labServiceItem.id,
-      isPanel: lab.isPanel,
-      isFixed: isFixed,
-    });
-    // const labs = await db.ServiceItem.findAll({
-    //   where: { id: lab.childService },
-    // });
-    console.log(lab.childService);
-    if (lab.isPanel) {
-      const lbProfiles = await db.LabTestProfile.findAll(
-        // { parentId: labProfile.id },
-        { where: { labTest_id: { [db.Sequelize.Op.in]: lab.childService } } }
-      );
-      const lbProfileIds = lbProfiles.map((p: any) => p.id);
-      console.log(lbProfileIds);
-      await Promise.all(
-        // lab.childService.map((id) => {
-        //   console.log(id);
-        //   return db.PanelUnderpanel.create({
-        //     panel_id: labProfile.id,
-        //     underpanel_id: id,
-        //   });
-        // })
-        lbProfileIds.map((id: number) => {
-          return db.PanelUnderpanel.create({
-            panel_id: labProfile.id,
-            underpanel_id: id,
-          });
-        })
-      );
+export const createServiceItems = asyncHandler<{
+  validatedData: typeof createServiceItemSchema._type;
+}>(async (req, res) => {
+  const validatedData = req.validatedData;
+  const serviceCategory = await clinicserviceService.getServiceCategoryById(
+    validatedData.serviceCategory_id
+  );
+  const totaltServiceCategories = await serviceCategory.countItems();
 
-      // const panel = await labProfile.addUnderPanel(lbProfileIds);
-    }
+  if (!serviceCategory.has_many_items && totaltServiceCategories > 0) {
+    throw new ApiError(
+      400,
+      `${serviceCategory.name} already has ${totaltServiceCategories} service Items`
+    );
   }
-  res.status(201).json(labServiceItem);
+
+  const serviceItem = await clinicserviceService.createServiceItem(
+    validatedData
+  );
+
+  // return;
+  // const labServiceItem = await db.ServiceItem.create({
+  //   service_name: service_name,
+  //   price,
+  //   isFixed: isFixed,
+  //   // is_laboratory: true,
+  //   unit: unit,
+  //   serviceCategory_id: parseInt(req.body.serviceGroup),
+  // });
+  // if (islab) {
+  //   const labProfile = await db.LabTestProfile.create({
+  //     labTest_id: labServiceItem.id,
+  //     isPanel: lab.isPanel,
+  //     isFixed: isFixed,
+  //   });
+  //   // const labs = await db.ServiceItem.findAll({
+  //   //   where: { id: lab.childService },
+  //   // });
+  //   console.log(lab.childService);
+  //   if (lab.isPanel) {
+  //     const lbProfiles = await db.LabTestProfile.findAll(
+  //       // { parentId: labProfile.id },
+  //       { where: { labTest_id: { [db.Sequelize.Op.in]: lab.childService } } }
+  //     );
+  //     const lbProfileIds = lbProfiles.map((p: any) => p.id);
+  //     console.log(lbProfileIds);
+  //     await Promise.all(
+  //       // lab.childService.map((id) => {
+  //       //   console.log(id);
+  //       //   return db.PanelUnderpanel.create({
+  //       //     panel_id: labProfile.id,
+  //       //     underpanel_id: id,
+  //       //   });
+  //       // })
+  //       lbProfileIds.map((id: number) => {
+  //         return db.PanelUnderpanel.create({
+  //           panel_id: labProfile.id,
+  //           underpanel_id: id,
+  //         });
+  //       })
+  //     );
+
+  //     // const panel = await labProfile.addUnderPanel(lbProfileIds);
+  //   }
+  // }
+  res.status(201).json({
+    success: true,
+    message: `${validatedData.item_name} created successfully`,
+    data: serviceItem,
+  });
 });
 // @desc update service items
 export const updateServiceItems = asyncHandler(async (req, res) => {
@@ -642,16 +617,7 @@ export const deleteClinicService = asyncHandler(async (req, res) => {
 export const deactiveClinicService = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const clinicService = await clinicserviceService.deactivateClinicService(id);
-  // await db.ClinicService.update(
-  //   {
-  //     status: false,
-  //   },
-  //   {
-  //     where: {
-  //       id,
-  //     },
-  //   }
-  // );
+
   res.json({
     success: true,
     message: `${clinicService.service_name} updated successfully`,
@@ -661,16 +627,7 @@ export const deactiveClinicService = asyncHandler(async (req, res) => {
 export const activateClinicService = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const clinicService = await clinicserviceService.activateClinicService(id);
-  //  await db.ClinicService.update(
-  //   {
-  //     status: true,
-  //   },
-  //   {
-  //     where: {
-  //       id,
-  //     },
-  //   }
-  // );
+
   res.json({
     success: true,
     message: `${clinicService.service_name} updated successfully`,

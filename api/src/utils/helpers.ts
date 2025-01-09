@@ -16,8 +16,6 @@ export const removeUnusedMulterImageFilesOnError = (request: Request) => {
   const req = request;
   const multerFile = req.file;
   const multerFiles = req.files;
-  console.log(req.files);
-  console.log(req.file);
 
   if (multerFile) {
     removeLocalFile(multerFile.path);

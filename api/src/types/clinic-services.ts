@@ -28,16 +28,31 @@ export const createServiceItemSchema = z
     item_name: z
       .string({ required_error: "Item name is Required" })
       .trim()
-      .min(3, ""),
-    price: z.number().nonnegative().step(2),
+      .min(3, "Item name must be at least 3 characters"),
+    serviceCategory_id: z.number().int().nonnegative(),
+    price: z.number({}).nonnegative(),
     unit: z.string().optional(),
     isFixed: z.boolean(),
     isLab: z.boolean(),
     lab: z
       .object({
         isPanel: z.boolean(),
+        isUnderPanel: z.boolean(),
         panel_type: z.enum(["Panel", "UnderPanel", "Normal"]).optional(),
-        underPanels: z.array(z.number()).optional(),
+        referenceRange: z.string().trim().optional(),
+        underPanels: z
+          .array(
+            z.union([
+              z.number().int().nonnegative(),
+              z
+                .string()
+                .refine((value) => !isNaN(Number(value)), {
+                  message: "must be a number",
+                })
+                .transform((value) => Number(value)),
+            ])
+          )
+          .optional(),
       })
       .optional()
       .superRefine((data, ctx) => {
@@ -45,7 +60,15 @@ export const createServiceItemSchema = z
           ctx.addIssue({
             path: ["underPanels"],
             code: z.ZodIssueCode.custom,
-            message: "Required",
+            message: "must be at least 1 underPanel",
+          });
+        }
+
+        if (data?.isPanel && data?.isUnderPanel) {
+          ctx.addIssue({
+            path: ["isPanel"],
+            code: z.ZodIssueCode.custom,
+            message: "isPanel and isUnderPanel can't be true at the same time",
           });
         }
       }),
@@ -55,15 +78,23 @@ export const createServiceItemSchema = z
       ctx.addIssue({
         path: ["lab"],
         code: z.ZodIssueCode.custom,
-        message: "Lab info is Required",
+        message: "Lab info detail is Required",
       });
     }
-    if (data.isLab && data.lab?.isPanel && !data.lab?.underPanels?.length) {
+    // if (data.isLab && data.lab?.isPanel && !data.lab?.underPanels?.length) {
+    //   ctx.addIssue({
+    //     path: ["lab", "underPanels"],
+    //     code: z.ZodIssueCode.custom,
+    //     message: "Required",
+    //   });
+    // }
+    if (data.isLab && data.lab?.isUnderPanel && data.price > 0) {
       ctx.addIssue({
-        path: ["lab", "underPanels"],
+        path: ["price"],
         code: z.ZodIssueCode.custom,
-        message: "Required",
+        message: "Price must be 0",
       });
     }
   });
 export type createClinicServiceT = z.infer<typeof createClinicServiceSchema>;
+export type createServiceItemT = z.infer<typeof createServiceItemSchema>;

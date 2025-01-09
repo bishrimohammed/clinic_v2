@@ -54,8 +54,15 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  HasOneCreateAssociationMixin,
+  BelongsToManyAddAssociationMixin,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
+// import ServiceCategory from "./serviceCategory";
+import LabTestProfile from "./labTestProfile";
+import PanelUnderpanel from "./PanelUnderpanel";
+import { BelongsToManyAddAssociationsMixin } from "sequelize";
+import ServiceCategory from "./serviceCategory";
 
 class ServiceItem extends Model<
   InferAttributes<ServiceItem>,
@@ -70,6 +77,12 @@ class ServiceItem extends Model<
   declare isFixed: boolean;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
+
+  declare createLabTestProfile: HasOneCreateAssociationMixin<LabTestProfile>;
+  declare addUnderPanels: BelongsToManyAddAssociationsMixin<
+    PanelUnderpanel,
+    number
+  >;
 }
 
 ServiceItem.init(
@@ -85,9 +98,9 @@ ServiceItem.init(
       allowNull: false,
     },
     price: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DOUBLE(8, 2),
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: 0.0,
       validate: {
         min: 0, // Fixed typo from "valiate" to "validate"
       },
@@ -95,10 +108,9 @@ ServiceItem.init(
     serviceCategory_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      // references: {
-      //   model: "servicecategories",
-      //   key: "id",
-      // },
+      references: {
+        model: "servicecategories",
+      },
     },
     unit: {
       type: DataTypes.STRING,
@@ -125,12 +137,28 @@ ServiceItem.init(
   },
   {
     sequelize,
-    modelName: "serviceitem",
+    modelName: "ServiceItem",
     timestamps: true,
   }
 );
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// ServiceItem.sync({ force: false, alter: false });
+ServiceItem.sync({ force: false, alter: false });
 
+// ServiceItem.belongsTo(ServiceCategory, {
+//   foreignKey: "serviceCategory_id",
+//   as: "category",
+// });
+
+ServiceItem.hasOne(LabTestProfile, {
+  foreignKey: "labTest_id",
+  as: "labTestProfile",
+});
+
+ServiceItem.belongsToMany(ServiceItem, {
+  through: PanelUnderpanel,
+  foreignKey: "parent_id",
+  otherKey: "child_id",
+  as: "underPanels",
+});
 export default ServiceItem;

@@ -4,6 +4,7 @@ import { validate } from "../middleware/validate";
 import {
   createClinicServiceSchema,
   createServiceCategorySchema,
+  createServiceItemSchema,
   updateClinicServiceSchema,
   updateServiceCategorySchema,
 } from "../types/clinic-services";
@@ -11,14 +12,20 @@ const router = express.Router();
 
 router.get("/", clinicServiceController.getClinicServices);
 router.get(
-  "/:id/servicegroup",
+  "/:id/service-category",
   clinicServiceController.getClinicServiceCategoriesByServiceId
 );
 router.get(
   "/service-category/:category_id",
   clinicServiceController.getServiceCategoryById
 );
-router.get("/:id/serviceitems", clinicServiceController.getClinicServiceItems);
+
+router.get("/service-items", clinicServiceController.getServiceItems);
+router.get("/service-items/:id", clinicServiceController.getServiceItemById);
+router.get(
+  "/:id/service-items",
+  clinicServiceController.getServiceItemsByClinicServiceId
+);
 // router.get("/:id/gggg", clinicServiceController.ggggg);
 router.get("/withdetail", clinicServiceController.getClinicServiceDetail);
 router.get("/getLabServiceItems", clinicServiceController.getLabServiceItems);
@@ -45,7 +52,11 @@ router.post(
 );
 
 // router.post("/createLabService", clinicServiceController.createLabServiceItem);
-router.post("/serviceitem", clinicServiceController.addServiceItems);
+router.post(
+  "/service-item",
+  validate(createServiceItemSchema),
+  clinicServiceController.createServiceItems
+);
 router.post(
   "/:id/service-category",
   validate(createServiceCategorySchema),

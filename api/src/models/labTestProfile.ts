@@ -1,5 +1,3 @@
-// const { sequelize } = require(".");
-
 // module.exports = (sequelize, DataTypes) => {
 //   const labTestProfile = sequelize.define("labtestprofile", {
 //     id: {
@@ -22,11 +20,6 @@
 //       type: DataTypes.BOOLEAN,
 //       defaultValue: false,
 //     },
-//     // parentId: {
-//     //   type: DataTypes.INTEGER,
-//     //   //   defaultValue: false,
-//     //   allowNull: true,
-//     // },
 //   });
 //   labTestProfile.sync({ alter: false, force: false });
 //   return labTestProfile;
@@ -47,10 +40,10 @@ class LabTestProfile extends Model<
 > {
   declare id: CreationOptional<number>;
   declare labTest_id: number;
-  declare isPanel?: boolean;
+  declare isPanel: boolean;
   declare isFixed?: boolean;
-  declare createdAt?: CreationOptional<Date>;
-  declare updatedAt?: CreationOptional<Date>;
+  declare createdAt: CreationOptional<Date>;
+  declare updatedAt: CreationOptional<Date>;
 }
 
 LabTestProfile.init(

@@ -1,6 +1,8 @@
 import ClinicProfile from "./ClinicProfile";
 import ClinicService from "./ClinicService";
 import ServiceCategory from "./serviceCategory";
+import ServiceItem from "./serviceItem";
+import LabTestProfile from "./labTestProfile";
 
 import User from "./User";
 import Employee from "./Employee";
@@ -50,4 +52,6 @@ export {
   Woreda,
   ClinicService,
   ServiceCategory,
+  ServiceItem,
+  LabTestProfile,
 };

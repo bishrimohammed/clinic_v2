@@ -15,7 +15,7 @@ export const validate =
 
     // Apply transformations if provided and if there are matching keys
     if (transformations) {
-      console.log(true);
+      // console.log(true);
 
       Object.entries(transformations).forEach(([key, transformFn]) => {
         if (formData[key] !== undefined) {
