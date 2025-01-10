@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 
 // import asyncHandler from "express-async-handler";
-import { ClinicService, ServiceItem } from "../models";
+import { ClinicService, LabTestProfile, ServiceItem } from "../models";
 import { clinicserviceService } from "../services";
 import asyncHandler from "../utils/asyncHandler";
 import {
@@ -149,16 +149,24 @@ export const deleteServiceCategory = asyncHandler(async (req, res) => {
 // @desk delete service group
 // @desc get clinic service by id
 export const getServiceItemById = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const { item_id } = req.params;
 
-  const clinicItem = await clinicserviceService.getServiceItemById(id, [
+  const serviceItem = await clinicserviceService.getServiceItemById(item_id, [
     {
       model: ServiceItem,
       as: "underPanels",
       attributes: ["id", "service_name"],
     },
+    {
+      model: LabTestProfile,
+      as: "labTestProfile",
+    },
   ]);
-  res.json(clinicItem);
+  res.json({
+    success: true,
+    // message: `${serviceItem.service_name} updated successfully`,
+    data: serviceItem,
+  });
 });
 export const getServiceItems = asyncHandler(async (req, res) => {
   const query = req.query as serviceItemFilterType;
@@ -235,6 +243,7 @@ export const ggggg = asyncHandler(async (req, res) => {
 export const createServiceItems = asyncHandler<{
   validatedData: typeof createServiceItemSchema._type;
 }>(async (req, res) => {
+  const { id } = req.params;
   const validatedData = req.validatedData;
   const serviceCategory = await clinicserviceService.getServiceCategoryById(
     validatedData.serviceCategory_id
@@ -249,54 +258,9 @@ export const createServiceItems = asyncHandler<{
   }
 
   const serviceItem = await clinicserviceService.createServiceItem(
+    id,
     validatedData
   );
-
-  // return;
-  // const labServiceItem = await db.ServiceItem.create({
-  //   service_name: service_name,
-  //   price,
-  //   isFixed: isFixed,
-  //   // is_laboratory: true,
-  //   unit: unit,
-  //   serviceCategory_id: parseInt(req.body.serviceGroup),
-  // });
-  // if (islab) {
-  //   const labProfile = await db.LabTestProfile.create({
-  //     labTest_id: labServiceItem.id,
-  //     isPanel: lab.isPanel,
-  //     isFixed: isFixed,
-  //   });
-  //   // const labs = await db.ServiceItem.findAll({
-  //   //   where: { id: lab.childService },
-  //   // });
-  //   console.log(lab.childService);
-  //   if (lab.isPanel) {
-  //     const lbProfiles = await db.LabTestProfile.findAll(
-  //       // { parentId: labProfile.id },
-  //       { where: { labTest_id: { [db.Sequelize.Op.in]: lab.childService } } }
-  //     );
-  //     const lbProfileIds = lbProfiles.map((p: any) => p.id);
-  //     console.log(lbProfileIds);
-  //     await Promise.all(
-  //       // lab.childService.map((id) => {
-  //       //   console.log(id);
-  //       //   return db.PanelUnderpanel.create({
-  //       //     panel_id: labProfile.id,
-  //       //     underpanel_id: id,
-  //       //   });
-  //       // })
-  //       lbProfileIds.map((id: number) => {
-  //         return db.PanelUnderpanel.create({
-  //           panel_id: labProfile.id,
-  //           underpanel_id: id,
-  //         });
-  //       })
-  //     );
-
-  //     // const panel = await labProfile.addUnderPanel(lbProfileIds);
-  //   }
-  // }
   res.status(201).json({
     success: true,
     message: `${validatedData.item_name} created successfully`,
@@ -305,7 +269,7 @@ export const createServiceItems = asyncHandler<{
 });
 // @desc update service items
 export const updateServiceItems = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const { item_id } = req.params;
   const { service_name, price, unit, isFixed, islab, lab } = req.body;
   console.log(req.body);
   // return;
@@ -318,11 +282,11 @@ export const updateServiceItems = asyncHandler(async (req, res) => {
       unit: unit,
       serviceCategory_id: parseInt(req.body.serviceGroup),
     },
-    { where: { id: id } }
+    { where: { id: item_id } }
   );
   if (islab) {
     const labProfile = await db.LabTestProfile.findOne({
-      where: { labTest_id: id },
+      where: { labTest_id: item_id },
     });
 
     // console.log(labProfile);
@@ -620,7 +584,7 @@ export const deactiveClinicService = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: `${clinicService.service_name} updated successfully`,
+    message: `${clinicService.service_name} deactivated successfully`,
     data: clinicService,
   });
 });
@@ -630,42 +594,40 @@ export const activateClinicService = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: `${clinicService.service_name} updated successfully`,
+    message: `${clinicService.service_name} activated successfully`,
     data: clinicService,
   });
 });
 // @desc deactivate  service items
-export const deactiveServiceItem = asyncHandler(async (req, res) => {
-  console.log("\n\n bishri \n\n");
+export const deactivateServiceItem = asyncHandler(async (req, res) => {
+  const { item_id } = req.params;
 
-  const { id } = req.params;
-  // console.log("\n\n" + id + "\n\n");
-  const serviceItem = await db.ServiceItem.update(
-    {
-      status: false,
-    },
-    {
-      where: {
-        id,
-      },
-    }
-  );
-  res.json(serviceItem);
+  const serviceItem = await clinicserviceService.deactivateServiceItem(item_id);
+  // const serviceItem = await db.ServiceItem.update(
+  //   {
+  //     status: false,
+  //   },
+  //   {
+  //     where: {
+  //       id,
+  //     },
+  //   }
+  // );
+  res.json({
+    success: true,
+    message: `${serviceItem.service_name} deactivated successfully`,
+    data: serviceItem,
+  });
 });
 // @desc activate  service items
 export const activateServiceItem = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const serviceItem = await db.ServiceItem.update(
-    {
-      status: true,
-    },
-    {
-      where: {
-        id,
-      },
-    }
-  );
-  res.json(serviceItem);
+  const { item_id } = req.params;
+  const serviceItem = await clinicserviceService.activateServiceItem(item_id);
+  res.json({
+    success: true,
+    message: `${serviceItem.service_name} activated successfully`,
+    data: serviceItem,
+  });
 });
 export const getLaboratoryService = asyncHandler(async (req, res) => {
   const labcategories = await db.LabTestProfile.findAll({

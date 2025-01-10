@@ -21,7 +21,10 @@ router.get(
 );
 
 router.get("/service-items", clinicServiceController.getServiceItems);
-router.get("/service-items/:id", clinicServiceController.getServiceItemById);
+router.get(
+  "/service-items/:item_id",
+  clinicServiceController.getServiceItemById
+);
 router.get(
   "/:id/service-items",
   clinicServiceController.getServiceItemsByClinicServiceId
@@ -53,7 +56,7 @@ router.post(
 
 // router.post("/createLabService", clinicServiceController.createLabServiceItem);
 router.post(
-  "/service-item",
+  "/service-items",
   validate(createServiceItemSchema),
   clinicServiceController.createServiceItems
 );
@@ -63,7 +66,10 @@ router.post(
   clinicServiceController.createServiceCategory
 );
 
-router.put("/serviceitem/:id", clinicServiceController.updateServiceItems);
+router.put(
+  "/service-items/:item_id",
+  clinicServiceController.updateServiceItems
+);
 router.put(
   "/service-category/:category_id",
   validate(updateServiceCategorySchema),
@@ -89,11 +95,11 @@ router.patch("/:id/activate", clinicServiceController.activateClinicService);
 // service items
 
 router.patch(
-  "/:id/deactive/serviceitem",
-  clinicServiceController.deactiveServiceItem
+  "/service-items/:item_id/deactivate",
+  clinicServiceController.deactivateServiceItem
 );
 router.patch(
-  "/:id/activate/serviceitem",
+  "/service-items/:item_id/activate",
   clinicServiceController.activateServiceItem
 );
 

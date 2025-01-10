@@ -30,6 +30,7 @@ import {
   InferAttributes,
   InferCreationAttributes,
   ForeignKey,
+  BelongsToGetAssociationMixin,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 import ClinicService from "./ClinicService";
@@ -48,6 +49,7 @@ class ServiceCategory extends Model<
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
 
+  declare getClinicService: BelongsToGetAssociationMixin<ClinicService>;
   declare countItems: HasManyCountAssociationsMixin;
 }
 
@@ -67,10 +69,9 @@ ServiceCategory.init(
     clinicService_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      // references: {
-      //   model: "clinicServices",
-      //   key: "id",
-      // },
+      references: {
+        model: ClinicService,
+      },
     },
     has_many_items: {
       type: DataTypes.BOOLEAN,
@@ -100,6 +101,10 @@ ServiceCategory.init(
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
 ServiceCategory.sync({ alter: false });
+// ServiceCategory.belongsTo(ClinicService, {
+//   foreignKey: "clinicService_id",
+//   as: "clinicService",
+// });
 
 ServiceCategory.hasMany(ServiceItem, {
   foreignKey: "serviceCategory_id",

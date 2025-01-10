@@ -239,29 +239,38 @@ export const getServiceItems = async (query: serviceItemFilterType) => {
  * @returns {Promise<ServiceItem>}
  */
 export const createServiceItem = async (
+  clinicService_id: string,
   data: createServiceItemT
 ): Promise<ServiceItem> => {
   const { isFixed, isLab, item_name, price, serviceCategory_id, lab, unit } =
     data;
-  const serviceItem = await ServiceItem.create({
-    service_name: item_name,
-    price,
-    isFixed,
-    serviceCategory_id,
-    unit,
-  });
-  if (isLab && lab) {
-    // console.log("it is lab");
-
-    await serviceItem.createLabTestProfile({
-      isPanel: lab.isPanel,
-      labTest_id: serviceItem.id,
+  const clinicService = await getClinicServiceById(clinicService_id);
+  if (await clinicService.hasServiceCategory(serviceCategory_id)) {
+    const serviceItem = await ServiceItem.create({
+      service_name: item_name,
+      price,
+      isFixed,
+      serviceCategory_id,
+      unit,
     });
-    if (lab.isPanel) {
-      await serviceItem.addUnderPanels(lab.underPanels);
+    if (isLab && lab) {
+      // console.log("it is lab");
+
+      await serviceItem.createLabTestProfile({
+        isPanel: lab.isPanel,
+        labTest_id: serviceItem.id,
+      });
+      if (lab.isPanel) {
+        await serviceItem.addUnderPanels(lab.underPanels);
+      }
     }
+    return serviceItem;
+  } else {
+    throw new ApiError(
+      400,
+      `${clinicService.service_name} doesn't not have ${serviceCategory_id} categry`
+    );
   }
-  return serviceItem;
 };
 
 export const getServiceItemsByClinicServiceId = async (
