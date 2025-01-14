@@ -8,6 +8,7 @@ import * as clinicProfileService from "./clinic-profile.service";
 import * as addressService from "./address.service";
 import * as scheduleService from "./schedule.service";
 import * as clinicserviceService from "./clinic-service.service";
+import * as employeeService from "./employee.service";
 export {
   userService,
   authService,
@@ -20,4 +21,5 @@ export {
   scheduleService,
   clinicserviceService,
   roleService,
+  employeeService,
 };

@@ -19,7 +19,7 @@ const unitsRoute = require("./unit.router.js");
 const clinicprofileRoute = require("./ClinicProfile.router.ts");
 const fieldRoute = require("./FieldConfig.router.js");
 // employye route
-const employeeRoute = require("./employee.router.js");
+import employeeRoute from "./employee.router";
 // role and permission
 import roleRoute from "./Role.router";
 const permissionsRoute = require("./permission.router.js");

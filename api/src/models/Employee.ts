@@ -152,7 +152,6 @@
 
 //#endregion
 import {
-  Sequelize,
   DataTypes,
   Model,
   Optional,
@@ -166,6 +165,7 @@ import {
 import { EmployeeEntity } from "./types";
 import sequelize from "../db";
 import User from "./User";
+import Address from "./address/Address";
 // import User from "./User";
 // type EmployeeAttributes = Optional<EmployeeEntity, "id" | "digital_signature">;
 
@@ -288,6 +288,10 @@ Employee.init(
   { sequelize, tableName: "employees", timestamps: true }
 );
 // sequelize.sync();
+Employee.belongsTo(Address, {
+  foreignKey: "address_id",
+  as: "address",
+});
 // Employee.hasOne(User, {
 //   foreignKey: "employee_id",
 //   as: "userE",

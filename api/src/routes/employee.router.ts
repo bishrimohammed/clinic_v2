@@ -1,7 +1,7 @@
-const express = require("express");
-const EmployeeController = require("../controllers/EmployeeController");
-const upload = require("../config/multerConfig");
-const { protect } = require("../middleware/authMiddleWare");
+import express from "express";
+import * as EmployeeController from "../controllers/EmployeeController";
+import upload from "../config/multerConfig";
+import { protect } from "../middleware/authMiddleWare";
 // const PatientController = require("../controllers/PatientController");
 const router = express.Router();
 
@@ -11,17 +11,17 @@ router.get("/positions", EmployeeController.getEmployeePostions);
 // router.get("/search", PatientController.searchPatient);
 router.post(
   "/",
-  // upload.fields([
-  //   { name: "photo" },
-  //   { name: "digital_signature" },
-  //   { name: "doctor_titer" },
-  // ]),
+  upload.fields([
+    { name: "photo" },
+    { name: "digital_signature" },
+    { name: "doctor_titer" },
+  ]),
   protect,
   EmployeeController.createEmployee
 );
 router.put(
   "/:id",
-  // upload.fields([{ name: "photo" }, { name: "digital_signature" }]),
+  upload.fields([{ name: "photo" }, { name: "digital_signature" }]),
   protect,
   EmployeeController.updateEmployee
 );
@@ -35,4 +35,4 @@ router.patch("/:id/activate", protect, EmployeeController.activateEmployee);
 // router.post("/", createPatient); //.post("/search", searchPatient);
 // router.put("/:id", updatePatient);
 
-module.exports = router;
+export default router;
