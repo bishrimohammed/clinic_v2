@@ -7,6 +7,7 @@ import LabTestProfile from "./labTestProfile";
 import User from "./User";
 import Employee from "./Employee";
 import Role from "./Role";
+import RolePermission from "./RolePermission";
 import Permission from "./Permission";
 import UserPermission from "./UserPermissions";
 import Appointment from "./Appointment";
@@ -22,7 +23,7 @@ import City from "./address/City";
 import SubCity from "./address/SubCity";
 import Woreda from "./address/Woreda";
 import Address from "./address/Address";
-
+// RolePermission
 // InvestigationOrder
 // Schedule
 // MedicalBilling
@@ -54,4 +55,5 @@ export {
   ServiceCategory,
   ServiceItem,
   LabTestProfile,
+  RolePermission,
 };

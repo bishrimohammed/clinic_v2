@@ -9,6 +9,7 @@ import {
   createClinicServiceT,
   createServiceCategorySchema,
   createServiceItemSchema,
+  createServiceItemT,
   updateClinicServiceSchema,
   updateServiceCategorySchema,
 } from "../types/clinic-services";
@@ -268,92 +269,99 @@ export const createServiceItems = asyncHandler<{
   });
 });
 // @desc update service items
-export const updateServiceItems = asyncHandler(async (req, res) => {
-  const { item_id } = req.params;
-  const { service_name, price, unit, isFixed, islab, lab } = req.body;
-  console.log(req.body);
-  // return;
-  const labServiceItem = await db.ServiceItem.update(
-    {
-      service_name: service_name,
-      price,
-      isFixed: isFixed,
-      // is_laboratory: true,
-      unit: unit,
-      serviceCategory_id: parseInt(req.body.serviceGroup),
-    },
-    { where: { id: item_id } }
+export const updateServiceItems = asyncHandler<{
+  validatedData: createServiceItemT;
+}>(async (req, res) => {
+  const { id, item_id } = req.params;
+  // const { service_name, price, unit, isFixed, islab, lab } = req.body;
+  // console.log(req.validatedData);
+  const serviceItem = await clinicserviceService.updateServiceItem(
+    id,
+    item_id,
+    req.validatedData
   );
-  if (islab) {
-    const labProfile = await db.LabTestProfile.findOne({
-      where: { labTest_id: item_id },
-    });
+  // return;
+  // const labServiceItem = await db.ServiceItem.update(
+  //   {
+  //     service_name: service_name,
+  //     price,
+  //     isFixed: isFixed,
+  //     // is_laboratory: true,
+  //     unit: unit,
+  //     serviceCategory_id: parseInt(req.body.serviceGroup),
+  //   },
+  //   { where: { id: item_id } }
+  // );
+  // if (islab) {
+  //   const labProfile = await db.LabTestProfile.findOne({
+  //     where: { labTest_id: item_id },
+  //   });
 
-    // console.log(labProfile);
-    // return;
-    // const labProfile = await db.LabTestProfile.update(
-    //   {
-    //     isPanel: lab.isPanel,
-    //     isFixed: lab.isFixed,
-    //   },
-    //   { where: { labTest_id: id } }
-    // );
-    // const labs = await db.ServiceItem.findAll({
-    //   where: { id: lab}
-    const lbProfiles = await db.LabTestProfile.findAll(
-      // { parentId: labProfile.id },
-      {
-        where: {
-          labTest_id: { [db.Sequelize.Op.in]: lab?.childService || [] },
-        },
-      }
-    );
-    const lbProfileIds = lbProfiles.map((p: any) => p.id);
-    console.log(lbProfileIds);
-    console.log(lab.childService);
-    if (lab.underPanel && labProfile.isPanel) {
-      // console.log(lbProfileIds);
-      console.log("hello");
-      await db.PanelUnderpanel.destroy({
-        where: {
-          panel_id: labProfile.id,
-          // underpanel_id: labProfile.underPanel.id
-        },
-      });
+  //   // console.log(labProfile);
+  //   // return;
+  //   // const labProfile = await db.LabTestProfile.update(
+  //   //   {
+  //   //     isPanel: lab.isPanel,
+  //   //     isFixed: lab.isFixed,
+  //   //   },
+  //   //   { where: { labTest_id: id } }
+  //   // );
+  //   // const labs = await db.ServiceItem.findAll({
+  //   //   where: { id: lab}
+  //   const lbProfiles = await db.LabTestProfile.findAll(
+  //     // { parentId: labProfile.id },
+  //     {
+  //       where: {
+  //         labTest_id: { [db.Sequelize.Op.in]: lab?.childService || [] },
+  //       },
+  //     }
+  //   );
+  //   const lbProfileIds = lbProfiles.map((p: any) => p.id);
+  //   console.log(lbProfileIds);
+  //   console.log(lab.childService);
+  //   if (lab.underPanel && labProfile.isPanel) {
+  //     // console.log(lbProfileIds);
+  //     console.log("hello");
+  //     await db.PanelUnderpanel.destroy({
+  //       where: {
+  //         panel_id: labProfile.id,
+  //         // underpanel_id: labProfile.underPanel.id
+  //       },
+  //     });
 
-      // const panel = await labProfile.addUnderPanel(lbProfileIds);
-    } else if (lab.isPanel && labProfile.isPanel) {
-      // console.log(lbProfileIds);
-      await db.PanelUnderpanel.destroy({
-        where: {
-          panel_id: labProfile.id,
-          // underpanel_id: labProfile.underPanel.id
-        },
-      });
-      await Promise.all(
-        lbProfileIds.map((id: number) => {
-          return db.PanelUnderpanel.create({
-            panel_id: labProfile.id,
-            underpanel_id: id,
-          });
-        })
-      );
-    } else if (lab.isPanel && !labProfile.isPanel) {
-      console.log("\n\nunderpanel to panel\n\n");
-      await Promise.all(
-        lbProfileIds.map((id: number) => {
-          return db.PanelUnderpanel.create({
-            panel_id: labProfile.id,
-            underpanel_id: id,
-          });
-        })
-      );
-    }
-    labProfile.isPanel = lab.isPanel;
-    labProfile.isFixed = isFixed;
-    await labProfile.save();
-  }
-  res.json({ msg: "ok" });
+  //     // const panel = await labProfile.addUnderPanel(lbProfileIds);
+  //   } else if (lab.isPanel && labProfile.isPanel) {
+  //     // console.log(lbProfileIds);
+  //     await db.PanelUnderpanel.destroy({
+  //       where: {
+  //         panel_id: labProfile.id,
+  //         // underpanel_id: labProfile.underPanel.id
+  //       },
+  //     });
+  //     await Promise.all(
+  //       lbProfileIds.map((id: number) => {
+  //         return db.PanelUnderpanel.create({
+  //           panel_id: labProfile.id,
+  //           underpanel_id: id,
+  //         });
+  //       })
+  //     );
+  //   } else if (lab.isPanel && !labProfile.isPanel) {
+  //     console.log("\n\nunderpanel to panel\n\n");
+  //     await Promise.all(
+  //       lbProfileIds.map((id: number) => {
+  //         return db.PanelUnderpanel.create({
+  //           panel_id: labProfile.id,
+  //           underpanel_id: id,
+  //         });
+  //       })
+  //     );
+  //   }
+  //   labProfile.isPanel = lab.isPanel;
+  //   labProfile.isFixed = isFixed;
+  //   await labProfile.save();
+  // }
+  res.json({ success: true, data: serviceItem });
 });
 
 // @desc create lab service items item

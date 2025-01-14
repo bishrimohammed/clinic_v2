@@ -1,5 +1,10 @@
 import { Includeable, Op } from "sequelize";
-import { ClinicService, ServiceCategory, ServiceItem } from "../models";
+import {
+  ClinicService,
+  LabTestProfile,
+  ServiceCategory,
+  ServiceItem,
+} from "../models";
 import { ApiError } from "../shared/error/ApiError";
 import {
   createClinicServiceT,
@@ -230,6 +235,12 @@ export const getServiceItems = async (query: serviceItemFilterType) => {
 
   const serviceItems = await ServiceItem.findAll({
     where: whereClause,
+    include: [
+      {
+        model: LabTestProfile,
+        as: "labTestProfile",
+      },
+    ],
   });
   return serviceItems;
 };
@@ -245,34 +256,101 @@ export const createServiceItem = async (
   const { isFixed, isLab, item_name, price, serviceCategory_id, lab, unit } =
     data;
   const clinicService = await getClinicServiceById(clinicService_id);
-  if (await clinicService.hasServiceCategory(serviceCategory_id)) {
-    const serviceItem = await ServiceItem.create({
-      service_name: item_name,
-      price,
-      isFixed,
-      serviceCategory_id,
-      unit,
+  if (!(await clinicService.hasServiceCategory(serviceCategory_id))) {
+    const category = await getServiceCategoryById(serviceCategory_id);
+    throw new ApiError(
+      400,
+      `${clinicService.service_name} doesn't not have ${category.name} category`
+    );
+  }
+  const serviceItem = await ServiceItem.create({
+    service_name: item_name,
+    price,
+    isFixed,
+    serviceCategory_id,
+    unit,
+  });
+  if (isLab && lab) {
+    // console.log("it is lab");
+    if (!clinicService.is_laboratory) {
+      await serviceItem.destroy();
+      throw new ApiError(
+        400,
+        `Service catagory(${serviceCategory_id}) is not laboratory service`
+      );
+    }
+    await serviceItem.createLabTestProfile({
+      isPanel: lab.isPanel,
+      labTest_id: serviceItem.id,
     });
-    if (isLab && lab) {
-      // console.log("it is lab");
+    if (lab.isPanel) {
+      await serviceItem.addUnderPanels(lab.underPanels);
+    }
+  }
+  return serviceItem;
+  // } else {
+  //   throw new ApiError(
+  //     400,
+  //     `${clinicService.service_name} doesn't not have ${serviceCategory_id} category`
+  //   );
+  // }
+};
 
+export const updateServiceItem = async (
+  clinicService_id: string,
+  item_id: string,
+  data: createServiceItemT
+): Promise<ServiceItem> => {
+  const { isFixed, isLab, item_name, price, serviceCategory_id, lab, unit } =
+    data;
+  const serviceItem = await getServiceItemById(item_id);
+  const clinicService = await getClinicServiceById(clinicService_id);
+  if (!(await clinicService.hasServiceCategory(serviceCategory_id))) {
+    const category = await getServiceCategoryById(serviceCategory_id);
+    throw new ApiError(
+      400,
+      `${clinicService.service_name} doesn't not have ${category.name} category`
+    );
+  }
+
+  if (isLab && lab) {
+    if (!clinicService.is_laboratory) {
+      const category = await getServiceCategoryById(serviceCategory_id);
+      throw new ApiError(
+        400,
+        `Service catagory(${category.name}) is not laboratory service`
+      );
+    }
+
+    const labTestProfile = await serviceItem.getLabTestProfile();
+    if (labTestProfile) {
+      if (labTestProfile.isPanel) {
+        await serviceItem.setUnderPanels([]);
+      }
+      await labTestProfile.update({
+        isPanel: lab.isPanel,
+      });
+    } else {
       await serviceItem.createLabTestProfile({
         isPanel: lab.isPanel,
         labTest_id: serviceItem.id,
       });
-      if (lab.isPanel) {
-        await serviceItem.addUnderPanels(lab.underPanels);
-      }
     }
-    return serviceItem;
-  } else {
-    throw new ApiError(
-      400,
-      `${clinicService.service_name} doesn't not have ${serviceCategory_id} categry`
-    );
-  }
-};
 
+    if (lab.isPanel) {
+      await serviceItem.addUnderPanels(lab.underPanels);
+    }
+  }
+  await serviceItem.update({
+    service_name: item_name,
+    price,
+    isFixed,
+    serviceCategory_id,
+    unit,
+  });
+  // await serviceItem({})
+  return serviceItem;
+};
 export const getServiceItemsByClinicServiceId = async (
   clinicService_id: string,
   query: serviceItemFilterType

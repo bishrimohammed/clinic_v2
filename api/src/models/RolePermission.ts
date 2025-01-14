@@ -1,50 +1,3 @@
-//#region
-// module.exports = (sequelize, DataTypes) => {
-//   const RolePermission = sequelize.define(
-//     "rolepermission",
-//     {
-//       id: {
-//         type: DataTypes.INTEGER,
-//         primaryKey: true,
-//         autoIncrement: true,
-//         allowNull: false,
-//       },
-//       role_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: false,
-//       },
-//       permission_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: false,
-//       },
-//       create: {
-//         type: DataTypes.BOOLEAN,
-//         allowNull: false,
-//       },
-//       read: {
-//         type: DataTypes.BOOLEAN,
-//         allowNull: false,
-//       },
-//       update: {
-//         type: DataTypes.BOOLEAN,
-//         allowNull: false,
-//       },
-//       delete: {
-//         type: DataTypes.BOOLEAN,
-//         allowNull: false,
-//       },
-//     },
-
-//     {
-//       timestamps: false,
-//     }
-//   );
-//   RolePermission.sync({ alter: false, force: false });
-//   return RolePermission;
-// };
-
-//#endregion
-
 import {
   Model,
   DataTypes,
@@ -85,6 +38,7 @@ RolePermission.init(
     permission_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: { model: Permission },
     },
     create: {
       type: DataTypes.BOOLEAN,
@@ -110,5 +64,13 @@ RolePermission.init(
     timestamps: false, // Disable timestamps
   }
 );
+RolePermission.belongsTo(Permission, {
+  foreignKey: "permission_id",
+  as: "permission",
+});
+// RolePermission.belongsTo(Role, {
+//   foreignKey: "role_id",
+//   as: "role",
+// });
 // RolePermission.create({})
 export default RolePermission;
