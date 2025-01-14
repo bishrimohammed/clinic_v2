@@ -9,6 +9,7 @@ import * as addressService from "./address.service";
 import * as scheduleService from "./schedule.service";
 import * as clinicserviceService from "./clinic-service.service";
 import * as employeeService from "./employee.service";
+import * as emergencyContactService from "./emergency-contact.service";
 export {
   userService,
   authService,
@@ -22,4 +23,5 @@ export {
   clinicserviceService,
   roleService,
   employeeService,
+  emergencyContactService,
 };

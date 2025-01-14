@@ -87,6 +87,7 @@ import {
   InferCreationAttributes,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
+import Address from "./address/Address";
 
 class EmergencyContact extends Model<
   InferAttributes<EmergencyContact>,
@@ -136,6 +137,9 @@ EmergencyContact.init(
     address_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: Address,
+      },
     },
     phone: {
       type: DataTypes.STRING,

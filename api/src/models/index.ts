@@ -23,6 +23,7 @@ import City from "./address/City";
 import SubCity from "./address/SubCity";
 import Woreda from "./address/Woreda";
 import Address from "./address/Address";
+import EmergencyContact from "./EmergencyContact";
 // RolePermission
 // InvestigationOrder
 // Schedule
@@ -56,4 +57,5 @@ export {
   ServiceItem,
   LabTestProfile,
   RolePermission,
+  EmergencyContact,
 };

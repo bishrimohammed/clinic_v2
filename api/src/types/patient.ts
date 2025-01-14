@@ -1,6 +1,5 @@
 import { z } from "zod";
-
-const phoneRegex = /^(07|09)\d{8}$/;
+import { phoneRegex } from "./shared";
 
 const patientRegistrationSchema = z
   .object({

@@ -87,7 +87,10 @@ export const updateClinicProfile = async (
     brand_color,
   } = data;
   // const clinicProfile = await getClinicProfileById(id);
-  const updatedAdress = await addressService.updateAdress(address);
+  const updatedAdress = await addressService.updateAddress(
+    address.id!,
+    address
+  );
   await Promise.all(
     data.working_hours.map((workHour) => {
       return scheduleService.updateWorkingHour(workHour);

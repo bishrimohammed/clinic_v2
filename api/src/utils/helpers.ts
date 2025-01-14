@@ -2,6 +2,7 @@ import fs from "fs";
 import { Request } from "express";
 import { ApiError } from "../shared/error/ApiError";
 
+// export const phoneRegex = /^(07|09)\d{8}$/;
 export const removeLocalFile = (localpath: string) => {
   // const fullpath = path.join(__dirname, "../public", filepath);
   fs.unlink(localpath, (err) => {
