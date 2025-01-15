@@ -157,5 +157,8 @@ EmergencyContact.init(
   },
   { sequelize, tableName: "emergencycontacts" }
 );
-
+EmergencyContact.belongsTo(Address, {
+  foreignKey: "address_id",
+  as: "address",
+});
 export default EmergencyContact;

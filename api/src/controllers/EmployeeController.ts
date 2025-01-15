@@ -1,29 +1,15 @@
-import asynHandler from "express-async-handler";
+// import asynHandler from "express-async-handler";
 const db = require("../models");
 import { format, parse } from "date-fns";
 import { employeeService } from "../services";
 import { employeeFilterType } from "../services/employee.service";
-// const { fromZonedTime } = require("date-fns-tz");
-// import { zonedTimeToUtc } from 'date-fns-tz';
-// const e = require("express");
-// const { Op, Sequelize } = require("sequelize");
-// const getEmploye = async()
-// module.exports = EmployeeController = {
-export const getEmployees = asynHandler(async (req, res) => {
-  // const Status = req.query.status.map((s) => s === "true");
-  // console.log(Status);
-  const query = req.query as employeeFilterType;
-  let where: any = {};
-  if (req.query.status) {
-    where.status = Boolean(req.query.status);
-  }
+import asyncHandler from "../utils/asyncHandler";
+import expressasynchandler from "express-async-handler";
+import { createEmployeeSchema } from "../types/employee";
 
-  if (req.query.position) {
-    where.position = req.query.position;
-  }
-  if (req.query.gender) {
-    where.gender = req.query.gender;
-  }
+export const getEmployees = asyncHandler(async (req, res) => {
+  const query = req.query as employeeFilterType;
+
   // console.log(where);
   const employees = await employeeService.getEmployees(query);
   // db.Employee.findAll({
@@ -111,8 +97,16 @@ export const getEmployees = asynHandler(async (req, res) => {
   // });
   res.status(200).json({ total: employees.length, data: employees });
 });
+export const getEmployeeById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const employee = await employeeService.getEmployeeById(id);
+  res.json({
+    success: true,
+    data: employee,
+  });
+});
 // @desc get employee that does not have user account
-export const getEmployeesWithNoUserAccounts = asynHandler(async (req, res) => {
+export const getEmployeesWithNoUserAccounts = asyncHandler(async (req, res) => {
   console.log("emp no");
   const employees = await db.Employee.findAll({
     include: [
@@ -126,7 +120,7 @@ export const getEmployeesWithNoUserAccounts = asynHandler(async (req, res) => {
   // console.log(employees[5].user);
   res.json(employee);
 });
-export const getEmployeePostions = asynHandler(async (req, res) => {
+export const getEmployeePostions = asyncHandler(async (req, res) => {
   const positions = await db.Employee.findAll({
     attributes: ["position"],
     group: ["position"],
@@ -139,126 +133,34 @@ export const getEmployeePostions = asynHandler(async (req, res) => {
   const distinctPositions = positions.map((position: any) => position.position);
   res.json(distinctPositions);
 });
-export const createEmployee = asynHandler(async (req, res) => {
-  const {
-    firstName,
-    lastName,
-    middleName,
-    position,
-    other_position,
-    date_of_birth,
-    date_of_hire,
-    gender,
-    Emergency,
-  } = req.body;
-  // console.log(req.body);
-  // res.status(404).json({ message: "hello" });
-  // return;
-  const emergence = JSON.parse(Emergency);
-  const address = JSON.parse(req.body?.address);
-  // console.log(emergence);
-  // return;
-  const addressExits = await db.Address.findOne({
-    // where: { [Op.or]: [{ phone_1: address.phone_1, email: address.email }] },
-    where: {
-      phone_1: address.phone_1,
-    },
+export const createEmployee = asyncHandler<{
+  validatedData: typeof createEmployeeSchema._type;
+}>(async (req, res) => {
+  const files = req.files as {
+    [fieldname: string]: Express.Multer.File[];
+  };
+
+  // Collect the uploaded files (assuming single file per field)
+  const uploadedFiles = {
+    photo: files?.photo?.[0]?.path || null,
+    digital_signature: files?.digital_signature?.[0]?.path || null,
+    doctor_titer: files?.doctor_titer?.[0]?.path || null,
+  };
+  const employeeData = {
+    ...req.validatedData,
+    ...uploadedFiles,
+  };
+
+  const employee = await employeeService.createEmployee(employeeData);
+
+  res.status(201).json({
+    success: true,
+    message: "Employee is registered successfully",
+    data: employee,
   });
-  if (addressExits) {
-    res.status(400);
-    throw new Error("Employee phone is already in use");
-  }
-  const newAddress = await db.Address.create(
-    {
-      woreda_id: address.woreda_id,
-      house_number: address.house_number ? address.house_number : null,
-      phone_1: address.phone_1,
-      phone_2: address.phone_2 ? address.phone_2 : null,
-      email: address?.email ? address.email : null,
-    },
-    { userId: req?.user?.id }
-  );
-  let emergenceContact_AddressId;
-  if (emergence.the_same_address_as_employee) {
-    emergenceContact_AddressId = newAddress.id;
-  } else {
-    const addressExits = await db.Address.findOne({
-      // where: { [Op.or]: [{ phone_1: address.phone_1, email: address.email }] },
-      where: {
-        phone_1: emergence.phone_1,
-      },
-    });
-    if (addressExits) {
-      res.status(400);
-      throw new Error("phone is already in use try another numbetr");
-    }
-    const newAddress1 = await db.Address.create(
-      {
-        woreda_id: emergence.woreda_id,
-        house_number: emergence.house_number,
-        phone_1: emergence.phone,
-        phone_2: emergence.phone_2,
-        email: emergence?.email ? emergence.email : null,
-      },
-      { userId: req?.user?.id }
-    );
-    emergenceContact_AddressId = newAddress1.id;
-  }
-  const emergencePhoneExist = await db.EmergencyContact.findOne({
-    where: {
-      phone: emergence.phone,
-    },
-  });
-  if (emergencePhoneExist) {
-    newAddress.destroy();
-    res.status(400);
-    throw new Error("Emergency phone number already exists");
-  }
-  const EmergencyContact = await db.EmergencyContact.create(
-    {
-      firstName,
-      middleName,
-      lastName,
-      relationship: emergence.relation,
-      other_relationship: emergence?.other_relation,
-      address_id: emergenceContact_AddressId,
-      phone: emergence.phone,
-    },
-    { userId: req?.user?.id }
-  );
-  const DATEOFBIRTH = new Date(date_of_birth);
-  const DATEOFHIRE = new Date(date_of_hire);
-
-  // const convertedBirthDate = fromZonedTime(DATEOFBIRTH, "Africa/Nairobi");
-  // const convertedHireDate = fromZonedTime(DATEOFHIRE, "Africa/Nairobi");
-  const newEmployee = await db.Employee.create(
-    {
-      firstName,
-      middleName,
-      lastName,
-      position: position,
-      other_position: position === "Other" ? other_position : null,
-      gender,
-      date_of_birth: format(DATEOFBIRTH, "yyyy-MM-dd"),
-      date_of_hire: format(DATEOFHIRE, "yyyy-MM-dd"),
-      // photo: req?.files?.["photo"] && "uploads/" + req.files["photo"][0]?.filename,
-      // digital_signature:
-      //   req.files["digital_signature"] &&
-      //   "uploads/" + req.files["digital_signature"][0]?.filename,
-      address_id: newAddress.id,
-
-      emergence_contact_id: EmergencyContact.id,
-      // doctor_titer:
-      //   req.files["doctor_titer"] &&
-      //   "uploads/" + req.files["doctor_titer"][0].filename,
-    },
-    { userId: req?.user?.id }
-  );
-
-  res.status(201).json({ message: "Employee is registered successfully" });
 });
 // @desc update employee
-export const updateEmployee = asynHandler(async (req, res) => {
+export const updateEmployee = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const {
     firstName,
@@ -389,60 +291,35 @@ export const updateEmployee = asynHandler(async (req, res) => {
 
   res.status(200).json({ message: "hello" }); //
 });
-export const deleteEmployee = asynHandler(async (req, res) => {
+export const deleteEmployee = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const empExist = await db.Employee.findByPk(id);
-  // console.log(empExist);
-  if (!empExist) {
-    res.send(404);
-    throw new Error(`Employee not found`);
-  }
-  await empExist.destroy({ userId: req.user?.id });
-  // delete employee
-  // await db.Employee.distory({
-  //   where: { id: id },
-  // });
-  res.status(200).json({ message: "Employee deleted successfully" });
+  // const employee =
+  await employeeService.deleteEmployee(id);
+
+  res
+    .status(200)
+    .json({ success: true, message: "Employee deleted successfully" });
 });
 
 // @desc deactivate employee
 
-export const deactivateEmployee = asynHandler(async (req, res) => {
+export const deactivateEmployee = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const empExist = await db.Employee.findByPk(id);
+  const employee = await employeeService.deactivateEmployee(id);
 
-  if (!empExist) {
-    res.send(404);
-    throw new Error(`Employee not found`);
-  }
-  empExist.status = false;
-  await empExist.save({ userId: req.user?.id });
-  // const employee = await db.Employee.update({
-  //   status: false
-  // },{
-  //   where:{
-  //     id
-  //   }
-  // })
-  res.status(200).json({ message: "Employee is deactivated successfully" });
+  res.status(200).json({
+    success: true,
+    data: employee,
+    message: "Employee is deactivated successfully",
+  });
 });
-export const activateEmployee = asynHandler(async (req, res) => {
+export const activateEmployee = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const empExist = await db.Employee.findByPk(id);
+  const employee = await employeeService.activateEmployee(id);
 
-  if (!empExist) {
-    res.send(404);
-    throw new Error(`Employee not found`);
-  }
-  empExist.status = true;
-  await empExist.save({ userId: req.user?.id });
-  // const employee = await db.Employee.update({
-  //   status: false
-  // },{
-  //   where:{
-  //     id
-  //   }
-  // })
-  res.status(200).json({ message: "Employee is deactivated successfully" });
+  res.status(200).json({
+    success: true,
+    data: employee,
+    message: "Employee is activated successfully",
+  });
 });
-// };

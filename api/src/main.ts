@@ -9,4 +9,7 @@
 //       edit: boolean,
 //       delete: boolean
 //   }[]
+
 // } | undefined;
+import path from "path";
+console.log("\n\n" + path.join(__dirname) + "\n\n");
