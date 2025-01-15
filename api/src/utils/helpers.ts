@@ -41,3 +41,11 @@ export const parseJSON = (value: string): any => {
     throw new ApiError(400, "Invalid JSON format");
   }
 };
+
+export const parseDate = (value: string): any => {
+  try {
+    return new Date(value.slice(0, 10));
+  } catch (error) {
+    throw new ApiError(400, "Invalid Date format");
+  }
+};

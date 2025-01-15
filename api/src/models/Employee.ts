@@ -166,6 +166,7 @@ import { EmployeeEntity } from "./types";
 import sequelize from "../db";
 import User from "./User";
 import Address from "./address/Address";
+import EmergencyContact from "./EmergencyContact";
 // import User from "./User";
 // type EmployeeAttributes = Optional<EmployeeEntity, "id" | "digital_signature">;
 
@@ -292,6 +293,10 @@ Employee.init(
 Employee.belongsTo(Address, {
   foreignKey: "address_id",
   as: "address",
+});
+Employee.belongsTo(EmergencyContact, {
+  foreignKey: "emergence_contact_id",
+  as: "emergencyContact",
 });
 // Employee.hasOne(User, {
 //   foreignKey: "employee_id",

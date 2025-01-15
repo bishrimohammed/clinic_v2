@@ -48,7 +48,7 @@ export const addressSchema = z.object({
       })
       .transform((value) => Number(value)),
   ]),
-  email: z.string().email("Invalid email").optional(),
+  email: z.string().trim().email("Invalid email").optional(),
   phone_1: z.string().regex(/^(09|07)\d{8}$/, "Phone number is invalid"),
   house_number: z.string().trim().optional(),
   street: z.string().trim().optional(),
@@ -73,6 +73,7 @@ export const createEmergencyContactSchema = z.object({
     .min(3, "Father Name must be at least 3 characters long"),
   lastName: z.string().trim().optional(),
   relationship: z.string().min(1, "Relationship is required"),
+  other_relation: z.string().trim().optional(),
   phone: z.string().regex(phoneRegex, "Phone number is invalid"),
   is_the_same_address: z.boolean(),
   region_id: z.union([

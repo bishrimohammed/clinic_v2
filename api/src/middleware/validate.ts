@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { TypeOf, z, ZodSchema } from "zod";
+import { TypeOf, ZodSchema } from "zod";
 import { ApiError } from "../shared/error/ApiError";
-import { TypedRequest } from "../types/TypedRequest";
 
 type TransformationMap = { [key: string]: (value: any) => any };
 
