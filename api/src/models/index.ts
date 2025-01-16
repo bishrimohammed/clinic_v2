@@ -24,15 +24,6 @@ import SubCity from "./address/SubCity";
 import Woreda from "./address/Woreda";
 import Address from "./address/Address";
 import EmergencyContact from "./EmergencyContact";
-// RolePermission
-// InvestigationOrder
-// Schedule
-// MedicalBilling
-// Role.hasMany(User, {
-//   foreignKey: "role_id",
-//   sourceKey: "id",
-//   as: "users",
-// });
 
 export {
   User,

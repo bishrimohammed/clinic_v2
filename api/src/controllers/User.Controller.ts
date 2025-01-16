@@ -8,20 +8,15 @@ import {
 } from "../services";
 import { Employee, Role, User } from "../models";
 import configs from "../config/configs";
-import { UserRegisterInput, UserUpdateInput } from "../types/user";
+import { userRegisterSchema, UserUpdateInput } from "../types/user";
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
+import asyncHandler from "../utils/asyncHandler";
 
-const asyncHandler = require("express-async-handler");
-const bcrypt = require("bcryptjs");
+// const asyncHandler = require("express-async-handler");
+import bcrypt from "bcryptjs";
 const db = require("../models");
-const { generateToken } = require("../utils/generateToken");
-const { Op, where } = require("sequelize");
-// const getClinicInformation = require("../helpers/getClinicInformation");
-// const db = require("../models/index.js");
-// const { getPaddedName } = require("../utils/getPaddedName.js");
-// const User = db.User;
-// req.user.id;
-// const UserController = {
+// import { generateToken } from "../utils/generateToken"
+import { Op } from "sequelize";
 
 export const getUsers = asyncHandler(async (req: Request, res: Response) => {
   const users = await User.findAll({
@@ -57,15 +52,7 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
       },
     ],
   });
-  // const user = await User.findAll({
-  //   include: [
-  //     {
-  //       model: db.Permission,
-  //       as: "userPermissions",
-  //     },
-  //   ],
-  // });
-  // const region = await db.Region.findAll({ include: ["cities"] });
+
   res.json(users);
 });
 export const getActiveUsers: RequestHandler = asyncHandler(
@@ -104,54 +91,18 @@ export const getDoctors = asyncHandler(async (req: Request, res: Response) => {
 });
 export const getUserById = asyncHandler(
   async (req: Request<{ id: string }>, res: Response) => {
-    const { id } = req.params;
-
-    const user = await userService.getUserById(id);
+    const userId = parseInt(req.params.id, 10);
+    const user = await userService.getUserById(userId);
     res.json(user);
   }
 );
-export const registerUser = asyncHandler(
-  async (req: Request<{}, {}, {}>, res: Response) => {
-    // return;
-    // const { employeeId, password, role, username, permissions } = req.body;
-    const body = req.body as UserRegisterInput;
-    // return;
-    // console.log(req.body);
-    // const isUserExist = await db.User.findOne({
-    //   where: {
-    //     username: username.toLowerCase(),
-    //   },
-    // });
-    const user = await userService.registerUser(body);
-    // if (isUserExist) {
-    //   res.status(500);
-    //   throw new Error("Username was taken. Please try another one.");
-    // }
+export const registerUser = asyncHandler<{
+  validatedData: typeof userRegisterSchema._type;
+}>(async (req, res: Response) => {
+  const user = await userService.registerUser(req.validatedData);
 
-    // const user = await db.User.create({
-    //   password: password,
-    //   employee_id: employeeId,
-    //   username: username,
-    //   role_id: role,
-    // });
-    // const username1 = getPaddedName(user.id, 4, "user-");
-    // user.username = username;
-    // await user.save();
-    // await Promise.all(
-    //   permissions.map((p) => {
-    //     return db.UserPermission.create({
-    //       user_id: user.id,
-    //       permission_id: p.permissionId,
-    //       create: p.create,
-    //       read: p.read,
-    //       update: p.update,
-    //       delete: p.delete,
-    //     });
-    //   })
-    // );
-    res.status(201).json({ message: "success" });
-  }
-);
+  res.status(201).json({ sucess: true, message: "success", data: user });
+});
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { username, password } = req.body;
   // console.log(req.body);
@@ -200,7 +151,8 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
 export const updateUser = asyncHandler(
   async (req: Request<{ id: string }>, res: Response) => {
     const body = req.body as UserUpdateInput;
-    const user = await userService.updateUser(req.params.id, body);
+    const userId = parseInt(req.params.id, 10);
+    const user = await userService.updateUser(userId, body);
     // const user = await db.User.findByPk(req.params.id);
     // if (!user) {
     //   res.status(404);
@@ -237,22 +189,17 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 export const deactivateUser = asyncHandler(
   async (req: Request<{ id: string }>, res: Response) => {
     // console.log(req.body.userData);
-    const user = await userService.deactivateUser(req.params.id);
+    const userId = parseInt(req.params.id, 10);
+    const user = await userService.deactivateUser(userId);
     res.status(200).json({ msg: "success" });
   }
 );
 export const activateUser = asyncHandler(
   async (req: Request<{ id: string }>, res: Response) => {
-    const user = await userService.activateUser(req.params.id);
-    // const { id } = req.params;
-    // const updatedUser = await db.User.update(
-    //   { status: true },
-    //   { where: { id: id } }
-    // );
-    // .then(([rowsUpdated, [updatedUser]]) => {
-    //   res.status(200).json(updatedUser);
-    // })
-    res.json({ msg: "success" });
+    const userId = parseInt(req.params.id, 10);
+    const user = await userService.activateUser(userId);
+
+    res.json({ success: true, msg: "success", data: user });
     // console.log(updatedUser);
   }
 );
@@ -327,55 +274,55 @@ export const updateWorkHour = asyncHandler(
 );
 export const changePassword = asyncHandler(
   async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { password } = req.body;
-    const user = await db.User.findOne({
-      where: {
-        id: id,
-      },
-      include: [
-        {
-          model: db.Role,
-          as: "role",
-          // include: ["permissions"],
-        },
-        {
-          model: db.Employee,
-          as: "employee",
-        },
-        {
-          model: db.Permission,
-          as: "userPermissions",
-        },
-      ],
-    });
-    if (!user) {
-      res.status(404);
-      throw new Error("User not found");
-    }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      res.status(400);
-      throw new Error("Invalid password");
-    }
-    user.password = req.body.newPassword;
-    user.is_new = false;
-    await user.save();
-    const token = generateToken(res, user.id);
+    // const { id } = req.params;
+    // const { password } = req.body;
+    // const user = await db.User.findOne({
+    //   where: {
+    //     id: id,
+    //   },
+    //   include: [
+    //     {
+    //       model: db.Role,
+    //       as: "role",
+    //       // include: ["permissions"],
+    //     },
+    //     {
+    //       model: db.Employee,
+    //       as: "employee",
+    //     },
+    //     {
+    //       model: db.Permission,
+    //       as: "userPermissions",
+    //     },
+    //   ],
+    // });
+    // if (!user) {
+    //   res.status(404);
+    //   throw new Error("User not found");
+    // }
+    // const isMatch = await bcrypt.compare(password, user.password);
+    // if (!isMatch) {
+    //   res.status(400);
+    //   throw new Error("Invalid password");
+    // }
+    // user.password = req.body.newPassword;
+    // user.is_new = false;
+    // await user.save();
+    // const token = generateToken(res, user.id);
     // console.log(token);
-    const permissions = user.userPermissions;
+    // const permissions = user.userPermissions;
     res.status(200).json({
-      id: user.id,
-      is_new: user.is_new,
-      name:
-        user.employee.firstName +
-        " " +
-        user.employee.middleName +
-        " " +
-        user.employee.lastName,
-      token,
-      role: user.role,
-      permissions: user.userPermissions,
+      // id: user.id,
+      // is_new: user.is_new,
+      // name:
+      //   user.employee.firstName +
+      //   " " +
+      //   user.employee.middleName +
+      //   " " +
+      //   user.employee.lastName,
+      // token,
+      // role: user.role,
+      // permissions: user.userPermissions,
       // user,
       // address: user.address,
     });

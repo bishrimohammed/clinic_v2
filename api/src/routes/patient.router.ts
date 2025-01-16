@@ -1,7 +1,7 @@
-const express = require("express");
-const PatientController = require("../controllers/PatientController");
+import express from "express";
+import * as PatientController from "../controllers/PatientController";
 import upload from "../config/multerConfig";
-const { protect } = require("../middleware/authMiddleWare");
+import { protect } from "../middleware/authMiddleWare";
 const router = express.Router();
 
 router.get("/", PatientController.getAllPatients);
@@ -79,4 +79,4 @@ router.delete(
   PatientController.deleteSocialHistory
 );
 
-module.exports = router;
+export default router;

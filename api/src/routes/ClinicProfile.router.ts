@@ -45,4 +45,4 @@ router.put(
 
 // router.delete("/:id", ClinicProfileController.deleteClinicProfile);
 
-module.exports = router;
+export default router;

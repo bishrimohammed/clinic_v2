@@ -1,11 +1,17 @@
+import clinicprofileRoute from "./ClinicProfile.router";
+import serviceRoute from "./cilicService.router";
+// role and permission
+import employeeRoute from "./employee.router";
+import roleRoute from "./Role.router";
 import userRoute from "./user.router";
 import DashbordDataRoute from "./DashboardData.route";
-const woredaRoute = require("./address/woreda.router.js");
 import RegionRoute from "./address/region.router";
+import patientRoute from "./patient.router";
+
+const woredaRoute = require("./address/woreda.router.js");
 const CityRoute = require("./address/city.router.js");
 const SubCityRoute = require("./address/subCity.router.js");
 
-const patientRoute = require("./patient.router.ts");
 const AllergyRoute = require("./Allergy.route.js");
 const AppointmentRoute = require("./Appointment.router.js");
 const visitTypeRoute = require("./visitType.router.js");
@@ -14,14 +20,9 @@ const medicalRecordRoute = require("./MedicalRecord.router.ts");
 const MedicalRecordConsultaionRoute = require("./MedicalRecordConsultaion.router.js");
 const progressNoteRoute = require("./progressNote.router.ts");
 
-import serviceRoute from "./cilicService.router";
 const unitsRoute = require("./unit.router.js");
-const clinicprofileRoute = require("./ClinicProfile.router.ts");
 const fieldRoute = require("./FieldConfig.router.js");
-// employye route
-import employeeRoute from "./employee.router";
-// role and permission
-import roleRoute from "./Role.router";
+
 const permissionsRoute = require("./permission.router.js");
 
 const creditCompanyRoute = require("./CreditCompany.router.js");

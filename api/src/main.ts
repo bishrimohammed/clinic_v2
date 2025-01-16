@@ -11,5 +11,9 @@
 //   }[]
 
 // } | undefined;
-import path from "path";
-console.log("\n\n" + path.join(__dirname) + "\n\n");
+// import path from "path";
+// console.log("\n\n" + path.join(__dirname) + "\n\n");
+
+const arr = [{ permission_id: 2, create: true, read: false }];
+const ttt = [...arr, { user: 3 }];
+console.log(ttt);

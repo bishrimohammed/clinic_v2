@@ -1,14 +1,17 @@
 import { z } from "zod";
-import { phoneRegex } from "./shared";
+import { createEmergencyContactSchema, phoneRegex } from "./shared";
 
-const patientRegistrationSchema = z
+export const patientRegistrationSchema = z
   .object({
-    patientId: z.string().optional(),
+    patientId: z.string(),
     registrationDate: z.date().optional(),
-    firstName: z.string().trim().min(1, "Patient name is required"),
-    middleName: z.string().trim().min(1, "Father Name is required"),
+    firstName: z.string({ required_error: "Name is required" }).trim().min(3),
+    middleName: z
+      .string({ required_error: "Father's Name is required" })
+      .trim()
+      .min(3),
     lastName: z.string().trim().optional(),
-    gender: z.string().min(1, "Sex is required"),
+    gender: z.enum(["Male", "Female"], { required_error: "Sex is required" }),
     blood_type: z.string().optional(),
     nationality: z.string().optional(),
     marital_status: z.string().optional(),
@@ -40,27 +43,27 @@ const patientRegistrationSchema = z
           "Phone number is invalid"
         ),
     }),
-    emergency: z.object({
-      firstName: z
-        .string()
-        .trim()
-        .min(3, "First Name must be at least 3 characters long"),
-      middleName: z
-        .string()
-        .trim()
-        .min(3, "Father Name must be at least 3 characters long"),
-      lastName: z.string().trim().optional(),
-      relation: z.string().min(1, "Relationship is required"),
-      phone: z.string().regex(phoneRegex, "Phone number is invalid"),
-      the_same_address_as_patient: z.boolean().optional(),
-      other_relation: z.string().trim().optional(),
-      region_id: z.string().optional(),
-      city_id: z.string().optional(),
-      subcity_id: z.string().optional(),
-      woreda_id: z.string().optional(),
-      house_number: z.string().trim().optional(),
-    }),
-    isUpdate: z.boolean().default(false),
+    emergency: createEmergencyContactSchema,
+    // z.object({
+    //   firstName: z
+    //     .string()
+    //     .trim()
+    //     .min(3, "First Name must be at least 3 characters long"),
+    //   middleName: z
+    //     .string()
+    //     .trim()
+    //     .min(3, "Father Name must be at least 3 characters long"),
+    //   lastName: z.string().trim().optional(),
+    //   relation: z.string().min(1, "Relationship is required"),
+    //   phone: z.string().regex(phoneRegex, "Phone number is invalid"),
+    //   the_same_address_as_patient: z.boolean().optional(),
+    //   other_relation: z.string().trim().optional(),
+    //   region_id: z.string().optional(),
+    //   city_id: z.string().optional(),
+    //   subcity_id: z.string().optional(),
+    //   woreda_id: z.string().optional(),
+    //   house_number: z.string().trim().optional(),
+    // }),
     company_id: z.string().optional(),
     employeeId: z.string().optional(),
     employeeId_doc: z.any().optional(),
@@ -68,6 +71,14 @@ const patientRegistrationSchema = z
   })
   .superRefine((data, ctx) => {
     // Example: Cross-field validation
+    if (!data.is_new) {
+      ctx.addIssue({
+        path: ["manual_card_id"],
+        code: z.ZodIssueCode.custom,
+        message: "manual card is required",
+      });
+    }
+
     if (data.has_phone && !data.phone) {
       ctx.addIssue({
         path: ["phone"],
@@ -93,20 +104,23 @@ const patientRegistrationSchema = z
     }
 
     // Emergency contact validations
-    if (data.emergency.relation === "Other" && !data.emergency.other_relation) {
+    if (
+      data.emergency.relationship.toLowerCase() === "other" &&
+      !data.emergency.other_relation
+    ) {
       ctx.addIssue({
         path: ["emergency", "other_relation"],
         code: z.ZodIssueCode.custom,
-        message: "Relationship type is required when relation is 'Other'",
+        message: "Relationship type is required when relationship is 'Other'",
       });
     }
 
-    if (!data.emergency.the_same_address_as_patient) {
+    if (!data.emergency.is_the_same_address) {
       if (!data.emergency.region_id) {
         ctx.addIssue({
           path: ["emergency", "region_id"],
           code: z.ZodIssueCode.custom,
-          message: "Region is required for emergency contact",
+          message: "Region is required",
         });
       }
       if (!data.emergency.city_id) {
@@ -136,4 +150,3 @@ const patientRegistrationSchema = z
 export type PatientRegistrationInput = z.infer<
   typeof patientRegistrationSchema
 >;
-export { patientRegistrationSchema };
