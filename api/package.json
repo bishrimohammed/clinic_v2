@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
+    "test": "mocha",
     "dev": "nodemon --exec ts-node src/index.ts",
     "lint": "eslint . --ext .ts"
   },
@@ -27,15 +28,21 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/chai": "^5.0.1",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/mocha": "^10.0.10",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.10.2",
     "@types/sequelize": "^4.28.20",
+    "@types/sinon": "^17.0.3",
+    "chai": "^5.1.2",
     "dotenv": "^16.4.5",
+    "mocha": "^11.0.1",
     "nodemon": "^3.1.0",
+    "sinon": "^19.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   }
