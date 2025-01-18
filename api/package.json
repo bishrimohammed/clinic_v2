@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
-    "test": "mocha",
+    "test": "mocha  -r tsconfig-paths/register -r ts-node/register \"src/test/**/*.spec.ts\"",
     "dev": "nodemon --exec ts-node src/index.ts",
     "lint": "eslint . --ext .ts"
   },
@@ -44,6 +44,7 @@
     "nodemon": "^3.1.0",
     "sinon": "^19.0.2",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.2"
   }
 }
