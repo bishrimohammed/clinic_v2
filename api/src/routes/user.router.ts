@@ -1,9 +1,14 @@
 // const express = require("express");
 import express from "express";
 import * as UserController from "../controllers/User.Controller";
-import { userRegisterSchema } from "../types/user";
+import {
+  changePasswordSchema,
+  user_login_schema,
+  userRegisterSchema,
+  userUpdateSchema,
+} from "../types/user";
 import { validate } from "../middleware/validate";
-const { protect } = require("../middleware/authMiddleWare");
+import { protect } from "../middleware/authMiddleWare";
 const router = express.Router();
 
 router.get("/reset", UserController.resetPassword);
@@ -20,13 +25,23 @@ router.post(
   validate(userRegisterSchema),
   UserController.registerUser
 );
-router.post("/login", protect, UserController.loginUser);
+router.post("/login", validate(user_login_schema), UserController.loginUser);
 router.post("/doctor/workhours", protect, UserController.addWorkingHour);
-router.put("/:id", protect, UserController.updateUser);
+router.put(
+  "/:id",
+  protect,
+  validate(userUpdateSchema),
+  UserController.updateUser
+);
 
 router.put("/doctor/:id/workhours", protect, UserController.updateWorkHour);
 router.patch("/:id/activate", protect, UserController.activateUser);
 router.patch("/:id/deactivate", protect, UserController.deactivateUser);
-router.patch("/:id/changepassword", protect, UserController.changePassword);
+router.patch(
+  "/:id/change-password",
+  protect,
+  validate(changePasswordSchema),
+  UserController.changePassword
+);
 
 export default router;

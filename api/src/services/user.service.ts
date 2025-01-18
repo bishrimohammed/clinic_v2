@@ -1,8 +1,11 @@
-// import { register } from "module";
-import exp from "constants";
-import { User, UserPermission, Role } from "../models";
+import sequelize from "../db";
+import { User, UserPermission, Role, Employee } from "../models";
 import { ApiError } from "../shared/error/ApiError";
-import { UserRegisterInput, UserUpdateInput } from "../types/user";
+import {
+  changePasswordInput,
+  UserRegisterInput,
+  UserUpdateInput,
+} from "../types/user";
 
 interface permissionType {
   permissionId: number;
@@ -36,11 +39,38 @@ const createUserPermission = async (
   return createdpermissions;
 };
 // get paginated users and sort
-export const getUsers = async (page: number, limit: number, sort: string) => {
-  const users = await User.findAndCountAll({
-    limit: limit,
-    offset: (page - 1) * limit,
-    order: [[sort, "ASC"]],
+export const getUsers = async (
+  page?: number,
+  limit?: number,
+  sort?: string
+) => {
+  // const users = await User.findAndCountAll({
+  //   limit: limit,
+  // offset: (page - 1) * limit,
+  // order: [[sort, "ASC"]],
+  // });
+  const users = await User.findAll({
+    // where: {
+    //   "$role.name$": "CAshier",
+    // },
+    include: [
+      {
+        model: Employee,
+        as: "employee",
+        attributes: ["id", "firstName", "middleName", "lastName"],
+      },
+      {
+        model: Role,
+        as: "role",
+        attributes: ["id", "name"],
+      },
+    ],
+    attributes: ["id", "username", "status"],
+    order: [
+      ["employee", "firstName", "ASC"],
+      ["employee", "lastName", "ASC"],
+      ["employee", "middleName", "ASC"],
+    ],
   });
 
   return users;
@@ -62,7 +92,7 @@ export const getUserByusername = async (username: string) => {
  * @returns {User} user object or null
  */
 
-export const getUserById = async (id: number) => {
+export const getUserById = async (id: number): Promise<User> => {
   const user = await User.findByPk(id);
   if (!user) {
     throw new ApiError(404, "User not found");
@@ -90,30 +120,51 @@ export const registerUser = async ({
       { message: "User already exist", path: ["username"] },
     ]);
   }
-  const user = await User.create({
-    employee_id: employeeId,
-    password,
-    role_id,
-    username,
+  const user = await User.findOne({
+    where: {
+      employee_id: employeeId,
+    },
   });
-  // user.removeUserPermissions()
-  const transformedPermissions = permissions.map((permission) => {
-    return { ...permission, user_id: user.id };
-  });
-  // await Promise.all(
-  //   permissions.map((p) => {
-  //     return UserPermission.create({
-  //       user_id: user.id,
-  //       permission_id: p.permission_id,
-  //       create: p.create,
-  //       read: p.read,
-  //       edit: p.edit,
-  //       delete: p.delete,
-  //     });
-  //   })
-  // );
-  await UserPermission.bulkCreate(transformedPermissions);
-  return user;
+  if (user) {
+    throw new ApiError(403, "Employee has already an account", []);
+  }
+  const transaction = await sequelize.transaction();
+  try {
+    const user = await User.create(
+      {
+        employee_id: employeeId,
+        password,
+        role_id,
+        username,
+      },
+      { transaction }
+    );
+    // user.removeUserPermissions()
+    const transformedPermissions = permissions.map((permission) => {
+      return { ...permission, user_id: user.id };
+    });
+    // await Promise.all(
+    //   permissions.map((p) => {
+    //     return UserPermission.create({
+    //       user_id: user.id,
+    //       permission_id: p.permission_id,
+    //       create: p.create,
+    //       read: p.read,
+    //       edit: p.edit,
+    //       delete: p.delete,
+    //     });
+    //   })
+    // );
+    await UserPermission.bulkCreate(transformedPermissions, { transaction });
+    await transaction.commit();
+    return user;
+  } catch (error) {
+    const err = error as Error;
+    await transaction.rollback();
+    throw err;
+    // ApiError(400, `Failed to create user account: ${err.message}`);
+    // next
+  }
 };
 /**
  * Update user
@@ -131,23 +182,30 @@ export const updateUser = async (userId: number, newData: UserUpdateInput) => {
     permissions,
     // isUpdatePassword,
   } = newData;
-  const user = await getUserById(userId);
-  await user.update({
-    role_id: role_id,
-    employee_id: employeeId,
-    username: username,
-  });
-  // if (isUpdatePassword) {
-  //   user.setPassword(password);
-  //   await user.save();
-  // }
-  await user.setUsersPermissions([]);
-  // await createUserPermission(user.id, permissions);
-  const transformedPermissions = permissions.map((permission) => {
-    return { ...permission, user_id: user.id };
-  });
-  await UserPermission.bulkCreate(transformedPermissions);
-  return user;
+  const transaction = await sequelize.transaction();
+  try {
+    const user = await getUserById(userId);
+    await user.update({
+      role_id: role_id,
+      employee_id: employeeId,
+      username: username,
+    });
+    // if (isUpdatePassword) {
+    //   user.setPassword(password);
+    //   await user.save();
+    // }
+    await user.setUserPermissions([]);
+    // await createUserPermission(user.id, permissions);
+    const transformedPermissions = permissions.map((permission) => {
+      return { ...permission, user_id: user.id };
+    });
+    await UserPermission.bulkCreate(transformedPermissions);
+    await transaction.commit();
+    return user;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
 };
 
 export const deleteUser = async (userId: string) => {};
@@ -179,6 +237,23 @@ export const activateUser = async (userId: number) => {
   const user = await getUserById(userId);
   await user.update({
     status: true,
+  });
+  return user;
+};
+
+export const changeUserPassword = async (
+  userId: number,
+  data: changePasswordInput
+) => {
+  const { newpassword, oldpassword } = data;
+  const user = await getUserById(userId);
+  const isPasswordMatch = user.isPasswordMatch(oldpassword);
+  if (!isPasswordMatch) {
+    throw new ApiError(400, "Invalid oldPassword");
+  }
+
+  await user.update({
+    password: newpassword,
   });
   return user;
 };

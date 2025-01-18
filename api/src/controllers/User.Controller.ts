@@ -8,7 +8,12 @@ import {
 } from "../services";
 import { Employee, Role, User } from "../models";
 import configs from "../config/configs";
-import { userRegisterSchema, UserUpdateInput } from "../types/user";
+import {
+  changePasswordInput,
+  userRegisterSchema,
+  UserUpdateInput,
+  userUpdateSchema,
+} from "../types/user";
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
 import asyncHandler from "../utils/asyncHandler";
 
@@ -17,41 +22,44 @@ import bcrypt from "bcryptjs";
 const db = require("../models");
 // import { generateToken } from "../utils/generateToken"
 import { Op } from "sequelize";
+import { ApiError } from "../shared/error/ApiError";
+// import { ApiError } from "shared/error/ApiError";
 
 export const getUsers = asyncHandler(async (req: Request, res: Response) => {
-  const users = await User.findAll({
-    attributes: { exclude: ["password"] },
-    include: [
-      {
-        model: db.Role,
-        as: "role",
-        attributes: ["name"],
-        include: [
-          {
-            model: db.Permission,
-            as: "permissions",
-            // attributes: ["name"],
-          },
-        ],
-      },
-      {
-        model: db.Employee,
-        as: "employee",
-        // attributes: ["name"],
-        include: [
-          {
-            model: db.Address,
-            as: "address",
-            // attributes: ["name"],
-          },
-        ],
-      },
-      {
-        model: db.Permission,
-        as: "userPermissions",
-      },
-    ],
-  });
+  const users = await userService.getUsers();
+  // await User.findAll({
+  //   attributes: { exclude: ["password"] },
+  //   include: [
+  //     {
+  //       model: db.Role,
+  //       as: "role",
+  //       attributes: ["name"],
+  //       include: [
+  //         {
+  //           model: db.Permission,
+  //           as: "permissions",
+  //           // attributes: ["name"],
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       model: db.Employee,
+  //       as: "employee",
+  //       // attributes: ["name"],
+  //       include: [
+  //         {
+  //           model: db.Address,
+  //           as: "address",
+  //           // attributes: ["name"],
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       model: db.Permission,
+  //       as: "userPermissions",
+  //     },
+  //   ],
+  // });
 
   res.json(users);
 });
@@ -93,15 +101,20 @@ export const getUserById = asyncHandler(
   async (req: Request<{ id: string }>, res: Response) => {
     const userId = parseInt(req.params.id, 10);
     const user = await userService.getUserById(userId);
-    res.json(user);
+    const { password, ...userData } = user.toJSON();
+    console.log(userData);
+    res.json({
+      success: true,
+      data: userData,
+    });
   }
 );
 export const registerUser = asyncHandler<{
   validatedData: typeof userRegisterSchema._type;
 }>(async (req, res: Response) => {
   const user = await userService.registerUser(req.validatedData);
-
-  res.status(201).json({ sucess: true, message: "success", data: user });
+  const { password, ...userData } = user.toJSON();
+  res.status(201).json({ sucess: true, message: "success", data: userData });
 });
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { username, password } = req.body;
@@ -148,41 +161,41 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     clinicInfo: clinicInfo,
   });
 });
-export const updateUser = asyncHandler(
-  async (req: Request<{ id: string }>, res: Response) => {
-    const body = req.body as UserUpdateInput;
-    const userId = parseInt(req.params.id, 10);
-    const user = await userService.updateUser(userId, body);
-    // const user = await db.User.findByPk(req.params.id);
-    // if (!user) {
-    //   res.status(404);
-    //   throw new Error("User not found");
-    // }
-    // const updatedUser = await db.User.update(req.body);
-    // user.password = req.body.password;
-    // user.email = req.body.email;
-    // const Otheruser = await db.User.findOne({
-    //   where: {
-    //     username: req.body.username,
-    //   },
-    // });
-    // console.log(Otheruser?.id !== user.id);
-    // if (Otheruser && Otheruser?.id !== user.id) {
-    //   res.status(400);
-    //   throw new Error("Username was taken. Please try another one.");
-    // }
-    // if (req.body.isUpdatePasswordNeeded) {
-    //   user.password = req.body.password;
-    // }
-    // user.role_id = req.body.role;
-    // user.username = req.body.username;
-    // await user.save();
-    // await user.setUserPermissions([]);
-    // await db.UserPermission.bulkCreate(req.body.permissions);
-    res.json({ msg: "success", user });
-    // console.log(req.body);
-  }
-);
+export const updateUser = asyncHandler<{
+  validatedData: typeof userUpdateSchema._type;
+}>(async (req, res: Response) => {
+  const userId = parseInt(req.params.id, 10);
+  const user = await userService.updateUser(userId, req.validatedData);
+  const { password, ...userData } = user.toJSON();
+  // const user = await db.User.findByPk(req.params.id);
+  // if (!user) {
+  //   res.status(404);
+  //   throw new Error("User not found");
+  // }
+  // const updatedUser = await db.User.update(req.body);
+  // user.password = req.body.password;
+  // user.email = req.body.email;
+  // const Otheruser = await db.User.findOne({
+  //   where: {
+  //     username: req.body.username,
+  //   },
+  // });
+  // console.log(Otheruser?.id !== user.id);
+  // if (Otheruser && Otheruser?.id !== user.id) {
+  //   res.status(400);
+  //   throw new Error("Username was taken. Please try another one.");
+  // }
+  // if (req.body.isUpdatePasswordNeeded) {
+  //   user.password = req.body.password;
+  // }
+  // user.role_id = req.body.role;
+  // user.username = req.body.username;
+  // await user.save();
+  // await user.setUserPermissions([]);
+  // await db.UserPermission.bulkCreate(req.body.permissions);
+  res.json({ success: true, message: "success", data: userData });
+  // console.log(req.body);
+});
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   console.log(req.body.userData);
 });
@@ -191,15 +204,24 @@ export const deactivateUser = asyncHandler(
     // console.log(req.body.userData);
     const userId = parseInt(req.params.id, 10);
     const user = await userService.deactivateUser(userId);
-    res.status(200).json({ msg: "success" });
+    const { password, ...userData } = user.toJSON();
+    res.status(200).json({
+      success: true,
+      message: "Account successfully deactivated",
+      data: userData,
+    });
   }
 );
 export const activateUser = asyncHandler(
   async (req: Request<{ id: string }>, res: Response) => {
     const userId = parseInt(req.params.id, 10);
     const user = await userService.activateUser(userId);
-
-    res.json({ success: true, msg: "success", data: user });
+    const { password, ...userData } = user.toJSON();
+    res.json({
+      success: true,
+      message: "Account successfully activated",
+      data: userData,
+    });
     // console.log(updatedUser);
   }
 );
@@ -272,62 +294,113 @@ export const updateWorkHour = asyncHandler(
     res.json({ msg: "success" });
   }
 );
-export const changePassword = asyncHandler(
-  async (req: Request, res: Response) => {
-    // const { id } = req.params;
-    // const { password } = req.body;
-    // const user = await db.User.findOne({
-    //   where: {
-    //     id: id,
-    //   },
-    //   include: [
-    //     {
-    //       model: db.Role,
-    //       as: "role",
-    //       // include: ["permissions"],
-    //     },
-    //     {
-    //       model: db.Employee,
-    //       as: "employee",
-    //     },
-    //     {
-    //       model: db.Permission,
-    //       as: "userPermissions",
-    //     },
-    //   ],
-    // });
-    // if (!user) {
-    //   res.status(404);
-    //   throw new Error("User not found");
-    // }
-    // const isMatch = await bcrypt.compare(password, user.password);
-    // if (!isMatch) {
-    //   res.status(400);
-    //   throw new Error("Invalid password");
-    // }
-    // user.password = req.body.newPassword;
-    // user.is_new = false;
-    // await user.save();
-    // const token = generateToken(res, user.id);
-    // console.log(token);
-    // const permissions = user.userPermissions;
-    res.status(200).json({
-      // id: user.id,
-      // is_new: user.is_new,
-      // name:
-      //   user.employee.firstName +
-      //   " " +
-      //   user.employee.middleName +
-      //   " " +
-      //   user.employee.lastName,
-      // token,
-      // role: user.role,
-      // permissions: user.userPermissions,
-      // user,
-      // address: user.address,
-    });
+export const changePassword = asyncHandler<{
+  validatedData: changePasswordInput;
+}>(async (req, res: Response) => {
+  const userId = parseInt(req.params.id, 10);
+  const loggedInUserId = req.user?.id;
+
+  if (userId !== loggedInUserId) {
+    throw new ApiError(403, "You can't change other user paaword");
   }
-);
+  const user = await userService.changeUserPassword(userId, req.validatedData);
+  const [employee, role] = await Promise.all([
+    Employee.findByPk(user.dataValues.employee_id),
+    Role.findByPk(user.dataValues.role_id),
+  ]);
+
+  const permissions = await permissionService.formatUserPermission(user);
+
+  // const token = generateToken(user.id);
+  const userData = {
+    id: user.id as number,
+    is_new: user.is_new!,
+    name: employee?.getFullName().trim()!,
+    digital_signature: employee?.digital_signature || null,
+    doctor_titer: employee?.doctor_titer || null,
+    role: role?.name!,
+    permissions: permissions,
+  };
+  const accessToken = generateAccessToken(userData);
+  const refreshToken = generateRefreshToken(userData);
+  const clinicInfo = await clinicProfileService.getClinicInfo();
+  // console.log(token);
+  // const permissions = user.userPermissions;
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: configs.NODE_DEV === "production",
+    sameSite: "strict",
+    maxAge: 60 * 60,
+  });
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: configs.NODE_DEV === "production",
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 30,
+  });
+  res.status(200).json({
+    success: true,
+    message: "password changed successfully",
+    data: {
+      user: userData,
+      accessToken,
+      refreshToken,
+      clinicInfo: clinicInfo,
+    },
+  });
+  // const { id } = req.params;
+  // const { password } = req.body;
+  // const user = await db.User.findOne({
+  //   where: {
+  //     id: id,
+  //   },
+  //   include: [
+  //     {
+  //       model: db.Role,
+  //       as: "role",
+  //       // include: ["permissions"],
+  //     },
+  //     {
+  //       model: db.Employee,
+  //       as: "employee",
+  //     },
+  //     {
+  //       model: db.Permission,
+  //       as: "userPermissions",
+  //     },
+  //   ],
+  // });
+  // if (!user) {
+  //   res.status(404);
+  //   throw new Error("User not found");
+  // }
+  // const isMatch = await bcrypt.compare(password, user.password);
+  // if (!isMatch) {
+  //   res.status(400);
+  //   throw new Error("Invalid password");
+  // }
+  // user.password = req.body.newPassword;
+  // user.is_new = false;
+  // await user.save();
+  // const token = generateToken(res, user.id);
+  // console.log(token);
+  // const permissions = user.userPermissions;
+  // res.status(200).json({
+  // id: user.id,
+  // is_new: user.is_new,
+  // name:
+  //   user.employee.firstName +
+  //   " " +
+  //   user.employee.middleName +
+  //   " " +
+  //   user.employee.lastName,
+  // token,
+  // role: user.role,
+  // permissions: user.userPermissions,
+  // user,
+  // address: user.address,
+  // });
+});
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response) => {
     const username = "user-0003";
