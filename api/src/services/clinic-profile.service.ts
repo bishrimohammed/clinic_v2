@@ -48,7 +48,7 @@ export const getClinicDetails = async () => {
       },
       {
         model: Schedule,
-        as: "working_hours",
+        as: "workinghours",
         attributes: ["id", "day_of_week", "end_time", "start_time"],
       },
     ],
