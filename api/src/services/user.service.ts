@@ -1,11 +1,15 @@
+// import { clinicProfileService } from "services";
+import { clinicProfileService, scheduleService } from ".";
 import sequelize from "../db";
-import { User, UserPermission, Role, Employee } from "../models";
+import { User, UserPermission, Role, Employee, Schedule } from "../models";
 import { ApiError } from "../shared/error/ApiError";
 import {
+  addDoctorWorkingHoursInput,
   changePasswordInput,
   UserRegisterInput,
   UserUpdateInput,
 } from "../types/user";
+import { Op } from "sequelize";
 
 interface permissionType {
   permissionId: number;
@@ -63,6 +67,38 @@ export const getUsers = async (
         model: Role,
         as: "role",
         attributes: ["id", "name"],
+      },
+    ],
+    attributes: ["id", "username", "status"],
+    order: [
+      ["employee", "firstName", "ASC"],
+      ["employee", "lastName", "ASC"],
+      ["employee", "middleName", "ASC"],
+    ],
+  });
+
+  return users;
+};
+
+export const getDoctorsUser = async () => {
+  const users = await User.findAll({
+    where: {
+      "$role.name$": "doctor",
+    },
+    include: [
+      {
+        model: Employee,
+        as: "employee",
+        attributes: ["id", "firstName", "middleName", "lastName"],
+      },
+      {
+        model: Role,
+        as: "role",
+        attributes: ["id", "name"],
+      },
+      {
+        model: Schedule,
+        as: "schedules",
       },
     ],
     attributes: ["id", "username", "status"],
@@ -256,4 +292,157 @@ export const changeUserPassword = async (
     password: newpassword,
   });
   return user;
+};
+
+export const AddDoctorWorkingHour = async (
+  userId: number,
+  working_hour: addDoctorWorkingHoursInput
+) => {
+  const { day_of_week, end_time, start_time } = working_hour;
+  const clinicProfile = await clinicProfileService.getClinicInfo();
+  const isClinicOpen = await clinicProfile.getWorkinghours({
+    where: {
+      day_of_week: day_of_week,
+      start_time: {
+        [Op.lte]: start_time,
+      },
+      end_time: {
+        [Op.gte]: end_time,
+      },
+    },
+  });
+  // console.log(isClinicOpen);
+
+  if (!isClinicOpen.length) {
+    throw new ApiError(
+      400,
+      `The clinic is not open during the specified hours (${start_time} to ${end_time}) on ${day_of_week}. Please choose a different time or check the clinic's operating hours.`
+    );
+  }
+
+  // check overlap doctor working hour
+  const doctor = await getUserById(userId);
+  const isDoctor = (await doctor.getRole()).name.toLowerCase() === "doctor";
+  if (!isDoctor) {
+    throw new ApiError(400, `The user is not a Doctor`);
+  }
+  const doctorWorkingHours = await doctor.getSchedules({
+    where: {
+      day_of_week: day_of_week,
+
+      [Op.or]: [
+        {
+          start_time: { [Op.between]: [start_time, end_time] },
+        },
+        {
+          end_time: { [Op.between]: [start_time, end_time] },
+        },
+        {
+          [Op.and]: [
+            { start_time: { [Op.lt]: start_time } },
+            { end_time: { [Op.gt]: end_time } },
+          ],
+        },
+      ],
+    },
+  });
+  // console.log(doctorWorkingHours);
+
+  if (doctorWorkingHours.length) {
+    throw new ApiError(
+      400,
+      `The time interval overlaps (${start_time} to ${end_time} on ${day_of_week}) with an existing schedule .`
+    );
+  }
+
+  const schedule = await scheduleService.createDoctorWorkingHour({
+    ...working_hour,
+    doctorId: doctor.id,
+  });
+
+  return schedule;
+};
+
+export const updatedDoctorWorkingHour = async (
+  userId: number,
+  scheduleId: number,
+  working_hour: addDoctorWorkingHoursInput
+) => {
+  const { day_of_week, end_time, start_time } = working_hour;
+  const doctor = await getUserById(userId);
+  const schedules = await doctor.getSchedules({
+    where: {
+      id: scheduleId,
+    },
+  });
+  if (!schedules.length) {
+    throw new ApiError(400, `Schedule not found`);
+  }
+  const clinicProfile = await clinicProfileService.getClinicInfo();
+  const isClinicOpen = await clinicProfile.getWorkinghours({
+    where: {
+      day_of_week: day_of_week,
+      start_time: {
+        [Op.lte]: start_time,
+      },
+      end_time: {
+        [Op.gte]: end_time,
+      },
+    },
+  });
+  // console.log(isClinicOpen);
+
+  if (!isClinicOpen.length) {
+    throw new ApiError(
+      400,
+      `The clinic is not open during the specified hours (${start_time} to ${end_time}) on ${day_of_week}. Please choose a different time or check the clinic's operating hours.`
+    );
+  }
+
+  // check overlap doctor working hour
+  // const isDoctor = (await doctor.getRole()).name.toLowerCase() === "doctor";
+  // if (!isDoctor) {
+  //   throw new ApiError(400, `The user is not a Doctor`);
+  // }
+  const doctorWorkingHours = await doctor.getSchedules({
+    where: {
+      id: { [Op.ne]: scheduleId },
+      day_of_week: day_of_week,
+      [Op.or]: [
+        {
+          start_time: { [Op.between]: [start_time, end_time] },
+        },
+        {
+          end_time: { [Op.between]: [start_time, end_time] },
+        },
+        {
+          [Op.and]: [
+            { start_time: { [Op.lt]: start_time } },
+            { end_time: { [Op.gt]: end_time } },
+          ],
+        },
+      ],
+    },
+  });
+  // console.log(doctorWorkingHours);
+
+  if (doctorWorkingHours.length) {
+    throw new ApiError(
+      400,
+      `The time interval overlaps (${start_time} to ${end_time} on ${day_of_week}) with an existing schedule .`
+    );
+  }
+
+  const schedule = schedules[0];
+  await schedule.update({
+    day_of_week,
+    start_time,
+    end_time,
+  });
+  // const schedule = await scheduleService.createDoctorWorkingHour({
+  //   ...working_hour,
+  //   doctorId: doctor.id,
+  // });
+
+  return schedule;
 };

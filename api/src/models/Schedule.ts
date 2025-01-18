@@ -150,20 +150,20 @@ class Schedule extends Model<
   //   const whereClause: any = {
   //     id: { [Op.ne]: this.id },
   //     day_of_week: this.day_of_week,
-  //     [Op.or]: [
-  //       {
-  //         start_time: { [Op.lt]: value },
-  //         end_time: { [Op.gt]: value },
-  //       },
-  //       {
-  //         start_time: { [Op.lt]: this.end_time },
-  //         end_time: { [Op.gt]: this.end_time },
-  //       },
-  //       {
-  //         start_time: { [Op.gte]: value },
-  //         end_time: { [Op.lte]: this.end_time },
-  //       },
-  //     ],
+  // [Op.or]: [
+  //   {
+  //     start_time: { [Op.lt]: value },
+  //     end_time: { [Op.gt]: value },
+  //   },
+  //   {
+  //     start_time: { [Op.lt]: this.end_time },
+  //     end_time: { [Op.gt]: this.end_time },
+  //   },
+  //   {
+  //     start_time: { [Op.gte]: value },
+  //     end_time: { [Op.lte]: this.end_time },
+  //   },
+  // ],
   //   };
 
   //   // Check if doctor_id is not null before adding it to the whereClause

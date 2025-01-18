@@ -101,13 +101,45 @@ const changePasswordSchema = z.object({
     .min(6, "New Password must be at least 6 characters long"),
 });
 
+const addDoctorWorkingHoursSchema = z
+  .object({
+    day_of_week: z.enum([
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ]),
+    start_time: z.string({ required_error: "Start time is required" }).time({
+      message: "Start time must be a valid time",
+    }),
+    end_time: z.string({ required_error: "End time is required" }).time({
+      message: "End time must be a valid time",
+    }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.start_time >= data.end_time) {
+      ctx.addIssue({
+        path: ["start_time"],
+        code: z.ZodIssueCode.custom,
+        message: "Start time must be before end time",
+      });
+    }
+  });
+
 export type UserUpdateInput = z.infer<typeof userUpdateSchema>;
 export type UserRegisterInput = z.infer<typeof userRegisterSchema>;
 export type UserLoginInput = z.infer<typeof user_login_schema>;
 export type changePasswordInput = z.infer<typeof changePasswordSchema>;
+export type addDoctorWorkingHoursInput = z.infer<
+  typeof addDoctorWorkingHoursSchema
+>;
 export {
   userRegisterSchema,
   user_login_schema,
   userUpdateSchema,
   changePasswordSchema,
+  addDoctorWorkingHoursSchema,
 };

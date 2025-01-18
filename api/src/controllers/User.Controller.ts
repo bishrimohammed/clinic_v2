@@ -9,6 +9,7 @@ import {
 import { Employee, Role, User } from "../models";
 import configs from "../config/configs";
 import {
+  addDoctorWorkingHoursInput,
   changePasswordInput,
   userRegisterSchema,
   UserUpdateInput,
@@ -17,13 +18,10 @@ import {
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
 import asyncHandler from "../utils/asyncHandler";
 
-// const asyncHandler = require("express-async-handler");
-import bcrypt from "bcryptjs";
 const db = require("../models");
 // import { generateToken } from "../utils/generateToken"
 import { Op } from "sequelize";
 import { ApiError } from "../shared/error/ApiError";
-// import { ApiError } from "shared/error/ApiError";
 
 export const getUsers = asyncHandler(async (req: Request, res: Response) => {
   const users = await userService.getUsers();
@@ -81,20 +79,21 @@ export const getActiveUsers: RequestHandler = asyncHandler(
   }
 );
 export const getDoctors = asyncHandler(async (req: Request, res: Response) => {
-  const { query } = req.query;
-  console.log(req.user);
-  const role = await db.Role.findOne({
-    where: {
-      name: {
-        [Op.like]: `%doctor%`,
-      },
-    },
-  });
-  const doctors = await User.findAll({
-    where: { role_id: role.id, status: true },
-    attributes: { exclude: ["password"] },
-    include: ["employee", "schedules", "role"],
-  });
+  // const { query } = req.query;
+  // console.log(req.user);
+  // const role = await db.Role.findOne({
+  //   where: {
+  //     name: {
+  //       [Op.like]: `%doctor%`,
+  //     },
+  //   },
+  // });
+  const doctors = await userService.getDoctorsUser();
+  // User.findAll({
+  //   where: { role_id: role.id, status: true },
+  //   attributes: { exclude: ["password"] },
+  //   include: ["employee", "schedules", "role"],
+  // });
   res.json(doctors);
 });
 export const getUserById = asyncHandler(
@@ -165,36 +164,11 @@ export const updateUser = asyncHandler<{
   validatedData: typeof userUpdateSchema._type;
 }>(async (req, res: Response) => {
   const userId = parseInt(req.params.id, 10);
+
   const user = await userService.updateUser(userId, req.validatedData);
   const { password, ...userData } = user.toJSON();
-  // const user = await db.User.findByPk(req.params.id);
-  // if (!user) {
-  //   res.status(404);
-  //   throw new Error("User not found");
-  // }
-  // const updatedUser = await db.User.update(req.body);
-  // user.password = req.body.password;
-  // user.email = req.body.email;
-  // const Otheruser = await db.User.findOne({
-  //   where: {
-  //     username: req.body.username,
-  //   },
-  // });
-  // console.log(Otheruser?.id !== user.id);
-  // if (Otheruser && Otheruser?.id !== user.id) {
-  //   res.status(400);
-  //   throw new Error("Username was taken. Please try another one.");
-  // }
-  // if (req.body.isUpdatePasswordNeeded) {
-  //   user.password = req.body.password;
-  // }
-  // user.role_id = req.body.role;
-  // user.username = req.body.username;
-  // await user.save();
-  // await user.setUserPermissions([]);
-  // await db.UserPermission.bulkCreate(req.body.permissions);
+
   res.json({ success: true, message: "success", data: userData });
-  // console.log(req.body);
 });
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   console.log(req.body.userData);
@@ -225,75 +199,93 @@ export const activateUser = asyncHandler(
     // console.log(updatedUser);
   }
 );
-export const addWorkingHour = asyncHandler(
-  async (req: Request, res: Response) => {
-    // const { id } = req.params;
-    const { start_time, end_time, doctorId, day_of_week } = req.body;
-    // console.log(req.body);
-    const clinicISworking = await db.Schedule.findOne({
-      clinis_id: 4,
-      // doctor_id: doctorId,
-      day_of_week: day_of_week,
-    });
-    // i want to check if clinic is open or not
-    if (clinicISworking) {
-      if (
-        clinicISworking.start_time > start_time ||
-        clinicISworking.end_time < end_time
-      ) {
-        res.status(400);
-        throw new Error("Sorry, the clinic is not open at this time");
-      }
-    } else {
-      res.status(404);
-      throw new Error("Sorry, the clinic is not open on this day.");
-    }
-    const schedule = await db.Schedule.create(
-      {
-        start_time: start_time,
-        end_time: end_time,
-        doctor_id: doctorId,
-        day_of_week: day_of_week,
-      },
-      { userId: req?.user?.id }
-    );
-    res.status(201).json({ msg: "success" });
-  }
-);
-export const updateWorkHour = asyncHandler(
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { start_time, end_time, doctorId, day_of_week } = req.body;
-    // console.log(req.body);
-    // console.log(id);
-    const schedule = await db.Schedule.findByPk(id);
-    if (!schedule) {
-      res.status(404);
-      throw new Error("Schedule not found");
-    }
-    const clinicISworking = await db.Schedule.findOne({
-      clinis_id: 4,
-      // doctor_id: doctorId,
-      day_of_week: day_of_week,
-    });
-    // i want to check if clinic is open or not
-    if (clinicISworking) {
-      if (
-        clinicISworking.start_time > start_time ||
-        clinicISworking.end_time < end_time
-      ) {
-        res.status(400);
-        throw new Error("Sorry, the clinic is not open at this time range");
-      }
-    }
-    schedule.start_time = start_time;
-    schedule.end_time = end_time;
-    schedule.doctor_id = doctorId;
-    schedule.day_of_week = day_of_week;
-    await schedule.save({ userId: req?.user?.id });
-    res.json({ msg: "success" });
-  }
-);
+export const addWorkingHour = asyncHandler<{
+  validatedData: addDoctorWorkingHoursInput;
+}>(async (req, res: Response) => {
+  // const { id } = req.params;
+  // const { start_time, end_time, doctorId, day_of_week } = req.body;
+  // console.log(req.body);
+  // console.log(resq.validatedData);
+
+  const doctorId = parseInt(req.params.id, 10);
+  const schedule = await userService.AddDoctorWorkingHour(
+    doctorId,
+    req.validatedData
+  );
+  // const clinicISworking = await db.Schedule.findOne({
+  //   clinis_id: 4,
+  //   // doctor_id: doctorId,
+  //   day_of_week: day_of_week,
+  // });
+  // // i want to check if clinic is open or not
+  // if (clinicISworking) {
+  //   if (
+  //     clinicISworking.start_time > start_time ||
+  //     clinicISworking.end_time < end_time
+  //   ) {
+  //     res.status(400);
+  //     throw new Error("Sorry, the clinic is not open at this time");
+  //   }
+  // } else {
+  //   res.status(404);
+  //   throw new Error("Sorry, the clinic is not open on this day.");
+  // }
+  // const schedule = await db.Schedule.create(
+  //   {
+  //     start_time: start_time,
+  //     end_time: end_time,
+  //     doctor_id: doctorId,
+  //     day_of_week: day_of_week,
+  //   },
+  //   { userId: req?.user?.id }
+  // );
+  res.status(201).json({ success: true, message: "success", data: schedule });
+});
+export const updateWorkHour = asyncHandler<{
+  validatedData: addDoctorWorkingHoursInput;
+}>(async (req, res: Response) => {
+  const { id } = req.params;
+  // const { start_time, end_time, doctorId, day_of_week } = req.body;
+  // console.log(req.body);
+  // console.log(id);
+  const doctorId = parseInt(req.params.id, 10);
+  const scheduleId = parseInt(req.params.scheduleId, 10);
+  const schedule = await userService.updatedDoctorWorkingHour(
+    doctorId,
+    scheduleId,
+    req.validatedData
+  );
+  //   const schedule = await db.Schedule.findByPk(id);
+  //   if (!schedule) {
+  //     res.status(404);
+  //     throw new Error("Schedule not found");
+  //   }
+  //   const clinicISworking = await db.Schedule.findOne({
+  //     clinis_id: 4,
+  //     // doctor_id: doctorId,
+  //     day_of_week: day_of_week,
+  //   });
+  //   // i want to check if clinic is open or not
+  //   if (clinicISworking) {
+  //     if (
+  //       clinicISworking.start_time > start_time ||
+  //       clinicISworking.end_time < end_time
+  //     ) {
+  //       res.status(400);
+  //       throw new Error("Sorry, the clinic is not open at this time range");
+  //     }
+  //   }
+  //   schedule.start_time = start_time;
+  //   schedule.end_time = end_time;
+  //   schedule.doctor_id = doctorId;
+  //   schedule.day_of_week = day_of_week;
+  //   await schedule.save({ userId: req?.user?.id });
+  res.json({
+    success: true,
+    message: "schedule successfully updated",
+    data: schedule,
+  });
+});
 export const changePassword = asyncHandler<{
   validatedData: changePasswordInput;
 }>(async (req, res: Response) => {
@@ -348,58 +340,6 @@ export const changePassword = asyncHandler<{
       clinicInfo: clinicInfo,
     },
   });
-  // const { id } = req.params;
-  // const { password } = req.body;
-  // const user = await db.User.findOne({
-  //   where: {
-  //     id: id,
-  //   },
-  //   include: [
-  //     {
-  //       model: db.Role,
-  //       as: "role",
-  //       // include: ["permissions"],
-  //     },
-  //     {
-  //       model: db.Employee,
-  //       as: "employee",
-  //     },
-  //     {
-  //       model: db.Permission,
-  //       as: "userPermissions",
-  //     },
-  //   ],
-  // });
-  // if (!user) {
-  //   res.status(404);
-  //   throw new Error("User not found");
-  // }
-  // const isMatch = await bcrypt.compare(password, user.password);
-  // if (!isMatch) {
-  //   res.status(400);
-  //   throw new Error("Invalid password");
-  // }
-  // user.password = req.body.newPassword;
-  // user.is_new = false;
-  // await user.save();
-  // const token = generateToken(res, user.id);
-  // console.log(token);
-  // const permissions = user.userPermissions;
-  // res.status(200).json({
-  // id: user.id,
-  // is_new: user.is_new,
-  // name:
-  //   user.employee.firstName +
-  //   " " +
-  //   user.employee.middleName +
-  //   " " +
-  //   user.employee.lastName,
-  // token,
-  // role: user.role,
-  // permissions: user.userPermissions,
-  // user,
-  // address: user.address,
-  // });
 });
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response) => {

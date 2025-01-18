@@ -2,6 +2,7 @@
 import express from "express";
 import * as UserController from "../controllers/User.Controller";
 import {
+  addDoctorWorkingHoursSchema,
   changePasswordSchema,
   user_login_schema,
   userRegisterSchema,
@@ -26,7 +27,11 @@ router.post(
   UserController.registerUser
 );
 router.post("/login", validate(user_login_schema), UserController.loginUser);
-router.post("/doctor/workhours", protect, UserController.addWorkingHour);
+router.post(
+  "/:id/working-hours",
+  validate(addDoctorWorkingHoursSchema),
+  UserController.addWorkingHour
+);
 router.put(
   "/:id",
   protect,
@@ -34,7 +39,11 @@ router.put(
   UserController.updateUser
 );
 
-router.put("/doctor/:id/workhours", protect, UserController.updateWorkHour);
+router.put(
+  "/:id/working-hours/:scheduleId",
+  validate(addDoctorWorkingHoursSchema),
+  UserController.updateWorkHour
+);
 router.patch("/:id/activate", protect, UserController.activateUser);
 router.patch("/:id/deactivate", protect, UserController.deactivateUser);
 router.patch(

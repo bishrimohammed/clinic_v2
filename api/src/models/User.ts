@@ -13,6 +13,7 @@ import {
   BelongsToManyGetAssociationsMixin,
   BelongsToManyRemoveAssociationMixin,
   BelongsToManySetAssociationsMixin,
+  HasManyHasAssociationsMixin,
 } from "sequelize";
 import bcrypt from "bcryptjs";
 import Role from "./Role";
@@ -20,6 +21,7 @@ import Employee from "./Employee";
 import Permission from "./Permission";
 import UserPermission from "./UserPermissions";
 import Schedule from "./Schedule";
+import { HasManyGetAssociationsMixin } from "sequelize";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
@@ -35,6 +37,8 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
 
   declare getRole: BelongsToGetAssociationMixin<Role>;
   declare getEmployee: BelongsToGetAssociationMixin<Employee>;
+  declare getSchedules: HasManyGetAssociationsMixin<Schedule>;
+  // declare getSchedule: HasManyGetAssociationsMixin<Schedule>;
   declare getUserPermissions: BelongsToManyGetAssociationsMixin<Permission>;
   declare setUserPermissions: BelongsToManySetAssociationsMixin<
     Permission,
