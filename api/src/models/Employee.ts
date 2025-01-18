@@ -151,6 +151,7 @@
 // };
 
 //#endregion
+import sequelize from "../db";
 import {
   DataTypes,
   Model,
@@ -161,11 +162,12 @@ import {
   HasOneGetAssociationMixin,
   NonAttribute,
   Association,
+  BelongsToGetAssociationMixin,
 } from "sequelize";
 import { EmployeeEntity } from "./types";
-import sequelize from "../db";
-import User from "./User";
+// import User from "./User";
 import Address from "./address/Address";
+import { User } from "./";
 import EmergencyContact from "./EmergencyContact";
 // import User from "./User";
 // type EmployeeAttributes = Optional<EmployeeEntity, "id" | "digital_signature">;
@@ -196,7 +198,9 @@ class Employee extends Model<
   declare updatedAt: CreationOptional<Date>;
 
   declare getUser: HasOneGetAssociationMixin<User>;
+  declare getEmergencyContact: BelongsToGetAssociationMixin<EmergencyContact>;
   declare user?: NonAttribute<User>;
+  declare emergencyContact?: NonAttribute<EmergencyContact>;
 
   getFullName() {
     return `${this.firstName} ${this.middleName} ${this.lastName}`;
@@ -290,6 +294,10 @@ Employee.init(
   { sequelize, tableName: "employees", timestamps: true }
 );
 // sequelize.sync();
+// Employee.hasOne(User, {
+//   foreignKey: "employee_id",
+//   as: "user",
+// });
 Employee.belongsTo(Address, {
   foreignKey: "address_id",
   as: "address",

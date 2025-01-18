@@ -116,11 +116,12 @@ export const updateEmployeeSchema = z
       .max(new Date(), { message: "Date of Hire cannot be in the future" })
       .optional(),
     position: z.string().trim().optional(),
-    address: addressSchema.optional(),
-    emergencyContact: createEmergencyContactSchema.optional(),
+    address: addressSchema,
+    emergencyContact: createEmergencyContactSchema,
   })
   .superRefine((data, ctx) => {
     // Emergency contact validations
   });
 
 export type createEmployeeT = z.infer<typeof createEmployeeSchema>;
+export type updateEmployeeT = z.infer<typeof updateEmployeeSchema>;

@@ -9,7 +9,10 @@ import { parseDate, parseJSON } from "../utils/helpers";
 const router = express.Router();
 
 router.get("/", EmployeeController.getEmployees);
-router.get("/nouser", EmployeeController.getEmployeesWithNoUserAccounts);
+router.get(
+  "/has-no-account",
+  EmployeeController.getEmployeesWithNoUserAccounts
+);
 router.get("/positions", EmployeeController.getEmployeePostions);
 router.get("/:id", EmployeeController.getEmployeeById);
 router.post(

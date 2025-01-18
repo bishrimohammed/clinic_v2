@@ -33,7 +33,14 @@ import EmergencyContact from "./EmergencyContact";
 //   sourceKey: "id",
 //   as: "users",
 // });
-
+// UserPermission.belongsTo(User, {
+//   foreignKey: "user_id",
+//   as: "user",
+// });
+Employee.hasOne(User, {
+  foreignKey: "employee_id",
+  as: "user",
+});
 export {
   User,
   ClinicProfile,

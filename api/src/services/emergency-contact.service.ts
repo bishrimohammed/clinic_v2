@@ -2,8 +2,9 @@ import { addressService } from ".";
 import { EmergencyContact } from "../models";
 import { ApiError } from "../shared/error/ApiError";
 import { createEmergencyContactT } from "../types/shared";
+import { Transaction } from "sequelize";
 
-export const getEmergencyContactById = async (id: string) => {
+export const getEmergencyContactById = async (id: number) => {
   const emergenceContact = await EmergencyContact.findByPk(id);
   if (!emergenceContact) {
     throw new ApiError(404, "Emergency Contact not found");
@@ -79,17 +80,13 @@ export const createEmergencyContact = async (
 
 export const updateEmergencyContact = async (
   id: number,
-  data: Partial<
-    createEmergencyContactT & {
-      address_id?: number;
-    }
-  >
+  data: createEmergencyContactT & {
+    employeeAddressId: number;
+  },
+  transaction?: Transaction
 ) => {
   // Find the existing emergency contact
-  const emergencyContact = await EmergencyContact.findByPk(id);
-  if (!emergencyContact) {
-    throw new Error("Emergency contact not found");
-  }
+  const emergencyContact = await getEmergencyContactById(id);
 
   const {
     firstName,
@@ -105,33 +102,78 @@ export const updateEmergencyContact = async (
     house_number,
     street,
     other_relation,
+    employeeAddressId,
   } = data;
+  let addressId: number = emergencyContact.address_id;
+  if (!is_the_same_address) {
+    if (employeeAddressId !== emergencyContact.address_id) {
+      // Update existing address if IDs differ
+      await addressService.updateAddress(
+        emergencyContact.address_id,
+        {
+          city_id,
+          phone_1: phone,
+          region_id,
+          subcity_id,
+          woreda_id,
+          house_number,
+          street,
+        },
+        transaction
+      );
+      console.log("\n\n\n nor chane");
+      console.log(addressId);
 
-  // Optional: Update the address if provided and not the same as the existing one
-  if (!is_the_same_address && data.address_id) {
-    await addressService.updateAddress(data.address_id, {
-      city_id,
-      phone_1: phone,
-      region_id,
-      subcity_id,
-      woreda_id,
-      house_number,
-      street,
-    });
+      console.log("\n\n\n bkj");
+    } else {
+      // Create new address
+      const newAddress = await addressService.createAddress(
+        {
+          city_id,
+          phone_1: phone,
+          region_id,
+          subcity_id,
+          woreda_id,
+          house_number,
+          street,
+        },
+        transaction
+      );
+
+      addressId = newAddress.id;
+    }
+  } else if (employeeAddressId !== emergencyContact.address_id) {
+    // If address marked the same but different IDs, delete the old one
+
+    let deletedAddressId = emergencyContact.address_id;
+    await emergencyContact.update(
+      {
+        address_id: employeeAddressId,
+      },
+      { transaction }
+    );
+    // emergencyContact.address_id = employeeAddressId;
+
+    await addressService.deleteAddress(deletedAddressId, transaction);
+    addressId = employeeAddressId;
   }
+
+  // Determine relationship
   const relationSHIP =
     relationship?.toLowerCase() !== "other" ? relationship : other_relation!;
+
   // Update emergency contact details
-  const updatedEmergencyContact = await emergencyContact.update({
-    firstName: firstName || emergencyContact.firstName,
-    middleName: middleName || emergencyContact.middleName,
-    lastName: lastName || emergencyContact.lastName,
-    phone: phone || emergencyContact.phone,
-    relationship: relationSHIP || emergencyContact.relationship,
-    address_id: is_the_same_address
-      ? emergencyContact.address_id
-      : data.address_id,
-  });
+  const updatedEmergencyContact = await emergencyContact.update(
+    {
+      firstName: firstName || emergencyContact.firstName,
+      middleName: middleName || emergencyContact.middleName,
+      lastName: lastName || emergencyContact.lastName,
+      phone: phone || emergencyContact.phone,
+      relationship: relationSHIP || emergencyContact.relationship,
+      address_id: addressId,
+    },
+    { transaction }
+  );
 
   return updatedEmergencyContact;
 };

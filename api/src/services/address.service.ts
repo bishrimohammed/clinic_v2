@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import { Address } from "../models";
 import { ApiError } from "../shared/error/ApiError";
 import { addressT } from "../types/shared";
@@ -16,7 +17,11 @@ export const getAddressByPhone = async (phone: string) => {
     },
   });
 };
-export const updateAddress = async (id: number, data: Partial<addressT>) => {
+export const updateAddress = async (
+  id: number,
+  data: Partial<addressT>,
+  transaction?: Transaction
+) => {
   const { woreda_id, email, phone_1, house_number, street } = data;
   const address = await getAddressById(id);
   const updatedAddress = await address.update({
@@ -29,7 +34,10 @@ export const updateAddress = async (id: number, data: Partial<addressT>) => {
   return updatedAddress;
 };
 
-export const createAddress = async (data: addressT) => {
+export const createAddress = async (
+  data: addressT,
+  transaction?: Transaction
+) => {
   const {
     city_id,
     phone_1,
@@ -47,21 +55,30 @@ export const createAddress = async (data: addressT) => {
       { path: ["address", "phone_1"], message: "Phone number is Taken" },
     ]);
   }
-  const address = await Address.create({
-    phone_1,
-    woreda_id,
-    email,
-    house_number,
-    street,
-    phone_2,
-  });
+  const address = await Address.create(
+    {
+      phone_1,
+      woreda_id,
+      email,
+      house_number,
+      street,
+      phone_2,
+    },
+    {
+      transaction,
+    }
+  );
   return address;
 };
 
-export const deleteAddress = async (id: number | string) => {
+export const deleteAddress = async (
+  id: number | string,
+  transaction?: Transaction
+) => {
   return await Address.destroy({
     where: {
       id: id,
     },
+    transaction,
   });
 };

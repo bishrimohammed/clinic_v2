@@ -18,8 +18,17 @@ export const validate =
 
       Object.entries(transformations).forEach(([key, transformFn]) => {
         if (formData[key] !== undefined) {
-          formData[key] = transformFn(formData[key]);
-          requiresTransformation = true;
+          // formData[key] = transformFn(formData[key]);
+          // requiresTransformation = true;
+          try {
+            formData[key] = transformFn(formData[key]);
+            requiresTransformation = true;
+          } catch (error) {
+            const err = error as Error;
+            throw new ApiError(400, `Transformation error for field ${key}`, [
+              { message: err.message, path: [key] },
+            ]);
+          }
         }
       });
     }
