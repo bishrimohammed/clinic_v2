@@ -118,6 +118,7 @@ export const registerUser = asyncHandler<{
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { username, password } = req.body;
   // console.log(req.body);
+
   const user = await authService.login(username, password);
   const [employee, role] = await Promise.all([
     Employee.findByPk(user.dataValues.employee_id),
