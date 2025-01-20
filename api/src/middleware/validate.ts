@@ -9,9 +9,6 @@ export const validate =
   (req: Request, res: Response, next: NextFunction) => {
     const formData = { ...req.body };
 
-    let requiresTransformation = false;
-    // console.log(req.body);
-
     // Apply transformations if provided and if there are matching keys
     if (transformations) {
       // console.log(true);
@@ -22,7 +19,6 @@ export const validate =
           // requiresTransformation = true;
           try {
             formData[key] = transformFn(formData[key]);
-            requiresTransformation = true;
           } catch (error) {
             const err = error as Error;
             throw new ApiError(400, `Transformation error for field ${key}`, [
@@ -38,28 +34,47 @@ export const validate =
         message: error.message,
         path: error.path,
       }));
-      throw new ApiError(400, "Valiadtion error", errors);
+      throw new ApiError(400, "Validation error", errors);
     }
     const validatedData: TypeOf<T> = schema.parse(formData);
-    // console.log(validatedData);
 
-    // Attach the validated data to the request object if transformations were applied
-    if (requiresTransformation) {
-      // (req as TypedRequest<TypeOf<T>>).validatedData = validatedData;
-    }
+    // Attach the validated data to the request object
+
     (
       req as Request & {
         validatedData: TypeOf<T>;
       }
     ).validatedData = validatedData;
 
-    // const result = schema.safeParse(req.body);
-    // if (!result.success) {
-    //   const errors = result.error.errors.map((error) => ({
-    //     message: error.message,
-    //     path: error.path,
-    //   }));
-    //   throw new ApiError(400, "Required field", errors);
-    // }
+    next();
+  };
+
+export const validateQuery =
+  <T extends ZodSchema<any>>(schema: T) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    const query = { ...req.query };
+    console.log(query);
+
+    const result = schema.safeParse(query);
+    if (!result.success) {
+      const message = result.error.errors
+        .map((error) => error.message)
+        .join(", "); // Joining messages with a comma for readability
+      throw new ApiError(400, message);
+    }
+    next();
+  };
+
+export const validateParams =
+  <T extends ZodSchema<any>>(schema: T) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    const params = req.params;
+    const result = schema.safeParse(params);
+    if (!result.success) {
+      const message = result.error.errors
+        .map((error) => error.message)
+        .join(", "); // Joining messages with a comma for readability
+      throw new ApiError(400, message);
+    }
     next();
   };
