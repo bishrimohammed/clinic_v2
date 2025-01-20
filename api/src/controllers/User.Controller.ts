@@ -11,6 +11,7 @@ import configs from "../config/configs";
 import {
   addDoctorWorkingHoursInput,
   changePasswordInput,
+  UserLoginInput,
   userRegisterSchema,
   UserUpdateInput,
   userUpdateSchema,
@@ -25,39 +26,6 @@ import { ApiError } from "../shared/error/ApiError";
 
 export const getUsers = asyncHandler(async (req: Request, res: Response) => {
   const users = await userService.getUsers();
-  // await User.findAll({
-  //   attributes: { exclude: ["password"] },
-  //   include: [
-  //     {
-  //       model: db.Role,
-  //       as: "role",
-  //       attributes: ["name"],
-  //       include: [
-  //         {
-  //           model: db.Permission,
-  //           as: "permissions",
-  //           // attributes: ["name"],
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       model: db.Employee,
-  //       as: "employee",
-  //       // attributes: ["name"],
-  //       include: [
-  //         {
-  //           model: db.Address,
-  //           as: "address",
-  //           // attributes: ["name"],
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       model: db.Permission,
-  //       as: "userPermissions",
-  //     },
-  //   ],
-  // });
 
   res.json(users);
 });
@@ -115,52 +83,54 @@ export const registerUser = asyncHandler<{
   const { password, ...userData } = user.toJSON();
   res.status(201).json({ sucess: true, message: "success", data: userData });
 });
-export const loginUser = asyncHandler(async (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  // console.log(req.body);
+export const loginUser = asyncHandler(
+  async (req: Request & { validatedData: UserLoginInput }, res: Response) => {
+    // const { username, password } = req.body;
+    // console.log(req.body);
+    const { password, username } = req.validatedData;
+    const user = await authService.login(username, password);
+    const [employee, role] = await Promise.all([
+      Employee.findByPk(user.dataValues.employee_id),
+      Role.findByPk(user.dataValues.role_id),
+    ]);
 
-  const user = await authService.login(username, password);
-  const [employee, role] = await Promise.all([
-    Employee.findByPk(user.dataValues.employee_id),
-    Role.findByPk(user.dataValues.role_id),
-  ]);
+    const permissions = await permissionService.formatUserPermission(user);
 
-  const permissions = await permissionService.formatUserPermission(user);
-
-  // const token = generateToken(user.id);
-  const userData = {
-    id: user.id as number,
-    is_new: user.is_new!,
-    name: employee?.getFullName().trim()!,
-    digital_signature: employee?.digital_signature || null,
-    doctor_titer: employee?.doctor_titer || null,
-    role: role?.name!,
-    permissions: permissions,
-  };
-  const accessToken = generateAccessToken(userData);
-  const refreshToken = generateRefreshToken(userData);
-  const clinicInfo = await clinicProfileService.getClinicInfo();
-  // console.log(token);
-  // const permissions = user.userPermissions;
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: configs.NODE_DEV === "production",
-    sameSite: "strict",
-    maxAge: 60 * 60,
-  });
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: configs.NODE_DEV === "production",
-    sameSite: "strict",
-    maxAge: 60 * 60 * 24 * 30,
-  });
-  res.status(200).json({
-    user: userData,
-    accessToken,
-    refreshToken,
-    clinicInfo: clinicInfo,
-  });
-});
+    // const token = generateToken(user.id);
+    const userData = {
+      id: user.id as number,
+      is_new: user.is_new!,
+      name: employee?.getFullName().trim()!,
+      digital_signature: employee?.digital_signature || null,
+      doctor_titer: employee?.doctor_titer || null,
+      role: role?.name!,
+      permissions: permissions,
+    };
+    const accessToken = generateAccessToken(userData);
+    const refreshToken = generateRefreshToken(userData);
+    const clinicInfo = await clinicProfileService.getClinicInfo();
+    // console.log(token);
+    // const permissions = user.userPermissions;
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: configs.NODE_DEV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: configs.NODE_DEV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 30,
+    });
+    res.status(200).json({
+      user: userData,
+      accessToken,
+      refreshToken,
+      clinicInfo: clinicInfo,
+    });
+  }
+);
 export const updateUser = asyncHandler<{
   validatedData: typeof userUpdateSchema._type;
 }>(async (req, res: Response) => {

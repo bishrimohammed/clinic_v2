@@ -122,6 +122,14 @@ export const updateEmployeeSchema = z
   .superRefine((data, ctx) => {
     // Emergency contact validations
   });
-
+export const employeeFilterQuerySchema = z.object({
+  status: z.enum(["true", "false"]).optional(),
+  position: z.string().optional(),
+  gender: z.enum(["Male", "Female"]).optional(),
+});
+export const employeeGetByIdParamSchema = z.object({
+  id: z.string().transform((value) => parseInt(value)),
+  item_id: z.string(),
+});
 export type createEmployeeT = z.infer<typeof createEmployeeSchema>;
 export type updateEmployeeT = z.infer<typeof updateEmployeeSchema>;

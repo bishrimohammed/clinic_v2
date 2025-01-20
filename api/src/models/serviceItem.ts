@@ -9,13 +9,14 @@ import {
   HasOneGetAssociationMixin,
   BelongsToManySetAssociationsMixin,
   BelongsToManyRemoveAssociationMixin,
+  ForeignKey,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 // import ServiceCategory from "./serviceCategory";
 import LabTestProfile from "./labTestProfile";
 import PanelUnderpanel from "./PanelUnderpanel";
 import { BelongsToManyAddAssociationsMixin } from "sequelize";
-import ServiceCategory from "./serviceCategory";
+import { ServiceCategory } from ".";
 import { BelongsToManyRemoveAssociationsMixin } from "sequelize";
 
 class ServiceItem extends Model<
@@ -25,7 +26,7 @@ class ServiceItem extends Model<
   declare id: CreationOptional<number>;
   declare service_name: string;
   declare price: number;
-  declare serviceCategory_id: number;
+  declare serviceCategory_id: ForeignKey<ServiceCategory["id"]>;
   declare unit?: string | null; // Optional field
   declare status?: boolean;
   declare isFixed: boolean;
@@ -107,7 +108,6 @@ ServiceItem.init(
 );
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-ServiceItem.sync({ force: false, alter: false });
 
 // ServiceItem.belongsTo(ServiceCategory, {
 //   foreignKey: "serviceCategory_id",
@@ -125,4 +125,7 @@ ServiceItem.belongsToMany(ServiceItem, {
   otherKey: "child_id",
   as: "underPanels",
 });
+
+ServiceItem.sync({ force: false, alter: false });
+
 export default ServiceItem;

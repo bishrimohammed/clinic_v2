@@ -1,8 +1,8 @@
-import * as express from "express-serve-static-core";
+import * as Express from "express-serve-static-core";
 declare global {
   namespace Express {
     interface Request {
-      user?:
+      user:
         | {
             id: number;
             role: string;

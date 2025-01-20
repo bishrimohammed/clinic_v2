@@ -398,7 +398,7 @@ export const getServiceItemsByClinicServiceId = async (
     include: [
       {
         model: ServiceCategory,
-        as: "serviceCategory",
+        as: "category",
         attributes: ["id", "name", "status"],
       },
     ],

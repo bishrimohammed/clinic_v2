@@ -27,6 +27,7 @@ router.get(
 );
 router.get(
   "/:id/service-items",
+
   clinicServiceController.getServiceItemsByClinicServiceId
 );
 // router.get("/:id/gggg", clinicServiceController.ggggg);

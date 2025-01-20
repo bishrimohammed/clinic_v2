@@ -24,10 +24,7 @@ import SubCity from "./address/SubCity";
 import Woreda from "./address/Woreda";
 import Address from "./address/Address";
 import EmergencyContact from "./EmergencyContact";
-// RolePermission
-// InvestigationOrder
-// Schedule
-// MedicalBilling
+
 // Role.hasMany(User, {
 //   foreignKey: "role_id",
 //   sourceKey: "id",
@@ -37,6 +34,10 @@ import EmergencyContact from "./EmergencyContact";
 //   foreignKey: "user_id",
 //   as: "user",
 // });
+ServiceItem.belongsTo(ServiceCategory, {
+  foreignKey: "serviceCategory_id",
+  as: "category",
+});
 Employee.hasOne(User, {
   foreignKey: "employee_id",
   as: "user",

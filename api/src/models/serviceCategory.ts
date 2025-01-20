@@ -71,6 +71,7 @@ ServiceCategory.init(
       allowNull: false,
       references: {
         model: ClinicService,
+        key: "id",
       },
     },
     has_many_items: {

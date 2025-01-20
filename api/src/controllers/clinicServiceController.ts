@@ -181,7 +181,7 @@ export const getServiceItemsByClinicServiceId = asyncHandler(
   async (req, res) => {
     const { id: clinicService_id } = req.params;
     const query = req.query as serviceItemFilterType;
-    // console.log(q);
+    // console.log(req.params);
 
     const serviceItems =
       await clinicserviceService.getServiceItemsByClinicServiceId(

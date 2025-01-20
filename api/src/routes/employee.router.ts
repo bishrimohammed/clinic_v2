@@ -2,19 +2,36 @@ import express from "express";
 import * as EmployeeController from "../controllers/EmployeeController";
 import upload from "../config/multerConfig";
 import { protect } from "../middleware/authMiddleWare";
-import { validate } from "../middleware/validate";
-import { createEmployeeSchema, updateEmployeeSchema } from "../types/employee";
+import {
+  validate,
+  validateQuery,
+  validateParams,
+} from "../middleware/validate";
+import {
+  createEmployeeSchema,
+  employeeFilterQuerySchema,
+  employeeGetByIdParamSchema,
+  updateEmployeeSchema,
+} from "../types/employee";
 import { parseDate, parseJSON } from "../utils/helpers";
 
 const router = express.Router();
 
-router.get("/", EmployeeController.getEmployees);
+router.get(
+  "/",
+  validateQuery(employeeFilterQuerySchema),
+  EmployeeController.getEmployees
+);
 router.get(
   "/has-no-account",
   EmployeeController.getEmployeesWithNoUserAccounts
 );
 router.get("/positions", EmployeeController.getEmployeePostions);
-router.get("/:id", EmployeeController.getEmployeeById);
+router.get(
+  "/:id",
+  validateParams(employeeGetByIdParamSchema),
+  EmployeeController.getEmployeeById
+);
 router.post(
   "/",
   protect,
