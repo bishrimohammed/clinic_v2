@@ -118,6 +118,30 @@ export const getPatients = async (query: PatientQueryType) => {
   };
 };
 
+export const getPatientNamesForDropdown = async (pageNumber?: string) => {
+  let page = pageNumber ? parseInt(pageNumber, 10) : 1;
+  if (isNaN(page)) {
+    // If the result is NaN, set the page to 1 or handle it accordingly
+    page = 1;
+  }
+  const limit = 10;
+  const offset = (page - 1) * limit;
+  const { rows: patients, count } = await Patient.findAndCountAll({
+    attributes: ["id", "firstName", "middleName", "lastName"],
+    order: [
+      ["firstName", "ASC"],
+      ["middleName", "ASC"],
+      ["lastName", "ASC"],
+    ],
+    offset,
+    limit,
+  });
+  const hasMore = count > page * limit;
+  return {
+    patients,
+    hasMore,
+  };
+};
 export const getPatientById = async (id: number) => {
   const patient = await Patient.findByPk(id);
   if (!patient) {
@@ -132,6 +156,66 @@ export const getLastPatientId = async () => {
   });
 
   return patient;
+};
+
+export const searchPatientPatientByCardNumberOrNameOrPhone = async (query: {
+  page?: string;
+  patientId?: string;
+  patientName?: string;
+  phone?: string;
+}) => {
+  const { patientId, patientName, phone } = query;
+  const page = query.page ? parseInt(query.page) : 1;
+  const offset = (page - 1) * 10;
+  const whereClause: any = {};
+  if (patientId) {
+    whereClause.card_number = { [Op.like]: `%${patientId}%` };
+  }
+  if (patientName) {
+    const nameParts = patientName.split(" ");
+    const nameConditions = [];
+
+    if (nameParts[0]) {
+      nameConditions.push({ firstName: { [Op.like]: `%${nameParts[0]}%` } });
+    }
+    if (nameParts[1]) {
+      nameConditions.push({ middleName: { [Op.like]: `%${nameParts[1]}%` } });
+    }
+    if (nameParts[2]) {
+      nameConditions.push({ lastName: { [Op.like]: `%${nameParts[2]}%` } });
+    }
+
+    if (nameConditions.length > 0) {
+      whereClause[Op.and] = nameConditions;
+    }
+  }
+
+  if (phone) {
+    whereClause.phone = { [Op.like]: `%${phone}%` };
+  }
+  const { rows: patients, count } = await Patient.findAndCountAll({
+    where: whereClause,
+    attributes: ["id", "firstName", "middleName", "lastName"],
+    order: [
+      ["firstName", "ASC"],
+      ["middleName", "ASC"],
+      ["lastName", "ASC"],
+    ],
+    offset,
+    limit: 10,
+  });
+
+  const hasMore = count > page * 10;
+  // {
+  //   [Op.or]: [
+  //     { card_number: { [Op.like]: `%${searchTerm}%` } },
+  //     { firstName: { [Op.like]: `%${searchTerm}%` } },
+  //     { middleName: { [Op.like]: `%${searchTerm}%` } },
+  //     { lastName: { [Op.like]: `%${searchTerm}%` } },
+  //     { phone: { [Op.like]: `%${searchTerm}%` } },
+  //   ],
+  // },
+  return { patients, hasMore };
 };
 export const createPatient = async (
   data: PatientRegistrationInput & {

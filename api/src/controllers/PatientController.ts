@@ -10,7 +10,6 @@ import { patientService } from "../services";
 import asyncHandler from "../utils/asyncHandler";
 const db = require("../models");
 import { Op } from "sequelize";
-// const { getPaddedName } = require("../utils/getPaddedName");
 
 export const getAllPatients = asyncHandler(async (req, res) => {
   // console.log(req.query);
@@ -138,7 +137,6 @@ export const getAllPatients = asyncHandler(async (req, res) => {
     },
   });
 });
-// getPatients: expressAsyncHandler(async (req, res) => {});
 export const getLastPatientId = asyncHandler(async (req, res) => {
   const lastPatient = await patientService.getLastPatientId();
   // res.status(200).json(lastPatient?.card_number);
@@ -151,105 +149,126 @@ export const getLastPatientId = asyncHandler(async (req, res) => {
   });
 });
 export const getPatientNameList = asyncHandler(async (req, res) => {
+  const { page } = req.query as {
+    page: string | undefined;
+  };
+
   // console.log("\n\nkjaduig\n\n");
-  const patients = await db.Patient.findAll({
-    attributes: ["id", "firstName", "lastName", "middleName"],
+  const patientResults = await patientService.getPatientNamesForDropdown(page);
+
+  res.json({
+    status: "success",
+    message: "",
+    data: {
+      patients: patientResults.patients,
+      hasMore: patientResults.hasMore,
+    },
   });
-  res.json(patients);
 });
 export const getPatientOverViewData = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const patient = await db.Patient.findByPk(id, {
-    include: [
-      {
-        model: db.MedicalRecord,
-        as: "medicalRecords",
-        include: [
-          {
-            model: db.MedicalRecordDetail,
-            as: "medicalRecordDetails",
-            include: [
-              {
-                model: db.User,
-                as: "doctor",
-                include: [
-                  {
-                    model: db.Employee,
-                    as: "employee",
-                    attributes: ["id", "firstName", "lastName", "middleName"],
-                  },
-                ],
-                attributes: ["id"],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-    attributes: [
-      "id",
-      "firstName",
-      "lastName",
-      "middleName",
-      "gender",
-      "birth_date",
-      "has_phone",
-      "phone",
-      "status",
-      "card_number",
-    ],
-  });
+  const patient = 1;
+  //  await db.Patient.findByPk(id, {
+  //   include: [
+  //     {
+  //       model: db.MedicalRecord,
+  //       as: "medicalRecords",
+  //       include: [
+  //         {
+  //           model: db.MedicalRecordDetail,
+  //           as: "medicalRecordDetails",
+  //           include: [
+  //             {
+  //               model: db.User,
+  //               as: "doctor",
+  //               include: [
+  //                 {
+  //                   model: db.Employee,
+  //                   as: "employee",
+  //                   attributes: ["id", "firstName", "lastName", "middleName"],
+  //                 },
+  //               ],
+  //               attributes: ["id"],
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     },
+  //   ],
+  //   attributes: [
+  //     "id",
+  //     "firstName",
+  //     "lastName",
+  //     "middleName",
+  //     "gender",
+  //     "birth_date",
+  //     "has_phone",
+  //     "phone",
+  //     "status",
+  //     "card_number",
+  //   ],
+  // });
   res.json(patient);
 });
 export const searchPatient = asyncHandler(async (req, res) => {
   const query = req.query as {
-    patientId: string;
-    patientName: string;
-    phone: string;
+    patientId: string | undefined;
+    patientName: string | undefined;
+    phone: string | undefined;
+    page: string | undefined;
   };
-  // console.log(req.query);
-  let where: any = {};
-  if (query.patientId) {
-    where.card_number = { [Op.like]: `%${query.patientId}%` };
-  }
-  if (query.phone) {
-    where.phone = { [Op.like]: `%${query.phone}%` };
-  }
-  if (query.patientName) {
-    let name = query?.patientName?.split(" ");
-    if (name.length === 1) {
-      where.firstName = { [Op.like]: `%${name[0]}%` };
-    } else if (name.length === 2) {
-      where.firstName = { [Op.like]: `%${name[0]}%` };
-      where.middleName = { [Op.like]: `%${name[1]}%` };
-    } else if (name.length === 3) {
-      where.firstName = { [Op.like]: `%${name[0]}%` };
-      where.middleName = { [Op.like]: `%${name[1]}%` };
-      where.lastName = { [Op.like]: `%${name[2]}%` };
-    }
 
-    // where.firstName = { [Op.like]: `%${req.query.patientName}%` };
-  }
-  // [Op.like]: `%doctor%`,
-  let patients;
-  if (where.card_number || where.firstName || where.phone) {
-    patients = await db.Patient.findAll({
-      where,
-      limit: 10,
-      attributes: [
-        "id",
-        "firstName",
-        "middleName",
-        "lastName",
-        "card_number",
-        "phone",
-      ],
-    });
-  } else {
-    patients = [];
-  }
+  const patientResults =
+    await patientService.searchPatientPatientByCardNumberOrNameOrPhone(query);
+  // let where: any = {};
+  // if (query.patientId) {
+  //   where.card_number = { [Op.like]: `%${query.patientId}%` };
+  // }
+  // if (query.phone) {
+  //   where.phone = { [Op.like]: `%${query.phone}%` };
+  // }
+  // if (query.patientName) {
+  //   let name = query?.patientName?.split(" ");
+  //   if (name.length === 1) {
+  //     where.firstName = { [Op.like]: `%${name[0]}%` };
+  //   } else if (name.length === 2) {
+  //     where.firstName = { [Op.like]: `%${name[0]}%` };
+  //     where.middleName = { [Op.like]: `%${name[1]}%` };
+  //   } else if (name.length === 3) {
+  //     where.firstName = { [Op.like]: `%${name[0]}%` };
+  //     where.middleName = { [Op.like]: `%${name[1]}%` };
+  //     where.lastName = { [Op.like]: `%${name[2]}%` };
+  //   }
 
-  res.status(200).json(patients);
+  //   // where.firstName = { [Op.like]: `%${req.query.patientName}%` };
+  // }
+  // // [Op.like]: `%doctor%`,
+  // let patients;
+  // if (where.card_number || where.firstName || where.phone) {
+  //   patients = await db.Patient.findAll({
+  //     where,
+  //     limit: 10,
+  //     attributes: [
+  //       "id",
+  //       "firstName",
+  //       "middleName",
+  //       "lastName",
+  //       "card_number",
+  //       "phone",
+  //     ],
+  //   });
+  // } else {
+  //   patients = [];
+  // }
+
+  res.status(200).json({
+    status: "success",
+    message: "Patients retrieved successfully",
+    data: {
+      patients: patientResults.patients,
+      hasMore: patientResults.hasMore,
+    },
+  });
 });
 export const getPatient = asyncHandler(async (req, res) => {
   const patientId = parseInt(req.params.id);
