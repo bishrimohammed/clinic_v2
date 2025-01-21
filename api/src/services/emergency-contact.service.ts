@@ -54,15 +54,18 @@ export const createEmergencyContact = async (
   if (is_the_same_address) {
     addressId = parentAdderssId;
   } else {
-    const createdAddress = await addressService.createAddress({
-      city_id,
-      phone_1: phone,
-      region_id,
-      subcity_id,
-      woreda_id,
-      house_number,
-      street,
-    });
+    const createdAddress = await addressService.createAddress(
+      {
+        city_id,
+        phone_1: phone,
+        region_id,
+        subcity_id,
+        woreda_id,
+        house_number,
+        street,
+      },
+      transaction
+    );
     addressId = createdAddress.id;
   }
   const createdEmergencyContact = await EmergencyContact.create(
@@ -124,10 +127,6 @@ export const updateEmergencyContact = async (
         },
         transaction
       );
-      console.log("\n\n\n nor chane");
-      console.log(addressId);
-
-      console.log("\n\n\n bkj");
     } else {
       // Create new address
       const newAddress = await addressService.createAddress(
