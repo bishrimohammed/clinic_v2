@@ -9,8 +9,8 @@ import {
 import { patientService } from "../services";
 import asyncHandler from "../utils/asyncHandler";
 const db = require("../models");
-import { Op } from "sequelize";
 
+//#region Patient
 export const getAllPatients = asyncHandler(async (req, res) => {
   // console.log(req.query);
   const query = req.query as PatientQueryType;
@@ -148,7 +148,7 @@ export const getLastPatientId = asyncHandler(async (req, res) => {
     },
   });
 });
-export const getPatientNameList = asyncHandler(async (req, res) => {
+export const getPatientNamesForDropdown = asyncHandler(async (req, res) => {
   const { page } = req.query as {
     page: string | undefined;
   };
@@ -312,48 +312,7 @@ export const getPatientGeneralInforamtion = asyncHandler(async (req, res) => {
   // console.log(patient);
   res.json(patient);
 });
-export const getFamilyHistory = asyncHandler(async (req, res) => {
-  const patientId = parseInt(req.params.id);
-  const familyHistories = await patientService.getFamilyHistories(patientId);
-  // const patient = await db.Patient.findByPk(id);
-  // if (!patient) {
-  //   res.status(404);
-  //   throw new Error("Patient not found");
-  // }
-  // const familyHistories = await db.FamilyHistory.findAll({
-  //   where: {
-  //     patient_id: patient.id,
-  //   },
-  // });
-  res.json({
-    status: "success",
-    message: "Family histories retrieved successfully",
-    data: {
-      familyHistories,
-    },
-  });
-});
-export const getSocialHistory = asyncHandler(async (req, res) => {
-  const patientId = parseInt(req.params.id);
-  const socialHistories = await patientService.getSocialHistories(patientId);
-  // db.Patient.findByPk(id);
-  // if (!patient) {
-  //   res.status(404);
-  //   throw new Error("Patient not found");
-  // }
-  // const socialHistories = await db.SocialHistory.findAll({
-  //   where: {
-  //     patient_id: patient.id,
-  //   },
-  // });
-  res.json({
-    status: "success",
-    message: "Social histories retrieved successfully",
-    data: {
-      socialHistories,
-    },
-  });
-});
+
 export const createPatient = asyncHandler<{
   validatedData: PatientRegistrationInput;
 }>(async (req, res) => {
@@ -861,7 +820,22 @@ export const deactivatePatient = asyncHandler(async (req, res) => {
     },
   });
 });
-// deletePatient: expressAsyncHandler(async (req, res) => {});
+
+//#endregion
+
+//#region Patient Allergies
+
+export const getPatientAllergy = asyncHandler(async (req, res) => {
+  const patientId = parseInt(req.params.id);
+  const allergies = await patientService.getPatientAllergies(patientId);
+  res.json({
+    status: "success",
+    message: "Patient allergies retrieved successfully",
+    data: {
+      allergies,
+    },
+  });
+});
 export const addPatientAllergy = asyncHandler<{
   validatedData: createAllergyInput;
 }>(async (req, res) => {
@@ -893,6 +867,75 @@ export const addPatientAllergy = asyncHandler<{
     message: "Patient allergies added successfully",
     data: {
       allergy,
+    },
+  });
+});
+export const updatePatientAllergy = asyncHandler<{
+  validatedData: createAllergyInput;
+}>(async (req, res) => {
+  // const { severity, allergy_type, reaction_details } = req.body;
+  const allergyId = parseInt(req.params.allergy_id);
+  const userId = req.user?.id!;
+  const allergy = await patientService.updateAllergy(
+    allergyId,
+    req.validatedData,
+    userId
+  );
+  // const patient = await db.Patient.findByPk(req.params.id);
+  // if (!patient) {
+  //   res.status(400);
+  //   throw new Error("Patient doesn't exist");
+  // }
+  // await db.Allergy.create(
+  //   {
+  //     patient_id: patient.id,
+  //     severity: severity,
+  //     allergy_type: allergy_type,
+  //     reaction_details: reaction_details,
+  //     created_by: req.user?.id,
+  //   },
+  //   { userId: req.user?.id }
+  // );
+  res.status(201).json({
+    status: "success",
+    message: "Patient allergies updated successfully",
+    data: {
+      allergy,
+    },
+  });
+});
+
+export const deletePatientAllergy = asyncHandler(async (req, res) => {
+  const allergyId = parseInt(req.params.allergy_id);
+  await patientService.deleteAllergy(allergyId);
+  res.json({
+    status: "success",
+    message: "Patient allergy deleted successfully",
+    data: null,
+  });
+});
+//#endregion
+
+//#region Patient Family History
+
+export const getPatientFamilyHistory = asyncHandler(async (req, res) => {
+  const patientId = parseInt(req.params.id);
+  const familyHistories = await patientService.getFamilyHistories(patientId);
+  // const patient = await db.Patient.findByPk(id);
+  // if (!patient) {
+  //   res.status(404);
+  //   throw new Error("Patient not found");
+  // }
+  // const familyHistories = await db.FamilyHistory.findAll({
+  //   where: {
+  //     patient_id: patient.id,
+  //   },
+  // });
+  res.json({
+    status: "success",
+    message: "Family histories retrieved successfully",
+    data: {
+      familyHistories,
     },
   });
 });
@@ -931,11 +974,13 @@ export const addPatientFamilyHistory = asyncHandler<{
     },
   });
 });
-export const updateFamilyhistory = asyncHandler(async (req, res) => {
+export const updatePatientFamilyHistory = asyncHandler<{
+  validatedData: createFamilyHistoryInput;
+}>(async (req, res) => {
   // const { medical_condition, relationship } = req.body;
   // const { id } = req.params;
-  const familyHistoryId = parseInt(req.params.id);
-  const userId = req.user?.id!;
+  const familyHistoryId = parseInt(req.params.family_history_id);
+  // const userId = req.user?.id!;
   const familyHistory = await patientService.updateFamilyHistory(
     familyHistoryId,
     req.validatedData
@@ -962,8 +1007,9 @@ export const updateFamilyhistory = asyncHandler(async (req, res) => {
     },
   });
 });
-export const deleteFamilyHistory = asyncHandler(async (req, res) => {
-  const familyHistoryId = parseInt(req.params.id);
+
+export const deletePatientFamilyHistory = asyncHandler(async (req, res) => {
+  const familyHistoryId = parseInt(req.params.family_history_id);
   await patientService.deleteFamilyHistory(familyHistoryId);
   // const familyHistory = await db.FamilyHistory.findByPk(req.params.id);
   // if (!familyHistory) {
@@ -980,6 +1026,31 @@ export const deleteFamilyHistory = asyncHandler(async (req, res) => {
   });
 });
 
+//#endregion
+
+//#region Patient Social History
+
+export const getPatientSocialHistory = asyncHandler(async (req, res) => {
+  const patientId = parseInt(req.params.id);
+  const socialHistories = await patientService.getSocialHistories(patientId);
+  // db.Patient.findByPk(id);
+  // if (!patient) {
+  //   res.status(404);
+  //   throw new Error("Patient not found");
+  // }
+  // const socialHistories = await db.SocialHistory.findAll({
+  //   where: {
+  //     patient_id: patient.id,
+  //   },
+  // });
+  res.json({
+    status: "success",
+    message: "Social histories retrieved successfully",
+    data: {
+      socialHistories,
+    },
+  });
+});
 export const addPatientSocialHistory = asyncHandler<{
   validatedData: createSocialHistoryInput;
 }>(async (req, res) => {
@@ -1017,10 +1088,10 @@ export const addPatientSocialHistory = asyncHandler<{
     },
   });
 });
-export const updateSocialHistory = asyncHandler(async (req, res) => {
+export const updatePatientSocialHistory = asyncHandler(async (req, res) => {
   // const { tobacco_use, alcohol_use } = req.body;
   // const { id } = req.params;
-  const socialHistoryId = parseInt(req.params.id);
+  const socialHistoryId = parseInt(req.params.social_history_id);
   const socialHistory = await patientService.updatesocialHistory(
     socialHistoryId,
     req.validatedData
@@ -1047,8 +1118,8 @@ export const updateSocialHistory = asyncHandler(async (req, res) => {
     },
   });
 });
-export const deleteSocialHistory = asyncHandler(async (req, res) => {
-  const socialHistoryId = parseInt(req.params.id);
+export const deletePatientSocialHistory = asyncHandler(async (req, res) => {
+  const socialHistoryId = parseInt(req.params.social_history_id);
   await patientService.deletesocialHistory(socialHistoryId);
   // db.SocialHistory.findByPk(req.params.id);
   // if (!socialHistory) {
@@ -1062,6 +1133,24 @@ export const deleteSocialHistory = asyncHandler(async (req, res) => {
     status: "success",
     message: "Patient social history deleted successfully",
     data: null,
+  });
+});
+
+//#endregion
+
+//#region Patient Past Medical History
+
+export const getPatientPastMedicalHistory = asyncHandler(async (req, res) => {
+  const patientId = parseInt(req.params.id);
+  const pastMedicalHistories = await patientService.getPastMedicalHistories(
+    patientId
+  );
+  res.json({
+    status: "success",
+    message: "Past medical histories retrieved successfully",
+    data: {
+      pastMedicalHistories,
+    },
   });
 });
 
@@ -1095,3 +1184,35 @@ export const addPatientPastMedicalHistory = asyncHandler<{
     },
   });
 });
+export const updatePatientPastMedicalHistory = asyncHandler<{
+  validatedData: createPastMedicalHistoryInput;
+}>(async (req, res) => {
+  // const { medical_condition, treatment } = req.body;
+  const pastMedicalHistoryId = parseInt(req.params.past_medical_history_id);
+  const pastMedicalHistory = await patientService.updatePastMedicalHistory(
+    pastMedicalHistoryId,
+    req.validatedData
+  );
+
+  res.status(200).json({
+    status: "success",
+    message: "Patient past medical history updated successfully",
+    data: {
+      pastMedicalHistory,
+    },
+  });
+});
+
+export const deletePatientPastMedicalHistory = asyncHandler(
+  async (req, res) => {
+    const pastMedicalHistoryId = parseInt(req.params.past_medical_history_id);
+    await patientService.deletePastMedicalHistory(pastMedicalHistoryId);
+    res.status(200).json({
+      status: "success",
+      message: "Patient past medical history deleted successfully",
+      data: null,
+    });
+  }
+);
+
+//#endregion

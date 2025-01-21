@@ -426,8 +426,8 @@ export const makeOutPatient = async (id: number) => {
 
 //#endregion
 //#region Allery
-export const getAllergies = async (id: number) => {
-  const patient = await getPatientById(id);
+export const getPatientAllergies = async (patientId: number) => {
+  const patient = await getPatientById(patientId);
   const allergies = await patient.getAllergies();
   return allergies;
 };
