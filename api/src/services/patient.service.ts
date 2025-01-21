@@ -1,6 +1,13 @@
 import sequelize from "../db";
 import { Patient } from "../models";
-import { PatientQueryType, PatientRegistrationInput } from "../types/patient";
+import {
+  createAllergyInput,
+  createFamilyHistoryInput,
+  createPastMedicalHistoryInput,
+  createSocialHistoryInput,
+  PatientQueryType,
+  PatientRegistrationInput,
+} from "../types/patient";
 import { ApiError } from "../shared/error/ApiError";
 import { Op } from "sequelize";
 import Allergy from "../models/patient/Allergy";
@@ -348,20 +355,33 @@ export const getAllergYById = async (allergyId: number) => {
   return allergy;
 };
 
-export const createAllergy = async (patientId: number) => {
+export const createAllergy = async (
+  patientId: number,
+  data: createAllergyInput,
+  created_by: number
+) => {
+  const { allergy_type, severity, reaction_details } = data;
   const patient = await getPatientById(patientId);
   const allergy = patient.createAllergy({
-    created_by: 1,
-    allergy_type: "bb",
-    severity: "Mild",
+    allergy_type,
+    severity,
+    reaction_details,
+    created_by: created_by,
   });
   return allergy;
 };
 
-export const updateAllergy = async (alleryId: number) => {
+export const updateAllergy = async (
+  alleryId: number,
+  data: createAllergyInput,
+  created_by: number
+) => {
+  const { allergy_type, severity, reaction_details } = data;
   const allergy = await getAllergYById(alleryId);
   await allergy.update({
-    allergy_type: "",
+    allergy_type,
+    reaction_details,
+    severity,
   });
   return allergy;
 };
@@ -387,20 +407,30 @@ export const getFamilyHistoryById = async (familyHistoryId: number) => {
   return familyHistory;
 };
 
-export const createFamilyHistory = async (patientId: number) => {
+export const createFamilyHistory = async (
+  patientId: number,
+  data: createFamilyHistoryInput,
+  created_by: number
+) => {
+  const { medical_condition, relationship } = data;
   const patient = await getPatientById(patientId);
   const familyHistory = await patient.createFamilyHistory({
-    created_by: 1,
-    medical_condition: "",
-    relationship: "",
+    medical_condition,
+    relationship,
+    created_by: created_by,
   });
   return familyHistory;
 };
 
-export const updateFamilyHistory = async (alleryId: number) => {
+export const updateFamilyHistory = async (
+  alleryId: number,
+  data: createFamilyHistoryInput
+) => {
+  const { medical_condition, relationship } = data;
   const familyHistory = await getFamilyHistoryById(alleryId);
   await familyHistory.update({
-    medical_condition: "",
+    medical_condition,
+    relationship,
   });
   return familyHistory;
 };
@@ -426,23 +456,32 @@ export const getSocialHistoryById = async (socialHistoryId: number) => {
   return socialHistory;
 };
 
-export const createsocialHistory = async (patientId: number) => {
+export const createsocialHistory = async (
+  patientId: number,
+  data: createSocialHistoryInput,
+  created_by: number
+) => {
+  const { alcohol_consumption, drug_use, smoking_status } = data;
   const patient = await getPatientById(patientId);
   const socialHistory = await patient.createSocialHistory({
-    created_by: 1,
+    created_by: created_by,
     // medical_condition: "",
     // relationship: "",
-    alcohol_use: "",
-    tobacco_use: "Current smoker",
+    alcohol_use: alcohol_consumption,
+    tobacco_use: smoking_status,
   });
   return socialHistory;
 };
 
-export const updatesocialHistory = async (socialHistoryId: number) => {
+export const updatesocialHistory = async (
+  socialHistoryId: number,
+  data: createSocialHistoryInput
+) => {
+  const { alcohol_consumption, smoking_status } = data;
   const socialHistory = await getSocialHistoryById(socialHistoryId);
   await socialHistory.update({
-    // medical_condition: "",
-    alcohol_use: "",
+    alcohol_use: alcohol_consumption,
+    tobacco_use: smoking_status,
   });
   return socialHistory;
 };
@@ -471,29 +510,36 @@ export const getPastMedicalHistoryById = async (
   return pastMedicalHistory;
 };
 
-export const createpastMedicalHistory = async (patientId: number) => {
+export const createPastMedicalHistory = async (
+  patientId: number,
+  data: createPastMedicalHistoryInput,
+  created_by: number
+) => {
+  const { medical_condition, treatment } = data;
   const patient = await getPatientById(patientId);
   const pastMedicalHistory = await patient.createPastMedicalHistory({
-    created_by: 1,
-    medical_condition: "",
-    treatment: "",
-    // relationship: "",
+    medical_condition,
+    treatment,
+    created_by: created_by,
   });
   return pastMedicalHistory;
 };
 
-export const updatepastMedicalHistory = async (
-  pastMedicalHistoryId: number
+export const updatePastMedicalHistory = async (
+  pastMedicalHistoryId: number,
+  data: createPastMedicalHistoryInput
 ) => {
+  const { medical_condition, treatment } = data;
   const pastMedicalHistory = await getPastMedicalHistoryById(
     pastMedicalHistoryId
   );
   await pastMedicalHistory.update({
-    medical_condition: "",
+    medical_condition,
+    treatment,
   });
   return pastMedicalHistory;
 };
-export const deletepastMedicalHistory = async (
+export const deletePastMedicalHistory = async (
   pastMedicalHistoryId: number
 ) => {
   const pastMedicalHistory = await getPastMedicalHistoryById(

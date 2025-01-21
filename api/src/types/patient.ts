@@ -154,7 +154,40 @@ export const patientQuerySchema = z.object({
   isRegistrationTypeNew: z.enum(["true", "false"]).optional(), // Renamed for clarity
 });
 
+export const createAllergySchema = z.object({
+  allergy_type: z.string().trim().min(3),
+  severity: z.enum(["Mild", "Moderate", "Severe"]),
+  reaction_details: z.string().trim().optional(),
+});
+
+export const createFamilyHistorySchema = z.object({
+  medical_condition: z.string().trim().min(3),
+  relationship: z.string().trim().min(3),
+});
+
+export const createSocialHistorySchema = z.object({
+  smoking_status: z.enum(["Current smoker", "Former smoker", "Non-smoker"]),
+  alcohol_consumption: z.enum(["light", "moderate", "heavy"]),
+  drug_use: z.enum(["never", "occasional", "regular"]),
+});
+
+export const createPastMedicalHistorySchema = z.object({
+  medical_condition: z.string().trim().min(3),
+  diagnosis_date: z.string().trim().optional(),
+  treatment: z.string().trim().min(3),
+});
+
 export type PatientRegistrationInput = z.infer<
   typeof patientRegistrationSchema
 >;
 export type PatientQueryType = z.infer<typeof patientQuerySchema>;
+export type createAllergyInput = z.infer<typeof createAllergySchema>;
+export type createFamilyHistoryInput = z.infer<
+  typeof createFamilyHistorySchema
+>;
+export type createSocialHistoryInput = z.infer<
+  typeof createSocialHistorySchema
+>;
+export type createPastMedicalHistoryInput = z.infer<
+  typeof createPastMedicalHistorySchema
+>;
