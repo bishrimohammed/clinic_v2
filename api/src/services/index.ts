@@ -10,6 +10,7 @@ import * as scheduleService from "./schedule.service";
 import * as clinicserviceService from "./clinic-service.service";
 import * as employeeService from "./employee.service";
 import * as emergencyContactService from "./emergency-contact.service";
+import * as creditCompanyService from "./credit-company.service";
 export {
   userService,
   authService,
@@ -24,4 +25,5 @@ export {
   roleService,
   employeeService,
   emergencyContactService,
+  creditCompanyService,
 };

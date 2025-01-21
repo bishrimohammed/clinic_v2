@@ -24,6 +24,8 @@ import SubCity from "./address/SubCity";
 import Woreda from "./address/Woreda";
 import Address from "./address/Address";
 import EmergencyContact from "./EmergencyContact";
+import CreditCompanyProfile from "./creditCompanyProfile";
+import CreditAgreement from "./creditAgreement";
 
 // Role.hasMany(User, {
 //   foreignKey: "role_id",
@@ -34,6 +36,8 @@ import EmergencyContact from "./EmergencyContact";
 //   foreignKey: "user_id",
 //   as: "user",
 // });
+// CreditCompanyProfile
+// CreditAgreement
 ServiceItem.belongsTo(ServiceCategory, {
   foreignKey: "serviceCategory_id",
   as: "category",
@@ -66,4 +70,6 @@ export {
   LabTestProfile,
   RolePermission,
   EmergencyContact,
+  CreditAgreement,
+  CreditCompanyProfile,
 };

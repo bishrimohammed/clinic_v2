@@ -1,113 +1,96 @@
 import expressAsyncHandler from "express-async-handler";
+import { PatientQueryType, PatientRegistrationInput } from "../types/patient";
+import { patientService } from "../services";
+import asyncHandler from "../utils/asyncHandler";
 const db = require("../models");
 const { Op } = require("sequelize");
 const { getPaddedName } = require("../utils/getPaddedName");
 // module.exports = PatientController = {
 export const getAllPatients = expressAsyncHandler(async (req, res) => {
   // console.log(req.query);
-  const { page: qPage, limit: qLimit } = req.query as {
-    page: string;
-    limit: string;
-  };
-  const page = parseInt(qPage);
-  const limit = parseInt(qLimit);
-  let where: any = {};
+  const query = req.query as PatientQueryType;
+  const patientsData = await patientService.getPatients(query);
+  // const { page: qPage, limit: qLimit } = req.query as {
+  //   page: string;
+  //   limit: string;
+  // };
+  // const page = parseInt(qPage);
+  // const limit = parseInt(qLimit);
+  // let where: any = {};
 
-  let sortDirection;
-  if (req.query?.status !== "") {
-    if (req.query.status === "true") {
-      where.status = true;
-    } else if (req.query.status === "false") {
-      where.status = false;
-    }
-  }
-  if (req.query?.is_credit) {
-    if (req.query.is_credit === "true") {
-      where.is_credit = true;
-    } else if (req.query.is_credit === "false") {
-      where.is_credit = false;
-    }
-    // where.is_credit = Boolean(req.query.is_credit);
-  }
-  if (req.query?.is_new) {
-    if (req.query.is_new === "true") {
-      where.is_new = true;
-    } else if (req.query.is_new === "false") {
-      where.is_new = false;
-    }
-    // where.is_new = Boolean(req.query.is_new);
-  }
-  if (req.query?.gender) {
-    where.gender = req.query?.gender;
-  }
-  // sort
-  switch (req.query?.sortBy) {
-    case "name":
-      if (req.query?.order === "asc") {
-        sortDirection = [
-          ["firstName", "ASC"],
-          ["middleName", "ASC"],
-          ["lastName", "ASC"],
-        ];
-      } else {
-        sortDirection = [
-          ["lastName", "DESC"],
-          ["firstName", "DESC"],
-          ["middleName", "DESC"],
-        ];
-      }
-      break;
-    case "age":
-      if (req.query?.order === "asc") {
-        sortDirection = [["birth_date", "ASC"]];
-      } else {
-        sortDirection = [["birth_date", "DESC"]];
-      }
-      break;
-    case "sex":
-      if (req.query?.order === "asc") {
-        sortDirection = [["gender", "ASC"]];
-      } else {
-        sortDirection = [["gender", "DESC"]];
-      }
-      break;
-    case "registation_date":
-      if (req.query?.order === "asc") {
-        sortDirection = [["createdAt", "ASC"]];
-      } else {
-        sortDirection = [["createdAt", "DESC"]];
-      }
-      break;
-    default:
-      sortDirection = [
-        ["firstName", "ASC"],
-        ["middleName", "ASC"],
-        ["lastName", "ASC"],
-      ];
-  }
-  // if (req.query?.sortBy === "name") {
-  //   if (req.query?.order === "asc") {
-  //     order = [
+  // let sortDirection;
+  // if (req.query?.status !== "") {
+  //   if (req.query.status === "true") {
+  //     where.status = true;
+  //   } else if (req.query.status === "false") {
+  //     where.status = false;
+  //   }
+  // }
+  // if (req.query?.is_credit) {
+  //   if (req.query.is_credit === "true") {
+  //     where.is_credit = true;
+  //   } else if (req.query.is_credit === "false") {
+  //     where.is_credit = false;
+  //   }
+  //   // where.is_credit = Boolean(req.query.is_credit);
+  // }
+  // if (req.query?.is_new) {
+  //   if (req.query.is_new === "true") {
+  //     where.is_new = true;
+  //   } else if (req.query.is_new === "false") {
+  //     where.is_new = false;
+  //   }
+  //   // where.is_new = Boolean(req.query.is_new);
+  // }
+  // if (req.query?.gender) {
+  //   where.gender = req.query?.gender;
+  // }
+  // // sort
+  // switch (req.query?.sortBy) {
+  //   case "name":
+  //     if (req.query?.order === "asc") {
+  //       sortDirection = [
+  //         ["firstName", "ASC"],
+  //         ["middleName", "ASC"],
+  //         ["lastName", "ASC"],
+  //       ];
+  //     } else {
+  //       sortDirection = [
+  //         ["lastName", "DESC"],
+  //         ["firstName", "DESC"],
+  //         ["middleName", "DESC"],
+  //       ];
+  //     }
+  //     break;
+  //   case "age":
+  //     if (req.query?.order === "asc") {
+  //       sortDirection = [["birth_date", "ASC"]];
+  //     } else {
+  //       sortDirection = [["birth_date", "DESC"]];
+  //     }
+  //     break;
+  //   case "sex":
+  //     if (req.query?.order === "asc") {
+  //       sortDirection = [["gender", "ASC"]];
+  //     } else {
+  //       sortDirection = [["gender", "DESC"]];
+  //     }
+  //     break;
+  //   case "registation_date":
+  //     if (req.query?.order === "asc") {
+  //       sortDirection = [["createdAt", "ASC"]];
+  //     } else {
+  //       sortDirection = [["createdAt", "DESC"]];
+  //     }
+  //     break;
+  //   default:
+  //     sortDirection = [
   //       ["firstName", "ASC"],
   //       ["middleName", "ASC"],
   //       ["lastName", "ASC"],
   //     ];
-  //   } else {
-  //     order = [
-  //       ["lastName", "DESC"],
-  //       ["firstName", "DESC"],
-  //       ["middleName", "DESC"],
-  //     ];
-  //   }
-
-  //   // order = [[db.Patient, "lastName", "ASC"], [db.Patient, "firstName", "ASC"]];
   // }
-  // console.log(where);
-  // console.log(order);
-  // console.log(req.query);
-  // const patients = await db.Patient.findAll({ where: where, order: order });
-  // const patients = await db.Patient.findAll({ where: where });
-  // const patients = await db.Patient.findAll({
+  // const { count, rows } = await db.Patient.findAndCountAll({
   //   where: where,
   //   include: [
   //     {
@@ -116,55 +99,50 @@ export const getAllPatients = expressAsyncHandler(async (req, res) => {
   //       attributes: ["id", "phone_1"],
   //     },
   //   ],
-  //   attributes: ["id", "
-  const { count, rows } = await db.Patient.findAndCountAll({
-    where: where,
-    include: [
-      {
-        model: db.Address,
-        as: "address",
-        attributes: ["id", "phone_1"],
-      },
-    ],
-    attributes: [
-      "id",
-      "firstName",
-      "lastName",
-      "middleName",
-      "gender",
-      "birth_date",
-      "has_phone",
-      "phone",
-      "status",
-      "createdAt",
-      "card_number",
-    ],
-    // order: [
-    //   ["firstName", "ASC"],
-    //   ["middleName", "ASC"],
-    //   ["lastName", "ASC"],
-    // ],
-    order: sortDirection,
-    offset: (page - 1) * limit,
-    limit: limit,
-  });
-  const hasMore = count > page * limit;
+  //   attributes: [
+  //     "id",
+  //     "firstName",
+  //     "lastName",
+  //     "middleName",
+  //     "gender",
+  //     "birth_date",
+  //     "has_phone",
+  //     "phone",
+  //     "status",
+  //     "createdAt",
+  //     "card_number",
+  //   ],
+  //   // order: [
+  //   //   ["firstName", "ASC"],
+  //   //   ["middleName", "ASC"],
+  //   //   ["lastName", "ASC"],
+  //   // ],
+  //   order: sortDirection,
+  //   offset: (page - 1) * limit,
+  //   limit: limit,
+  // });
+  // const hasMore = count > page * limit;
   // console.log(patients);
   res.status(200).json({
-    patients: rows,
-    currentPage: page,
-    totalPages: Math.ceil(count / limit),
-    totalItems: count,
-    hasMore: hasMore,
+    status: "success",
+    message: "Patients retrieved successfully",
+    data: {
+      patients: patientsData.patients,
+      pagination: patientsData.pagination,
+    },
   });
 });
 // getPatients: expressAsyncHandler(async (req, res) => {});
 export const getLastPatientId = expressAsyncHandler(async (req, res) => {
-  const lastPatient = await db.Patient.findOne({
-    order: [["id", "DESC"]],
+  const lastPatient = await patientService.getLastPatientId();
+  // res.status(200).json(lastPatient?.card_number);
+  res.status(200).json({
+    status: "success",
+    message: "Patient retrieved successfully",
+    data: {
+      lastPatientId: lastPatient?.card_number,
+    },
   });
-  res.status(200).json(lastPatient?.card_number);
-  // res.status(200).json(null);
 });
 export const getPatientNameList = expressAsyncHandler(async (req, res) => {
   // console.log("\n\nkjaduig\n\n");
@@ -268,148 +246,148 @@ export const searchPatient = expressAsyncHandler(async (req, res) => {
   res.status(200).json(patients);
 });
 export const getPatient = expressAsyncHandler(async (req, res) => {
-  const { id } = req.params;
+  // const { id } = req.params;
+  const patientId = parseInt(req.params.id);
   // console.log("\n\nlkhljgfxdgchjgcf\n\n");
-  const address = {
-    model: db.Address,
-    as: "address",
-    include: [
-      {
-        model: db.Woreda,
-        as: "woreda",
-        attributes: ["id", "name"],
-        include: [
-          {
-            model: db.SubCity,
-            as: "SubCity",
-            attributes: ["id", "subCity_name"],
-            include: [
-              {
-                model: db.City,
-                as: "city",
-                attributes: ["id", "name"],
-                include: [
-                  {
-                    model: db.Region,
-                    as: "region",
-                    attributes: ["id", "name"],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
+  // const address = {
+  //   model: db.Address,
+  //   as: "address",
+  //   include: [
+  //     {
+  //       model: db.Woreda,
+  //       as: "woreda",
+  //       attributes: ["id", "name"],
+  //       include: [
+  //         {
+  //           model: db.SubCity,
+  //           as: "SubCity",
+  //           attributes: ["id", "subCity_name"],
+  //           include: [
+  //             {
+  //               model: db.City,
+  //               as: "city",
+  //               attributes: ["id", "name"],
+  //               include: [
+  //                 {
+  //                   model: db.Region,
+  //                   as: "region",
+  //                   attributes: ["id", "name"],
+  //                 },
+  //               ],
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // };
   // const EmergencyAddress = address;
 
-  const patient = await db.Patient.findOne({
-    where: { id: id },
-    include: [
-      address,
-      {
-        model: db.CreditCompanyProfile,
-        as: "creditCompany",
-        attributes: ["id", "name", "tin", "phone"],
-      },
-      {
-        model: db.EmergencyContact,
-        as: "emergencyContact",
-        // include: [{ ...address }],
-        attributes: [
-          "id",
-          "firstName",
-          "lastName",
-          "middleName",
-          "relationship",
-          "phone",
-        ],
-        include: [
-          {
-            model: db.Address,
-            as: "address",
-            include: [
-              {
-                model: db.Woreda,
-                as: "woreda",
-                attributes: ["id", "name"],
-                include: [
-                  {
-                    model: db.SubCity,
-                    as: "SubCity",
-                    attributes: ["id", "subCity_name"],
-                    include: [
-                      {
-                        model: db.City,
-                        as: "city",
-                        attributes: ["id", "name"],
-                        include: [
-                          {
-                            model: db.Region,
-                            as: "region",
-                            attributes: ["id", "name"],
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        model: db.Allergy,
-        as: "allergies",
-      },
-      {
-        model: db.FamilyHistory,
-        as: "familyHistories",
-      },
-      {
-        model: db.SocialHistory,
-        as: "socialHistories",
-      },
-    ],
+  const patient = await patientService.getPatientById(patientId);
+  //  db.Patient.findOne({
+  //   where: { id: id },
+  //   include: [
+  //     address,
+  //     {
+  //       model: db.CreditCompanyProfile,
+  //       as: "creditCompany",
+  //       attributes: ["id", "name", "tin", "phone"],
+  //     },
+  //     {
+  //       model: db.EmergencyContact,
+  //       as: "emergencyContact",
+  //       // include: [{ ...address }],
+  //       attributes: [
+  //         "id",
+  //         "firstName",
+  //         "lastName",
+  //         "middleName",
+  //         "relationship",
+  //         "phone",
+  //       ],
+  //       include: [
+  //         {
+  //           model: db.Address,
+  //           as: "address",
+  //           include: [
+  //             {
+  //               model: db.Woreda,
+  //               as: "woreda",
+  //               attributes: ["id", "name"],
+  //               include: [
+  //                 {
+  //                   model: db.SubCity,
+  //                   as: "SubCity",
+  //                   attributes: ["id", "subCity_name"],
+  //                   include: [
+  //                     {
+  //                       model: db.City,
+  //                       as: "city",
+  //                       attributes: ["id", "name"],
+  //                       include: [
+  //                         {
+  //                           model: db.Region,
+  //                           as: "region",
+  //                           attributes: ["id", "name"],
+  //                         },
+  //                       ],
+  //                     },
+  //                   ],
+  //                 },
+  //               ],
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       model: db.Allergy,
+  //       as: "allergies",
+  //     },
+  //     {
+  //       model: db.FamilyHistory,
+  //       as: "familyHistories",
+  //     },
+  //     {
+  //       model: db.SocialHistory,
+  //       as: "socialHistories",
+  //     },
+  //   ],
+  // });
+  // if (!patient) {
+  //   res.status(404);
+  //   throw new Error("Patient not found");
+  // }
+  // let Patient;
+  // if (patient.is_credit) {
+  //   const agreements = await db.CreditAgreement.findAll({
+  //     where: {
+  //       company_id: patient?.company_id,
+  //     },
+  //     attributes: ["id"],
+  //   });
+  //   // console.log(agreements);
+  //   const agreement = agreements?.map((a: any) => a.id);
+  //   // console.log(agreement);
+  //   const employee = await db.CreditPatient.findOne({
+  //     where: {
+  //       patient_id: patient.id,
+  //       agreement_id: agreement,
+  //     },
+  //   });
+  //   // patient = { ...patient, employeeId: employee?.employee_id };
+  //   Patient = { ...patient.dataValues, employeeId: employee?.employee_id };
+  // } else {
+  //   Patient = patient.dataValues;
+  // }
+
+  res.status(200).json({
+    status: "success",
+    message: "Patient retrieved successfully",
+    data: {
+      patient: patient,
+    },
   });
-  if (!patient) {
-    res.status(404);
-    throw new Error("Patient not found");
-  }
-  let Patient;
-  if (patient.is_credit) {
-    const agreements = await db.CreditAgreement.findAll({
-      where: {
-        company_id: patient?.company_id,
-      },
-      attributes: ["id"],
-    });
-    // console.log(agreements);
-    const agreement = agreements?.map((a: any) => a.id);
-    // console.log(agreement);
-    const employee = await db.CreditPatient.findOne({
-      where: {
-        patient_id: patient.id,
-        agreement_id: agreement,
-      },
-    });
-    // patient = { ...patient, employeeId: employee?.employee_id };
-    Patient = { ...patient.dataValues, employeeId: employee?.employee_id };
-  } else {
-    Patient = patient.dataValues;
-  }
-  // const patient = await db.Patient.findByPk(1);
-  // console.log(patient);
-  // const pp = JSON.parse(patient);
-  // console.log(patient);
-  // const PATIENT = !patient.is_credit
-  //   ? patient
-  //   : { ...patient.dataValues, hello: "kjhljhgkut" };
-  // console.log(JSON.stringify(PATIENT));
-  // patient.hello = "kjhljhgkut";
-  res.json(Patient);
 });
 export const getPatientGeneralInforamtion = expressAsyncHandler(
   async (req, res) => {
@@ -470,10 +448,25 @@ export const getSocialHistory = expressAsyncHandler(async (req, res) => {
   });
   res.json(socialHistories);
 });
-export const createPatient = expressAsyncHandler(async (req, res) => {
+export const createPatient = asyncHandler<{
+  validatedData: PatientRegistrationInput;
+}>(async (req, res) => {
   const { patient, address, emergency, company_id, employeeId } = req.body;
   // console.log(req.body);
   // return;
+  const files = req.files as {
+    [fieldname: string]: Express.Multer.File[];
+  };
+
+  // Collect the uploaded files (assuming single file per field)
+  const uploadedFiles = {
+    employeeId_doc: files?.employeeId_doc?.[0]?.path || null,
+    letter_doc: files?.letter_doc?.[0]?.path || null,
+  };
+  const patientData = {
+    ...req.validatedData,
+    ...uploadedFiles,
+  };
   const patientParsed = JSON.parse(patient);
   const addressParsed = JSON.parse(address);
   const emergencyParsed = JSON.parse(emergency);
