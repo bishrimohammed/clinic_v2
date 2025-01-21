@@ -97,32 +97,6 @@ export const deactivateClinicService = async (id: string) => {
   const updatedClinicService = await clinicService.update({ status: false });
   return updatedClinicService;
 };
-// export const getClinicServiceCategories = async () => {
-//   const clinicServices = await ClinicService.findAll({
-//     include: [
-//       {
-//         model: ServiceCategory,
-//         as: "serviceCategories",
-//       },
-//     ],
-//   });
-//   return clinicServices;
-// };
-
-// export const getClinicServiceCategoryById = async (id: string) => {
-//   const clinicService = await ClinicService.findByPk(id, {
-//     include: [
-//       {
-//         model: ServiceCategory,
-//         as: "serviceCategories",
-//       },
-//     ],
-//   });
-//   if (!clinicService) {
-//     throw new ApiError(404, "Clinic Service is not found");
-//   }
-//   return clinicService;
-// };
 
 //#region  Service category
 

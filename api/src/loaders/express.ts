@@ -73,6 +73,8 @@ const expressLoader = async (app: Application) => {
 
   app.use("/api/v1/employees", employeeRoute);
 
+  app.use("/api/v1/patients", patientRoute);
+
   // app.use("/api/v1/patient", patientRoute);
   // app.use("/api/v1/allergies", AllergyRoute);
   // app.use("/api/v1/woreda", woredaRoute);

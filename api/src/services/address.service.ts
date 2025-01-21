@@ -24,13 +24,16 @@ export const updateAddress = async (
 ) => {
   const { woreda_id, email, phone_1, house_number, street } = data;
   const address = await getAddressById(id);
-  const updatedAddress = await address.update({
-    email: email || address.email,
-    woreda_id: woreda_id || address.woreda_id,
-    phone_1: phone_1 || address.phone_1,
-    house_number: house_number || address.house_number,
-    street: street || address.street,
-  });
+  const updatedAddress = await address.update(
+    {
+      email: email || address.email,
+      woreda_id: woreda_id || address.woreda_id,
+      phone_1: phone_1 || address.phone_1,
+      house_number: house_number || address.house_number,
+      street: street || address.street,
+    },
+    { transaction }
+  );
   return updatedAddress;
 };
 

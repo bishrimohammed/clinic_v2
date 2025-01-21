@@ -91,12 +91,10 @@ export const createEmployee = async (
   // if(emergencyContact.)
   const createdEmergencyContact =
     await emergencyContactService.createEmergencyContact(
-      emergencyContact,
-      createdAddress.id
+      { ...emergencyContact, parentAdderssId: createdAddress.id }
+      // createdAddress.id
     );
-  // if(!createdEmergencyContact){
-  //     await createdAddress.destroy()
-  // }
+
   const employee = await Employee.create({
     firstName,
     middleName,
@@ -168,7 +166,7 @@ export const updateEmployee = async (
     if (emergencyContact) {
       await emergencyContactService.updateEmergencyContact(
         employee.emergence_contact_id,
-        { ...emergencyContact, employeeAddressId: employee.address_id },
+        { ...emergencyContact, parentAdderssId: employee.address_id },
         transaction
       );
     }

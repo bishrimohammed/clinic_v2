@@ -25,8 +25,9 @@ export const getEmergencyContactByPhone = async (phone: string) => {
 };
 
 export const createEmergencyContact = async (
-  data: createEmergencyContactT,
-  address_id: number
+  data: createEmergencyContactT & { parentAdderssId: number },
+  // address_id: number,
+  transaction?: Transaction
 ) => {
   const {
     firstName,
@@ -42,6 +43,7 @@ export const createEmergencyContact = async (
     house_number,
     street,
     other_relation,
+    parentAdderssId,
   } = data;
   let addressId: number;
 
@@ -50,7 +52,7 @@ export const createEmergencyContact = async (
     throw new ApiError(400, "Phone number is Taken");
   }
   if (is_the_same_address) {
-    addressId = address_id;
+    addressId = parentAdderssId;
   } else {
     const createdAddress = await addressService.createAddress({
       city_id,
@@ -63,25 +65,26 @@ export const createEmergencyContact = async (
     });
     addressId = createdAddress.id;
   }
-  const createdEmergencyContact = await EmergencyContact.create({
-    firstName,
-    middleName,
-    lastName,
-    phone,
-    relationship:
-      relationship.toLowerCase() !== "other" ? relationship : other_relation!,
-    address_id: addressId,
-  });
-  if (!createdEmergencyContact) {
-    await addressService.deleteAddress(addressId);
-  }
+  const createdEmergencyContact = await EmergencyContact.create(
+    {
+      firstName,
+      middleName,
+      lastName,
+      phone,
+      relationship:
+        relationship.toLowerCase() !== "other" ? relationship : other_relation!,
+      address_id: addressId,
+    },
+    { transaction }
+  );
+
   return createdEmergencyContact;
 };
 
 export const updateEmergencyContact = async (
   id: number,
   data: createEmergencyContactT & {
-    employeeAddressId: number;
+    parentAdderssId: number;
   },
   transaction?: Transaction
 ) => {
@@ -102,11 +105,11 @@ export const updateEmergencyContact = async (
     house_number,
     street,
     other_relation,
-    employeeAddressId,
+    parentAdderssId,
   } = data;
   let addressId: number = emergencyContact.address_id;
   if (!is_the_same_address) {
-    if (employeeAddressId !== emergencyContact.address_id) {
+    if (parentAdderssId !== emergencyContact.address_id) {
       // Update existing address if IDs differ
       await addressService.updateAddress(
         emergencyContact.address_id,
@@ -142,20 +145,20 @@ export const updateEmergencyContact = async (
 
       addressId = newAddress.id;
     }
-  } else if (employeeAddressId !== emergencyContact.address_id) {
+  } else if (parentAdderssId !== emergencyContact.address_id) {
     // If address marked the same but different IDs, delete the old one
 
     let deletedAddressId = emergencyContact.address_id;
     await emergencyContact.update(
       {
-        address_id: employeeAddressId,
+        address_id: parentAdderssId,
       },
       { transaction }
     );
-    // emergencyContact.address_id = employeeAddressId;
+    // emergencyContact.address_id = parentAdderssId;
 
     await addressService.deleteAddress(deletedAddressId, transaction);
-    addressId = employeeAddressId;
+    addressId = parentAdderssId;
   }
 
   // Determine relationship
