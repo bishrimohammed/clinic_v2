@@ -44,43 +44,44 @@ const LoginForm = () => {
     },
   });
   // const user = await getServerUser();
-  const { mutate, isPending } = useMutation({ mutationFn: loginMutationFn });
+  const { mutate, isPending } = useMutation({
+    mutationFn: loginMutationFn,
+    async onSuccess(response) {
+      const { data } = response;
+      const user = data.user;
+      setUser(user);
+      await createUserSession(data);
+      router.refresh();
+      router.replace("/", { scroll: true });
+      // window.history.replaceState(null, "", "/dashboard");
+      // console.log(data);
+    },
+    onError(err) {
+      if (err instanceof CustomError) {
+        const { errors } = err;
+        // console.error(errors);
+        toast({
+          description: err.message,
+          title: "Error",
+          variant: "destructive",
+        });
+        errors.map((error) => {
+          const path = error.path.join(".") as "username" | "password";
+          // console.log(path);
+
+          form.setError(`${path}`, {
+            type: "validate",
+            message: error.message,
+          });
+        });
+      } else {
+        console.error(err);
+      }
+    },
+  });
   function onSubmit(data: z.infer<typeof loginSchema>) {
     // console.log(data);
-    mutate(data, {
-      async onSuccess(response) {
-        const { data } = response;
-        await createUserSession(data);
-        const user = data.user;
-        setUser(user);
-        // router.refresh();
-        router.push("/");
-        // window.history.replaceState(null, "", "/dashboard");
-        // console.log(data);
-      },
-      onError(err) {
-        if (err instanceof CustomError) {
-          const { errors } = err;
-          console.error(errors);
-          toast({
-            description: err.message,
-            title: "Error",
-            variant: "destructive",
-          });
-          errors.map((error) => {
-            const path = error.path.join(".") as "username" | "password";
-            console.log(path);
-
-            form.setError(`${path}`, {
-              type: "validate",
-              message: error.message,
-            });
-          });
-        } else {
-          console.error(err);
-        }
-      },
-    });
+    mutate(data);
   }
   return (
     <Form {...form}>

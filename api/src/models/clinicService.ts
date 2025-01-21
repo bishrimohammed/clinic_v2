@@ -41,6 +41,7 @@ import {
   HasManyGetAssociationsMixin,
   NonAttribute,
   HasManyCountAssociationsMixin,
+  HasManyHasAssociationMixin,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 import ServiceCategory from "./serviceCategory";
@@ -59,6 +60,10 @@ class ClinicService extends Model<
   declare hasManyCategory?: boolean;
 
   declare getServiceCategories: HasManyGetAssociationsMixin<ServiceCategory>;
+  declare hasServiceCategory: HasManyHasAssociationMixin<
+    ServiceCategory,
+    number
+  >;
   declare countServiceCategories: HasManyCountAssociationsMixin;
 
   declare serviceCategories?: NonAttribute<ServiceCategory[]>;

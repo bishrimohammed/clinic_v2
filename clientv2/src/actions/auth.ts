@@ -17,7 +17,7 @@ export const createUserSession = async (sessionData: SessionData) => {
       sameSite: "strict",
       maxAge: 60 * 60,
     });
-    cookieStore.set("accessToken", JSON.stringify(sessionData.accessToken), {
+    cookieStore.set("accessToken", sessionData.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

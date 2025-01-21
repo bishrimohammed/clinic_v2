@@ -86,8 +86,11 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  HasManyGetAssociationsMixin,
+  HasManyCreateAssociationMixin,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
+import CreditAgreement from "./creditAgreement";
 
 class CreditCompanyProfile extends Model<
   InferAttributes<CreditCompanyProfile>,
@@ -100,7 +103,24 @@ class CreditCompanyProfile extends Model<
   declare representative_phone: string;
   declare phone?: string | null;
   declare address_id: number;
-  declare status: boolean;
+  declare status: CreationOptional<boolean>;
+
+  declare getAgreements: HasManyGetAssociationsMixin<CreditAgreement>;
+  declare createAgreementt: HasManyCreateAssociationMixin<
+    CreditAgreement,
+    "company_id"
+  >;
+
+  public getActiveAgreement = async () => {
+    const companyId = this.id;
+    const agreement = await CreditAgreement.findOne({
+      where: {
+        company_id: companyId,
+        status: true,
+      },
+    });
+    return agreement;
+  };
 }
 
 CreditCompanyProfile.init(
@@ -183,5 +203,8 @@ CreditCompanyProfile.init(
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
 // CreditCompanyProfile.sync({ alter: false, force: false });
-
+CreditCompanyProfile.hasMany(CreditAgreement, {
+  foreignKey: "company_id",
+  as: "agreements",
+});
 export default CreditCompanyProfile;

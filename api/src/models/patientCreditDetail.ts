@@ -37,18 +37,21 @@ import {
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 
-class CreditPatient extends Model<
-  InferAttributes<CreditPatient>,
-  InferCreationAttributes<CreditPatient>
+class patientCreditDetail extends Model<
+  InferAttributes<patientCreditDetail>,
+  InferCreationAttributes<patientCreditDetail>
 > {
   declare id: CreationOptional<number>;
   declare patient_id: number;
+  declare credit_company_id: number;
   declare agreement_id: number;
   declare employee_id: number;
-  declare status: boolean;
+  declare credit_limit: number;
+  declare credit_balance: number;
+  declare status: CreationOptional<boolean>;
 }
 
-CreditPatient.init(
+patientCreditDetail.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -68,6 +71,18 @@ CreditPatient.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    credit_company_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    credit_limit: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    credit_balance: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
     status: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
@@ -75,8 +90,9 @@ CreditPatient.init(
   },
   {
     sequelize,
-    modelName: "creditpatients", // Specify the model name
+    modelName: "patientCreditDetail", // Specify the model name
+    tableName: "patient_credit_details",
   }
 );
 
-export default CreditPatient;
+export default patientCreditDetail;

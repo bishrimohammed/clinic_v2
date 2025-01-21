@@ -1,3 +1,4 @@
+import sequelize from "../db";
 import {
   DataTypes,
   Model,
@@ -12,19 +13,20 @@ import {
   BelongsToManyGetAssociationsMixin,
   BelongsToManyRemoveAssociationMixin,
   BelongsToManySetAssociationsMixin,
+  HasManyHasAssociationsMixin,
 } from "sequelize";
 import bcrypt from "bcryptjs";
-import sequelize from "../db";
 import Role from "./Role";
 import Employee from "./Employee";
 import Permission from "./Permission";
 import UserPermission from "./UserPermissions";
 import Schedule from "./Schedule";
+import { HasManyGetAssociationsMixin } from "sequelize";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
   declare username: string;
-  declare email: string | null;
+  // declare email: string | null;
   declare password: string;
   declare employee_id: ForeignKey<Employee["id"]>;
   declare role_id: ForeignKey<Role["id"]>;
@@ -35,8 +37,10 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
 
   declare getRole: BelongsToGetAssociationMixin<Role>;
   declare getEmployee: BelongsToGetAssociationMixin<Employee>;
+  declare getSchedules: HasManyGetAssociationsMixin<Schedule>;
+  // declare getSchedule: HasManyGetAssociationsMixin<Schedule>;
   declare getUserPermissions: BelongsToManyGetAssociationsMixin<Permission>;
-  declare setUsersPermissions: BelongsToManySetAssociationsMixin<
+  declare setUserPermissions: BelongsToManySetAssociationsMixin<
     Permission,
     number
   >;
@@ -53,6 +57,9 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     const salt = bcrypt.genSaltSync(10);
     const hashPassword = bcrypt.hashSync(password, salt);
     this.setDataValue("password", hashPassword);
+  }
+  public isPasswordMatch(password: string) {
+    return bcrypt.compareSync(password, this.password);
   }
   declare static associations: {
     role: Association<User, Role>;
@@ -75,13 +82,13 @@ User.init(
         msg: "Username is taken",
       },
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      validate: {
-        isEmail: true,
-      },
-    },
+    // email: {
+    //   type: DataTypes.STRING,
+    //   allowNull: true,
+    //   validate: {
+    //     isEmail: true,
+    //   },
+    // },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -93,6 +100,10 @@ User.init(
     employee_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      unique: {
+        msg: "Employee has already an account",
+        name: "employeeId",
+      },
     },
     role_id: {
       type: DataTypes.INTEGER,
@@ -117,7 +128,7 @@ User.init(
   },
   {
     sequelize,
-    modelName: "User",
+    modelName: "user",
     tableName: "users", // Specify the actual table name
     timestamps: true,
   }

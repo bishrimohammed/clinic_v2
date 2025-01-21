@@ -277,9 +277,16 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  HasManyGetAssociationsMixin,
+  HasManyAddAssociationMixin,
+  HasManyCreateAssociationMixin,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 import { Op } from "sequelize"; // Import Op for query operations
+import Allergy from "./patient/Allergy";
+import FamilyHistory from "./patient/FamilyHistory";
+import SocialHistory from "./patient/SocialHistory";
+import PastMedicalHistory from "./patient/PastMedicalHistory";
 
 class Patient extends Model<
   InferAttributes<Patient>,
@@ -313,6 +320,25 @@ class Patient extends Model<
   declare status?: boolean;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
+
+  declare getAllergies: HasManyGetAssociationsMixin<Allergy>;
+  declare getFamilyHistories: HasManyGetAssociationsMixin<FamilyHistory>;
+  declare getSocialHistories: HasManyGetAssociationsMixin<SocialHistory>;
+  declare getPastMedicalHistories: HasManyGetAssociationsMixin<PastMedicalHistory>;
+
+  declare createAllergy: HasManyCreateAssociationMixin<Allergy, "patient_id">;
+  declare createSocialHistory: HasManyCreateAssociationMixin<
+    SocialHistory,
+    "patient_id"
+  >;
+  declare createFamilyHistory: HasManyCreateAssociationMixin<
+    FamilyHistory,
+    "patient_id"
+  >;
+  declare createPastMedicalHistory: HasManyCreateAssociationMixin<
+    PastMedicalHistory,
+    "patient_id"
+  >;
 }
 
 Patient.init(
@@ -581,5 +607,23 @@ Patient.init(
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
 // Patient.sync({ force: false, alter: false });
+Patient.hasMany(Allergy, {
+  foreignKey: "patient_id",
+  as: "allergies",
+});
+
+Patient.hasMany(FamilyHistory, {
+  foreignKey: "patient_id",
+  as: "familyHistories",
+});
+Patient.hasMany(SocialHistory, {
+  foreignKey: "patient_id",
+  as: "socialHistories",
+});
+
+Patient.hasMany(PastMedicalHistory, {
+  foreignKey: "patient_id",
+  as: "pastMedicalHistories",
+});
 
 export default Patient;

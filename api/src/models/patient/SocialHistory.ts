@@ -79,15 +79,17 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  ForeignKey,
 } from "sequelize";
 import sequelize from "../../db/index"; // Ensure the correct path
+import Patient from "../Patient";
 
 class SocialHistory extends Model<
   InferAttributes<SocialHistory>,
   InferCreationAttributes<SocialHistory>
 > {
   declare id: CreationOptional<number>;
-  declare patient_id: number;
+  declare patient_id: ForeignKey<Patient["id"]>;
   declare tobacco_use: "Current smoker" | "Former smoker" | "Non-smoker";
   declare alcohol_use: string;
   declare created_by: number;

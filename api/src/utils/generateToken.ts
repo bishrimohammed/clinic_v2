@@ -17,7 +17,6 @@ const generateToken = (userId: number) => {
   // });
   return token;
 };
-
-module.exports = {
+export = {
   generateToken,
 };

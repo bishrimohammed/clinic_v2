@@ -1,16 +1,25 @@
 import { z } from "zod";
+import {
+  addressSchema,
+  createEmergencyContactSchema,
+  phoneRegex,
+} from "./shared";
 
-const phoneRegex = /^(07|09)\d{8}$/;
-
-const patientRegistrationSchema = z
+export const patientRegistrationSchema = z
   .object({
-    patientId: z.string().optional(),
+    patientId: z.string(),
     registrationDate: z.date().optional(),
-    firstName: z.string().trim().min(1, "Patient name is required"),
-    middleName: z.string().trim().min(1, "Father Name is required"),
+    firstName: z.string({ required_error: "Name is required" }).trim().min(3),
+    middleName: z
+      .string({ required_error: "Father's Name is required" })
+      .trim()
+      .min(3),
     lastName: z.string().trim().optional(),
-    gender: z.string().min(1, "Sex is required"),
-    blood_type: z.string().optional(),
+    gender: z.enum(["Male", "Female"], { required_error: "Sex is required" }),
+    blood_type: z
+      .enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"])
+      .optional(),
+
     nationality: z.string().optional(),
     marital_status: z.string().optional(),
     guardian_name: z.string().trim().optional(),
@@ -25,43 +34,8 @@ const patientRegistrationSchema = z
     is_new: z.boolean(),
     manual_card_id: z.string().trim().optional(),
     is_credit: z.boolean({ required_error: "Payment type is required" }),
-    address: z.object({
-      street: z.string().optional(),
-      region_id: z.string().min(1, "Region is required"),
-      city_id: z.string().min(1, "City is required"),
-      subcity_id: z.string().min(1, "Subcity is required"),
-      woreda_id: z.string().min(1, "Woreda is required"),
-      house_number: z.string().optional(),
-      email: z.string().email("Invalid email").optional(),
-      phone_2: z
-        .string()
-        .optional()
-        .refine(
-          (value) => !value || phoneRegex.test(value),
-          "Phone number is invalid"
-        ),
-    }),
-    emergency: z.object({
-      firstName: z
-        .string()
-        .trim()
-        .min(3, "First Name must be at least 3 characters long"),
-      middleName: z
-        .string()
-        .trim()
-        .min(3, "Father Name must be at least 3 characters long"),
-      lastName: z.string().trim().optional(),
-      relation: z.string().min(1, "Relationship is required"),
-      phone: z.string().regex(phoneRegex, "Phone number is invalid"),
-      the_same_address_as_patient: z.boolean().optional(),
-      other_relation: z.string().trim().optional(),
-      region_id: z.string().optional(),
-      city_id: z.string().optional(),
-      subcity_id: z.string().optional(),
-      woreda_id: z.string().optional(),
-      house_number: z.string().trim().optional(),
-    }),
-    isUpdate: z.boolean().default(false),
+    address: addressSchema,
+    emergencyContact: createEmergencyContactSchema,
     company_id: z.string().optional(),
     employeeId: z.string().optional(),
     employeeId_doc: z.any().optional(),
@@ -69,6 +43,14 @@ const patientRegistrationSchema = z
   })
   .superRefine((data, ctx) => {
     // Example: Cross-field validation
+    if (!data.is_new) {
+      ctx.addIssue({
+        path: ["manual_card_id"],
+        code: z.ZodIssueCode.custom,
+        message: "manual card is required",
+      });
+    }
+
     if (data.has_phone && !data.phone) {
       ctx.addIssue({
         path: ["phone"],
@@ -94,39 +76,42 @@ const patientRegistrationSchema = z
     }
 
     // Emergency contact validations
-    if (data.emergency.relation === "Other" && !data.emergency.other_relation) {
+    if (
+      data.emergencyContact.relationship.toLowerCase() === "other" &&
+      !data.emergencyContact.other_relation
+    ) {
       ctx.addIssue({
-        path: ["emergency", "other_relation"],
+        path: ["emergencyContact", "other_relation"],
         code: z.ZodIssueCode.custom,
-        message: "Relationship type is required when relation is 'Other'",
+        message: "Relationship type is required when relationship is 'Other'",
       });
     }
 
-    if (!data.emergency.the_same_address_as_patient) {
-      if (!data.emergency.region_id) {
+    if (!data.emergencyContact.is_the_same_address) {
+      if (!data.emergencyContact.region_id) {
         ctx.addIssue({
-          path: ["emergency", "region_id"],
+          path: ["emergencyContact", "region_id"],
           code: z.ZodIssueCode.custom,
-          message: "Region is required for emergency contact",
+          message: "Region is required",
         });
       }
-      if (!data.emergency.city_id) {
+      if (!data.emergencyContact.city_id) {
         ctx.addIssue({
-          path: ["emergency", "city_id"],
+          path: ["emergencyContact", "city_id"],
           code: z.ZodIssueCode.custom,
           message: "City is required for emergency contact",
         });
       }
-      if (!data.emergency.subcity_id) {
+      if (!data.emergencyContact.subcity_id) {
         ctx.addIssue({
-          path: ["emergency", "subcity_id"],
+          path: ["emergencyContact", "subcity_id"],
           code: z.ZodIssueCode.custom,
           message: "Subcity is required for emergency contact",
         });
       }
-      if (!data.emergency.woreda_id) {
+      if (!data.emergencyContact.woreda_id) {
         ctx.addIssue({
-          path: ["emergency", "woreda_id"],
+          path: ["emergencyContact", "woreda_id"],
           code: z.ZodIssueCode.custom,
           message: "Woreda is required for emergency contact",
         });
@@ -134,7 +119,75 @@ const patientRegistrationSchema = z
     }
   });
 
+export const patientQuerySchema = z.object({
+  page: z
+    .string()
+    .refine((value) => !isNaN(Number(value)), {
+      message: "Page must be a number",
+    })
+    .default("1"),
+
+  // Directly allow numbers
+  limit: z
+    .string()
+    .refine((value) => !isNaN(Number(value)), {
+      message: "Limit must be a number",
+    })
+    .default("10"),
+
+  searchTerm: z.string().optional(), // Renamed for clarity
+  sortBy: z
+    .enum([
+      "name_asc",
+      "name_desc",
+      "age_asc",
+      "age_desc",
+      "sex_asc",
+      "sex_desc",
+      "registration_date_asc", // Corrected spelling
+      "registration_date_desc", // Corrected spelling
+    ])
+    .optional(),
+
+  gender: z.enum(["male", "female"]).optional(), // Renamed for clarity
+  isPaymentWayCredit: z.enum(["true", "false"]).optional(), // Renamed for clarity
+  isRegistrationTypeNew: z.enum(["true", "false"]).optional(), // Renamed for clarity
+});
+
+export const createAllergySchema = z.object({
+  allergy_type: z.string().trim().min(3),
+  severity: z.enum(["Mild", "Moderate", "Severe"]),
+  reaction_details: z.string().trim().optional(),
+});
+
+export const createFamilyHistorySchema = z.object({
+  medical_condition: z.string().trim().min(3),
+  relationship: z.string().trim().min(3),
+});
+
+export const createSocialHistorySchema = z.object({
+  smoking_status: z.enum(["Current smoker", "Former smoker", "Non-smoker"]),
+  alcohol_consumption: z.enum(["light", "moderate", "heavy"]),
+  drug_use: z.enum(["never", "occasional", "regular"]),
+});
+
+export const createPastMedicalHistorySchema = z.object({
+  medical_condition: z.string().trim().min(3),
+  diagnosis_date: z.string().trim().optional(),
+  treatment: z.string().trim().min(3),
+});
+
 export type PatientRegistrationInput = z.infer<
   typeof patientRegistrationSchema
 >;
-export { patientRegistrationSchema };
+export type PatientQueryType = z.infer<typeof patientQuerySchema>;
+export type createAllergyInput = z.infer<typeof createAllergySchema>;
+export type createFamilyHistoryInput = z.infer<
+  typeof createFamilyHistorySchema
+>;
+export type createSocialHistoryInput = z.infer<
+  typeof createSocialHistorySchema
+>;
+export type createPastMedicalHistoryInput = z.infer<
+  typeof createPastMedicalHistorySchema
+>;

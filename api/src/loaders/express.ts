@@ -1,13 +1,8 @@
 import express, { Application } from "express";
-// import dotenv from "dotenv";
-// const { Sequelize } = require("sequelize");
 import cors from "cors";
-// import sequelize  from"./config/database.js";
 import { notFound, errorHandler } from "../middleware/errorMiddleWare";
 import cookieParser from "cookie-parser";
 import path from "path";
-// import { connectDb } from "./db/connectDb";
-// import upload  from"./config/multerConfig.js";
 
 import {
   InventoryRoute,
@@ -75,6 +70,10 @@ const expressLoader = async (app: Application) => {
   app.use("/api/v1/roles", roleRoute);
 
   app.use("/api/v1/clinic-services", serviceRoute);
+
+  app.use("/api/v1/employees", employeeRoute);
+
+  app.use("/api/v1/patients", patientRoute);
 
   // app.use("/api/v1/patient", patientRoute);
   // app.use("/api/v1/allergies", AllergyRoute);

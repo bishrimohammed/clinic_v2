@@ -1,53 +1,3 @@
-// module.exports = (sequelize, DataTypes) => {
-//   const ServiceItem = sequelize.define("serviceitem", {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//       allowNull: false,
-//     },
-//     service_name: {
-//       type: DataTypes.STRING,
-//       allowNull: false,
-//     },
-//     price: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//       defaultValue: 0,
-//       valiate: {
-//         min: 0,
-//       },
-//     },
-//     serviceCategory_id: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//       // references: {
-//       //     model: ServiceCategory,
-//       //     key: "id",
-//       // },
-//     },
-//     unit: {
-//       type: DataTypes.STRING,
-//       allowNull: true,
-//     },
-//     status: {
-//       type: DataTypes.BOOLEAN,
-//       allowNull: false,
-//       defaultValue: true,
-//     },
-//     isFixed: {
-//       type: DataTypes.BOOLEAN,
-//       allowNull: true,
-//       defaultValue: false,
-//     },
-//   });
-//   ServiceItem.sync({
-//     force: false,
-//     alter: false,
-//   });
-//   return ServiceItem;
-// };
-
 import {
   Model,
   DataTypes,
@@ -56,13 +6,18 @@ import {
   InferCreationAttributes,
   HasOneCreateAssociationMixin,
   BelongsToManyAddAssociationMixin,
+  HasOneGetAssociationMixin,
+  BelongsToManySetAssociationsMixin,
+  BelongsToManyRemoveAssociationMixin,
+  ForeignKey,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 // import ServiceCategory from "./serviceCategory";
 import LabTestProfile from "./labTestProfile";
 import PanelUnderpanel from "./PanelUnderpanel";
 import { BelongsToManyAddAssociationsMixin } from "sequelize";
-import ServiceCategory from "./serviceCategory";
+import { ServiceCategory } from ".";
+import { BelongsToManyRemoveAssociationsMixin } from "sequelize";
 
 class ServiceItem extends Model<
   InferAttributes<ServiceItem>,
@@ -71,15 +26,25 @@ class ServiceItem extends Model<
   declare id: CreationOptional<number>;
   declare service_name: string;
   declare price: number;
-  declare serviceCategory_id: number;
+  declare serviceCategory_id: ForeignKey<ServiceCategory["id"]>;
   declare unit?: string | null; // Optional field
   declare status?: boolean;
   declare isFixed: boolean;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
 
+  // declare removeLabTestProfile: HasOneSetAssociationMixin<LabTestProfile>;
+  declare getLabTestProfile: HasOneGetAssociationMixin<LabTestProfile>;
   declare createLabTestProfile: HasOneCreateAssociationMixin<LabTestProfile>;
   declare addUnderPanels: BelongsToManyAddAssociationsMixin<
+    PanelUnderpanel,
+    number
+  >;
+  declare setUnderPanels: BelongsToManySetAssociationsMixin<
+    PanelUnderpanel,
+    number
+  >;
+  declare removeUnderPanels: BelongsToManyRemoveAssociationMixin<
     PanelUnderpanel,
     number
   >;
@@ -143,7 +108,6 @@ ServiceItem.init(
 );
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-ServiceItem.sync({ force: false, alter: false });
 
 // ServiceItem.belongsTo(ServiceCategory, {
 //   foreignKey: "serviceCategory_id",
@@ -161,4 +125,7 @@ ServiceItem.belongsToMany(ServiceItem, {
   otherKey: "child_id",
   as: "underPanels",
 });
+
+ServiceItem.sync({ force: false, alter: false });
+
 export default ServiceItem;

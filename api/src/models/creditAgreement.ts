@@ -99,20 +99,22 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  ForeignKey,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
+import CreditCompanyProfile from "./creditCompanyProfile";
 
 class CreditAgreement extends Model<
   InferAttributes<CreditAgreement>,
   InferCreationAttributes<CreditAgreement>
 > {
   declare id: CreationOptional<number>;
-  declare company_id: number;
+  declare company_id: ForeignKey<CreditCompanyProfile["id"]>;
   declare agreement_doc: string;
   declare start_date: Date; // Use Date for Sequelize DATE
   declare end_date: Date; // Use Date for Sequelize DATE
-  declare max_limit: number;
-  declare status: boolean;
+  declare max_limit: CreationOptional<number>;
+  declare status: CreationOptional<boolean>;
 }
 
 CreditAgreement.init(
@@ -204,4 +206,8 @@ CreditAgreement.init(
   }
 );
 
+// CreditAgreement.belongsTo(CreditCompanyProfile, {
+//   foreignKey: "company_id",
+//   as: "company",
+// });
 export default CreditAgreement;

@@ -4,6 +4,7 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  HasManyGetAssociationsMixin,
 } from "sequelize";
 import sequelize from "../db";
 import Address from "./address/Address";
@@ -26,6 +27,8 @@ class ClinicProfile extends Model<
   declare clinic_type: string;
   declare has_triage: boolean;
   declare clinic_seal: string | null;
+
+  declare getWorkinghours: HasManyGetAssociationsMixin<Schedule>;
 }
 ClinicProfile.init(
   {
@@ -92,6 +95,6 @@ ClinicProfile.belongsTo(Address, {
 });
 ClinicProfile.hasMany(Schedule, {
   foreignKey: "clinic_id",
-  as: "working_hours",
+  as: "workinghours",
 });
 export default ClinicProfile;

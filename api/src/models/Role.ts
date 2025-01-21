@@ -1,26 +1,15 @@
-import { DataTypes, Model, NonAttribute, Optional } from "sequelize";
-
-// module.exports = (sequelize, DataTypes) => {
-//   const Role = sequelize.define("role", {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//       allowNull: false,
-//     },
-//     name: {
-//       type: DataTypes.STRING,
-//       required: true,
-//       unique: true,
-//     },
-//     status: {
-//       type: DataTypes.BOOLEAN,
-//       defaultValue: true,
-//     },
-//   });
-
-//   return Role;
-// };
+import {
+  BelongsToManyAddAssociationsMixin,
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManySetAssociationsMixin,
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+  NonAttribute,
+  Optional,
+} from "sequelize";
 
 import { RoleEntity } from "./types";
 import sequelize from "../db";
@@ -28,11 +17,31 @@ import User from "./User";
 import Permission from "./Permission";
 import RolePermission from "./RolePermission";
 
-type RoleAttributes = Optional<RoleEntity, "id">;
-class Role extends Model<RoleEntity, RoleAttributes> implements RoleEntity {
-  declare id: number;
+class Role extends Model<InferAttributes<Role>, InferCreationAttributes<Role>> {
+  declare id: CreationOptional<number>;
   declare name: string;
-  declare status: boolean;
+  declare status: CreationOptional<boolean>;
+  declare getPermissions: BelongsToManyGetAssociationsMixin<RolePermission>;
+  //   declare createRolePermissions: HasManyAd<
+  //   RolePermission,
+  //   number
+
+  // >;
+  declare addPermissions: BelongsToManyAddAssociationsMixin<
+    RolePermission,
+    number
+    // {
+    //   permission_id: number;
+    //   create: boolean;
+    //   read: boolean;
+    //   edit: boolean;
+    //   delete: boolean;
+    // }
+  >;
+  declare setPermissions: BelongsToManySetAssociationsMixin<
+    RolePermission,
+    number
+  >;
   declare users?: NonAttribute<User[]>;
 }
 
@@ -60,7 +69,13 @@ Role.belongsToMany(Permission, {
   through: RolePermission,
   foreignKey: "role_id",
   otherKey: "permission_id",
+  as: "permissions",
 });
-
+Role.hasMany(RolePermission, {
+  // through: RolePermission,
+  foreignKey: "role_id",
+  // otherKey: "permission_id",
+  as: "rolePermissions",
+});
 Role.sync({ alter: false });
 export default Role;

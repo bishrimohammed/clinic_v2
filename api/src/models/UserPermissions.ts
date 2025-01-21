@@ -116,16 +116,24 @@ UserPermission.init(
     // modelName: 'UserPermission', // Optional: specify the model name
     tableName: "userpermissions", // Specify the actual table name
     timestamps: false, // Disable timestamps
+    indexes: [
+      {
+        unique: true,
+        fields: ["user_id", "permission_id"],
+        name: "user_id and permission_id must be unique",
+      },
+    ],
   }
 );
 
-UserPermission.belongsTo(Permission, {
-  foreignKey: "permission_id",
-  as: "permission",
-});
+// UserPermission.belongsTo(Permission, {
+//   foreignKey: "permission_id",
+//   as: "permission",
+// });
 // UserPermission.belongsTo(User, {
 //   foreignKey: "user_id",
 //   as: "user",
 // });
 // UserPermission.create({})
+UserPermission.sync({ alter: false });
 export default UserPermission;

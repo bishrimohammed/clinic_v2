@@ -50,8 +50,11 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  HasManyGetAssociationsMixin,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
+import CurrentMedication from "./medicalRecords/CurrentMedication";
+import DiscontinuedMedication from "./medicalRecords/DiscontinuedMedication";
 
 class MedicalRecord extends Model<
   InferAttributes<MedicalRecord>,
@@ -62,6 +65,9 @@ class MedicalRecord extends Model<
   declare status?: boolean;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
+
+  declare getDiscontinuedMedications: HasManyGetAssociationsMixin<DiscontinuedMedication>;
+  declare getCurrentMedications: HasManyGetAssociationsMixin<CurrentMedication>;
 }
 
 MedicalRecord.init(
@@ -125,5 +131,14 @@ MedicalRecord.init(
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
 // MedicalRecord.sync({ force: false, alter: false });
+
+MedicalRecord.hasMany(CurrentMedication, {
+  foreignKey: "medical_record_id",
+  as: "currentMedication",
+});
+MedicalRecord.hasMany(DiscontinuedMedication, {
+  foreignKey: "medical_record_id",
+  as: "discontinuedMedication",
+});
 
 export default MedicalRecord;

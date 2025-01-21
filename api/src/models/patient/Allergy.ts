@@ -91,18 +91,20 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  ForeignKey,
 } from "sequelize";
 import sequelize from "../../db/index"; // Ensure the correct path
+import Patient from "../Patient";
 
 class Allergy extends Model<
   InferAttributes<Allergy>,
   InferCreationAttributes<Allergy>
 > {
   declare id: CreationOptional<number>;
-  declare patient_id: number;
+  declare patient_id: ForeignKey<Patient["id"]>;
   declare allergy_type: string;
   declare severity: "Mild" | "Moderate" | "Severe";
-  declare reaction_details: string;
+  declare reaction_details: string | null;
   declare created_by: number;
   declare deletedAt?: Date | null; // Optional field for soft deletes
   declare createdAt?: CreationOptional<Date>;
