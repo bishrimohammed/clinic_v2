@@ -128,37 +128,129 @@ export const createEmergencyContactSchema = z
     }
 
     if (!data.is_the_same_address) {
-      if (!data.region_id) {
-        ctx.addIssue({
-          path: ["region_id"],
-          code: z.ZodIssueCode.custom,
-          message: "Region is required for emergency contact",
-        });
-      }
-      if (!data.city_id) {
-        ctx.addIssue({
-          path: ["city_id"],
-          code: z.ZodIssueCode.custom,
-          message: "City is required for emergency contact",
-        });
-      }
-      if (!data.subcity_id) {
-        ctx.addIssue({
-          path: ["subcity_id"],
-          code: z.ZodIssueCode.custom,
-          message: "Subcity is required for emergency contact",
-        });
-      }
-      if (!data.woreda_id) {
-        ctx.addIssue({
-          path: ["woreda_id"],
-          code: z.ZodIssueCode.custom,
-          message: "Woreda is required for emergency contact",
-        });
-      }
+      (
+        ["region_id", "city_id", "subcity_id", "woreda_id"] as Array<
+          keyof typeof data
+        >
+      ).forEach((field) => {
+        if (!data[field]) {
+          ctx.addIssue({
+            path: [field],
+            code: z.ZodIssueCode.custom,
+            message: `${field.replace(
+              "_",
+              " "
+            )} is required for emergency contact`,
+          });
+        }
+      });
     }
   });
 
+export const updateEmergencyContactSchema = z
+  .object({
+    firstName: z.string().trim().optional(),
+    middleName: z.string().trim().optional(),
+    lastName: z.string().trim().optional(),
+    relationship: z
+      .string({ required_error: "Relationship is required" })
+      .optional(),
+    other_relation: z.string().trim().optional(),
+    phone: z.string().regex(phoneRegex, "Phone number is invalid"),
+    is_the_same_address: z.boolean().optional(),
+    region_id: z
+      .union([
+        z.number().int().nonnegative(), // Directly allow numbers
+        z
+          .string()
+          .refine((value) => !isNaN(Number(value)), {
+            message: "Must be a number",
+          })
+          .transform((value) => Number(value)),
+      ])
+      .optional(),
+    city_id: z
+      .union([
+        z.number().int().nonnegative(),
+        z
+          .string()
+          .refine((value) => !isNaN(Number(value)), {
+            message: "Must be a number",
+          })
+          .transform((value) => Number(value)),
+      ])
+      .optional(),
+    subcity_id: z
+      .union([
+        z.number().int().nonnegative(), // Directly allow numbers
+        z
+          .string()
+          .refine((value) => !isNaN(Number(value)), {
+            message: "Must be a number",
+          })
+          .transform((value) => Number(value)),
+      ])
+      .optional(),
+    woreda_id: z
+      .union([
+        z.number().int().nonnegative(), // Directly allow numbers
+        z
+          .string()
+          .refine((value) => !isNaN(Number(value)), {
+            message: "Must be a number",
+          })
+          .transform((value) => Number(value)),
+      ])
+      .optional(),
+    house_number: z.string().trim().optional(),
+    street: z.string().trim().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data?.relationship?.toLowerCase() === "other" &&
+      !data?.other_relation
+    ) {
+      ctx.addIssue({
+        path: ["other_relation"],
+        code: z.ZodIssueCode.custom,
+        message: "Relationship type is required when relation is 'Other'",
+      });
+    }
+
+    if (!data.is_the_same_address) {
+      (
+        ["region_id", "city_id", "subcity_id", "woreda_id"] as Array<
+          keyof typeof data
+        >
+      ).forEach((field) => {
+        if (!data[field]) {
+          ctx.addIssue({
+            path: [field],
+            code: z.ZodIssueCode.custom,
+            message: `${field.replace(
+              "_",
+              " "
+            )} is required for emergency contact`,
+          });
+        }
+      });
+    }
+  });
+
+export const preprocessBoolean = z.preprocess(
+  (val) => {
+    // Convert string values to boolean if they represent "true" or "false"
+    if (typeof val === "string") {
+      const lowerCaseVal = val.toLowerCase();
+      if (lowerCaseVal === "true") return true;
+      if (lowerCaseVal === "false") return false;
+    }
+    return val; // Return the original value if not a string or not "true"/"false"
+  },
+  z.boolean().refine((val) => typeof val === "boolean", {
+    message: "Expected a boolean value (true or false)",
+  })
+);
 export type addressT = z.infer<typeof addressSchema>;
 export type createEmergencyContactT = z.infer<
   typeof createEmergencyContactSchema

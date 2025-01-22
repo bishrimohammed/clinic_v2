@@ -5,9 +5,11 @@ import {
   createSocialHistoryInput,
   PatientQueryType,
   PatientRegistrationInput,
+  updatePatientSchema,
 } from "../types/patient";
 import { patientService } from "../services";
 import asyncHandler from "../utils/asyncHandler";
+import { getUploadedFilePath } from "../utils/helpers";
 const db = require("../models");
 
 //#region Patient
@@ -319,15 +321,21 @@ export const createPatient = asyncHandler<{
   // const { patient, address, emergency, company_id, employeeId } = req.body;
   // console.log(req.body);
   // return;
+  // console.log(req.validatedData);
+
   const files = req.files as {
     [fieldname: string]: Express.Multer.File[];
   };
 
-  // Collect the uploaded files (assuming single file per field)
   const uploadedFiles = {
-    employeeId_doc: files?.employeeId_doc?.[0]?.path || null,
-    letter_doc: files?.letter_doc?.[0]?.path || null,
+    employeeId_doc: getUploadedFilePath(files, "employeeId_doc"),
+    letter_doc: getUploadedFilePath(files, "letter_doc"),
   };
+  // Collect the uploaded files (assuming single file per field)
+  // const uploadedFiles = {
+  //   employeeId_doc:files.employeeId_doc? "uploads/"+ files?.employeeId_doc[0].fieldname : null,
+  //   letter_doc: files?.letter_doc?.[0]?.path || null,
+  // };
   const patientData = {
     ...req.validatedData,
     ...uploadedFiles,
@@ -505,7 +513,7 @@ export const createPatient = asyncHandler<{
   });
 });
 export const updatePatient = asyncHandler<{
-  validatedData: PatientRegistrationInput;
+  validatedData: typeof updatePatientSchema._type;
 }>(async (req, res) => {
   // console.log("\n\nupdatePatient\n\n");
   const { id } = req.params;
@@ -521,8 +529,8 @@ export const updatePatient = asyncHandler<{
 
   // Collect the uploaded files (assuming single file per field)
   const uploadedFiles = {
-    employeeId_doc: files?.employeeId_doc?.[0]?.path || null,
-    letter_doc: files?.letter_doc?.[0]?.path || null,
+    employeeId_doc: getUploadedFilePath(files, "employeeId_doc"),
+    letter_doc: getUploadedFilePath(files, "letter_doc"),
   };
   const patientData = {
     ...req.validatedData,
@@ -764,7 +772,7 @@ export const updatePatient = asyncHandler<{
     status: "success",
     message: "Patient updated successfully",
     data: {
-      patient,
+      patient: patient,
     },
   });
 });

@@ -88,9 +88,11 @@ import {
   InferCreationAttributes,
   HasManyGetAssociationsMixin,
   HasManyCreateAssociationMixin,
+  HasManyHasAssociationMixin,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 import CreditAgreement from "./creditAgreement";
+import CompanyEmployee from "./CompanyEmployee";
 
 class CreditCompanyProfile extends Model<
   InferAttributes<CreditCompanyProfile>,
@@ -106,6 +108,8 @@ class CreditCompanyProfile extends Model<
   declare status: CreationOptional<boolean>;
 
   declare getAgreements: HasManyGetAssociationsMixin<CreditAgreement>;
+  declare getEmployees: HasManyGetAssociationsMixin<CompanyEmployee>;
+  declare hasEmployee: HasManyHasAssociationMixin<CompanyEmployee, number>;
   declare createAgreementt: HasManyCreateAssociationMixin<
     CreditAgreement,
     "company_id"
@@ -206,5 +210,9 @@ CreditCompanyProfile.init(
 CreditCompanyProfile.hasMany(CreditAgreement, {
   foreignKey: "company_id",
   as: "agreements",
+});
+CreditCompanyProfile.hasMany(CompanyEmployee, {
+  foreignKey: "company_id",
+  as: "employees",
 });
 export default CreditCompanyProfile;

@@ -146,8 +146,10 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  ForeignKey,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
+import CreditCompanyProfile from "./creditCompanyProfile";
 
 class CompanyEmployee extends Model<
   InferAttributes<CompanyEmployee>,
@@ -164,7 +166,7 @@ class CompanyEmployee extends Model<
   declare position: string;
   declare photo_url?: string | null;
   declare address_id: number;
-  declare company_id: number;
+  declare company_id: ForeignKey<CreditCompanyProfile["id"]>;
   declare status: boolean;
 }
 

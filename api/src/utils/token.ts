@@ -24,7 +24,7 @@ interface TokenOptions {
 }
 
 const ACCESS_TOKEN_OPTIONS: TokenOptions = {
-  expiresIn: "60m",
+  expiresIn: "1d",
 };
 
 const REFRESS_TOKEN_OPTIONS: TokenOptions = {

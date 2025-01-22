@@ -12,6 +12,28 @@ export const removeLocalFile = (localpath: string) => {
     console.log(localpath + " removed successfully");
   });
 };
+/**
+ * Get the uploaded file path for a given key.
+ *
+ * @param files - The files object from Multer.
+ * @param key - The key for the desired file.
+ * @returns The constructed file path or null if not found.
+ */
+export const getUploadedFilePath = (
+  files: { [key: string]: Express.Multer.File[] },
+  key: string
+): string | null => {
+  const file = files?.[key]?.[0];
+  if (!file) {
+    console.warn(`No file found for key: ${key}`);
+    return null;
+  }
+  if (!file.filename) {
+    console.warn(`Filename is missing for key: ${key}`);
+    return null;
+  }
+  return `uploads/${file.filename}`;
+};
 
 export const removeUnusedMulterImageFilesOnError = (request: Request) => {
   const req = request;

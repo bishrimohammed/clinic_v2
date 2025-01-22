@@ -2,6 +2,13 @@ import express from "express";
 import * as PatientController from "../controllers/PatientController";
 import upload from "../config/multerConfig";
 import { protect } from "../middleware/authMiddleWare";
+import { validate } from "../middleware/validate";
+import {
+  PatientRegistrationInput,
+  patientRegistrationSchema,
+  updatePatientSchema,
+} from "../types/patient";
+import { parseJSON } from "../utils/helpers";
 const router = express.Router();
 
 router.get("/", PatientController.getAllPatients);
@@ -32,8 +39,12 @@ router.get(
 // router.get("/search", PatientController.searchPatient);
 router.post(
   "/",
-  upload.fields([{ name: "employeeId_doc" }, { name: "letter_doc" }]),
   protect,
+  upload.fields([{ name: "employeeId_doc" }, { name: "letter_doc" }]),
+  validate(patientRegistrationSchema, {
+    address: parseJSON,
+    emergencyContact: parseJSON,
+  }),
   PatientController.createPatient
 );
 router.post("/:id/allergy", protect, PatientController.addPatientAllergy);
@@ -55,8 +66,12 @@ router.post(
 
 router.put(
   "/:id",
-  upload.fields([{ name: "employeeId_doc" }, { name: "letter_doc" }]),
   protect,
+  upload.fields([{ name: "employeeId_doc" }, { name: "letter_doc" }]),
+  validate(updatePatientSchema, {
+    address: parseJSON,
+    emergencyContact: parseJSON,
+  }),
   PatientController.updatePatient
 );
 router.put(

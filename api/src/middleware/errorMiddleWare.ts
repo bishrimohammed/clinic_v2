@@ -29,6 +29,24 @@ export const errorHandler = (
     error = new ApiError(400, err.message, errors, err.stack);
     // res.status(400).json({ errors });
   }
+  if (err.name === "SequelizeForeignKeyConstraintError") {
+    // Handle Sequelize foreign key constraint errors
+    statusCode = 400;
+    message =
+      "Foreign key constraint error. Ensure the referenced data exists.";
+    error = new ApiError(
+      statusCode,
+      message,
+      [
+        {
+          message: `Ensure the referenced data(${err.value}) exists.`,
+          path: err.fields,
+        },
+      ],
+      err.stack
+    );
+  }
+
   const response = {
     ...error,
     message: error.message,

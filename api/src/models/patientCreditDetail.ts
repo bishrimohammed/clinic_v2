@@ -35,11 +35,15 @@ import {
   InferAttributes,
   InferCreationAttributes,
 } from "sequelize";
-import sequelize from "../db/index"; // Ensure the correct path
+import sequelize from "../db"; // Ensure the correct path
+import Patient from "./Patient";
+import CreditAgreement from "./creditAgreement";
+import CompanyEmployee from "./CompanyEmployee";
+import CreditCompanyProfile from "./creditCompanyProfile";
 
-class patientCreditDetail extends Model<
-  InferAttributes<patientCreditDetail>,
-  InferCreationAttributes<patientCreditDetail>
+class PatientCreditDetail extends Model<
+  InferAttributes<PatientCreditDetail>,
+  InferCreationAttributes<PatientCreditDetail>
 > {
   declare id: CreationOptional<number>;
   declare patient_id: number;
@@ -51,7 +55,7 @@ class patientCreditDetail extends Model<
   declare status: CreationOptional<boolean>;
 }
 
-patientCreditDetail.init(
+PatientCreditDetail.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -62,25 +66,41 @@ patientCreditDetail.init(
     patient_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: Patient,
+        key: "id",
+      },
     },
     agreement_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: CreditAgreement,
+        key: "id",
+      },
     },
     employee_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: CompanyEmployee,
+        key: "id",
+      },
     },
     credit_company_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: CreditCompanyProfile,
+        key: "id",
+      },
     },
     credit_limit: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
     credit_balance: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
     status: {
@@ -90,9 +110,11 @@ patientCreditDetail.init(
   },
   {
     sequelize,
-    modelName: "patientCreditDetail", // Specify the model name
+    modelName: "patientCreditDetail",
     tableName: "patient_credit_details",
   }
 );
 
-export default patientCreditDetail;
+PatientCreditDetail.sync({ alter: false });
+
+export default PatientCreditDetail;
