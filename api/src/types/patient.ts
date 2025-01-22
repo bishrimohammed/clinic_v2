@@ -3,6 +3,7 @@ import {
   addressSchema,
   createEmergencyContactSchema,
   phoneRegex,
+  preprocessBoolean,
 } from "./shared";
 
 export const patientRegistrationSchema = z
@@ -21,19 +22,29 @@ export const patientRegistrationSchema = z
       .optional(),
 
     nationality: z.string().optional(),
-    marital_status: z.string().min(1).optional(),
+    marital_status: z.string().trim().optional(),
     guardian_name: z.string().trim().optional(),
     guardian_relationship: z.string().trim().optional(),
     occupation: z.string().trim().optional(),
-    has_phone: z.boolean().optional(),
-    phone: z.string().regex(phoneRegex, "Phone number is invalid").optional(),
-    birth_date: z
-      .date({ required_error: "Date of Birth is required" })
-      .max(new Date(), "Date must be less than or equal to today")
-      .min(new Date("1900-01-01"), "Date of Birth must be after 1900-01-01"),
-    is_new: z.boolean(),
-    manual_card_id: z.string().trim().min(1).optional(),
-    is_credit: z.boolean({ required_error: "Payment type is required" }),
+    has_phone: preprocessBoolean,
+    // phone: z.string().regex(phoneRegex, "Phone number is invalid").optional(),
+    phone: z
+      .string()
+      .optional()
+      .refine((val) => !val || phoneRegex.test(val), {
+        message: "Phone number is invalid",
+      }),
+    birth_date: z.preprocess((val) => {
+      if (typeof val === "string") {
+        const parsedDate = new Date(val);
+        return isNaN(parsedDate.getTime()) ? null : parsedDate; // Return null for invalid dates
+      }
+      return val; // Return the original value if not a string
+    }, z.date({ required_error: "Date of Birth is required" }).max(new Date(), "Date must be less than or equal to today").min(new Date("1900-01-01"), "Date of Birth must be after 1900-01-01")),
+    is_new: preprocessBoolean,
+    manual_card_id: z.string().trim().optional(),
+    is_credit: preprocessBoolean,
+    // ({ required_error: "Payment type is required" }),
     address: addressSchema,
     emergencyContact: createEmergencyContactSchema,
     company_id: z
@@ -78,26 +89,30 @@ export const patientRegistrationSchema = z
       });
     }
 
-    if (data.is_credit && !data.company_id) {
-      ctx.addIssue({
-        path: ["company_id"],
-        code: z.ZodIssueCode.custom,
-        message: "Company ID is required for credit payments",
-      });
-    }
     if (data.is_credit) {
-      ctx.addIssue({
-        path: ["credit_limit"],
-        code: z.ZodIssueCode.custom,
-        message: "Credit limit is required",
-      });
-    }
-    if (data.company_id && !data.employeeId) {
-      ctx.addIssue({
-        path: ["employeeId"],
-        code: z.ZodIssueCode.custom,
-        message: "Employee ID is required when company ID is provided",
-      });
+      if (!data.company_id) {
+        ctx.addIssue({
+          path: ["company_id"],
+          code: z.ZodIssueCode.custom,
+          message: "Company ID is required for credit payments",
+        });
+      }
+
+      if (!data.credit_limit) {
+        ctx.addIssue({
+          path: ["credit_limit"],
+          code: z.ZodIssueCode.custom,
+          message: "Credit limit is required",
+        });
+      }
+
+      if (!data.employeeId) {
+        ctx.addIssue({
+          path: ["employeeId"],
+          code: z.ZodIssueCode.custom,
+          message: "Employee ID is required",
+        });
+      }
     }
 
     // Emergency contact validations
