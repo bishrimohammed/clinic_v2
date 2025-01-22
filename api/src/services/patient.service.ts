@@ -9,7 +9,7 @@ import {
   PatientRegistrationInput,
 } from "../types/patient";
 import { ApiError } from "../shared/error/ApiError";
-import { Op } from "sequelize";
+import { Op, Transaction } from "sequelize";
 import Allergy from "../models/patient/Allergy";
 import FamilyHistory from "../models/patient/FamilyHistory";
 import SocialHistory from "../models/patient/SocialHistory";
@@ -20,14 +20,14 @@ import {
   emergencyContactService,
 } from ".";
 
+//#region Patient
+
 export const groupPatientByGenderAndCount = async () => {
   return await Patient.count({
     attributes: [[sequelize.fn("count", sequelize.col("gender")), "count"]],
     group: ["gender"],
   });
 };
-
-//#region Patient
 
 export const getPatients = async (query: PatientQueryType) => {
   const {
@@ -146,6 +146,7 @@ export const getPatientNamesForDropdown = async (pageNumber?: string) => {
     hasMore,
   };
 };
+
 export const getPatientById = async (id: number) => {
   const patient = await Patient.findByPk(id);
   if (!patient) {
@@ -221,6 +222,7 @@ export const searchPatientPatientByCardNumberOrNameOrPhone = async (query: {
   // },
   return { patients, hasMore };
 };
+
 export const createPatient = async (
   data: PatientRegistrationInput & {
     employeeId_doc: string | null;
@@ -288,11 +290,11 @@ export const createPatient = async (
         birth_date,
         is_new,
         manual_card_id: manualCardId,
-        blood_type: blood_type,
+        blood_type: blood_type || null,
         card_number: patientId,
         marital_status: marital_status ? marital_status : null,
-        nationality,
-        guardian_name,
+        nationality: nationality || null,
+        guardian_name: guardian_name || null,
         guardian_relationship: guardian_relationship || null,
         occupation: occupation || null,
         address_id: createdAddress.id,
@@ -340,12 +342,11 @@ export const createPatient = async (
 
     throw error;
   }
-  // return data;
 };
 
 export const updatePatient = async (
   patient_id: number,
-  data: PatientRegistrationInput & {
+  data: Partial<PatientRegistrationInput> & {
     employeeId_doc: string | null;
     letter_doc: string | null;
   }
@@ -377,51 +378,45 @@ export const updatePatient = async (
     letter_doc,
   } = data;
   const transaction = await sequelize.transaction();
+  console.log(data);
+
   try {
     const patient = await getPatientById(patient_id);
-    const createdAddress = await addressService.updateAddress(
-      patient.address_id,
-      address,
-      transaction
-    );
-    // if(emergencyContact.)
-    const createdEmergencyContact =
-      await emergencyContactService.updateEmergencyContact(
-        patient.emergence_contact_id,
-        { ...emergencyContact, parentAdderssId: createdAddress.id },
+    if (address) {
+      await addressService.updateAddress(
+        patient.address_id,
+        address,
         transaction
       );
-
+    }
+    if (emergencyContact) {
+      await emergencyContactService.updateEmergencyContact(
+        patient.emergence_contact_id,
+        { ...emergencyContact, parentAdderssId: patient.address_id },
+        transaction
+      );
+    }
     await patient.update({
-      firstName,
-      middleName,
-      lastName,
-      has_phone,
-      phone,
-      gender,
-      birth_date,
-      is_new,
-      manual_card_id: manual_card_id,
-      blood_type: blood_type,
-      card_number: patientId,
-      marital_status: marital_status ? marital_status : null,
-      nationality,
-      guardian_name,
-      guardian_relationship,
-      occupation,
-      address_id: createdAddress.id,
-      emergence_contact_id: createdEmergencyContact.id,
-      is_credit,
+      firstName: firstName || patient.firstName,
+      middleName: middleName || patient.middleName,
+      lastName: lastName || patient.lastName,
+      has_phone: has_phone || patient.has_phone,
+      phone: phone || patient.phone,
+      gender: gender || patient.gender,
+      birth_date: birth_date || patient.birth_date,
+      is_new: is_new || patient.is_new,
+      manual_card_id: manual_card_id || patient.manual_card_id,
+      blood_type: blood_type || patient.blood_type,
+      // card_number: patientId,
+      marital_status: marital_status || patient.marital_status,
+      nationality: nationality || patient.nationality,
+      guardian_name: guardian_name || patient.guardian_name,
+      guardian_relationship:
+        guardian_relationship || patient.guardian_relationship,
+      occupation: occupation || patient.occupation,
+      is_credit: is_credit || patient.is_credit,
     });
-    // if(is_credit){
-    //   const companyId = parseInt(company_id!)
-    //   const company =await creditCompanyService.getCreditCompanyById(companyId);
-    //   const activeAgreement = await company.getActiveAgreement();
-    //   if(!activeAgreement){
-    //     throw new ApiError(400,"Company doesn't have active agreement")
-    //   }
 
-    // }
     await transaction.commit();
     return patient;
   } catch (error) {
@@ -429,6 +424,44 @@ export const updatePatient = async (
     await transaction.rollback();
     throw error;
   }
+};
+
+export const updatePatientCreditDetail = async (
+  patient: Patient,
+  data: { company_id: number; employeeId: number; credit_limit: number },
+  transaction: Transaction
+) => {
+  const company = await creditCompanyService.getCreditCompanyById(
+    data.company_id
+  );
+  const activeAgreement = await company.getActiveAgreement();
+
+  if (!activeAgreement) {
+    throw new ApiError(
+      400,
+      `Company ${company.name} does not have an active agreement`
+    );
+  }
+
+  const hasEmployee = await company.hasEmployee(data.employeeId);
+  if (!hasEmployee) {
+    throw new ApiError(
+      400,
+      `Employee does not work at ${company.name} company`
+    );
+  }
+
+  await PatientCreditDetail.upsert(
+    {
+      agreement_id: activeAgreement.id,
+      credit_company_id: company.id,
+      employee_id: data.employeeId,
+      patient_id: patient.id,
+      credit_limit: data.credit_limit,
+      credit_balance: data.credit_limit,
+    },
+    { transaction }
+  );
 };
 
 export const deactivatePatient = async (id: number) => {
@@ -464,12 +497,15 @@ export const makeOutPatient = async (id: number) => {
 };
 
 //#endregion
+
 //#region Allery
+
 export const getPatientAllergies = async (patientId: number) => {
   const patient = await getPatientById(patientId);
   const allergies = await patient.getAllergies();
   return allergies;
 };
+
 export const getAllergYById = async (allergyId: number) => {
   const allergy = await Allergy.findByPk(allergyId);
   if (!allergy) {
@@ -508,11 +544,13 @@ export const updateAllergy = async (
   });
   return allergy;
 };
+
 export const deleteAllergy = async (alleryId: number) => {
   const allergy = await getAllergYById(alleryId);
   await allergy.destroy();
   return allergy;
 };
+
 //#endregion
 
 //#region family History
@@ -566,6 +604,7 @@ export const deleteFamilyHistory = async (alleryId: number) => {
 //#endregion
 
 //#region Social History
+
 export const getSocialHistories = async (patientId: number) => {
   const patient = await getPatientById(patientId);
   const socialHistories = await patient.getFamilyHistories();
@@ -608,19 +647,23 @@ export const updatesocialHistory = async (
   });
   return socialHistory;
 };
+
 export const deletesocialHistory = async (socialHistoryId: number) => {
   const socialHistory = await getSocialHistoryById(socialHistoryId);
   await socialHistory.destroy();
   return socialHistory;
 };
+
 //#endregion
 
 //#region Past Medical History
+
 export const getPastMedicalHistories = async (patientId: number) => {
   const patient = await getPatientById(patientId);
   const pastMedicalHistories = await patient.getPastMedicalHistories();
   return pastMedicalHistories;
 };
+
 export const getPastMedicalHistoryById = async (
   pastMedicalHistoryId: number
 ) => {
@@ -662,6 +705,7 @@ export const updatePastMedicalHistory = async (
   });
   return pastMedicalHistory;
 };
+
 export const deletePastMedicalHistory = async (
   pastMedicalHistoryId: number
 ) => {
@@ -671,4 +715,5 @@ export const deletePastMedicalHistory = async (
   await pastMedicalHistory.destroy();
   return pastMedicalHistory;
 };
+
 //#endregion

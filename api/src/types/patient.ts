@@ -4,6 +4,7 @@ import {
   createEmergencyContactSchema,
   phoneRegex,
   preprocessBoolean,
+  updateEmergencyContactSchema,
 } from "./shared";
 
 export const patientRegistrationSchema = z
@@ -114,46 +115,98 @@ export const patientRegistrationSchema = z
         });
       }
     }
+  });
 
-    // Emergency contact validations
-    if (
-      data.emergencyContact.relationship.toLowerCase() === "other" &&
-      !data.emergencyContact.other_relation
-    ) {
+export const updatePatientSchema = z
+  .object({
+    patientId: z.string().optional(), // Assuming patientId is not being updated
+    registrationDate: z.date().optional(),
+    firstName: z.string().trim().min(3).optional(),
+    middleName: z.string().trim().min(3).optional(),
+    lastName: z.string().trim().optional(),
+    gender: z.enum(["Male", "Female"]).optional(),
+    blood_type: z
+      .enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"])
+      .optional(),
+    nationality: z.string().optional(),
+    marital_status: z.string().trim().optional(),
+    guardian_name: z.string().trim().optional(),
+    guardian_relationship: z.string().trim().optional(),
+    occupation: z.string().trim().optional(),
+    has_phone: preprocessBoolean.optional(),
+    phone: z
+      .string()
+      .optional()
+      .refine((val) => !val || phoneRegex.test(val), {
+        message: "Phone number is invalid",
+      }),
+    birth_date: z
+      .preprocess((val) => {
+        if (typeof val === "string") {
+          const parsedDate = new Date(val);
+          return isNaN(parsedDate.getTime()) ? null : parsedDate;
+        }
+        return val;
+      }, z.date().max(new Date(), "Date must be less than or equal to today").min(new Date("1900-01-01"), "Date of Birth must be after 1900-01-01"))
+      .optional(),
+    is_new: preprocessBoolean.optional(),
+    manual_card_id: z.string().trim().optional(),
+    is_credit: preprocessBoolean.optional(),
+    address: addressSchema.optional(),
+    emergencyContact: createEmergencyContactSchema.optional(),
+    company_id: z
+      .string()
+      .refine((value) => !isNaN(Number(value)), {
+        message: "Company ID must be a number",
+      })
+      .transform(Number)
+      .optional(),
+    employeeId: z
+      .string()
+      .refine((value) => !isNaN(Number(value)), {
+        message: "Employee ID must be a number",
+      })
+      .transform(Number)
+      .optional(),
+    credit_limit: z
+      .string()
+      .refine((value) => !isNaN(Number(value)), {
+        message: "Credit limit must be a number",
+      })
+      .transform(Number)
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.has_phone && !data.phone) {
       ctx.addIssue({
-        path: ["emergencyContact", "other_relation"],
+        path: ["phone"],
         code: z.ZodIssueCode.custom,
-        message: "Relationship type is required when relationship is 'Other'",
+        message: "Phone is required when has_phone is true",
       });
     }
 
-    if (!data.emergencyContact.is_the_same_address) {
-      if (!data.emergencyContact.region_id) {
+    if (data.is_credit) {
+      if (!data.company_id) {
         ctx.addIssue({
-          path: ["emergencyContact", "region_id"],
+          path: ["company_id"],
           code: z.ZodIssueCode.custom,
-          message: "Region is required",
+          message: "Company ID is required for credit payments",
         });
       }
-      if (!data.emergencyContact.city_id) {
+
+      if (!data.credit_limit) {
         ctx.addIssue({
-          path: ["emergencyContact", "city_id"],
+          path: ["credit_limit"],
           code: z.ZodIssueCode.custom,
-          message: "City is required for emergency contact",
+          message: "Credit limit is required",
         });
       }
-      if (!data.emergencyContact.subcity_id) {
+
+      if (!data.employeeId) {
         ctx.addIssue({
-          path: ["emergencyContact", "subcity_id"],
+          path: ["employeeId"],
           code: z.ZodIssueCode.custom,
-          message: "Subcity is required for emergency contact",
-        });
-      }
-      if (!data.emergencyContact.woreda_id) {
-        ctx.addIssue({
-          path: ["emergencyContact", "woreda_id"],
-          code: z.ZodIssueCode.custom,
-          message: "Woreda is required for emergency contact",
+          message: "Employee ID is required",
         });
       }
     }

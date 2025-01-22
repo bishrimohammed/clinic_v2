@@ -5,6 +5,7 @@ import {
   createSocialHistoryInput,
   PatientQueryType,
   PatientRegistrationInput,
+  updatePatientSchema,
 } from "../types/patient";
 import { patientService } from "../services";
 import asyncHandler from "../utils/asyncHandler";
@@ -512,7 +513,7 @@ export const createPatient = asyncHandler<{
   });
 });
 export const updatePatient = asyncHandler<{
-  validatedData: PatientRegistrationInput;
+  validatedData: typeof updatePatientSchema._type;
 }>(async (req, res) => {
   // console.log("\n\nupdatePatient\n\n");
   const { id } = req.params;
@@ -771,7 +772,7 @@ export const updatePatient = asyncHandler<{
     status: "success",
     message: "Patient updated successfully",
     data: {
-      patient,
+      patient: patient,
     },
   });
 });

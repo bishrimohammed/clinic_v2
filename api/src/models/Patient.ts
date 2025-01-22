@@ -298,7 +298,16 @@ class Patient extends Model<
   declare gender?: "Male" | "Female"; // Specify enum type
   declare birth_date: Date;
   declare has_phone?: boolean;
-  declare blood_type?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+  declare blood_type?:
+    | "A+"
+    | "A-"
+    | "B+"
+    | "B-"
+    | "AB+"
+    | "AB-"
+    | "O+"
+    | "O-"
+    | null;
   declare nationality?: string | null;
   declare has_HIV?: boolean;
   declare phone?: string | null;
@@ -362,7 +371,10 @@ Patient.init(
     card_number: {
       type: DataTypes.STRING,
       allowNull: true,
-      // unique: true, // Uncomment if unique constraint is needed
+      unique: {
+        msg: "Patient Id is taken",
+        name: "card_number",
+      }, // Uncomment if unique constraint is needed
     },
     gender: {
       type: DataTypes.ENUM("Male", "Female"),
