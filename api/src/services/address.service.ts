@@ -22,7 +22,7 @@ export const updateAddress = async (
   data: Partial<addressT>,
   transaction?: Transaction
 ) => {
-  const { woreda_id, email, phone_1, house_number, street } = data;
+  const { woreda_id, email, phone_1, house_number, street, phone_2 } = data;
   const address = await getAddressById(id);
   const updatedAddress = await address.update(
     {
@@ -31,6 +31,7 @@ export const updateAddress = async (
       phone_1: phone_1 || address.phone_1,
       house_number: house_number || address.house_number,
       street: street || address.street,
+      phone_2: phone_2 || address.phone_2,
     },
     { transaction }
   );
@@ -52,6 +53,8 @@ export const createAddress = async (
     phone_2,
     street,
   } = data;
+  console.log(data);
+
   const existingAddress = await getAddressByPhone(phone_1);
   if (existingAddress) {
     throw new ApiError(400, "Phone is Taken", [
