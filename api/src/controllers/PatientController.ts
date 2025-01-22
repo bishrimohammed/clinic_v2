@@ -8,6 +8,7 @@ import {
 } from "../types/patient";
 import { patientService } from "../services";
 import asyncHandler from "../utils/asyncHandler";
+import { getUploadedFilePath } from "../utils/helpers";
 const db = require("../models");
 
 //#region Patient
@@ -323,11 +324,15 @@ export const createPatient = asyncHandler<{
     [fieldname: string]: Express.Multer.File[];
   };
 
-  // Collect the uploaded files (assuming single file per field)
   const uploadedFiles = {
-    employeeId_doc: files?.employeeId_doc?.[0]?.path || null,
-    letter_doc: files?.letter_doc?.[0]?.path || null,
+    employeeId_doc: getUploadedFilePath(files, "employeeId_doc"),
+    letter_doc: getUploadedFilePath(files, "letter_doc"),
   };
+  // Collect the uploaded files (assuming single file per field)
+  // const uploadedFiles = {
+  //   employeeId_doc:files.employeeId_doc? "uploads/"+ files?.employeeId_doc[0].fieldname : null,
+  //   letter_doc: files?.letter_doc?.[0]?.path || null,
+  // };
   const patientData = {
     ...req.validatedData,
     ...uploadedFiles,

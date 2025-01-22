@@ -26,7 +26,8 @@ import Address from "./address/Address";
 import EmergencyContact from "./EmergencyContact";
 import CreditCompanyProfile from "./creditCompanyProfile";
 import CreditAgreement from "./creditAgreement";
-
+import PatientCreditDetail from "./patientCreditDetail";
+// PatientCreditDetail
 // Role.hasMany(User, {
 //   foreignKey: "role_id",
 //   sourceKey: "id",
@@ -72,4 +73,5 @@ export {
   EmergencyContact,
   CreditAgreement,
   CreditCompanyProfile,
+  PatientCreditDetail,
 };

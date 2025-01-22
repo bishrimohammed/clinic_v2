@@ -21,7 +21,7 @@ export const patientRegistrationSchema = z
       .optional(),
 
     nationality: z.string().optional(),
-    marital_status: z.string().optional(),
+    marital_status: z.string().min(1).optional(),
     guardian_name: z.string().trim().optional(),
     guardian_relationship: z.string().trim().optional(),
     occupation: z.string().trim().optional(),
@@ -32,14 +32,33 @@ export const patientRegistrationSchema = z
       .max(new Date(), "Date must be less than or equal to today")
       .min(new Date("1900-01-01"), "Date of Birth must be after 1900-01-01"),
     is_new: z.boolean(),
-    manual_card_id: z.string().trim().optional(),
+    manual_card_id: z.string().trim().min(1).optional(),
     is_credit: z.boolean({ required_error: "Payment type is required" }),
     address: addressSchema,
     emergencyContact: createEmergencyContactSchema,
-    company_id: z.string().optional(),
-    employeeId: z.string().optional(),
-    employeeId_doc: z.any().optional(),
-    letter_doc: z.any().optional(),
+    company_id: z
+      .string()
+      .refine((value) => !isNaN(Number(value)), {
+        message: "company_id must be a number",
+      })
+      .transform((value) => Number(value))
+      .optional(),
+    employeeId: z
+      .string()
+      .refine((value) => !isNaN(Number(value)), {
+        message: "Employee must be a number",
+      })
+      .transform((value) => Number(value))
+      .optional(),
+    credit_limit: z
+      .string()
+      .refine((value) => !isNaN(Number(value)), {
+        message: "credit limit must be a number",
+      })
+      .transform((value) => Number(value))
+      .optional(),
+    // employeeId_doc: z.any().optional(),
+    // letter_doc: z.any().optional(),
   })
   .superRefine((data, ctx) => {
     // Example: Cross-field validation
@@ -66,7 +85,13 @@ export const patientRegistrationSchema = z
         message: "Company ID is required for credit payments",
       });
     }
-
+    if (data.is_credit) {
+      ctx.addIssue({
+        path: ["credit_limit"],
+        code: z.ZodIssueCode.custom,
+        message: "Credit limit is required",
+      });
+    }
     if (data.company_id && !data.employeeId) {
       ctx.addIssue({
         path: ["employeeId"],

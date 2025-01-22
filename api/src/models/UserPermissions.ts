@@ -120,7 +120,6 @@ UserPermission.init(
       {
         unique: true,
         fields: ["user_id", "permission_id"],
-        name: "user_id and permission_id must be unique",
       },
     ],
   }

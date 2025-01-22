@@ -128,34 +128,22 @@ export const createEmergencyContactSchema = z
     }
 
     if (!data.is_the_same_address) {
-      if (!data.region_id) {
-        ctx.addIssue({
-          path: ["region_id"],
-          code: z.ZodIssueCode.custom,
-          message: "Region is required for emergency contact",
-        });
-      }
-      if (!data.city_id) {
-        ctx.addIssue({
-          path: ["city_id"],
-          code: z.ZodIssueCode.custom,
-          message: "City is required for emergency contact",
-        });
-      }
-      if (!data.subcity_id) {
-        ctx.addIssue({
-          path: ["subcity_id"],
-          code: z.ZodIssueCode.custom,
-          message: "Subcity is required for emergency contact",
-        });
-      }
-      if (!data.woreda_id) {
-        ctx.addIssue({
-          path: ["woreda_id"],
-          code: z.ZodIssueCode.custom,
-          message: "Woreda is required for emergency contact",
-        });
-      }
+      (
+        ["region_id", "city_id", "subcity_id", "woreda_id"] as Array<
+          keyof typeof data
+        >
+      ).forEach((field) => {
+        if (!data[field]) {
+          ctx.addIssue({
+            path: [field],
+            code: z.ZodIssueCode.custom,
+            message: `${field.replace(
+              "_",
+              " "
+            )} is required for emergency contact`,
+          });
+        }
+      });
     }
   });
 

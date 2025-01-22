@@ -1,5 +1,5 @@
 import sequelize from "../db";
-import { Patient } from "../models";
+import { Patient, PatientCreditDetail } from "../models";
 import {
   createAllergyInput,
   createFamilyHistoryInput,
@@ -14,7 +14,11 @@ import Allergy from "../models/patient/Allergy";
 import FamilyHistory from "../models/patient/FamilyHistory";
 import SocialHistory from "../models/patient/SocialHistory";
 import PastMedicalHistory from "../models/patient/PastMedicalHistory";
-import { addressService, emergencyContactService } from ".";
+import {
+  addressService,
+  creditCompanyService,
+  emergencyContactService,
+} from ".";
 
 export const groupPatientByGenderAndCount = async () => {
   return await Patient.count({
@@ -246,6 +250,7 @@ export const createPatient = async (
     is_credit,
     company_id,
     employeeId,
+    credit_limit,
     employeeId_doc,
     letter_doc,
   } = data;
@@ -264,36 +269,54 @@ export const createPatient = async (
         transaction
       );
 
+    //
+    const manualCardId = !is_new ? manual_card_id : null;
+    // If the patient does not have a phone, use the emergency contact's phone as fallback.
+    const resolvedPhone = phone || emergencyContact.phone || null;
     const patient = await Patient.create({
       firstName,
       middleName,
       lastName,
-      has_phone,
-      phone,
+      has_phone: !!resolvedPhone,
+      phone: resolvedPhone,
       gender,
       birth_date,
       is_new,
-      manual_card_id: manual_card_id,
+      manual_card_id: manualCardId,
       blood_type: blood_type,
       card_number: patientId,
       marital_status: marital_status ? marital_status : null,
       nationality,
       guardian_name,
-      guardian_relationship,
-      occupation,
+      guardian_relationship: guardian_relationship || null,
+      occupation: occupation || null,
       address_id: createdAddress.id,
       emergence_contact_id: createdEmergencyContact.id,
       is_credit,
+      empoyeeId_url: employeeId_doc,
     });
-    // if(is_credit){
-    //   const companyId = parseInt(company_id!)
-    //   const company =await creditCompanyService.getCreditCompanyById(companyId);
-    //   const activeAgreement = await company.getActiveAgreement();
-    //   if(!activeAgreement){
-    //     throw new ApiError(400,"Company doesn't have active agreement")
-    //   }
-
-    // }
+    if (is_credit) {
+      const companyId = company_id!;
+      const company = await creditCompanyService.getCreditCompanyById(
+        companyId
+      );
+      const activeAgreement = await company.getActiveAgreement();
+      if (!activeAgreement) {
+        throw new ApiError(400, "Company doesn't have active agreement");
+      }
+      // const creditLimit = credit_limit!;
+      await PatientCreditDetail.create(
+        {
+          agreement_id: activeAgreement.id,
+          credit_company_id: company.id,
+          employee_id: employeeId!,
+          patient_id: patient.id,
+          credit_limit: credit_limit!,
+          credit_balance: credit_limit!,
+        },
+        { transaction }
+      );
+    }
     await transaction.commit();
     return patient;
   } catch (error) {
@@ -349,7 +372,6 @@ export const updatePatient = async (
       await emergencyContactService.updateEmergencyContact(
         patient.emergence_contact_id,
         { ...emergencyContact, parentAdderssId: createdAddress.id },
-
         transaction
       );
 

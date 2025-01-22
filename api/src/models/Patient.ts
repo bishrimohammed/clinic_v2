@@ -278,11 +278,9 @@ import {
   InferAttributes,
   InferCreationAttributes,
   HasManyGetAssociationsMixin,
-  HasManyAddAssociationMixin,
   HasManyCreateAssociationMixin,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
-import { Op } from "sequelize"; // Import Op for query operations
 import Allergy from "./patient/Allergy";
 import FamilyHistory from "./patient/FamilyHistory";
 import SocialHistory from "./patient/SocialHistory";

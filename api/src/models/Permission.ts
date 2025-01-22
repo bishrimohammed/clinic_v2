@@ -19,10 +19,10 @@ class Permission extends Model<
   declare name: string;
   declare status?: boolean;
   declare UserPermission?: NonAttribute<UserPermission>;
-  declare static associations: {
-    users: Association<Permission, User>;
-    // employee: Association<User, Employee>;
-  };
+  // declare static associations: {
+  //   users: Association<Permission, User>;
+  // employee: Association<User, Employee>;
+  // };
 }
 // Permission.create({})
 Permission.init(
@@ -43,7 +43,7 @@ Permission.init(
       defaultValue: true,
     },
   },
-  { sequelize }
+  { sequelize, tableName: "permissions" }
 );
 
 // Permission.belongsToMany(, {
