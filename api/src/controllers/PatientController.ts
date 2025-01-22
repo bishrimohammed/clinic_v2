@@ -320,6 +320,8 @@ export const createPatient = asyncHandler<{
   // const { patient, address, emergency, company_id, employeeId } = req.body;
   // console.log(req.body);
   // return;
+  // console.log(req.validatedData);
+
   const files = req.files as {
     [fieldname: string]: Express.Multer.File[];
   };
@@ -526,8 +528,8 @@ export const updatePatient = asyncHandler<{
 
   // Collect the uploaded files (assuming single file per field)
   const uploadedFiles = {
-    employeeId_doc: files?.employeeId_doc?.[0]?.path || null,
-    letter_doc: files?.letter_doc?.[0]?.path || null,
+    employeeId_doc: getUploadedFilePath(files, "employeeId_doc"),
+    letter_doc: getUploadedFilePath(files, "letter_doc"),
   };
   const patientData = {
     ...req.validatedData,

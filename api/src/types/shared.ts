@@ -147,6 +147,20 @@ export const createEmergencyContactSchema = z
     }
   });
 
+export const preprocessBoolean = z.preprocess(
+  (val) => {
+    // Convert string values to boolean if they represent "true" or "false"
+    if (typeof val === "string") {
+      const lowerCaseVal = val.toLowerCase();
+      if (lowerCaseVal === "true") return true;
+      if (lowerCaseVal === "false") return false;
+    }
+    return val; // Return the original value if not a string or not "true"/"false"
+  },
+  z.boolean().refine((val) => typeof val === "boolean", {
+    message: "Expected a boolean value (true or false)",
+  })
+);
 export type addressT = z.infer<typeof addressSchema>;
 export type createEmergencyContactT = z.infer<
   typeof createEmergencyContactSchema
