@@ -50,7 +50,6 @@
 //       paranoid: true,
 //       hooks: {
 //         afterCreate: async (appointment, options) => {
-
 //           await sequelize.models.appointments_audit.create({
 //             appointment_id: appointment.id,
 //             patient_id: appointment.patient_id,
@@ -110,10 +109,10 @@ import {
   Model,
   DataTypes,
   CreationOptional,
-  ForeignKey,
   InferAttributes,
   InferCreationAttributes,
 } from "sequelize";
+
 import sequelize from "../db/index"; // Ensure the correct path
 import Patient from "./Patient";
 import User from "./User";
@@ -123,13 +122,22 @@ class Appointment extends Model<
   InferCreationAttributes<Appointment>
 > {
   declare id: CreationOptional<number>;
-  declare patient_id: number;
+  declare patient_id: number | null;
   declare patient_name: string;
   declare doctor_id: number;
   declare appointment_date: Date;
   declare appointment_time: string;
-  declare reason: string;
+  declare reason: string | null;
   declare appointment_type: string;
+
+  // declare previous_appointment_id: number | null;
+  // declare next_appointment_date: Date;
+  // declare appointed_by: number;
+  // declare re_appointed_by: number | null;
+  // declare patient_visit_id: number | null;
+  // declare is_new_patient: boolean;
+  // declare registration_status: "pending" | "compeleted" | null;
+
   declare status: string;
   declare deletedAt: Date | null;
   declare createdAt: CreationOptional<Date>;
@@ -148,11 +156,13 @@ Appointment.init(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    patient_name: DataTypes.STRING,
+    patient_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     doctor_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      validate: {},
     },
     appointment_date: {
       type: DataTypes.DATEONLY,
@@ -162,8 +172,14 @@ Appointment.init(
       type: DataTypes.TIME,
       allowNull: false,
     },
-    reason: DataTypes.STRING,
-    appointment_type: DataTypes.STRING,
+    reason: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    appointment_type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM,
       allowNull: false,
@@ -186,14 +202,17 @@ Appointment.init(
   },
   { sequelize, paranoid: true }
 );
+
 Appointment.belongsTo(Patient, {
   foreignKey: "patient_id",
   targetKey: "id",
   as: "patient",
 });
+
 Appointment.belongsTo(User, {
   foreignKey: "doctor_id",
   targetKey: "id",
   as: "doctor",
 });
+
 export default Appointment;

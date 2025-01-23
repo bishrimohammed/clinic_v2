@@ -124,10 +124,14 @@ export const loginUser = asyncHandler(
       maxAge: 60 * 60 * 24 * 30,
     });
     res.status(200).json({
-      user: userData,
-      accessToken,
-      refreshToken,
-      clinicInfo: clinicInfo,
+      statsu: "success",
+      message: "Logged in successfully",
+      data: {
+        user: userData,
+        accessToken,
+        refreshToken,
+        clinicInfo: clinicInfo,
+      },
     });
   }
 );
