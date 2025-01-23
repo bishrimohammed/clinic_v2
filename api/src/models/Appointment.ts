@@ -116,6 +116,7 @@ import {
 import sequelize from "../db/index"; // Ensure the correct path
 import Patient from "./Patient";
 import User from "./User";
+import PatientVisit from "./PatientVisit";
 
 class Appointment extends Model<
   InferAttributes<Appointment>,
@@ -130,16 +131,16 @@ class Appointment extends Model<
   declare reason: string | null;
   declare appointment_type: string;
 
-  // declare previous_appointment_id: number | null;
-  // declare next_appointment_date: Date;
-  // declare appointed_by: number;
-  // declare re_appointed_by: number | null;
-  // declare patient_visit_id: number | null;
-  // declare is_new_patient: boolean;
-  // declare registration_status: "pending" | "compeleted" | null;
+  declare previous_appointment_id: number | null;
+  declare next_appointment_date: Date | null;
+  declare appointed_by: number;
+  declare re_appointed_by: number | null;
+  declare patient_visit_id: number | null;
+  declare is_new_patient: boolean;
+  declare registration_status: "pending" | "compeleted" | null;
 
   declare status: string;
-  declare deletedAt: Date | null;
+  declare deletedAt: CreationOptional<Date>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -180,6 +181,50 @@ Appointment.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    is_new_patient: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    registration_status: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    previous_appointment_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: Appointment,
+        key: "id",
+      },
+    },
+    next_appointment_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    appointed_by: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: User,
+        key: "id",
+      },
+    },
+    re_appointed_by: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: User,
+        key: "id",
+      },
+    },
+    patient_visit_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: PatientVisit,
+        key: "id",
+      },
+    },
     status: {
       type: DataTypes.ENUM,
       allowNull: false,
@@ -214,5 +259,7 @@ Appointment.belongsTo(User, {
   targetKey: "id",
   as: "doctor",
 });
+
+Appointment.sync({ alter: false });
 
 export default Appointment;

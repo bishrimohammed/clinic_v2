@@ -12,7 +12,7 @@ import Permission from "./Permission";
 import UserPermission from "./UserPermissions";
 import Appointment from "./Appointment";
 import Patient from "./Patient";
-import PatientAssignment from "./PatientAssignment";
+import PatientVisit from "./PatientVisit";
 import InvestigationOrder from "./medicalRecords/InvestigationOrder";
 import Schedule from "./Schedule";
 import MedicalBilling from "./MedicalBilling";
@@ -27,6 +27,7 @@ import EmergencyContact from "./EmergencyContact";
 import CreditCompanyProfile from "./creditCompanyProfile";
 import CreditAgreement from "./creditAgreement";
 import PatientCreditDetail from "./patientCreditDetail";
+
 // PatientCreditDetail
 // Role.hasMany(User, {
 //   foreignKey: "role_id",
@@ -39,14 +40,18 @@ import PatientCreditDetail from "./patientCreditDetail";
 // });
 // CreditCompanyProfile
 // CreditAgreement
+// Appointment
+
 ServiceItem.belongsTo(ServiceCategory, {
   foreignKey: "serviceCategory_id",
   as: "category",
 });
+
 Employee.hasOne(User, {
   foreignKey: "employee_id",
   as: "user",
 });
+
 export {
   User,
   ClinicProfile,
@@ -56,7 +61,7 @@ export {
   UserPermission,
   Appointment,
   Patient,
-  PatientAssignment,
+  PatientVisit,
   InvestigationOrder,
   Schedule,
   MedicalBilling,

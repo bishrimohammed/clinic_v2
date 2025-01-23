@@ -5,7 +5,7 @@ import {
   InvestigationOrder,
   MedicalBilling,
   Patient,
-  PatientAssignment,
+  PatientVisit,
   Role,
   Schedule,
   User,
@@ -65,7 +65,7 @@ export const getDashboardData = async (req: Request) => {
     });
 
   const { count: totalUpcomingPatientVisit, rows: active_Visits } =
-    await PatientAssignment.findAndCountAll({
+    await PatientVisit.findAndCountAll({
       where: {
         ...where,
         status: true,
@@ -178,7 +178,7 @@ export const getActivePatientVisit = async (req: Request) => {
     where.doctor_id = req.user?.id;
   }
   const { count: totalUpcomingPatientVisit, rows: active_Visits } =
-    await PatientAssignment.findAndCountAll({
+    await PatientVisit.findAndCountAll({
       where: {
         ...where,
         status: true,

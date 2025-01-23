@@ -208,9 +208,9 @@ import { Op } from "sequelize"; // Import Op for query operations
 import Patient from "./Patient";
 import User from "./User";
 
-class PatientAssignment extends Model<
-  InferAttributes<PatientAssignment>,
-  InferCreationAttributes<PatientAssignment>
+class PatientVisit extends Model<
+  InferAttributes<PatientVisit>,
+  InferCreationAttributes<PatientVisit>
 > {
   declare id: CreationOptional<number>;
   declare patient_id: number;
@@ -247,7 +247,7 @@ class PatientAssignment extends Model<
   declare updatedAt?: CreationOptional<Date>;
 }
 
-PatientAssignment.init(
+PatientVisit.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -361,8 +361,8 @@ PatientAssignment.init(
   },
   {
     sequelize,
-    modelName: "patientassignment",
-    tableName: "patientassignments",
+    modelName: "PatientVisit",
+    tableName: "patient_visits",
     timestamps: true,
     // hooks: {
     //   afterCreate: async (visit, options) => {
@@ -451,14 +451,14 @@ PatientAssignment.init(
   }
 );
 
-PatientAssignment.belongsTo(Patient, {
+PatientVisit.belongsTo(Patient, {
   foreignKey: "patient_id",
   as: "patient",
 });
-PatientAssignment.belongsTo(User, {
+PatientVisit.belongsTo(User, {
   foreignKey: "doctor_id",
   as: "doctor",
 });
-// PatientAssignment.sync({ force: false, alter: false });
+// PatientVisit.sync({ force: false, alter: false });
 
-export default PatientAssignment;
+export default PatientVisit;
