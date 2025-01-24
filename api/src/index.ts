@@ -1,7 +1,33 @@
-import http from "http";
+import http, { Server } from "http";
 import express from "express";
 import loaders from "./loaders";
+import logger from "./config/logger";
+import { ConnectionError } from "sequelize";
 
+const unExpectedErrorHandler = (server: Server) => {
+  return function (error: any) {
+    // logger.error(error);
+    if (error instanceof ConnectionError) {
+      logger.error("Database connection error:", +error);
+      // process.exit(1);
+    }
+    logger.error("Unexpected Error:", { error });
+    // console.log(error);
+
+    exitHandler(server);
+  };
+};
+
+const exitHandler = (server: Server) => {
+  if (server) {
+    server.close(() => {
+      logger.info("Server closed");
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+};
 const startServer = async () => {
   const app = express();
 
@@ -9,7 +35,16 @@ const startServer = async () => {
 
   const httpServer = http.createServer(app);
   const server = httpServer.listen(5001, () => {
-    console.log(`server listening on port ${5001}`);
+    logger.info(`server listening on port ${5001}`);
+  });
+  process.on("uncaughtException", unExpectedErrorHandler(server));
+  process.on("unhandledRejection", unExpectedErrorHandler(server));
+
+  process.on("SIGTERM", () => {
+    logger.info("SIGTERM recieved");
+    if (server) {
+      server.close();
+    }
   });
 };
 

@@ -1,3 +1,4 @@
+import logger from "../config/logger";
 import sequelize from "../db";
 
 const dbLoader = async () => {
@@ -11,16 +12,14 @@ const dbLoader = async () => {
   // console.log("Database can't connect");
   // process.exit(1);
   // }
-  sequelize
-    .authenticate()
-    .then(() => {
-      console.log("Connected to the database.");
-      sequelize.sync({ alter: false });
-    })
-    .catch((err: Error) => {
-      console.log("Error: " + err.message);
-      // process.exit(1);
-    });
+  sequelize.authenticate().then(() => {
+    logger.info("Connected to the database.");
+    sequelize.sync({ alter: false });
+  });
+  // .catch((err: Error) => {
+  //   console.log("Error: " + err.message);
+  //   // process.exit(1);
+  // });
 };
 
 export default dbLoader;
