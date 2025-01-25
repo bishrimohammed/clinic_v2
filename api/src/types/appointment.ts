@@ -1,5 +1,33 @@
 import { z } from "zod";
 
+export const appointmentQuerySchema = z.object({
+  page: z
+    .string()
+    .refine((value) => !isNaN(Number(value)), {
+      message: "Page must be a number",
+    })
+    .default("1"),
+
+  // Directly allow numbers
+  limit: z
+    .string()
+    .refine((value) => !isNaN(Number(value)), {
+      message: "Limit must be a number",
+    })
+    .default("10"),
+
+  searchTerm: z.string().optional(), // Renamed for clarity
+  sortBy: z
+    .enum([
+      "name_asc",
+      "name_desc",
+      "appointment_date_asc",
+      "appointment_date_desc",
+    ])
+    .optional(),
+  status: z.string().optional(),
+});
+
 export const createAppointmentSchema = z.object({
   patient_id: z.number().nullable(),
   patient_name: z.string().trim(),
@@ -18,4 +46,4 @@ export const createAppointmentSchema = z.object({
   //   registration_status: z.enum(["pending", "completed"]).nullable(),
 });
 
-// export default AppointmentSchema;
+export type appointmentQueryType = z.infer<typeof appointmentQuerySchema>;

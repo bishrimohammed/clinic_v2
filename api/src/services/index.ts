@@ -4,6 +4,8 @@ import * as roleService from "./role.service";
 import * as dashboardService from "./dashboard.service";
 import * as permissionService from "./permission.service";
 import * as patientService from "./patient.service";
+import * as appointmentService from "./appointment.Service";
+
 import * as clinicProfileService from "./clinic-profile.service";
 import * as addressService from "./address.service";
 import * as scheduleService from "./schedule.service";
@@ -18,6 +20,7 @@ export {
   dashboardService,
   permissionService,
   patientService,
+  appointmentService,
   clinicProfileService,
   addressService,
   scheduleService,

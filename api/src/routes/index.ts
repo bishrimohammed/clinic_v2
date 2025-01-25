@@ -7,13 +7,13 @@ import userRoute from "./user.router";
 import DashbordDataRoute from "./DashboardData.route";
 import RegionRoute from "./address/region.router";
 import patientRoute from "./patient.router";
+import AppointmentRoute from "./Appointment.router";
 
 const woredaRoute = require("./address/woreda.router.js");
 const CityRoute = require("./address/city.router.js");
 const SubCityRoute = require("./address/subCity.router.js");
 
 const AllergyRoute = require("./Allergy.route.js");
-const AppointmentRoute = require("./Appointment.router.js");
 const visitTypeRoute = require("./visitType.router.js");
 const assignPatientRoute = require("./PatientAssignment.router.js");
 const medicalRecordRoute = require("./MedicalRecord.router.ts");

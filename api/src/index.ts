@@ -6,13 +6,7 @@ import { ConnectionError } from "sequelize";
 
 const unExpectedErrorHandler = (server: Server) => {
   return function (error: any) {
-    // logger.error(error);
-    if (error instanceof ConnectionError) {
-      logger.error("Database connection error:", +error);
-      // process.exit(1);
-    }
     logger.error("Unexpected Error:", { error });
-    // console.log(error);
 
     exitHandler(server);
   };
@@ -28,6 +22,7 @@ const exitHandler = (server: Server) => {
     process.exit(1);
   }
 };
+
 const startServer = async () => {
   const app = express();
 
