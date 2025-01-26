@@ -126,7 +126,7 @@ class Appointment extends Model<
   declare patient_id: number | null;
   declare patient_name: string;
   declare doctor_id: number;
-  declare appointment_date: Date;
+  declare appointment_date: string;
   declare appointment_time: string;
   declare reason: string | null;
   declare appointment_type: string;
@@ -135,11 +135,19 @@ class Appointment extends Model<
   declare next_appointment_date: Date | null;
   declare appointed_by: number;
   declare re_appointed_by: number | null;
+  declare cancelled_by: number | null;
   declare patient_visit_id: number | null;
   declare is_new_patient: boolean;
   declare registration_status: "pending" | "compeleted" | null;
 
-  declare status: string;
+  declare status: CreationOptional<
+    | "Scheduled"
+    | "Completed"
+    | "Cancelled"
+    | "Missed"
+    | "Rescheduled"
+    | "Confirmed"
+  >;
   declare deletedAt: CreationOptional<Date>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -166,7 +174,7 @@ Appointment.init(
       allowNull: false,
     },
     appointment_date: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       allowNull: false,
     },
     appointment_time: {
@@ -217,6 +225,14 @@ Appointment.init(
         key: "id",
       },
     },
+    cancelled_by: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: User,
+        key: "id",
+      },
+    },
     patient_visit_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -228,8 +244,15 @@ Appointment.init(
     status: {
       type: DataTypes.ENUM,
       allowNull: false,
-      values: ["upcoming", "overdue", "cancelled"],
-      defaultValue: "upcoming",
+      values: [
+        "Scheduled",
+        "Confirmed",
+        "Completed",
+        "Cancelled",
+        "Missed",
+        "Rescheduled",
+      ],
+      defaultValue: "Scheduled",
     },
     deletedAt: {
       type: DataTypes.DATE,

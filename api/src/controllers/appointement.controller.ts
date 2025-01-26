@@ -15,77 +15,32 @@ const db = require("../models");
 export const getAppointments = asyncHandler(async (req, res) => {
   const query = req.query as appointmentQueryType;
   const appointementResults = await appointmentService.getAppointments(query);
-  // const page = parseInt(req.query?.page) || 1;
-  // const limit = parseInt(req.query?.limit) || 10;
-  // let sortDirection;
-  // let where:any = {};
-  // if (req.query.status) {
-  //   where.status = req.query.status;
-  // }
-  // switch (req.query?.sortBy) {
-  //   case "patient_name":
-  //     if (req.query?.order === "asc") {
-  //       sortDirection = [["patient_name", "ASC"]];
-  //     } else {
-  //       sortDirection = [["patient_name", "DESC"]];
-  //     }
-  //     break;
-  //   case "appointment_date":
-  //     if (req.query?.order === "asc") {
-  //       sortDirection = [["appointment_date", "ASC"]];
-  //     } else {
-  //       sortDirection = [["appointment_date", "DESC"]];
-  //     }
-  //     break;
-  //   default:
-  //     sortDirection = [["appointment_date", "DESC"]];
-  // }
-  // const { count, rows } = await db.Appointment.findAndCountAll({
-  //   where: where,
-  //   // order: [["createdAt", "DESC"]],
-  //   include: [
-  //     {
-  //       model: db.Patient,
-  //       as: "patient",
-  //       attributes: ["firstName", "middleName", "lastName", "id"],
-  //     },
-  //     {
-  //       model: db.User,
-  //       as: "doctor",
-  //       include: [
-  //         {
-  //           model: db.Employee,
-  //           as: "employee",
-  //           attributes: ["firstName", "middleName", "lastName", "id"],
-  //         },
-  //       ],
-  //       attributes: ["id"],
-  //     },
-  //   ],
-  //   order: sortDirection,
-  //   offset: (page - 1) * limit,
-  //   limit: limit,
-  // });
-  // const hasMore = count > page * limit;
-  // res.json({
-  //   hasMore,
-  //   results: rows,
-  //   currentPage: (page),
-  //   totalPages: Math.ceil(count / limit),
-  //   totalItems: count,
-  // });
+
   res.json({
     status: "success",
-    message: "",
+    message: "Appointments retrieved successfully",
     data: {
-      appointmenta: appointementResults,
+      appointments: appointementResults.appointements,
+      pagination: appointementResults.pagination,
     },
   });
 });
 export const getAppointment = asyncHandler(async (req, res) => {
   const { id } = req.params;
+});
+export const getActiveAppointments = asyncHandler(async (req, res) => {
+  const query = req.query as appointmentQueryType;
+  const appointementResults = await appointmentService.getActiveAppointments(
+    query
+  );
+
   res.json({
-    message: "Hello from AppointementController.getAppointment",
+    status: "success",
+    message: "Appointments retrieved successfully",
+    data: {
+      appointments: appointementResults.appointements,
+      pagination: appointementResults.pagination,
+    },
   });
 });
 export const createAppointment = asyncHandler(async (req, res) => {

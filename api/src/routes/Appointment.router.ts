@@ -15,6 +15,11 @@ router.get(
   validateQuery(appointmentQuerySchema),
   AppointementController.getAppointments
 );
+router.get(
+  "/active",
+  validateQuery(appointmentQuerySchema),
+  AppointementController.getActiveAppointments
+);
 router.get("/:id", AppointementController.getAppointment);
 router.post(
   "/",

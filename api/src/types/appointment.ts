@@ -46,4 +46,6 @@ export const createAppointmentSchema = z.object({
   //   registration_status: z.enum(["pending", "completed"]).nullable(),
 });
 
+export type createAppointmentType = z.infer<typeof createAppointmentSchema>;
+export type updateAppointmentType = z.infer<typeof createAppointmentSchema>;
 export type appointmentQueryType = z.infer<typeof appointmentQuerySchema>;
