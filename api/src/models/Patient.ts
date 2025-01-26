@@ -346,6 +346,10 @@ class Patient extends Model<
     PastMedicalHistory,
     "patient_id"
   >;
+
+  getFullName() {
+    return `${this.firstName} ${this.middleName} ${this.lastName}`;
+  }
 }
 
 Patient.init(
