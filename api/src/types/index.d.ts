@@ -29,4 +29,7 @@ declare module "sequelize" {
      */
     userId?: number;
   }
+  interface InstanceCreateOptions {
+    userId?: number;
+  }
 }

@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { isValidDate } from "../utils/helpers";
+import { timePattern } from "../utils/constants";
 
 export const appointmentQuerySchema = z.object({
   page: z
@@ -32,8 +34,13 @@ export const createAppointmentSchema = z.object({
   patient_id: z.number().nullable(),
   patient_name: z.string().trim(),
   doctor_id: z.number(),
-  appointment_date: z.date(),
-  appointment_time: z.string().time(),
+  appointment_date: z
+    .string()
+    .transform((val) => new Date(val))
+    .refine(isValidDate, { message: "Invalid date" }), // Check if the date is valid
+
+  appointment_time: z.string().regex(timePattern, { message: "Invalid time" }), // Check if the time matches the regex pattern
+
   reason: z.string().trim().nullable(),
   appointment_type: z.string().trim(),
   patient_visit_id: z.number().nullable(),

@@ -21,3 +21,6 @@ export type PermissionName =
   | "Lab Result"
   | "External Lab Service Result"
   | "Report";
+
+export const timePattern =
+  /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])(:([0-5][0-9]))?$/;

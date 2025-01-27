@@ -7,6 +7,7 @@ import {
   createAppointmentType,
 } from "../types/appointment";
 import asyncHandler from "../utils/asyncHandler";
+import logger from "../config/logger";
 
 // const db = require("../models");
 const { Op } = require("sequelize");
@@ -52,7 +53,8 @@ export const createAppointment = asyncHandler(
     // const { patient_id, doctor_id, reason, date, time, patient_name, type } =
     //   req.body;
     const userId = req.user?.id!;
-    const appointement = appointmentService.createAppointment(
+    logger.info(userId);
+    const appointement = await appointmentService.createAppointment(
       req.validatedData,
       userId
     );

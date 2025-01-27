@@ -1,14 +1,24 @@
-import { Model, DataTypes } from "sequelize";
+import {
+  Model,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+} from "sequelize";
 import sequelize from "../../db"; // Your Sequelize instance
 
-class AppointmentAuditLog extends Model {
-  declare id: number;
+class AppointmentAuditLog extends Model<
+  InferAttributes<AppointmentAuditLog, {}>,
+  InferCreationAttributes<AppointmentAuditLog>
+> {
+  declare id: CreationOptional<number>;
   declare appointment_id: number;
   declare changed_by: number; // User ID who made the change
-  declare change_type: "create" | "update" | "delete";
-  declare old_values: Record<string, any>; // Old values of the appointment
-  declare new_values: Record<string, any>; // New values of the appointment
-  declare changed_at: Date;
+  declare change_type: "I" | "U" | "D";
+  // declare old_values: CreationOptional<Record<string, any>>; // Old values of the appointment
+  // declare new_values: CreationOptional<Record<string, any>>; // New values of the appointment
+  declare changed_values: CreationOptional<Record<string, any>>; // Changed values of the appointment
+  declare changed_at: CreationOptional<Date>;
 }
 
 AppointmentAuditLog.init(
@@ -27,14 +37,12 @@ AppointmentAuditLog.init(
       allowNull: false,
     },
     change_type: {
-      type: DataTypes.ENUM("create", "update", "delete"),
+      type: DataTypes.ENUM,
+      values: ["I", "U", "D"],
       allowNull: false,
     },
-    old_values: {
-      type: DataTypes.JSON,
-      allowNull: true,
-    },
-    new_values: {
+
+    changed_values: {
       type: DataTypes.JSON,
       allowNull: true,
     },
@@ -46,8 +54,10 @@ AppointmentAuditLog.init(
   {
     sequelize,
     modelName: "AppointmentAuditLog",
+    tableName: "appointment_audit",
     timestamps: false,
   }
 );
 
+AppointmentAuditLog.sync({ alter: false });
 export default AppointmentAuditLog;

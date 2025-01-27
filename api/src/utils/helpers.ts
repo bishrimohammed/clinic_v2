@@ -100,3 +100,10 @@ export const combineAndFormatDateTime = (
 
   return format(dateTime, outputFormat);
 };
+
+/**
+ * Checks if a given date is valid.
+ * @param date
+ * @returns
+ */
+export const isValidDate = (date: Date) => !isNaN(date.getTime());

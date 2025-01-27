@@ -113,6 +113,7 @@ import {
   InferCreationAttributes,
   UpdateOptions,
   InstanceUpdateOptions,
+  CreateOptions,
 } from "sequelize";
 
 import sequelize from "../../db/index"; // Ensure the correct path
@@ -120,10 +121,16 @@ import Patient from "../Patient";
 import User from "../User";
 import PatientVisit from "../PatientVisit";
 import AppointmentAuditLog from "./AppointmentAuditLog ";
+// import AppointmentAuditLog from "./AppointmentAuditLog";
 
 interface CustomUpdateOptions extends InstanceUpdateOptions<Appointment> {
   userId?: number; // Add the userId property
 }
+
+interface CustomCreateOptions extends CreateOptions<Appointment> {
+  userId?: number;
+}
+
 class Appointment extends Model<
   InferAttributes<Appointment, {}>,
   InferCreationAttributes<Appointment>
@@ -142,6 +149,7 @@ class Appointment extends Model<
   declare appointed_by: number;
   declare re_appointed_by: number | null;
   declare cancelled_by: number | null;
+  // declare u: string | null;
   declare patient_visit_id: number | null;
   declare is_new_patient: CreationOptional<boolean>;
   declare registration_status: "pending" | "compeleted" | null;
@@ -275,6 +283,7 @@ Appointment.init(
         key: "id",
       },
     },
+
     patient_visit_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -309,24 +318,48 @@ Appointment.init(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
-  },
+  }, // async afterCreate(attributes, options: CustomCreateOptions) {
   {
     sequelize,
     paranoid: true,
     hooks: {
-      async afterCreate(attributes, options) {},
-      async afterUpdate(instance, options: CustomUpdateOptions) {
-        const oldValues = instance.previous(); // Get the previous values
-        const newValues = instance.get(); // Get the updated values
-        const {} = options;
+      async afterCreate(appointement, options: CustomCreateOptions) {
+        const attributes = appointement.get();
+        const { id, deletedAt, createdAt, updatedAt, ...otherAttributes } =
+          attributes;
         const changedBy = options?.userId ? options.userId : -1;
         await AppointmentAuditLog.create({
-          appointment_id: instance.id,
+          appointment_id: id,
           changed_by: changedBy, // Pass the user ID who made the change
-          change_type: "update",
-          old_values: oldValues,
-          new_values: newValues,
+          change_type: "I",
+          // old_values: {},
+          changed_values: otherAttributes,
         });
+      },
+      async afterUpdate(instance, options) {
+        const oldValues: Record<string, any> = instance.previous(); // Get the previous values
+        const newValues: Record<string, any> = instance.get(); // Get the updated values
+
+        // Determine which fields were changed
+        const changedFields: Record<string, any> = {};
+        for (const key of Object.keys(newValues)) {
+          if (oldValues[key] !== newValues[key]) {
+            changedFields[key] = {
+              old_value: oldValues[key],
+              new_value: newValues[key],
+            };
+          }
+        }
+        const changedBy = options.userId ? options.userId : -1;
+        // Log only the changed fields
+        if (Object.keys(changedFields).length > 0) {
+          await AppointmentAuditLog.create({
+            appointment_id: instance.id,
+            changed_by: changedBy, // Access userId from the options object
+            change_type: "U",
+            changed_values: changedFields,
+          });
+        }
       },
     },
   }

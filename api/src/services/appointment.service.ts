@@ -1,4 +1,9 @@
-import { InstanceUpdateOptions, Op, UpdateOptions } from "sequelize";
+import {
+  CreateOptions,
+  InstanceUpdateOptions,
+  Op,
+  UpdateOptions,
+} from "sequelize";
 import { Appointment } from "../models";
 import {
   appointmentQueryType,
@@ -9,7 +14,12 @@ import { ApiError } from "../shared/error/ApiError";
 import { patientService, userService } from ".";
 
 import { combineAndFormatDateTime } from "../utils/helpers";
-
+interface CustomUpdateOptions extends InstanceUpdateOptions<Appointment> {
+  userId?: number; // Add the userId property
+}
+interface CustomCreateOptions extends CreateOptions<Appointment> {
+  userId?: number;
+}
 export const getAppointments = async (query: appointmentQueryType) => {
   const { searchTerm, sortBy, status } = query;
 
@@ -158,26 +168,48 @@ export const createAppointment = async (
     appointment_type,
     patient_visit_id,
   } = data;
-  const isNewPatient = !!patient_id;
+  const isNewPatient = patient_id ? false : true;
   let patientName = patient_name;
+
+  const doctor = await userService.getUserById(doctor_id); // Assuming getUserById is a method in your user service
+
+  if (!(await doctor.isDoctorRole())) {
+    throw new ApiError(
+      400,
+      // `User (${doctor_id}) not a doctor role`
+      `User with id (${doctor_id}) not a doctor role`
+    );
+  }
+
   if (patient_id) {
     const patient = await patientService.getPatientById(patient_id);
     patientName = patient.getFullName();
+    // check of the patient is already scheduled for the same day and time and doctor
+    if (await isPatientAlreadyScheduledWithDoctor(patient_id, doctor_id)) {
+      throw new ApiError(
+        400,
+        "Patient already has an appointment scheduled with the same doctor"
+      );
+    }
   }
-  const daysOfWeek = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  // console.log(req.body);
-  const Weekdate = new Date(appointment_date).getDay();
-  // Validate if the doctor_id belongs to a user with the "doctor" role
-  const doctor = await userService.getUserById(doctor_id); // Assuming getUserById is a method in your user service
-  const day_of_week = daysOfWeek[Weekdate] as
+
+  // Check if the doctor is already scheduled for the same day and time
+  if (
+    await isDoctorAlreadyScheduledWithOtherPatient(
+      doctor_id,
+      appointment_date,
+      appointment_time
+    )
+  ) {
+    throw new ApiError(
+      400,
+      "Doctor already has an appointment scheduled for the same day and time."
+    );
+  }
+
+  const day_of_week = new Date(appointment_date).toLocaleString("en-us", {
+    weekday: "long",
+  }) as
     | "Sunday"
     | "Monday"
     | "Tuesday"
@@ -188,44 +220,94 @@ export const createAppointment = async (
   const isDoctorAvailable = await userService.isDoctorAvailable({
     date: appointment_date,
     dayOfWeek: day_of_week,
-    doctorId: doctor.id,
+    doctor: doctor,
     time: appointment_time,
   });
   if (!isDoctorAvailable) {
     throw new ApiError(400, "Doctor is not available at the specified time.");
   }
-  if (!(await doctor.hasRole("doctor"))) {
-    throw new ApiError(
-      400,
-      "The specified doctor is not valid or does not have the correct role."
-    );
-  }
-  // create appointment date from appointment_date(eg. 01-17-2025) and appointment_time using date-fns
+
+  // create appointment
 
   const appointmentDate = combineAndFormatDateTime(
     appointment_date.toISOString().split("T")[0],
     appointment_time
   );
-  const appointment = await Appointment.create({
-    patient_id,
-    doctor_id,
-    reason,
-    patient_name: patientName,
-    appointment_date: appointmentDate,
-    appointment_time,
-    appointment_type,
-    patient_visit_id,
-    appointed_by: userId,
-    is_new_patient: isNewPatient,
-    registration_status: isNewPatient ? "pending" : null,
-  });
+  const appointment = await Appointment.create(
+    {
+      patient_id,
+      doctor_id,
+      reason,
+      patient_name: patientName,
+      appointment_date: appointmentDate,
+      appointment_time,
+      appointment_type,
+      patient_visit_id,
+      appointed_by: userId,
+      is_new_patient: isNewPatient,
+      registration_status: isNewPatient ? "pending" : null,
+    },
+    { hooks: true, userId: userId }
+  );
 
   return appointment;
 };
 
+// export const updateAppointment = async (
+//   appointmentId: number,
+//   data: updateAppointmentType,
+//   userId: number
+// ) => {
+//   const {
+//     patient_id,
+//     doctor_id,
+//     reason,
+//     patient_name,
+//     appointment_date,
+//     appointment_time,
+//     appointment_type,
+//     patient_visit_id,
+//   } = data;
+
+//   const appointement = await getAppointmentById(appointmentId);
+//   if (appointement.status?.toLowerCase() !== "scheduled") {
+//     throw new ApiError(
+//       400,
+//       "Appointment is not scheduled you can not update it"
+//     );
+//   }
+//   // Validate if the doctor_id corresponds to a user with the "doctor" role
+//   const doctor = await userService.getUserById(doctor_id); // Fetch the doctor by ID
+
+//   // Check if the doctor has the "doctor" role
+//   if (!(await doctor.isDoctorRole())) {
+//     throw new ApiError(
+//       400,
+//       " The specified doctor is not valid or does not have the doctor role."
+//     );
+//   }
+//   // If the doctor has the "doctor" role, proceed to update the appointment
+//   const appointmentDate = combineAndFormatDateTime(
+//     appointment_date.toISOString().split("T")[0], // Format date
+//     appointment_time
+//   );
+
+//   // Update the appointment
+//   await appointement.update({
+//     patient_id,
+//     doctor_id,
+//     reason,
+//     patient_name,
+//     appointment_date: appointmentDate,
+//     appointment_time,
+//     appointment_type,
+//     patient_visit_id,
+//   });
+//   return appointement; // The updated appointment object
+// };
 export const updateAppointment = async (
   appointmentId: number,
-  data: updateAppointmentType,
+  data: Partial<createAppointmentType>,
   userId: number
 ) => {
   const {
@@ -239,41 +321,118 @@ export const updateAppointment = async (
     patient_visit_id,
   } = data;
 
-  const appointement = await getAppointmentById(appointmentId);
-  if (appointement.status?.toLowerCase() !== "scheduled") {
+  const existingAppointment = await getAppointmentById(appointmentId);
+  if (existingAppointment.status !== "Scheduled") {
     throw new ApiError(
       400,
       "Appointment is not scheduled you can not update it"
     );
   }
-  // Validate if the doctor_id corresponds to a user with the "doctor" role
-  const doctor = await userService.getUserById(doctor_id); // Fetch the doctor by ID
 
-  // Check if the doctor has the "doctor" role
-  if (!(await doctor.isDoctorRole())) {
-    throw new ApiError(
-      400,
-      " The specified doctor is not valid or does not have the doctor role."
-    );
+  // Check if the doctor_id is provided and is valid
+  if (doctor_id) {
+    const doctor = await userService.getUserById(doctor_id);
+
+    if (!(await doctor.isDoctorRole())) {
+      throw new ApiError(
+        400,
+        `User with id (${doctor_id}) is not a doctor role.`
+      );
+    }
+
+    // Check if the doctor has another appointment at the same time
+    if (
+      appointment_date &&
+      appointment_time &&
+      (await isDoctorAlreadyScheduledWithOtherPatient(
+        doctor_id,
+        appointment_date,
+        appointment_time
+      ))
+    ) {
+      throw new ApiError(
+        400,
+        "Doctor already has an appointment scheduled for the same day and time."
+      );
+    }
   }
-  // If the doctor has the "doctor" role, proceed to update the appointment
-  const appointmentDate = combineAndFormatDateTime(
-    appointment_date.toISOString().split("T")[0], // Format date
-    appointment_time
-  );
+
+  // Check if the patient_id is provided and is valid
+  if (patient_id) {
+    const patient = await patientService.getPatientById(patient_id);
+    const updatedPatientName = patient_name || patient.getFullName();
+
+    // Check if the patient has a conflicting appointment with the same doctor
+    if (
+      doctor_id &&
+      appointment_date &&
+      appointment_time &&
+      (await isPatientAlreadyScheduledWithDoctor(patient_id, doctor_id))
+    ) {
+      throw new ApiError(
+        400,
+        "Patient already has an appointment scheduled with the same doctor."
+      );
+    }
+
+    data.patient_name = updatedPatientName; // Ensure the name is updated if provided
+  }
+
+  // Validate doctor's availability
+  if (doctor_id && appointment_date && appointment_time) {
+    const day_of_week = new Date(appointment_date).toLocaleString("en-us", {
+      weekday: "long",
+    }) as
+      | "Sunday"
+      | "Monday"
+      | "Tuesday"
+      | "Wednesday"
+      | "Thursday"
+      | "Friday"
+      | "Saturday";
+
+    const isDoctorAvailable = await userService.isDoctorAvailable({
+      date: appointment_date,
+      dayOfWeek: day_of_week,
+      doctor: await userService.getUserById(doctor_id),
+      time: appointment_time,
+    });
+
+    if (!isDoctorAvailable) {
+      throw new ApiError(400, "Doctor is not available at the specified time.");
+    }
+  }
+
+  // Format the updated appointment date and time if both are provided
+  // if (appointment_date && appointment_time) {
+  //   data.appointment_date = combineAndFormatDateTime(
+  //     appointment_date.toISOString().split("T")[0],
+  //     appointment_time
+  //   );
+  // }
 
   // Update the appointment
-  await appointement.update({
-    patient_id,
-    doctor_id,
-    reason,
-    patient_name,
-    appointment_date: appointmentDate,
-    appointment_time,
-    appointment_type,
-    patient_visit_id,
-  });
-  return appointement; // The updated appointment object
+  await existingAppointment.update(
+    {
+      patient_id: patient_id || existingAppointment.patient_id,
+      doctor_id: doctor_id || existingAppointment.doctor_id,
+      reason: reason || existingAppointment.reason,
+      patient_name: patient_name || existingAppointment.patient_name,
+      appointment_date:
+        appointment_date || existingAppointment.appointment_date,
+      appointment_time:
+        appointment_time || existingAppointment.appointment_time,
+      appointment_type:
+        appointment_type || existingAppointment.appointment_type,
+      patient_visit_id:
+        patient_visit_id || existingAppointment.patient_visit_id,
+
+      // updated_by: userId, // Record who updated the appointment
+    },
+    { hooks: true, userId: userId }
+  );
+
+  return existingAppointment;
 };
 
 export const cancelAppointment = async (
@@ -390,4 +549,46 @@ export const rescheduleOrCreate = async (
   await existingAppointment.save();
 
   return newAppointment;
+};
+
+// check if patient has schedule appointment in the same day and time with the same doctor
+
+export const isPatientAlreadyScheduledWithDoctor = async (
+  patientId: number,
+  doctorId: number
+  // appointmentDate: Date,
+  // appointmentTime: string
+) => {
+  const appointment = await Appointment.findOne({
+    where: {
+      patient_id: patientId,
+      doctor_id: doctorId,
+      // appointment_date: appointmentDate,
+      // appointment_time: appointmentTime,
+      status: "Scheduled",
+    },
+  });
+  // const hasAppointment = appointment ? true : false;
+  return !!appointment;
+};
+
+// has doctor appointment in the same day and time with the other patient
+export const isDoctorAlreadyScheduledWithOtherPatient = async (
+  doctorId: number,
+  appointmentDate: Date,
+  appointmentTime: string
+) => {
+  const appointment = await Appointment.findOne({
+    where: {
+      doctor_id: doctorId,
+      appointment_date: appointmentDate,
+      appointment_time: appointmentTime,
+      status: "Scheduled",
+    },
+  });
+  const hasOtherAppointment = appointment ? true : false;
+  if (hasOtherAppointment) {
+    throw new ApiError(400, "Doctor has appointment with other patient");
+  }
+  return hasOtherAppointment;
 };
