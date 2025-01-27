@@ -10,7 +10,7 @@ import Role from "./Role";
 import RolePermission from "./RolePermission";
 import Permission from "./Permission";
 import UserPermission from "./UserPermissions";
-import Appointment from "./Appointment";
+import Appointment from "./appointment/Appointment";
 import Patient from "./Patient";
 import PatientVisit from "./PatientVisit";
 import InvestigationOrder from "./medicalRecords/InvestigationOrder";

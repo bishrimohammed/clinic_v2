@@ -1,8 +1,11 @@
 import express from "express";
 import * as AppointementController from "../controllers/appointement.controller";
 import { protect } from "../middleware/authMiddleWare";
-import { validateQuery } from "../middleware/validate";
-import { appointmentQuerySchema } from "../types/appointment";
+import { validate, validateQuery } from "../middleware/validate";
+import {
+  appointmentQuerySchema,
+  createAppointmentSchema,
+} from "../types/appointment";
 // import {
 //   approvalSettingMiddleWare,
 // } from "../middleware/appovalSettingMiddleWare"
@@ -25,6 +28,7 @@ router.post(
   "/",
   protect,
   // approvalSettingMiddleWare("appointment", "create"),
+  validate(createAppointmentSchema),
   AppointementController.createAppointment
 );
 router.put("/:id", protect, AppointementController.updateAppointment);

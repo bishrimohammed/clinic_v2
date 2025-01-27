@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { InstanceUpdateOptions, Op, UpdateOptions } from "sequelize";
 import { Appointment } from "../models";
 import {
   appointmentQueryType,
@@ -164,9 +164,36 @@ export const createAppointment = async (
     const patient = await patientService.getPatientById(patient_id);
     patientName = patient.getFullName();
   }
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  // console.log(req.body);
+  const Weekdate = new Date(appointment_date).getDay();
   // Validate if the doctor_id belongs to a user with the "doctor" role
   const doctor = await userService.getUserById(doctor_id); // Assuming getUserById is a method in your user service
-
+  const day_of_week = daysOfWeek[Weekdate] as
+    | "Sunday"
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday";
+  const isDoctorAvailable = await userService.isDoctorAvailable({
+    date: appointment_date,
+    dayOfWeek: day_of_week,
+    doctorId: doctor.id,
+    time: appointment_time,
+  });
+  if (!isDoctorAvailable) {
+    throw new ApiError(400, "Doctor is not available at the specified time.");
+  }
   if (!(await doctor.hasRole("doctor"))) {
     throw new ApiError(
       400,
@@ -307,8 +334,60 @@ export const completeAppointment = async (
 };
 
 // reschedule appointment
-export const rescheduleAppointment = async (
+export const rescheduleOrCreate = async (
   appointmentId: number,
-  data: updateAppointmentType,
-  userId: number
-) => {};
+  newDate: string,
+  newTime: string,
+  rescheduledBy: number,
+  options?: { newDoctorId?: number; newReason?: string }
+): Promise<Appointment> => {
+  const existingAppointment = await getAppointmentById(appointmentId);
+
+  interface CustomUpdateOptions extends InstanceUpdateOptions<Appointment> {
+    userId?: number; // Add the userId property
+  }
+  // If the changes are minor (e.g., only date/time), reschedule the existing appointment
+  if (!options?.newDoctorId && !options?.newReason) {
+    await existingAppointment.update(
+      {
+        appointment_date: newDate,
+        appointment_time: newTime,
+        status: "Rescheduled",
+        re_appointed_by: rescheduledBy,
+      },
+      {
+        hooks: true,
+        // userId: 6,
+        fields: [
+          "appointment_date",
+          "appointment_time",
+          "status",
+          "re_appointed_by",
+        ],
+      }
+    );
+
+    return existingAppointment;
+  }
+
+  // If the changes are significant, create a new appointment and mark the old one as cancelled
+  const newAppointment = await Appointment.create({
+    patient_id: existingAppointment.patient_id,
+    patient_name: existingAppointment.patient_name,
+    doctor_id: options.newDoctorId || existingAppointment.doctor_id,
+    appointment_date: newDate,
+    appointment_time: newTime,
+    reason: options.newReason || existingAppointment.reason,
+    appointment_type: existingAppointment.appointment_type,
+    previous_appointment_id: existingAppointment.id, // Link to the old appointment
+    appointed_by: rescheduledBy,
+    status: "Scheduled",
+  });
+
+  // Mark the old appointment as cancelled
+  existingAppointment.status = "Cancelled";
+  existingAppointment.cancelled_by = rescheduledBy;
+  await existingAppointment.save();
+
+  return newAppointment;
+};

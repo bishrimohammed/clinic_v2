@@ -111,15 +111,21 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  UpdateOptions,
+  InstanceUpdateOptions,
 } from "sequelize";
 
-import sequelize from "../db/index"; // Ensure the correct path
-import Patient from "./Patient";
-import User from "./User";
-import PatientVisit from "./PatientVisit";
+import sequelize from "../../db/index"; // Ensure the correct path
+import Patient from "../Patient";
+import User from "../User";
+import PatientVisit from "../PatientVisit";
+import AppointmentAuditLog from "./AppointmentAuditLog ";
 
+interface CustomUpdateOptions extends InstanceUpdateOptions<Appointment> {
+  userId?: number; // Add the userId property
+}
 class Appointment extends Model<
-  InferAttributes<Appointment>,
+  InferAttributes<Appointment, {}>,
   InferCreationAttributes<Appointment>
 > {
   declare id: CreationOptional<number>;
@@ -137,20 +143,56 @@ class Appointment extends Model<
   declare re_appointed_by: number | null;
   declare cancelled_by: number | null;
   declare patient_visit_id: number | null;
-  declare is_new_patient: boolean;
+  declare is_new_patient: CreationOptional<boolean>;
   declare registration_status: "pending" | "compeleted" | null;
 
-  declare status: CreationOptional<
+  declare status?:
     | "Scheduled"
     | "Completed"
     | "Cancelled"
     | "Missed"
     | "Rescheduled"
-    | "Confirmed"
-  >;
+    | "Confirmed";
+
   declare deletedAt: CreationOptional<Date>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+
+  public static async createFollowUp(
+    originalAppointmentId: number,
+    followUpDate: string,
+    followUpTime: string,
+    appointedBy: number,
+    options?: { doctorId?: number; reason?: string }
+  ): Promise<Appointment> {
+    const originalAppointment = await Appointment.findByPk(
+      originalAppointmentId
+    );
+
+    if (!originalAppointment) {
+      throw new Error("Original appointment not found");
+    }
+
+    // Mark the original appointment as "Completed"
+    originalAppointment.status = "Completed";
+    await originalAppointment.save();
+
+    // Create the follow-up appointment
+    const followUpAppointment = await Appointment.create({
+      patient_id: originalAppointment.patient_id,
+      patient_name: originalAppointment.patient_name,
+      doctor_id: options?.doctorId || originalAppointment.doctor_id,
+      appointment_date: followUpDate,
+      appointment_time: followUpTime,
+      reason: options?.reason || "Follow-up",
+      appointment_type: "Follow-up",
+      previous_appointment_id: originalAppointment.id, // Link to the original appointment
+      appointed_by: appointedBy,
+      status: "Scheduled",
+    });
+
+    return followUpAppointment;
+  }
 }
 
 Appointment.init(
@@ -174,7 +216,7 @@ Appointment.init(
       allowNull: false,
     },
     appointment_date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     appointment_time: {
@@ -268,7 +310,26 @@ Appointment.init(
       defaultValue: DataTypes.NOW,
     },
   },
-  { sequelize, paranoid: true }
+  {
+    sequelize,
+    paranoid: true,
+    hooks: {
+      async afterCreate(attributes, options) {},
+      async afterUpdate(instance, options: CustomUpdateOptions) {
+        const oldValues = instance.previous(); // Get the previous values
+        const newValues = instance.get(); // Get the updated values
+        const {} = options;
+        const changedBy = options?.userId ? options.userId : -1;
+        await AppointmentAuditLog.create({
+          appointment_id: instance.id,
+          changed_by: changedBy, // Pass the user ID who made the change
+          change_type: "update",
+          old_values: oldValues,
+          new_values: newValues,
+        });
+      },
+    },
+  }
 );
 
 Appointment.belongsTo(Patient, {
