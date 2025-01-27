@@ -1,7 +1,14 @@
 // import { clinicProfileService } from "services";
 import { clinicProfileService, scheduleService } from ".";
 import sequelize from "../db";
-import { User, UserPermission, Role, Employee, Schedule } from "../models";
+import {
+  User,
+  UserPermission,
+  Role,
+  Employee,
+  Schedule,
+  Appointment,
+} from "../models";
 import { ApiError } from "../shared/error/ApiError";
 import {
   addDoctorWorkingHoursInput,
@@ -445,4 +452,54 @@ export const updatedDoctorWorkingHour = async (
   // });
 
   return schedule;
+};
+
+interface isDoctorAvailableParam {
+  doctorId: number;
+  date: Date;
+  dayOfWeek:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
+  time: string;
+}
+export const isDoctorAvailable = async ({
+  dayOfWeek,
+  doctorId,
+  date,
+  time,
+}: isDoctorAvailableParam) => {
+  const doctor = await getUserById(doctorId);
+  const schedules = await doctor.getSchedules({
+    where: {
+      day_of_week: dayOfWeek,
+      [Op.and]: [
+        {
+          start_time: { [Op.lte]: time },
+          end_time: { [Op.gte]: time },
+        },
+      ],
+    },
+  });
+
+  const hasSchedule = schedules.length > 0;
+  // if (!hasSchedule) {
+  //   throw new ApiError(400, "Doctor doesn't have work now ");
+  // }
+  const hasOtherAppointment = await Appointment.findOne({
+    where: {
+      doctor_id: doctor.id,
+      status: "Scheduled",
+      appointment_date: date,
+    },
+  });
+  // if (hasOtherAppointment) {
+  //   throw new ApiError(400, "Doctor has other appointment");
+  // }
+  const isAvailable = hasSchedule && !hasOtherAppointment;
+  return isAvailable;
 };
