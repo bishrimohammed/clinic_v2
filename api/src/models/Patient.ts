@@ -348,7 +348,9 @@ class Patient extends Model<
   >;
 
   getFullName() {
-    const fullName = `${this.firstName} ${this.middleName} ${this.lastName}`;
+    const fullName = `${this.firstName} ${this.middleName} ${
+      this.lastName ? this.lastName : ""
+    }`;
     return fullName.trim();
   }
 }

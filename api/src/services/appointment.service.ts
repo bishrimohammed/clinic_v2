@@ -55,13 +55,22 @@ export const getAppointments = async (query: appointmentQueryType) => {
       orderClause.push(["patient_name", "DESC"]);
       break;
     case "appointment_date_asc":
-      orderClause.push(["appointment_date", "ASC"]);
+      orderClause.push(
+        ["appointment_date", "ASC"],
+        ["appointment_time", "ASC"]
+      );
       break;
     case "appointment_date_desc":
-      orderClause.push(["appointment_date", "DESC"]);
+      orderClause.push(
+        ["appointment_date", "DESC"],
+        ["appointment_time", "DESC"]
+      );
       break;
     default:
-      orderClause.push(["appointment_date", "ASC"]);
+      orderClause.push(
+        ["appointment_date", "DESC"],
+        ["appointment_time", "DESC"]
+      );
       break;
   }
 
