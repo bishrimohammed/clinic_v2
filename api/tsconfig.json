@@ -5,6 +5,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "types": ["node"],
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
     "rootDir": "./src",
@@ -12,6 +13,6 @@
     "moduleResolution": "node",
     "typeRoots": ["node_modules/@types", "./src/types"] // Include custom types directory
   },
-  "include": ["src/**/*", "index.d.ts"], // types are included
+  "include": ["src/**/*", "src/types/**/*.d.ts"], // types are included
   "exclude": ["node_modules"]
 }

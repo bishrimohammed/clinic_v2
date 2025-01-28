@@ -7,6 +7,10 @@ import {
   PatientRegistrationInput,
   patientRegistrationSchema,
   updatePatientSchema,
+  createAllergySchema,
+  createFamilyHistorySchema,
+  createPastMedicalHistorySchema,
+  createSocialHistorySchema,
 } from "../types/patient";
 import { parseJSON } from "../utils/helpers";
 const router = express.Router();
@@ -30,7 +34,7 @@ router.get(
   protect,
   PatientController.getPatientSocialHistory
 );
-router.get("/:id/allery", protect, PatientController.getPatientAllergy);
+router.get("/:id/allergy", protect, PatientController.getPatientAllergy);
 router.get(
   "/:id/past-medical-history",
   protect,
@@ -47,20 +51,28 @@ router.post(
   }),
   PatientController.createPatient
 );
-router.post("/:id/allergy", protect, PatientController.addPatientAllergy);
+router.post(
+  "/:id/allergy",
+  protect,
+  validate(createAllergySchema),
+  PatientController.addPatientAllergy
+);
 router.post(
   "/:id/family-history",
   protect,
+  validate(createFamilyHistorySchema),
   PatientController.addPatientFamilyHistory
 );
 router.post(
   "/:id/social-history",
   protect,
+  validate(createSocialHistorySchema),
   PatientController.addPatientSocialHistory
 );
 router.post(
   "/:id/past-medical-history",
   protect,
+  validate(createPastMedicalHistorySchema),
   PatientController.addPatientPastMedicalHistory
 );
 
@@ -77,24 +89,28 @@ router.put(
 router.put(
   "/family-history/:family_history_id",
   protect,
+  validate(createFamilyHistorySchema),
   PatientController.updatePatientFamilyHistory
 );
 
 router.put(
   "/social-history/:social_history_id",
   protect,
+  validate(createSocialHistorySchema),
   PatientController.updatePatientSocialHistory
 );
 router.put(
   "/allergy/:allergy_id",
   protect,
-  PatientController.updatePatientFamilyHistory
+  validate(createAllergySchema),
+  PatientController.updatePatientAllergy
 );
 
 router.put(
   "/past-medical-history/:past_medical_history_id",
   protect,
-  PatientController.updatePatientSocialHistory
+  validate(createPastMedicalHistorySchema),
+  PatientController.updatePatientPastMedicalHistory
 );
 // router
 //   .get("/:id", getPatient)
@@ -121,7 +137,7 @@ router.delete(
 );
 
 router.delete(
-  "/allery/:allergy_id",
+  "/allergy/:allergy_id",
   protect,
   PatientController.deletePatientAllergy
 );

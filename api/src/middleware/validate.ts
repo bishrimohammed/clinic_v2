@@ -53,7 +53,7 @@ export const validateQuery =
   <T extends ZodSchema<any>>(schema: T) =>
   (req: Request, res: Response, next: NextFunction) => {
     const query = { ...req.query };
-    console.log(query);
+    // console.log(query);
 
     const result = schema.safeParse(query);
     if (!result.success) {

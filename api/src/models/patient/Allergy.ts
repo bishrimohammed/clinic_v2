@@ -133,7 +133,7 @@ Allergy.init(
     },
     reaction_details: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     created_by: {
       type: DataTypes.INTEGER,
@@ -197,6 +197,6 @@ Allergy.init(
 
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// Allergy.sync({ alter: false });
+Allergy.sync({ alter: false });
 
 export default Allergy;

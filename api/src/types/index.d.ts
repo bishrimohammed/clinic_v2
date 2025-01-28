@@ -20,3 +20,19 @@ declare global {
     }
   }
 }
+
+declare module "sequelize" {
+  interface InstanceUpdateOptions {
+    /**
+     * The ID of the user performing the update.
+     * Used for auditing purposes in hooks like `afterUpdate`.
+     */
+    userId?: number;
+  }
+  interface InstanceCreateOptions {
+    userId?: number;
+  }
+  interface InstanceDestroyOptions {
+    userId?: number;
+  }
+}

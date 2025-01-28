@@ -607,7 +607,7 @@ export const deleteFamilyHistory = async (alleryId: number) => {
 
 export const getSocialHistories = async (patientId: number) => {
   const patient = await getPatientById(patientId);
-  const socialHistories = await patient.getFamilyHistories();
+  const socialHistories = await patient.getSocialHistories();
   return socialHistories;
 };
 export const getSocialHistoryById = async (socialHistoryId: number) => {

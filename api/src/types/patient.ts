@@ -250,7 +250,7 @@ export const patientQuerySchema = z.object({
 export const createAllergySchema = z.object({
   allergy_type: z.string().trim().min(3),
   severity: z.enum(["Mild", "Moderate", "Severe"]),
-  reaction_details: z.string().trim().optional(),
+  reaction_details: z.string().trim().optional().nullable(),
 });
 
 export const createFamilyHistorySchema = z.object({
@@ -261,7 +261,7 @@ export const createFamilyHistorySchema = z.object({
 export const createSocialHistorySchema = z.object({
   smoking_status: z.enum(["Current smoker", "Former smoker", "Non-smoker"]),
   alcohol_consumption: z.enum(["light", "moderate", "heavy"]),
-  drug_use: z.enum(["never", "occasional", "regular"]),
+  drug_use: z.enum(["never", "occasional", "regular"]).optional().nullable(),
 });
 
 export const createPastMedicalHistorySchema = z.object({

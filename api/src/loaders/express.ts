@@ -44,12 +44,8 @@ import {
   printRoute,
   // ExternalServiceRoute,
 } from "../routes/index";
-// const db = require("./models/index");
-// const { Sequelize } = require("sequelize");
-// await connectDb()
-// const app = express();
+// import sequelize from "../db";
 
-// const Role = require("./models/Role.js");
 const expressLoader = async (app: Application) => {
   //   dotenv.config();
   app.use(express.json());
@@ -61,7 +57,7 @@ const expressLoader = async (app: Application) => {
     "/uploads",
     express.static(path.join(currentDirname, "public/uploads"))
   );
-  // app.use(upload.any());
+
   app.use(cors({ origin: "http://localhost:3000", credentials: true }));
   app.use("/api/v1/users", userRoute);
   app.use("/api/v1/dashboards", DashbordDataRoute);
@@ -74,7 +70,11 @@ const expressLoader = async (app: Application) => {
   app.use("/api/v1/employees", employeeRoute);
 
   app.use("/api/v1/patients", patientRoute);
+  app.use("/api/v1/appointments", AppointmentRoute);
 
+  // app.use("/models", (req, res) => {
+  //   res.json(sequelize.models);
+  // });
   // app.use("/api/v1/patient", patientRoute);
   // app.use("/api/v1/allergies", AllergyRoute);
   // app.use("/api/v1/woreda", woredaRoute);

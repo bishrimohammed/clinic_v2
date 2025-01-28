@@ -61,6 +61,14 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   public isPasswordMatch(password: string) {
     return bcrypt.compareSync(password, this.password);
   }
+  public async hasRole(roleName: string): Promise<boolean> {
+    const role = await this.getRole(); // Fetch the associated role
+    return role?.name?.toLowerCase() === roleName.toLowerCase(); // Check if the role name matches
+  }
+  public async isDoctorRole(): Promise<boolean> {
+    const role = await this.getRole(); // Fetch the associated role
+    return role?.name?.toLowerCase() === "doctor"; // Check if the role name matches
+  }
   declare static associations: {
     role: Association<User, Role>;
     employee: Association<User, Employee>;

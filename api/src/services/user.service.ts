@@ -1,7 +1,15 @@
 // import { clinicProfileService } from "services";
 import { clinicProfileService, scheduleService } from ".";
+import logger from "../config/logger";
 import sequelize from "../db";
-import { User, UserPermission, Role, Employee, Schedule } from "../models";
+import {
+  User,
+  UserPermission,
+  Role,
+  Employee,
+  Schedule,
+  Appointment,
+} from "../models";
 import { ApiError } from "../shared/error/ApiError";
 import {
   addDoctorWorkingHoursInput,
@@ -445,4 +453,41 @@ export const updatedDoctorWorkingHour = async (
   // });
 
   return schedule;
+};
+
+interface isDoctorAvailableParam {
+  doctor: User;
+  date: Date;
+  dayOfWeek:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
+  time: string;
+}
+export const isDoctorAvailable = async (data: isDoctorAvailableParam) => {
+  const { doctor, date, dayOfWeek, time } = data;
+  // const doctor = await getUserById(doctorId);
+  const schedules = await doctor.getSchedules({
+    where: {
+      day_of_week: dayOfWeek,
+      [Op.and]: [
+        {
+          start_time: { [Op.lte]: time },
+          end_time: { [Op.gte]: time },
+        },
+      ],
+    },
+  });
+  // console.log(schedules);
+  const hasSchedule = schedules.length > 0;
+  if (!hasSchedule) {
+    throw new ApiError(400, "Doctor doesn't have work now ");
+  }
+
+  const isAvailable = hasSchedule;
+  return isAvailable;
 };

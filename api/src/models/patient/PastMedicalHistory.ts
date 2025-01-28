@@ -91,7 +91,7 @@ class PastMedicalHistory extends Model<
   declare medical_condition: string;
   declare treatment: string;
   declare created_by: number;
-  declare deletedAt?: Date | null;
+  declare deletedAt?: CreationOptional<Date>;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
 }
@@ -184,6 +184,6 @@ PastMedicalHistory.init(
 
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// PastMedicalHistory.sync({ alter: false });
+PastMedicalHistory.sync({ alter: false });
 
 export default PastMedicalHistory;
