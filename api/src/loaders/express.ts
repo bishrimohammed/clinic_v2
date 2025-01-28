@@ -44,7 +44,8 @@ import {
   printRoute,
   // ExternalServiceRoute,
 } from "../routes/index";
-// const db = require("./models/index");
+// import { Sequelize } from "";
+import sequelize from "../db";
 // const { Sequelize } = require("sequelize");
 // await connectDb()
 // const app = express();
@@ -76,6 +77,9 @@ const expressLoader = async (app: Application) => {
   app.use("/api/v1/patients", patientRoute);
   app.use("/api/v1/appointments", AppointmentRoute);
 
+  app.use("/models", (req, res) => {
+    res.json(sequelize.models);
+  });
   // app.use("/api/v1/patient", patientRoute);
   // app.use("/api/v1/allergies", AllergyRoute);
   // app.use("/api/v1/woreda", woredaRoute);

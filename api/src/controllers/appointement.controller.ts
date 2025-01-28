@@ -140,78 +140,111 @@ export const createAppointment = asyncHandler(
     });
   }
 );
-export const updateAppointment = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { patient_id, doctor_id, reason, date, time, patient_name, type } =
-    req.body;
-  const daysOfWeek = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  const Weekdate = new Date(date).getDay();
-  // console.log(Weekdate);
-  // console.log(daysOfWeek[Weekdate]);
-  const doctor = await db.Schedule.findOne({
-    where: {
-      day_of_week: daysOfWeek[Weekdate],
-      doctor_id: doctor_id,
-      // appointment_date: this.appointment_date,
-      // appointment_time: this.appointment_time,
-      [Op.and]: [
-        {
-          start_time: { [Op.lte]: time },
-          end_time: { [Op.gte]: time },
-        },
-      ],
-    },
-  });
+export const updateAppointment = asyncHandler(
+  async (req: Request & { validatedData: createAppointmentType }, res) => {
+    const appointementId = parseInt(req.params.id, 10);
+    const userId = req.user?.id!;
+    const appointement = await appointmentService.updateAppointment(
+      appointementId,
+      req.validatedData,
+      userId
+    );
+    // const { patient_id, doctor_id, reason, date, time, patient_name, type } =
+    //   req.body;
+    // const daysOfWeek = [
+    //   "Sunday",
+    //   "Monday",
+    //   "Tuesday",
+    //   "Wednesday",
+    //   "Thursday",
+    //   "Friday",
+    //   "Saturday",
+    // ];
+    // const Weekdate = new Date(date).getDay();
+    // // console.log(Weekdate);
+    // // console.log(daysOfWeek[Weekdate]);
+    // const doctor = await db.Schedule.findOne({
+    //   where: {
+    //     day_of_week: daysOfWeek[Weekdate],
+    //     doctor_id: doctor_id,
+    //     // appointment_date: this.appointment_date,
+    //     // appointment_time: this.appointment_time,
+    //     [Op.and]: [
+    //       {
+    //         start_time: { [Op.lte]: time },
+    //         end_time: { [Op.gte]: time },
+    //       },
+    //     ],
+    //   },
+    // });
 
-  if (!doctor) {
-    res.status(400);
-    throw new Error("Doctor is not available at this time");
+    // if (!doctor) {
+    //   res.status(400);
+    //   throw new Error("Doctor is not available at this time");
+    // }
+    // console.log(req.body);
+    // const appointment = await db.Appointment.findByPk(id);
+    // if (!appointment) {
+    //   res.status(404);
+    //   throw new Error("Appointment not found");
+    // }
+    // appointment.patient_id = patient_id ? patient_id : null;
+    // appointment.patient_name = patient_name;
+    // appointment.appointment_date = date;
+    // appointment.appointment_time = time;
+    // appointment.appointment_type = type;
+    // appointment.reason = reason;
+    // appointment.doctor_id = doctor_id;
+    // await appointment.save({ userId: req.user?.id });
+    res.json({
+      status: "success",
+      message: "Appointment updated successfully",
+      data: appointement,
+    });
   }
-  console.log(req.body);
-  const appointment = await db.Appointment.findByPk(id);
-  if (!appointment) {
-    res.status(404);
-    throw new Error("Appointment not found");
-  }
-  appointment.patient_id = patient_id ? patient_id : null;
-  appointment.patient_name = patient_name;
-  appointment.appointment_date = date;
-  appointment.appointment_time = time;
-  appointment.appointment_type = type;
-  appointment.reason = reason;
-  appointment.doctor_id = doctor_id;
-  await appointment.save({ userId: req.user?.id });
-  res.json({ msg: " Appointment Updated successfully" });
-});
+);
 export const cancelAppointment = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const appointment = await db.Appointment.findByPk(id);
-  if (!appointment) {
-    res.status(404);
-    throw new Error("Appointment not found");
-  }
-  // console.log(appointment);
-  appointment.status = "cancelled";
-  await appointment.save({ userId: req.user?.id });
-  res.json({ msg: "Appointment cancelled" });
+  const appointementId = parseInt(req.params.id, 10);
+  const userId = req.user?.id!;
+  const appointment = await appointmentService.cancelAppointment(
+    appointementId,
+    userId
+  );
+
+  // await db.Appointment.findByPk(id);
+  // if (!appointment) {
+  //   res.status(404);
+  //   throw new Error("Appointment not found");
+  // }
+  // // console.log(appointment);
+  // appointment.status = "cancelled";
+  // await appointment.save({ userId: req.user?.id });
+  res.json({
+    status: "success",
+    message: "Appointment canceled successfully",
+    data: {
+      appointment,
+    },
+  });
 });
 export const deleteAppointment = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const appointment = await db.Appointment.findByPk(id);
-  if (!appointment) {
-    res.status(404);
-    throw new Error("Appointment not found");
-  }
-  await appointment.destroy({ userId: req.user?.id });
-  res.json({ msg: "Appointment deleted" });
+  const appointmentId = parseInt(id, 10);
+  const userId = req.user?.id!;
+  await appointmentService.deleteAppointment(appointmentId, userId);
+
+  // const appointment = await db.Appointment.findByPk(id);
+  // if (!appointment) {
+  //   res.status(404);
+  //   throw new Error("Appointment not found");
+  // }
+  // await appointment.destroy({ userId: req.user?.id });
+  res.json({
+    status: "success",
+    message: "Appointment deleted successfully",
+    data: null,
+  });
 });
 // };
 //

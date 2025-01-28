@@ -1,119 +1,11 @@
-// const { Op } = require("sequelize");
-// const db = require(".");
-// const { sequelize } = require(".");
-
-// module.exports = (sequelize, DataTypes) => {
-//   const Appointment = sequelize.define(
-//     "appointment",
-//     {
-//       id: {
-//         type: DataTypes.INTEGER,
-//         primaryKey: true,
-//         autoIncrement: true,
-//         allowNull: false,
-//       },
-
-//       patient_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: true,
-//       },
-//       patient_name: DataTypes.STRING,
-//       doctor_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: false,
-//         validate: {},
-//       },
-//       appointment_date: {
-//         type: DataTypes.DATEONLY,
-//         allowNull: false,
-//       },
-//       appointment_time: {
-//         type: DataTypes.TIME,
-//         allowNull: false,
-//       },
-//       reason: DataTypes.STRING,
-//       appointment_type: DataTypes.STRING,
-//       status: {
-//         type: DataTypes.ENUM,
-//         allowNull: false,
-//         values: ["upcoming", "overdue", "cancelled"],
-//         defaultValue: "upcoming",
-//       },
-//       deletedAt: {
-//         type: DataTypes.DATE,
-//         allowNull: true,
-//         defaultValue: null,
-//       },
-
-//     },
-//     {
-//       paranoid: true,
-//       hooks: {
-//         afterCreate: async (appointment, options) => {
-//           await sequelize.models.appointments_audit.create({
-//             appointment_id: appointment.id,
-//             patient_id: appointment.patient_id,
-//             patient_name: appointment.patient_name,
-//             doctor_id: appointment.doctor_id,
-//             appointment_date: appointment.appointment_date,
-//             appointment_time: appointment.appointment_time,
-//             reason: appointment.reason,
-//             appointment_type: appointment.appointment_type,
-//             status: appointment.status,
-//             operation_type: "I",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//         beforeUpdate: async (appointment, options) => {
-//           const previousAppointmentData = appointment._previousDataValues;
-//           await sequelize.models.appointments_audit.create({
-//             appointment_id: previousAppointmentData.id,
-//             patient_id: previousAppointmentData.patient_id,
-//             patient_name: previousAppointmentData.patient_name,
-//             doctor_id: previousAppointmentData.doctor_id,
-//             appointment_date: previousAppointmentData.appointment_date,
-//             appointment_time: previousAppointmentData.appointment_time,
-//             reason: previousAppointmentData.reason,
-//             appointment_type: previousAppointmentData.appointment_type,
-//             status: previousAppointmentData.status,
-//             operation_type: "U",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//         beforeDestroy: async (appointment, options) => {
-//           await sequelize.models.appointments_audit.create({
-//             appointment_id: appointment.id,
-//             patient_id: appointment.patient_id,
-//             patient_name: appointment.patient_name,
-//             doctor_id: appointment.doctor_id,
-//             appointment_date: appointment.appointment_date,
-//             appointment_time: appointment.appointment_time,
-//             reason: appointment.reason,
-//             appointment_type: appointment.appointment_type,
-//             status: appointment.status,
-//             operation_type: "D",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//       },
-//     }
-//   );
-//   Appointment.sync({ alter: false });
-//   return Appointment;
-// };
-
 import {
   Model,
   DataTypes,
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
-  UpdateOptions,
   InstanceUpdateOptions,
-  CreateOptions,
+  InstanceDestroyOptions,
 } from "sequelize";
 
 import sequelize from "../../db/index"; // Ensure the correct path
@@ -123,12 +15,16 @@ import PatientVisit from "../PatientVisit";
 import AppointmentAuditLog from "./AppointmentAuditLog ";
 // import AppointmentAuditLog from "./AppointmentAuditLog";
 
-interface CustomUpdateOptions extends InstanceUpdateOptions<Appointment> {
+interface CustomUpdateOptions extends InstanceUpdateOptions {
   userId?: number; // Add the userId property
 }
 
-interface CustomCreateOptions extends CreateOptions<Appointment> {
+interface CustomCreateOptions extends InstanceUpdateOptions {
   userId?: number;
+}
+
+interface CustomDestroyOptions extends InstanceDestroyOptions {
+  userId: number;
 }
 
 class Appointment extends Model<
@@ -148,7 +44,7 @@ class Appointment extends Model<
   declare next_appointment_date: Date | null;
   declare appointed_by: number;
   declare re_appointed_by: number | null;
-  declare cancelled_by: number | null;
+  // declare cancelled_by: number | null;
   // declare u: string | null;
   declare patient_visit_id: number | null;
   declare is_new_patient: CreationOptional<boolean>;
@@ -165,42 +61,6 @@ class Appointment extends Model<
   declare deletedAt: CreationOptional<Date>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
-
-  public static async createFollowUp(
-    originalAppointmentId: number,
-    followUpDate: string,
-    followUpTime: string,
-    appointedBy: number,
-    options?: { doctorId?: number; reason?: string }
-  ): Promise<Appointment> {
-    const originalAppointment = await Appointment.findByPk(
-      originalAppointmentId
-    );
-
-    if (!originalAppointment) {
-      throw new Error("Original appointment not found");
-    }
-
-    // Mark the original appointment as "Completed"
-    originalAppointment.status = "Completed";
-    await originalAppointment.save();
-
-    // Create the follow-up appointment
-    const followUpAppointment = await Appointment.create({
-      patient_id: originalAppointment.patient_id,
-      patient_name: originalAppointment.patient_name,
-      doctor_id: options?.doctorId || originalAppointment.doctor_id,
-      appointment_date: followUpDate,
-      appointment_time: followUpTime,
-      reason: options?.reason || "Follow-up",
-      appointment_type: "Follow-up",
-      previous_appointment_id: originalAppointment.id, // Link to the original appointment
-      appointed_by: appointedBy,
-      status: "Scheduled",
-    });
-
-    return followUpAppointment;
-  }
 }
 
 Appointment.init(
@@ -275,14 +135,6 @@ Appointment.init(
         key: "id",
       },
     },
-    cancelled_by: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: User,
-        key: "id",
-      },
-    },
 
     patient_visit_id: {
       type: DataTypes.INTEGER,
@@ -336,14 +188,26 @@ Appointment.init(
           changed_values: otherAttributes,
         });
       },
-      async afterUpdate(instance, options) {
-        const oldValues: Record<string, any> = instance.previous(); // Get the previous values
-        const newValues: Record<string, any> = instance.get(); // Get the updated values
+      async afterUpdate(instance, options: CustomUpdateOptions) {
+        const oldValues = instance.previous() as Record<string, any> | null;
+        const newValues = instance.get() as Record<string, any>;
+
+        // console.log(options);
+        // console.log(oldValues);
+        // console.log(newValues);
+        if (!oldValues || !newValues) {
+          console.warn("Unable to retrieve instance values for audit logging.");
+          return;
+        }
 
         // Determine which fields were changed
-        const changedFields: Record<string, any> = {};
+        const changedFields: Record<
+          string,
+          { old_value: any; new_value: any }
+        > = {};
+
         for (const key of Object.keys(newValues)) {
-          if (oldValues[key] !== newValues[key]) {
+          if (key in oldValues && oldValues[key] !== newValues[key]) {
             changedFields[key] = {
               old_value: oldValues[key],
               new_value: newValues[key],
@@ -360,6 +224,19 @@ Appointment.init(
             changed_values: changedFields,
           });
         }
+        // console.log(changedFields);
+      },
+      async afterDestroy(instance, options: CustomDestroyOptions) {
+        // if(!options.userId) return
+        const changedBy = options.userId;
+        await AppointmentAuditLog.create({
+          appointment_id: instance.id,
+          changed_by: changedBy, // Access userId from the options object
+          change_type: "D",
+          // old_values: {},
+          // changed_values: {},
+          // deleted_at: new Date(),
+        });
       },
     },
   }

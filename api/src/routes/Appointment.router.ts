@@ -31,7 +31,12 @@ router.post(
   validate(createAppointmentSchema),
   AppointementController.createAppointment
 );
-router.put("/:id", protect, AppointementController.updateAppointment);
+router.put(
+  "/:id",
+  protect,
+  validate(createAppointmentSchema),
+  AppointementController.updateAppointment
+);
 router.patch("/:id/cancel", protect, AppointementController.cancelAppointment);
 router.delete("/:id", protect, AppointementController.deleteAppointment);
 

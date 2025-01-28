@@ -1,25 +1,27 @@
 import {
   CreateOptions,
+  InstanceDestroyOptions,
   InstanceUpdateOptions,
   Op,
-  UpdateOptions,
 } from "sequelize";
 import { Appointment } from "../models";
 import {
   appointmentQueryType,
   createAppointmentType,
-  updateAppointmentType,
 } from "../types/appointment";
 import { ApiError } from "../shared/error/ApiError";
 import { patientService, userService } from ".";
 
 import { combineAndFormatDateTime } from "../utils/helpers";
-interface CustomUpdateOptions extends InstanceUpdateOptions<Appointment> {
+
+interface CustomUpdateOptions extends InstanceUpdateOptions {
   userId?: number; // Add the userId property
 }
+
 interface CustomCreateOptions extends CreateOptions<Appointment> {
   userId?: number;
 }
+
 export const getAppointments = async (query: appointmentQueryType) => {
   const { searchTerm, sortBy, status } = query;
 
@@ -146,6 +148,7 @@ export const getActiveAppointments = async (query: appointmentQueryType) => {
     },
   };
 };
+
 export const getAppointmentById = async (id: number) => {
   const appointment = await Appointment.findByPk(id);
   if (!appointment) {
@@ -153,6 +156,7 @@ export const getAppointmentById = async (id: number) => {
   }
   return appointment;
 };
+
 export const createAppointment = async (
   data: createAppointmentType,
   userId: number
@@ -253,58 +257,6 @@ export const createAppointment = async (
   return appointment;
 };
 
-// export const updateAppointment = async (
-//   appointmentId: number,
-//   data: updateAppointmentType,
-//   userId: number
-// ) => {
-//   const {
-//     patient_id,
-//     doctor_id,
-//     reason,
-//     patient_name,
-//     appointment_date,
-//     appointment_time,
-//     appointment_type,
-//     patient_visit_id,
-//   } = data;
-
-//   const appointement = await getAppointmentById(appointmentId);
-//   if (appointement.status?.toLowerCase() !== "scheduled") {
-//     throw new ApiError(
-//       400,
-//       "Appointment is not scheduled you can not update it"
-//     );
-//   }
-//   // Validate if the doctor_id corresponds to a user with the "doctor" role
-//   const doctor = await userService.getUserById(doctor_id); // Fetch the doctor by ID
-
-//   // Check if the doctor has the "doctor" role
-//   if (!(await doctor.isDoctorRole())) {
-//     throw new ApiError(
-//       400,
-//       " The specified doctor is not valid or does not have the doctor role."
-//     );
-//   }
-//   // If the doctor has the "doctor" role, proceed to update the appointment
-//   const appointmentDate = combineAndFormatDateTime(
-//     appointment_date.toISOString().split("T")[0], // Format date
-//     appointment_time
-//   );
-
-//   // Update the appointment
-//   await appointement.update({
-//     patient_id,
-//     doctor_id,
-//     reason,
-//     patient_name,
-//     appointment_date: appointmentDate,
-//     appointment_time,
-//     appointment_type,
-//     patient_visit_id,
-//   });
-//   return appointement; // The updated appointment object
-// };
 export const updateAppointment = async (
   appointmentId: number,
   data: Partial<createAppointmentType>,
@@ -347,33 +299,32 @@ export const updateAppointment = async (
       (await isDoctorAlreadyScheduledWithOtherPatient(
         doctor_id,
         appointment_date,
-        appointment_time
+        appointment_time,
+        (appointmentId = existingAppointment.id)
       ))
     ) {
-      throw new ApiError(
-        400,
-        "Doctor already has an appointment scheduled for the same day and time."
-      );
+      throw new ApiError(400, "Doctor has appointment with other patient");
     }
   }
 
   // Check if the patient_id is provided and is valid
+  let updatedPatientName = patient_name;
   if (patient_id) {
     const patient = await patientService.getPatientById(patient_id);
-    const updatedPatientName = patient_name || patient.getFullName();
+    updatedPatientName = patient.getFullName();
 
     // Check if the patient has a conflicting appointment with the same doctor
-    if (
-      doctor_id &&
-      appointment_date &&
-      appointment_time &&
-      (await isPatientAlreadyScheduledWithDoctor(patient_id, doctor_id))
-    ) {
-      throw new ApiError(
-        400,
-        "Patient already has an appointment scheduled with the same doctor."
-      );
-    }
+    // if (
+    //   doctor_id &&
+    //   appointment_date &&
+    //   appointment_time &&
+    //   (await isPatientAlreadyScheduledWithDoctor(patient_id, doctor_id))
+    // ) {
+    //   throw new ApiError(
+    //     400,
+    //     "Patient already has an appointment scheduled with the same doctor."
+    //   );
+    // }
 
     data.patient_name = updatedPatientName; // Ensure the name is updated if provided
   }
@@ -404,30 +355,52 @@ export const updateAppointment = async (
   }
 
   // Format the updated appointment date and time if both are provided
-  // if (appointment_date && appointment_time) {
-  //   data.appointment_date = combineAndFormatDateTime(
-  //     appointment_date.toISOString().split("T")[0],
-  //     appointment_time
-  //   );
-  // }
+  let appointmentDate = existingAppointment.appointment_date;
+  if (appointment_date && appointment_time) {
+    appointmentDate = appointment_date.toString(); // Format date
+    // combineAndFormatDateTime(
+    //   appointment_date.toISOString().split("T")[0],
+    //   appointment_time
+    // );
+  }
 
   // Update the appointment
+  // await Appointment.update(
+  //   {
+  //     patient_id: patient_id || existingAppointment.patient_id,
+  //     doctor_id: doctor_id || existingAppointment.doctor_id,
+  //     reason: reason || existingAppointment.reason,
+  //     patient_name: patient_name || existingAppointment.patient_name,
+  //     appointment_date: appointmentDate,
+  //     appointment_time:
+  //       appointment_time || existingAppointment.appointment_time,
+  //     appointment_type:
+  //       appointment_type || existingAppointment.appointment_type,
+  //     patient_visit_id:
+  //       patient_visit_id || existingAppointment.patient_visit_id,
+  //   },
+  //   {
+  //     where: { id: appointmentId },
+  //     hooks: true,
+  //     individualHooks: true,
+
+  //         },
+
+  // );
+  // @ts-ignore
   await existingAppointment.update(
     {
       patient_id: patient_id || existingAppointment.patient_id,
       doctor_id: doctor_id || existingAppointment.doctor_id,
       reason: reason || existingAppointment.reason,
-      patient_name: patient_name || existingAppointment.patient_name,
-      appointment_date:
-        appointment_date || existingAppointment.appointment_date,
+      patient_name: updatedPatientName,
+      appointment_date: appointmentDate,
       appointment_time:
         appointment_time || existingAppointment.appointment_time,
       appointment_type:
         appointment_type || existingAppointment.appointment_type,
       patient_visit_id:
         patient_visit_id || existingAppointment.patient_visit_id,
-
-      // updated_by: userId, // Record who updated the appointment
     },
     { hooks: true, userId: userId }
   );
@@ -440,22 +413,27 @@ export const cancelAppointment = async (
   userId: number
 ) => {
   const appointment = await getAppointmentById(appointmentId);
-  if (appointment.status?.toLowerCase() !== "scheduled") {
+  if (appointment.status !== "Scheduled") {
     throw new ApiError(
       400,
       "Appointment is not scheduled you can not cancel it"
     );
   }
-  await appointment.update({ status: "Cancelled", cancelled_by: userId });
+  const updateOptions = { hooks: true, userId } as InstanceUpdateOptions & {
+    userId: number;
+  };
+  // @ts-ignore
+  await appointment.update({ status: "Cancelled" }, { ...updateOptions });
   return appointment;
 };
 
 export const confirmAppointment = async (
   appointmentId: number,
+
   userId: number
 ) => {
   const appointment = await getAppointmentById(appointmentId);
-  if (appointment.status?.toLowerCase() !== "scheduled") {
+  if (appointment.status !== "Scheduled") {
     throw new ApiError(
       400,
       "Appointment is not scheduled you can not confirm it"
@@ -468,12 +446,30 @@ export const confirmAppointment = async (
       "Patient is not registered you can not confirm the appointment"
     );
   }
+
   await appointment.update({ status: "Confirmed" });
+
   return appointment;
 };
-export const deleteAppointment = async (appointmentId: number) => {
+
+export const deleteAppointment = async (
+  appointmentId: number,
+  userId: number
+) => {
   const appointment = await getAppointmentById(appointmentId);
-  await appointment.destroy();
+  if (appointment.status?.toLowerCase() !== "scheduled") {
+    throw new ApiError(
+      400,
+      "Appointment is not scheduled you can not delete it"
+    );
+  }
+  // interface gg extends InstanceDestroyOptions {
+  //   userId: number;
+  // }
+  const destroyOptions = { hooks: true, userId } as InstanceDestroyOptions & {
+    userId: number;
+  };
+  await appointment.destroy(destroyOptions);
   return appointment;
 };
 
@@ -545,14 +541,13 @@ export const rescheduleOrCreate = async (
 
   // Mark the old appointment as cancelled
   existingAppointment.status = "Cancelled";
-  existingAppointment.cancelled_by = rescheduledBy;
+  // existingAppointment.re_appointed_by = rescheduledBy;
   await existingAppointment.save();
 
   return newAppointment;
 };
 
 // check if patient has schedule appointment in the same day and time with the same doctor
-
 export const isPatientAlreadyScheduledWithDoctor = async (
   patientId: number,
   doctorId: number
@@ -576,19 +571,22 @@ export const isPatientAlreadyScheduledWithDoctor = async (
 export const isDoctorAlreadyScheduledWithOtherPatient = async (
   doctorId: number,
   appointmentDate: Date,
-  appointmentTime: string
+  appointmentTime: string,
+  appointmentId?: number // optional parameter to exclude the current appointment from the check if it's provided
 ) => {
+  const whereClause: any = {
+    doctor_id: doctorId,
+    appointment_date: appointmentDate,
+    appointment_time: appointmentTime,
+    status: "Scheduled",
+  };
+  if (appointmentId) {
+    whereClause.id = { [Op.not]: appointmentId };
+  }
   const appointment = await Appointment.findOne({
-    where: {
-      doctor_id: doctorId,
-      appointment_date: appointmentDate,
-      appointment_time: appointmentTime,
-      status: "Scheduled",
-    },
+    where: whereClause,
   });
   const hasOtherAppointment = appointment ? true : false;
-  if (hasOtherAppointment) {
-    throw new ApiError(400, "Doctor has appointment with other patient");
-  }
+
   return hasOtherAppointment;
 };

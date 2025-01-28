@@ -32,4 +32,7 @@ declare module "sequelize" {
   interface InstanceCreateOptions {
     userId?: number;
   }
+  interface InstanceDestroyOptions {
+    userId?: number;
+  }
 }
