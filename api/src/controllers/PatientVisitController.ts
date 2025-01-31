@@ -22,6 +22,8 @@ export const getPatientVisits = asyncHandler(async (req, res) => {
 export const getActivePatientVisits = asyncHandler(async (req, res) => {
   const query = req.query as patientVisitQueryType;
   const userId = req.user?.id!;
+  console.log(query);
+
   const visitResults = await visitService.getActiveVisits(query, userId);
   res.status(200).json({
     status: "success",
@@ -33,33 +35,40 @@ export const getActivePatientVisits = asyncHandler(async (req, res) => {
 });
 export const getPatientVisitById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const visit = await db.PatientAssignment.findByPk(id, {
-    include: [
-      {
-        model: db.Patient,
-        as: "patient",
-        attributes: [
-          "id",
-          "firstName",
-          "lastName",
-          "middleName",
-          "card_number",
-          "patient_type",
-        ],
-      },
-      {
-        model: db.User,
-        as: "doctor",
-        include: {
-          model: db.Employee,
-          as: "employee",
-          attributes: ["id", "firstName", "middleName", "lastName"],
-        },
-        attributes: ["id"],
-      },
-    ],
+  const visitId = parseInt(id, 10);
+  const visit = await visitService.getPatientVisitById(visitId, true);
+  // db.PatientAssignment.findByPk(id, {
+  //   include: [
+  //     {
+  //       model: db.Patient,
+  //       as: "patient",
+  //       attributes: [
+  //         "id",
+  //         "firstName",
+  //         "lastName",
+  //         "middleName",
+  //         "card_number",
+  //         "patient_type",
+  //       ],
+  //     },
+  //     {
+  //       model: db.User,
+  //       as: "doctor",
+  //       include: {
+  //         model: db.Employee,
+  //         as: "employee",
+  //         attributes: ["id", "firstName", "middleName", "lastName"],
+  //       },
+  //       attributes: ["id"],
+  //     },
+  //   ],
+  // });
+  res.json({
+    status: "success",
+    data: {
+      visit: visit,
+    },
   });
-  res.json(visit);
 });
 export const getUpcomingPatientVisitByDoctorId = asyncHandler(
   async (req, res) => {

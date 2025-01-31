@@ -4,10 +4,16 @@ import { Employee, Patient, PatientVisit, User } from "../models";
 import { userService } from ".";
 import { ApiError } from "../shared/error/ApiError";
 
+/**
+ * Get All patient visits
+ * @param query - query params
+ * @returns  - patient visits
+ */
 export const getVisits = async (query: patientVisitQueryType) => {
-  const { q: searchTerm, sortBy } = query;
+  const { q, sortBy } = query;
   const page = parseInt(query.page) || 1;
   const limit = parseInt(query.limit) || 10;
+  const searchTerm = q?.trim();
   const whereClause: any = {};
   const orderClause: any = [];
 
@@ -114,14 +120,20 @@ export const getVisits = async (query: patientVisitQueryType) => {
     },
   };
 };
-
+/**
+ * Get active patient visits
+ * @param query it contains query params for pagination and sorting and search
+ * @param userId is the id of the user who is logged in
+ * @returns
+ */
 export const getActiveVisits = async (
   query: patientVisitQueryType,
   userId: number
 ) => {
-  const { q: searchTerm, sortBy } = query;
+  const { q, sortBy } = query;
   const page = parseInt(query.page) || 1;
   const limit = parseInt(query.limit) || 10;
+  const searchTerm = q?.trim();
   const whereClause: any = {};
   const orderClause: any = [];
 
@@ -233,38 +245,99 @@ export const getActiveVisits = async (
     },
   };
 };
+/**
+ * Get patient visit by id
+ * @param id patient visit id
+ * @param withPatient it will include patient data
+ * @param withDoctor it will include doctor data
+ * @returns
+ */
+export const getPatientVisitById = async (
+  id: number,
+  withPatient: boolean = false,
+  withDoctor: boolean = false
+) => {
+  const includeClause: any = [];
+  if (withPatient) {
+    includeClause.push({
+      model: Patient,
+      as: "patient",
+      attributes: [
+        "id",
+        "firstName",
+        "lastName",
+        "middleName",
+        "card_number",
+        "patient_type",
+      ],
+    });
+  }
 
-export const getPatientVisitById = async (id: number) => {
+  if (withDoctor) {
+    includeClause.push({
+      model: User,
+      as: "doctor",
+      include: [
+        {
+          model: Employee,
+          as: "employee",
+          attributes: ["id", "firstName", "middleName", "lastName"],
+        },
+      ],
+      attributes: ["id"],
+    });
+  }
+
   const visit = await PatientVisit.findByPk(id, {
-    include: [
-      {
-        model: Patient,
-        as: "patient",
-        attributes: [
-          "id",
-          "firstName",
-          "lastName",
-          "middleName",
-          "card_number",
-          "patient_type",
-        ],
-      },
-      {
-        model: User,
-        as: "doctor",
-        include: [
-          {
-            model: Employee,
-            as: "employee",
-            attributes: ["id", "firstName", "middleName", "lastName"],
-          },
-        ],
-        attributes: ["id"],
-      },
-    ],
+    include: includeClause,
+    // include: [
+    //   {
+    //     model: Patient,
+    //     as: "patient",
+    //     attributes: [
+    //       "id",
+    //       "firstName",
+    //       "lastName",
+    //       "middleName",
+    //       "card_number",
+    //       "patient_type",
+    //     ],
+    //   },
+    //   {
+    //     model: User,
+    //     as: "doctor",
+    //     include: [
+    //       {
+    //         model: Employee,
+    //         as: "employee",
+    //         attributes: ["id", "firstName", "middleName", "lastName"],
+    //       },
+    //     ],
+    //     attributes: ["id"],
+    //   },
+    // ],
   });
   if (!visit) {
     throw new ApiError(404, "patientVisit not found");
   }
   return visit;
 };
+
+// export const createPatientVisit = async (
+//   data: CreatePatientVisitType
+// ) => {
+//   const visit = await PatientVisit.create(data);
+//   return visit;
+// };
+
+// export const updatePatientVisit = async (
+//   id: number,
+//   data: UpdatePatientVisitType
+// ) => {
+//   const visit = await getPatientVisitById(id);
+//   if (!visit) {
+//     throw new ApiError(404, "patientVisit not found");
+//   }
+//   await visit.update(data);
+//   return visit;
+// };

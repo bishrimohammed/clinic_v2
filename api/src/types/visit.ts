@@ -16,7 +16,7 @@ export const patientVisitQuerySchema = z.object({
     })
     .default("10"),
 
-  q: z.string().optional(), // Renamed for clarity
+  q: z.string().trim().optional(), // Renamed for clarity
   sortBy: z
     .enum([
       "patientName_asc",
