@@ -13,36 +13,49 @@ export const getVisits = async (
   query: patientVisitQueryType,
   userId: number
 ) => {
-  const { q, sortBy } = query;
+  const { q: searchTerm, sortBy } = query;
   const page = parseInt(query.page) || 1;
   const limit = parseInt(query.limit) || 10;
-  const searchTerm = q?.trim();
+  // const searchTerm = q?.trim();
   const whereClause: any = {};
   const orderClause: any = [];
   if (await userService.isDoctor(userId)) {
     whereClause.doctorId = userId;
   }
   // search by patient name, patient id,
-  if (searchTerm) {
-    whereClause[Op.or] = [
-      {
-        [Op.or]: [
-          { "$patient.firstName$": { [Op.like]: `%${searchTerm}%` } },
-          { "$patient.lastName$": { [Op.like]: `%${searchTerm}%` } },
-          { "$patient.middleName$": { [Op.like]: `%${searchTerm}%` } },
-          { "$patient.card_number$": { [Op.like]: `%${searchTerm}%` } },
-          { "$patient.phone$": { [Op.like]: `%${searchTerm}%` } },
-        ],
-      },
-      Sequelize.literal(
-        `CONCAT(patient.firstName, ' ', patient.middleName, ' ', patient.lastName) LIKE '%${searchTerm}%'`
-      ),
-      Sequelize.literal(
-        `CONCAT(patient.firstName, ' ', patient.middleName) LIKE '%${searchTerm}%'`
-      ),
-    ];
-  }
 
+  if (searchTerm) {
+    const searchConditions = [];
+    const trimmedSearchTerm = searchTerm.trim();
+
+    if (trimmedSearchTerm.includes(" ")) {
+      // Split search term into individual words for full name search
+      const terms = trimmedSearchTerm.split(/\s+/);
+      const nameConditions = terms.map((term) => ({
+        [Op.or]: [
+          { "$patient.firstName$": { [Op.like]: `%${term}%` } },
+          { "$patient.lastName$": { [Op.like]: `%${term}%` } },
+          { "$patient.middleName$": { [Op.like]: `%${term}%` } },
+        ],
+      }));
+      searchConditions.push({ [Op.and]: nameConditions });
+    } else {
+      // Single word search for name parts
+      searchConditions.push(
+        { "$patient.firstName$": { [Op.like]: `%${trimmedSearchTerm}%` } },
+        { "$patient.lastName$": { [Op.like]: `%${trimmedSearchTerm}%` } },
+        { "$patient.middleName$": { [Op.like]: `%${trimmedSearchTerm}%` } }
+      );
+    }
+
+    // Always include card number and phone number searches
+    searchConditions.push(
+      { "$patient.card_number$": { [Op.like]: `%${trimmedSearchTerm}%` } },
+      { "$patient.phone$": { [Op.like]: `%${trimmedSearchTerm}%` } }
+    );
+
+    whereClause[Op.or] = searchConditions;
+  }
   switch (sortBy) {
     case "patientName_asc":
       orderClause.push(
@@ -135,32 +148,45 @@ export const getActiveVisits = async (
   query: patientVisitQueryType,
   userId: number
 ) => {
-  const { q, sortBy } = query;
+  const { q: searchTerm, sortBy } = query;
   const page = parseInt(query.page) || 1;
   const limit = parseInt(query.limit) || 10;
-  const searchTerm = q?.trim();
+
   const whereClause: any = {};
   const orderClause: any = [];
 
   // search by patient name, patient id,
   if (searchTerm) {
-    whereClause[Op.or] = [
-      {
+    const searchConditions = [];
+    const trimmedSearchTerm = searchTerm.trim();
+
+    if (trimmedSearchTerm.includes(" ")) {
+      // Split search term into individual words for full name search
+      const terms = trimmedSearchTerm.split(/\s+/);
+      const nameConditions = terms.map((term) => ({
         [Op.or]: [
-          { "$patient.firstName$": { [Op.like]: `%${searchTerm}%` } },
-          { "$patient.lastName$": { [Op.like]: `%${searchTerm}%` } },
-          { "$patient.middleName$": { [Op.like]: `%${searchTerm}%` } },
-          { "$patient.card_number$": { [Op.like]: `%${searchTerm}%` } },
-          { "$patient.phone$": { [Op.like]: `%${searchTerm}%` } },
+          { "$patient.firstName$": { [Op.like]: `%${term}%` } },
+          { "$patient.lastName$": { [Op.like]: `%${term}%` } },
+          { "$patient.middleName$": { [Op.like]: `%${term}%` } },
         ],
-      },
-      Sequelize.literal(
-        `CONCAT(patient.firstName, ' ', patient.middleName, ' ', patient.lastName) LIKE '%${searchTerm}%'`
-      ),
-      Sequelize.literal(
-        `CONCAT(patient.firstName, ' ', patient.middleName) LIKE '%${searchTerm}%'`
-      ),
-    ];
+      }));
+      searchConditions.push({ [Op.and]: nameConditions });
+    } else {
+      // Single word search for name parts
+      searchConditions.push(
+        { "$patient.firstName$": { [Op.like]: `%${trimmedSearchTerm}%` } },
+        { "$patient.lastName$": { [Op.like]: `%${trimmedSearchTerm}%` } },
+        { "$patient.middleName$": { [Op.like]: `%${trimmedSearchTerm}%` } }
+      );
+    }
+
+    // Always include card number and phone number searches
+    searchConditions.push(
+      { "$patient.card_number$": { [Op.like]: `%${trimmedSearchTerm}%` } },
+      { "$patient.phone$": { [Op.like]: `%${trimmedSearchTerm}%` } }
+    );
+
+    whereClause[Op.or] = searchConditions;
   }
   // const user = await userService.getUserById(userId);
   // if (await user.isDoctorRole()) {
