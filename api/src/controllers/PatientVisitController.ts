@@ -10,7 +10,8 @@ const { Op } = require("sequelize");
 
 export const getPatientVisits = asyncHandler(async (req, res) => {
   const query = req.query as patientVisitQueryType;
-  const visitResults = await visitService.getVisits(query);
+  const userId = req.user?.id!;
+  const visitResults = await visitService.getVisits(query, userId);
   res.status(200).json({
     status: "success",
     data: {
@@ -22,7 +23,6 @@ export const getPatientVisits = asyncHandler(async (req, res) => {
 export const getActivePatientVisits = asyncHandler(async (req, res) => {
   const query = req.query as patientVisitQueryType;
   const userId = req.user?.id!;
-  console.log(query);
 
   const visitResults = await visitService.getActiveVisits(query, userId);
   res.status(200).json({
@@ -36,33 +36,7 @@ export const getActivePatientVisits = asyncHandler(async (req, res) => {
 export const getPatientVisitById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const visitId = parseInt(id, 10);
-  const visit = await visitService.getPatientVisitById(visitId, true);
-  // db.PatientAssignment.findByPk(id, {
-  //   include: [
-  //     {
-  //       model: db.Patient,
-  //       as: "patient",
-  //       attributes: [
-  //         "id",
-  //         "firstName",
-  //         "lastName",
-  //         "middleName",
-  //         "card_number",
-  //         "patient_type",
-  //       ],
-  //     },
-  //     {
-  //       model: db.User,
-  //       as: "doctor",
-  //       include: {
-  //         model: db.Employee,
-  //         as: "employee",
-  //         attributes: ["id", "firstName", "middleName", "lastName"],
-  //       },
-  //       attributes: ["id"],
-  //     },
-  //   ],
-  // });
+  const visit = await visitService.getPatientVisitById(visitId);
   res.json({
     status: "success",
     data: {
@@ -576,4 +550,27 @@ export const admitVisit = asyncHandler(async (req, res) => {
   await visit.save({ userId: req.user?.id });
   res.json(visit);
 });
-// };
+export const dischargeVisit = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const visit = await db.PatientAssignment.findByPk(id);
+  if (!visit) {
+    res.status(404);
+    throw new Error("Patient visit not found");
+  }
+  await db.Patient.update(
+    {
+      patient_type: "outpatient",
+    },
+    {
+      where: {
+        id: visit.patient_id,
+      },
+      userId: req.user?.id,
+    }
+  );
+  visit.stage = "Discharged";
+  visit.isDischarged = true;
+  visit.discharge_date = Date.now();
+  await visit.save({ userId: req.user?.id });
+  res.json(visit);
+});

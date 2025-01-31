@@ -9,14 +9,19 @@ import { ApiError } from "../shared/error/ApiError";
  * @param query - query params
  * @returns  - patient visits
  */
-export const getVisits = async (query: patientVisitQueryType) => {
+export const getVisits = async (
+  query: patientVisitQueryType,
+  userId: number
+) => {
   const { q, sortBy } = query;
   const page = parseInt(query.page) || 1;
   const limit = parseInt(query.limit) || 10;
   const searchTerm = q?.trim();
   const whereClause: any = {};
   const orderClause: any = [];
-
+  if (await userService.isDoctor(userId)) {
+    whereClause.doctorId = userId;
+  }
   // search by patient name, patient id,
   if (searchTerm) {
     whereClause[Op.or] = [
@@ -157,9 +162,12 @@ export const getActiveVisits = async (
       ),
     ];
   }
-  const user = await userService.getUserById(userId);
-  if (await user.isDoctorRole()) {
-    whereClause["doctorId"] = userId;
+  // const user = await userService.getUserById(userId);
+  // if (await user.isDoctorRole()) {
+  //   whereClause["doctorId"] = userId;
+  // }
+  if (await userService.isDoctor(userId)) {
+    whereClause.doctorId = userId;
   }
   whereClause["status"] = true;
 

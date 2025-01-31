@@ -33,4 +33,14 @@ export const patientVisitQuerySchema = z.object({
     .optional(),
 });
 
+export const createPatientVisitSchema = z.object({
+  patientId: z.string().optional(),
+  doctorId: z.string().optional(),
+  visitDate: z.string().optional(),
+  visitTime: z.string().optional(),
+  visitType: z.string().optional(),
+  visitReason: z.string().optional(),
+  // visitStatus: z.string().optional(),
+});
+
 export type patientVisitQueryType = z.infer<typeof patientVisitQuerySchema>;
