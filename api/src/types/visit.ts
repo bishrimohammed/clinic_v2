@@ -1,4 +1,8 @@
 import { z } from "zod";
+import { preprocessDate, preprocessNumber } from "./shared";
+import { timePattern } from "../utils/constants";
+import { isBefore, isEqual, startOfDay } from "date-fns";
+import { isValidDate } from "../utils/helpers";
 
 export const patientVisitQuerySchema = z.object({
   page: z
@@ -33,14 +37,75 @@ export const patientVisitQuerySchema = z.object({
     .optional(),
 });
 
-export const createPatientVisitSchema = z.object({
-  patientId: z.string().optional(),
-  doctorId: z.string().optional(),
-  visitDate: z.string().optional(),
-  visitTime: z.string().optional(),
-  visitType: z.string().optional(),
-  visitReason: z.string().optional(),
-  // visitStatus: z.string().optional(),
-});
+export const createPatientVisitSchema = z
+  .object({
+    patientId: preprocessNumber,
+    doctorId: preprocessNumber,
+    visitDate: z
+      .string()
+      .transform((val) => new Date(val))
+      .refine(isValidDate, { message: "Invalid date" }), // Check if the date is valid
+    visitTime: z
+      .string()
+      .trim()
+      .regex(timePattern, { message: "Invalid time" }),
+    visitType: z.enum([
+      "consultation",
+      "follow-up",
+      "emergency",
+      "checkup",
+      "vaccination",
+      "therapy",
+      "diagnostic",
+      "surgery",
+    ]),
+
+    visitReason: z.string().trim().optional(),
+    modeOfArrival: z
+      .union([
+        z.enum(["walk-in", "referral", "emergency", "scheduled", "ambulance"]),
+        z.literal(""),
+      ])
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    const today = startOfDay(new Date()); // Normalize today's date to remove time
+    const visitDate = startOfDay(new Date(data.visitDate)); // Ensure visitDate has no time
+
+    // Ensure visitDate is today or in the future
+    if (isBefore(visitDate, today)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Visit date must be today or in the future",
+        path: ["visitDate"],
+      });
+    }
+
+    // If visitDate is today, ensure visitTime is in the future
+    if (isEqual(visitDate, today)) {
+      const [hours, minutes] = data.visitTime.split(":").map(Number);
+      const visitTime = new Date();
+      visitTime.setHours(hours, minutes, 0, 0);
+
+      if (visitTime < new Date()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Visit time must be in the future",
+          path: ["visitTime"],
+        });
+      }
+    }
+
+    // if visit type is emergency modeOfArrival is required
+    if (data.visitType === "emergency") {
+      if (!data.modeOfArrival) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Mode of Arrival is required",
+          path: ["modeOfArrival"],
+        });
+      }
+    }
+  });
 
 export type patientVisitQueryType = z.infer<typeof patientVisitQuerySchema>;

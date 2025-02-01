@@ -251,6 +251,42 @@ export const preprocessBoolean = z.preprocess(
     message: "Expected a boolean value (true or false)",
   })
 );
+export const preprocessDate = z.preprocess(
+  (val) => {
+    // Convert string values to Date objects if they represent a valid date
+    if (typeof val === "string") {
+      const date = new Date(val);
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    return val; // Return the original value if not a string or not a valid date
+  },
+  z.date().refine((val) => !isNaN(val.getTime()), {
+    message: "Expected a valid date",
+  })
+  // .transform((val) => val.toISOString().split("T")[0])
+);
+
+export const preprocessNumber = z.preprocess(
+  (val) => {
+    // Convert string values to numbers if they represent a valid number
+    if (typeof val === "string") {
+      const number = Number(val);
+      if (!isNaN(number)) {
+        return number;
+      }
+    }
+    return val; // Return the original value if not a string or not a valid number
+  },
+  z
+    .number()
+    .refine((val) => !isNaN(val), {
+      message: "Expected a valid number",
+    })
+    .transform((val) => val.toString())
+);
+
 export type addressT = z.infer<typeof addressSchema>;
 export type createEmergencyContactT = z.infer<
   typeof createEmergencyContactSchema
