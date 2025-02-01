@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { preprocessDate, preprocessNumber } from "./shared";
+import { preprocessNumber } from "./shared";
 import { timePattern } from "../utils/constants";
 import { isBefore, isEqual, startOfDay } from "date-fns";
 import { isValidDate } from "../utils/helpers";
@@ -109,3 +109,4 @@ export const createPatientVisitSchema = z
   });
 
 export type patientVisitQueryType = z.infer<typeof patientVisitQuerySchema>;
+export type createPatientVisitType = z.infer<typeof createPatientVisitSchema>;
