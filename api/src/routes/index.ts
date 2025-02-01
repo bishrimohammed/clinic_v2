@@ -8,6 +8,7 @@ import DashbordDataRoute from "./DashboardData.route";
 import RegionRoute from "./address/region.router";
 import patientRoute from "./patient.router";
 import AppointmentRoute from "./Appointment.router";
+import patientVisitRoute from "./patientVisit.router";
 
 const woredaRoute = require("./address/woreda.router.js");
 const CityRoute = require("./address/city.router.js");
@@ -27,8 +28,6 @@ const permissionsRoute = require("./permission.router.js");
 
 const creditCompanyRoute = require("./CreditCompany.router.js");
 const dutyRoute = require("./Duty.router.js");
-
-const patientVisitRoute = require("./patientVisit.router.js");
 
 const BillingRoute = require("./Billing.route.js");
 const InventoryRoute = require("./Inventory.router.js");

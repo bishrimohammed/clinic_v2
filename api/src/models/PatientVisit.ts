@@ -5,8 +5,8 @@ import {
   InferAttributes,
   InferCreationAttributes,
 } from "sequelize";
-import sequelize from "../db/index"; // Ensure the correct path
-import { Op } from "sequelize"; // Import Op for query operations
+
+import sequelize from "../db/index";
 import Patient from "./Patient";
 import User from "./User";
 
@@ -14,22 +14,22 @@ class PatientVisit extends Model<
   InferAttributes<PatientVisit>,
   InferCreationAttributes<PatientVisit>
 > {
+  declare medicalRecordId: number;
+  // declare visitType_id?: number | null;
   declare id: CreationOptional<number>;
-  declare patient_id: number;
-  declare doctor_id: number;
-  // declare medicalRecord_id: number;
-  declare visitType_id?: number | null;
-  declare visit_date: Date;
-  declare visit_time: string; // Format: HH:mm:ss
-  declare visit_type?: string | null;
-  declare is_referred: boolean;
+  declare patientId: number;
+  declare doctorId: number;
+  declare visitDate: Date;
+  declare visitTime: string; // Format: HH:mm:ss
+  declare visitType?: string | null;
+  declare isReferred: boolean;
   declare reason?: string | null;
-  declare created_by: number;
-  declare symptom_notes?: string | null;
-  declare mode_of_arrival?: string | null;
+  declare createdBy: number;
+  declare symptomNotes?: string | null;
+  declare modeOfArrival?: string | null;
   declare stage?:
     | "Waiting for service fee"
-    | "Waiting for triage" 
+    | "Waiting for triage"
     | "Waiting for examiner"
     | "Performing triage"
     | "Admitted"
@@ -40,10 +40,10 @@ class PatientVisit extends Model<
     | "Done"
     | null;
   declare isAdmitted?: boolean;
-  declare admission_date?: Date | null;
-  declare discharge_summary?: string | null;
-  declare discharged_by?: number | null;
-  declare discharged_date?: Date | null;
+  declare admissionDate?: Date | null;
+  declare dischargeSummary?: string | null;
+  declare dischargedBy?: number | null;
+  declare dischargedDate?: Date | null;
   declare status: boolean;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
@@ -57,40 +57,40 @@ PatientVisit.init(
       autoIncrement: true,
       allowNull: false,
     },
-    patient_id: {
+    patientId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    doctor_id: {
+    doctorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    // medicalRecord_id: {
+    medicalRecordId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "medicalrecords",
+        key: "id",
+      },
+      onDelete: "CASCADE",
+    },
+    // visitType_id: {
     //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    //   references: {
-    //     model: "medicalrecords",
-    //     key: "id",
-    //   },
-    //   onDelete: "CASCADE",
+    //   allowNull: true,
     // },
-    visitType_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    visit_date: {
+    visitDate: {
       type: DataTypes.DATEONLY,
       allowNull: false,
     },
-    visit_time: {
+    visitTime: {
       type: DataTypes.TIME,
       allowNull: false,
     },
-    visit_type: {
+    visitType: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    is_referred: {
+    isReferred: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
@@ -99,15 +99,15 @@ PatientVisit.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    created_by: {
+    createdBy: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    symptom_notes: {
+    symptomNotes: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    mode_of_arrival: {
+    modeOfArrival: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -131,19 +131,19 @@ PatientVisit.init(
       allowNull: true,
       defaultValue: false,
     },
-    admission_date: {
+    admissionDate: {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    discharge_summary: {
+    dischargeSummary: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    discharged_by: {
+    dischargedBy: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    discharged_date: {
+    dischargedDate: {
       type: DataTypes.DATE,
       allowNull: true,
     },
@@ -254,11 +254,11 @@ PatientVisit.init(
 );
 
 PatientVisit.belongsTo(Patient, {
-  foreignKey: "patient_id",
+  foreignKey: "patientId",
   as: "patient",
 });
 PatientVisit.belongsTo(User, {
-  foreignKey: "doctor_id",
+  foreignKey: "doctorId",
   as: "doctor",
 });
 

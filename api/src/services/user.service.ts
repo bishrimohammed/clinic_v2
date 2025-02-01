@@ -455,6 +455,14 @@ export const updatedDoctorWorkingHour = async (
   return schedule;
 };
 
+export const isDoctor = async (userId: number) => {
+  const user = await getUserById(userId);
+  const isDoctor = (await user.getRole()).name.toLowerCase() === "doctor";
+  // if (!isDoctor) {
+  //   throw new ApiError(400, `The user is not a Doctor`);
+  // }
+  return isDoctor;
+};
 interface isDoctorAvailableParam {
   doctor: User;
   date: Date;

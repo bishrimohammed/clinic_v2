@@ -71,6 +71,7 @@ const expressLoader = async (app: Application) => {
 
   app.use("/api/v1/patients", patientRoute);
   app.use("/api/v1/appointments", AppointmentRoute);
+  app.use("/api/v1/visits", patientVisitRoute);
 
   // app.use("/models", (req, res) => {
   //   res.json(sequelize.models);
@@ -88,7 +89,6 @@ const expressLoader = async (app: Application) => {
 
   // app.use("/api/v1/assignpatient", assignPatientRoute);
 
-  // app.use("/api/v1/medicalrecords", medicalRecordRoute);
   // app.use("/api/v1/progressnotes", progressNoteRoute);
   // app.use("/api/v1/conditions-medication", ConditionsAndMedicationRoute);
 
