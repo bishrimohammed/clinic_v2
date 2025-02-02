@@ -9,6 +9,7 @@ import sequelize from "../db/index"; // Ensure the correct path
 import ExternalService from "./ExternalService";
 import MedicalRecord from "./MedicalRecord";
 import Invoice from "./billing/Invoice";
+import ServiceLineItem from "./billing/ServiceLineItem";
 
 class MedicalBilling extends Model<
   InferAttributes<MedicalBilling>,
@@ -73,14 +74,20 @@ MedicalBilling.hasMany(Invoice, {
   foreignKey: "medicalBillingId",
   as: "invoice",
 });
+MedicalBilling.hasMany(ServiceLineItem, {
+  foreignKey: "billingId",
+  as: "serviceLineItems",
+});
 MedicalBilling.belongsTo(ExternalService, {
   foreignKey: "billableId",
   constraints: false,
+  scope: { billableType: "ExternalService" },
   as: "billableExternalService",
 });
 MedicalBilling.belongsTo(MedicalRecord, {
   foreignKey: "billableId",
   constraints: false,
+  scope: { billableType: "MedicalRecord" },
   as: "billableMedicalRecord",
 });
 

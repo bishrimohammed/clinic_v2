@@ -15,9 +15,9 @@ class Invoice extends Model<
   declare id: CreationOptional<string>; // UUID primary key
   declare medicalBillingId: string; // Foreign key to MedicalBilling
   declare invoiceNumber: string;
-  declare amountPaid: number;
+  declare paidAmount: number;
   declare outstandingAmount: number;
-  declare totalBalance: number;
+  declare totalAmount: number;
   declare paymentStatus: "pending" | "completed" | "failed" | "partial paid";
   declare issuedAt: Date;
 }
@@ -41,7 +41,7 @@ Invoice.init(
       allowNull: false,
       unique: true,
     },
-    amountPaid: {
+    paidAmount: {
       type: DataTypes.FLOAT,
       allowNull: false,
       validate: {
@@ -55,7 +55,7 @@ Invoice.init(
         min: 0,
       },
     },
-    totalBalance: {
+    totalAmount: {
       type: DataTypes.FLOAT,
       allowNull: false,
       validate: {
@@ -75,10 +75,8 @@ Invoice.init(
     hasTrigger: true,
     validate: {
       checkAmountPaid(this: Invoice) {
-        if (this.amountPaid > this.outstandingAmount) {
-          throw new Error(
-            "Amount paid cannot be greater than outstanding amount."
-          );
+        if (this.paidAmount > this.totalAmount) {
+          throw new Error("Amount paid cannot be greater than total amount.");
         }
       },
     },

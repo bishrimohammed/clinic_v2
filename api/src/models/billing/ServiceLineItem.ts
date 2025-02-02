@@ -12,9 +12,9 @@ import MedicalBilling from "../MedicalBilling";
 import User from "../User";
 import Payment from "../Payment";
 
-class BilledLineItem extends Model<
-  InferAttributes<BilledLineItem>,
-  InferCreationAttributes<BilledLineItem>
+class ServiceLineItem extends Model<
+  InferAttributes<ServiceLineItem>,
+  InferCreationAttributes<ServiceLineItem>
 > {
   declare id: CreationOptional<string>;
   declare billingId: string;
@@ -29,7 +29,7 @@ class BilledLineItem extends Model<
   declare createdBy: number;
 }
 
-BilledLineItem.init(
+ServiceLineItem.init(
   {
     id: {
       type: DataTypes.UUID,
@@ -104,7 +104,7 @@ BilledLineItem.init(
   },
   {
     sequelize,
-    tableName: "billed_line_items",
+    tableName: "service_line_items",
     timestamps: true,
     paranoid: true,
     indexes: [
@@ -116,4 +116,4 @@ BilledLineItem.init(
   }
 );
 
-export default BilledLineItem;
+export default ServiceLineItem;

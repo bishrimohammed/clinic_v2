@@ -17,7 +17,7 @@ class MedicalRecord extends Model<
   InferAttributes<MedicalRecord>,
   InferCreationAttributes<MedicalRecord>
 > {
-  declare id: CreationOptional<number>;
+  declare id: CreationOptional<string>;
   declare patientId: number;
   declare status?: boolean;
   declare createdAt?: CreationOptional<Date>;
@@ -30,10 +30,10 @@ class MedicalRecord extends Model<
 MedicalRecord.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
+      primaryKey: true,
     },
     patientId: {
       type: DataTypes.INTEGER,
