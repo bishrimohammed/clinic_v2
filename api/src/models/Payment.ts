@@ -6,66 +6,69 @@ import {
   InferCreationAttributes,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
-import ServiceItem from "./serviceItem";
 
 class Payment extends Model<
   InferAttributes<Payment>,
   InferCreationAttributes<Payment>
 > {
-  declare id: CreationOptional<number>;
-  declare payment_amount: number;
-  declare payment_date?: Date; // Can be null
-  declare medical_billing_id: number;
-  declare item_id: number;
-  declare cashier_id?: number | null; // Can be null
-  declare status: "Paid" | "Unpaid" | "Void"; // Enum type
-  declare createdAt?: CreationOptional<Date>;
-  declare updatedAt?: CreationOptional<Date>;
+  declare id: CreationOptional<string>;
+  declare invoiceId: string;
+  declare paymentAmount: number;
+  declare paymentDate: Date;
+  declare paymentMethod: "Cash" | "Card" | "Insurance" | "Mobile";
+  declare referenceNumber: string;
+  declare receivedBy?: number;
+  declare status: "Paid" | "Pending" | "Void";
+
+  createdAt?: CreationOptional<Date>;
+  updatedAt?: CreationOptional<Date>;
 }
 
 Payment.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-      autoIncrement: true,
+
       allowNull: false,
     },
-    payment_amount: {
+    paymentAmount: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
     },
-    payment_date: {
+    paymentDate: {
       type: DataTypes.DATE,
       allowNull: true,
       defaultValue: DataTypes.NOW, // Use DataTypes.NOW for default
     },
-    medical_billing_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: "medicalbillings",
-        key: "id",
-      },
-      // onDelete: "CASCADE",
-    },
-    item_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: ServiceItem,
-        key: "id",
-      },
-    },
-    cashier_id: {
+    receivedBy: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    status: {
-      type: DataTypes.ENUM("Paid", "Unpaid", "Void"),
+    invoiceId: {
+      type: DataTypes.UUID,
       allowNull: false,
-      defaultValue: "Unpaid",
+      references: {
+        model: "invoices",
+        key: "id",
+      },
+      onDelete: "CASCADE",
+    },
+    paymentMethod: {
+      type: DataTypes.ENUM("Cash", "Card", "Insurance", "Mobile"),
+      allowNull: false,
+    },
+    referenceNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    status: {
+      type: DataTypes.ENUM("Paid", "Pending", "Void"),
+      allowNull: false,
+      defaultValue: "Pending",
     },
     createdAt: {
       type: DataTypes.DATE,
