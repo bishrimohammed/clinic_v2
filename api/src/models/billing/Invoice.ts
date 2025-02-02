@@ -16,10 +16,10 @@ class Invoice extends Model<
   declare medicalBillingId: string; // Foreign key to MedicalBilling
   declare invoiceNumber: string;
   declare amountPaid: number;
+  declare outstandingAmount: number;
+  declare totalBalance: number;
   declare paymentStatus: "pending" | "completed" | "failed" | "partial paid";
   declare issuedAt: Date;
-  declare createdAt?: CreationOptional<Date>;
-  declare updatedAt?: CreationOptional<Date>;
 }
 
 Invoice.init(
@@ -44,29 +44,46 @@ Invoice.init(
     amountPaid: {
       type: DataTypes.FLOAT,
       allowNull: false,
+      validate: {
+        min: 0,
+      },
+    },
+    outstandingAmount: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        min: 0,
+      },
+    },
+    totalBalance: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        min: 0,
+      },
     },
     paymentStatus: {
-      type: DataTypes.ENUM("pending", "completed", "failed"),
+      type: DataTypes.ENUM("pending", "completed", "failed", "partial_paid"),
       allowNull: false,
     },
     issuedAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
-
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
   },
   {
+    hasTrigger: true,
+    validate: {
+      checkAmountPaid(this: Invoice) {
+        if (this.amountPaid > this.outstandingAmount) {
+          throw new Error(
+            "Amount paid cannot be greater than outstanding amount."
+          );
+        }
+      },
+    },
     sequelize,
+    timestamps: true,
     hooks: {
       async beforeCreate(invoice, options) {
         const year = new Date().getFullYear();

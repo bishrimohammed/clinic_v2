@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { timePattern } from "../utils/constants";
 
 const userRegisterSchema = z.object({
   username: z
@@ -112,14 +113,21 @@ const addDoctorWorkingHoursSchema = z
       "Saturday",
       "Sunday",
     ]),
-    start_time: z.string({ required_error: "Start time is required" }).time({
-      message: "Start time must be a valid time",
-    }),
-    end_time: z.string({ required_error: "End time is required" }).time({
-      message: "End time must be a valid time",
-    }),
+    start_time: z
+      .string({ required_error: "Start time is required" })
+      .regex(timePattern, { message: "Invalid time" })
+      .time({
+        message: "Start time must be a valid time",
+      }),
+    end_time: z
+      .string({ required_error: "End time is required" })
+      .regex(timePattern, { message: "Invalid time" })
+      .time({
+        message: "End time must be a valid time",
+      }),
   })
   .superRefine((data, ctx) => {
+    // compare start time and end time
     if (data.start_time >= data.end_time) {
       ctx.addIssue({
         path: ["start_time"],

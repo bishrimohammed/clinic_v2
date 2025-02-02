@@ -21,9 +21,9 @@ class BilledLineItem extends Model<
   declare serviceItemId: number;
   declare quantity: number;
   declare unitPrice: number;
-  declare discount: number;
-  declare tax: number;
-  declare total: number;
+  declare discount: CreationOptional<number>;
+  declare tax: CreationOptional<number>;
+  declare total?: number;
   declare paymentId: string | null;
   // declare a user who created the line item
   declare createdBy: number;
@@ -35,7 +35,6 @@ BilledLineItem.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-
       allowNull: false,
     },
     billingId: {

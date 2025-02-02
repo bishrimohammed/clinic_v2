@@ -18,12 +18,10 @@ class MedicalBilling extends Model<
   declare billableId: string; // UUID of the associated record
   declare billableType: "MedicalRecord" | "ExternalService"; // Type of associated record
   declare isInternalService?: boolean;
-  declare billingDate: Date;
+  // declare billingDate: Date;
   declare hasAdvancedPayment?: boolean;
   declare isAdvancedPaymentAmountCompleted?: boolean;
   declare status: string;
-  declare createdAt?: CreationOptional<Date>;
-  declare updatedAt?: CreationOptional<Date>;
 }
 
 MedicalBilling.init(
@@ -46,10 +44,10 @@ MedicalBilling.init(
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
-    billingDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
+    // billingDate: {
+    //   type: DataTypes.DATE,
+    //   allowNull: false,
+    // },
     hasAdvancedPayment: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
@@ -61,16 +59,6 @@ MedicalBilling.init(
     status: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
     },
   },
   {

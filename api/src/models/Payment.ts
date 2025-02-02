@@ -18,10 +18,7 @@ class Payment extends Model<
   declare paymentMethod: "Cash" | "Card" | "Insurance" | "Mobile";
   declare referenceNumber: string;
   declare receivedBy?: number;
-  declare status: "Paid" | "Pending" | "Void";
-
-  createdAt?: CreationOptional<Date>;
-  updatedAt?: CreationOptional<Date>;
+  declare status: "Paid" | "Void";
 }
 
 Payment.init(
@@ -30,7 +27,6 @@ Payment.init(
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-
       allowNull: false,
     },
     paymentAmount: {
@@ -64,19 +60,10 @@ Payment.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
-
     status: {
-      type: DataTypes.ENUM("Paid", "Pending", "Void"),
+      type: DataTypes.ENUM("Paid", "Void"),
       allowNull: false,
-      defaultValue: "Pending",
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      defaultValue: "Paid",
     },
   },
   {
