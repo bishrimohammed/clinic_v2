@@ -6,21 +6,21 @@ import {
   InferCreationAttributes,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
-import Payment from "./Payment";
+import ExternalService from "./ExternalService";
+import MedicalRecord from "./MedicalRecord";
+import Invoice from "./billing/Invoice";
 
 class MedicalBilling extends Model<
   InferAttributes<MedicalBilling>,
   InferCreationAttributes<MedicalBilling>
 > {
-  declare id: CreationOptional<number>;
-  declare patient_id?: number | null;
-  declare visit_id?: number | null;
-  declare medical_record_id?: number | null;
-  declare externalService_id?: number | null;
-  declare is_internal_service?: boolean;
-  declare date: Date; // DATE as Date type
-  declare has_advanced_payment?: boolean;
-  declare is_advanced_payment_amount_completed?: boolean | null;
+  declare id: CreationOptional<string>;
+  declare billableId: string; // UUID of the associated record
+  declare billableType: "MedicalRecord" | "ExternalService"; // Type of associated record
+  declare isInternalService?: boolean;
+  declare billingDate: Date;
+  declare hasAdvancedPayment?: boolean;
+  declare isAdvancedPaymentAmountCompleted?: boolean;
   declare status: string;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
@@ -29,76 +29,47 @@ class MedicalBilling extends Model<
 MedicalBilling.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
+    },
+    billableId: {
+      type: DataTypes.UUID,
       allowNull: false,
     },
-    patient_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "patients",
-        key: "id",
-      },
-      onDelete: "SET NULL",
+    billableType: {
+      type: DataTypes.ENUM("MedicalRecord", "ExternalService"),
+      allowNull: false,
     },
-    visit_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "patientassignments",
-        key: "id",
-      },
-      onDelete: "SET NULL",
-    },
-    medical_record_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "medicalrecords",
-        key: "id",
-      },
-      onDelete: "CASCADE",
-    },
-    externalService_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "external_services",
-        key: "id",
-      },
-      onDelete: "SET NULL",
-    },
-    is_internal_service: {
+    isInternalService: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      allowNull: true,
     },
-    date: {
+    billingDate: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: new Date(),
     },
-    has_advanced_payment: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    is_advanced_payment_amount_completed: {
+    hasAdvancedPayment: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
-      defaultValue: false,
+    },
+    isAdvancedPaymentAmountCompleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
     },
     status: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: true, // Changed to string to match the type
     },
     createdAt: {
       type: DataTypes.DATE,
+      allowNull: false,
       defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
+      allowNull: false,
       defaultValue: DataTypes.NOW,
     },
   },
@@ -110,9 +81,19 @@ MedicalBilling.init(
   }
 );
 
-MedicalBilling.hasMany(Payment, {
-  foreignKey: "medical_billing_id",
-  as: "payments",
+MedicalBilling.hasMany(Invoice, {
+  foreignKey: "medicalBillingId",
+  as: "invoice",
+});
+MedicalBilling.belongsTo(ExternalService, {
+  foreignKey: "billableId",
+  constraints: false,
+  as: "billableExternalService",
+});
+MedicalBilling.belongsTo(MedicalRecord, {
+  foreignKey: "billableId",
+  constraints: false,
+  as: "billableMedicalRecord",
 });
 
 // Syncing the model is generally done in the database initialization

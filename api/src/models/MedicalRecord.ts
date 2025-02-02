@@ -11,13 +11,14 @@ import CurrentMedication from "./medicalRecords/CurrentMedication";
 import DiscontinuedMedication from "./medicalRecords/DiscontinuedMedication";
 import Patient from "./Patient";
 import PatientVisit from "./PatientVisit";
+import MedicalBilling from "./MedicalBilling";
 
 class MedicalRecord extends Model<
   InferAttributes<MedicalRecord>,
   InferCreationAttributes<MedicalRecord>
 > {
   declare id: CreationOptional<number>;
-  declare patient_id: number;
+  declare patientId: number;
   declare status?: boolean;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
@@ -34,7 +35,7 @@ MedicalRecord.init(
       autoIncrement: true,
       allowNull: false,
     },
-    patient_id: {
+    patientId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -63,12 +64,20 @@ MedicalRecord.init(
     timestamps: true, // Enable timestamps for createdAt and updatedAt
   }
 );
-
+MedicalRecord.hasOne(MedicalBilling, {
+  foreignKey: "billableId",
+  constraints: false,
+  as: "medicalBilling",
+  scope: { billableType: "MedicalRecord" }, // Ensure it's only for MedicalRecords
+});
 MedicalRecord.hasMany(PatientVisit, {
   foreignKey: "medicalRecordId",
   as: "visit",
 });
-
+MedicalRecord.belongsTo(Patient, {
+  foreignKey: "patientId",
+  as: "patient",
+});
 MedicalRecord.hasMany(CurrentMedication, {
   foreignKey: "medical_record_id",
   as: "currentMedication",
