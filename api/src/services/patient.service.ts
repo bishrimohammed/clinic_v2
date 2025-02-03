@@ -42,15 +42,33 @@ export const getPatients = async (query: PatientQueryType) => {
   const whereClause: any = {};
   const orderClause: any = [];
   if (searchTerm) {
-    whereClause[Op.or] = [
-      { firstName: { [Op.like]: `%${searchTerm}%` } },
-      { middleName: { [Op.like]: `%${searchTerm}%` } },
-      { lastName: { [Op.like]: `%${searchTerm}%` } },
+    const searchConditions = [];
+    const trimmedSearchTerm = searchTerm.trim();
+    if (trimmedSearchTerm.includes(" ")) {
+      const terms = trimmedSearchTerm.split(/\s+/);
+      const nameConditions = terms.map((term) => ({
+        [Op.or]: [
+          { firstName: { [Op.like]: `%${term}%` } },
+          { middleName: { [Op.like]: `%${term}%` } },
+          { lastName: { [Op.like]: `%${term}%` } },
+        ],
+      }));
+      searchConditions.push({ [Op.and]: nameConditions });
+    } else {
+      searchConditions.push(
+        { firstName: { [Op.like]: `%${trimmedSearchTerm}%` } },
+        { middleName: { [Op.like]: `%${trimmedSearchTerm}%` } },
+        { lastName: { [Op.like]: `%${trimmedSearchTerm}%` } }
+      );
+    }
+    searchConditions.push(
       { card_number: { [Op.like]: `%${searchTerm}%` } },
       { phone: { [Op.like]: `%${searchTerm}%` } },
-      { gender: { [Op.like]: `${searchTerm}%` } },
-      { manual_card_id: { [Op.like]: `%${searchTerm}%` } },
-    ];
+      { gender: { [Op.like]: `${searchTerm}%` } }
+      // { manual_card_id: { [Op.like]: `%${searchTerm}%` } },
+    );
+
+    whereClause[Op.or] = searchConditions;
   }
   if (gender) {
     whereClause.gender = gender;
@@ -177,22 +195,42 @@ export const searchPatientPatientByCardNumberOrNameOrPhone = async (query: {
     whereClause.card_number = { [Op.like]: `%${patientId}%` };
   }
   if (patientName) {
-    const nameParts = patientName.split(" ");
-    const nameConditions = [];
+    const searchConditions = [];
+    const trimmedSearchTerm = patientName.trim();
+    if (trimmedSearchTerm.includes(" ")) {
+      const terms = trimmedSearchTerm.split(/\s+/);
+      const nameConditions = terms.map((term) => ({
+        [Op.or]: [
+          { firstName: { [Op.like]: `%${term}%` } },
+          { middleName: { [Op.like]: `%${term}%` } },
+          { lastName: { [Op.like]: `%${term}%` } },
+        ],
+      }));
+      searchConditions.push({ [Op.and]: nameConditions });
+    } else {
+      searchConditions.push(
+        { firstName: { [Op.like]: `%${trimmedSearchTerm}%` } },
+        { middleName: { [Op.like]: `%${trimmedSearchTerm}%` } },
+        { lastName: { [Op.like]: `%${trimmedSearchTerm}%` } }
+      );
+    }
+    whereClause[Op.or] = searchConditions;
+    // const nameParts = patientName.split(" ");
+    // const nameConditions = [];
 
-    if (nameParts[0]) {
-      nameConditions.push({ firstName: { [Op.like]: `%${nameParts[0]}%` } });
-    }
-    if (nameParts[1]) {
-      nameConditions.push({ middleName: { [Op.like]: `%${nameParts[1]}%` } });
-    }
-    if (nameParts[2]) {
-      nameConditions.push({ lastName: { [Op.like]: `%${nameParts[2]}%` } });
-    }
+    // if (nameParts[0]) {
+    //   nameConditions.push({ firstName: { [Op.like]: `%${nameParts[0]}%` } });
+    // }
+    // if (nameParts[1]) {
+    //   nameConditions.push({ middleName: { [Op.like]: `%${nameParts[1]}%` } });
+    // }
+    // if (nameParts[2]) {
+    //   nameConditions.push({ lastName: { [Op.like]: `%${nameParts[2]}%` } });
+    // }
 
-    if (nameConditions.length > 0) {
-      whereClause[Op.and] = nameConditions;
-    }
+    // if (nameConditions.length > 0) {
+    //   whereClause[Op.and] = nameConditions;
+    // }
   }
 
   if (phone) {
