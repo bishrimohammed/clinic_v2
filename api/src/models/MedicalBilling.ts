@@ -64,7 +64,6 @@ MedicalBilling.init(
   },
   {
     sequelize,
-    modelName: "medicalbilling",
     tableName: "medicalbillings",
     timestamps: true, // Enable timestamps for createdAt and updatedAt
   }
@@ -78,21 +77,21 @@ MedicalBilling.hasMany(ServiceLineItem, {
   foreignKey: "billingId",
   as: "serviceLineItems",
 });
-MedicalBilling.belongsTo(ExternalService, {
-  foreignKey: "billableId",
-  constraints: false,
-  scope: { billableType: "ExternalService" },
-  as: "billableExternalService",
-});
-MedicalBilling.belongsTo(MedicalRecord, {
-  foreignKey: "billableId",
-  constraints: false,
-  scope: { billableType: "MedicalRecord" },
-  as: "billableMedicalRecord",
-});
+// MedicalBilling.belongsTo(ExternalService, {
+//   foreignKey: "billableId",
+//   constraints: false,
+//   scope: { billableType: "ExternalService" },
+//   as: "billableExternalService",
+// });
+// MedicalBilling.belongsTo(MedicalRecord, {
+//   foreignKey: "billableId",
+//   constraints: false,
+//   scope: { billableType: "MedicalRecord" },
+//   as: "billableMedicalRecord",
+// });
 
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// MedicalBilling.sync({ alter: false, force: false });
+MedicalBilling.sync({ alter: false, force: false });
 
 export default MedicalBilling;

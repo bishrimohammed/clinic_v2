@@ -109,8 +109,9 @@ Invoice.init(
   }
 );
 
-Invoice.belongsTo(MedicalBilling, {
-  foreignKey: "medicalBillingId",
-  as: "medicalBilling",
-});
+// Invoice.belongsTo(MedicalBilling, {
+//   foreignKey: "medicalBillingId",
+//   as: "medicalBilling",
+// });
+Invoice.sync({ force: false });
 export default Invoice;

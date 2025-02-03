@@ -9,15 +9,16 @@ import {
 import sequelize from "../db/index";
 import Patient from "./Patient";
 import User from "./User";
+import MedicalRecord from "./MedicalRecord";
 
 class PatientVisit extends Model<
   InferAttributes<PatientVisit>,
   InferCreationAttributes<PatientVisit>
 > {
-  declare medicalRecordId: number;
+  declare medicalRecordId: string;
   // declare visitType_id?: number | null;
   declare id: CreationOptional<number>;
-  declare patientId: number;
+  // declare patientId: number;
   declare doctorId: number;
   declare visitDate: Date;
   declare visitTime: string; // Format: HH:mm:ss
@@ -57,19 +58,19 @@ PatientVisit.init(
       autoIncrement: true,
       allowNull: false,
     },
-    patientId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+    // patientId: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    // },
     doctorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
     medicalRecordId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: "medicalrecords",
+        model: MedicalRecord,
         key: "id",
       },
       onDelete: "CASCADE",
@@ -163,7 +164,6 @@ PatientVisit.init(
   },
   {
     sequelize,
-    // modelName: "PatientVisit",
     tableName: "patient_visits",
     timestamps: true,
     // hooks: {
@@ -253,10 +253,10 @@ PatientVisit.init(
   }
 );
 
-PatientVisit.belongsTo(Patient, {
-  foreignKey: "patientId",
-  as: "patient",
-});
+// PatientVisit.belongsTo(Patient, {
+//   foreignKey: "patientId",
+//   as: "patient",
+// });
 PatientVisit.belongsTo(User, {
   foreignKey: "doctorId",
   as: "doctor",

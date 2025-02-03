@@ -22,7 +22,6 @@ class MedicalRecord extends Model<
   declare status?: boolean;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
-
   declare getDiscontinuedMedications: HasManyGetAssociationsMixin<DiscontinuedMedication>;
   declare getCurrentMedications: HasManyGetAssociationsMixin<CurrentMedication>;
 }
@@ -59,7 +58,6 @@ MedicalRecord.init(
   },
   {
     sequelize,
-    modelName: "medicalrecord",
     tableName: "medicalrecords",
     timestamps: true, // Enable timestamps for createdAt and updatedAt
   }
@@ -70,10 +68,10 @@ MedicalRecord.hasOne(MedicalBilling, {
   as: "medicalBilling",
   scope: { billableType: "MedicalRecord" }, // Ensure it's only for MedicalRecords
 });
-MedicalRecord.hasMany(PatientVisit, {
-  foreignKey: "medicalRecordId",
-  as: "visit",
-});
+// MedicalRecord.hasMany(PatientVisit, {
+//   foreignKey: "medicalRecordId",
+//   as: "visit",
+// });
 MedicalRecord.belongsTo(Patient, {
   foreignKey: "patientId",
   as: "patient",
