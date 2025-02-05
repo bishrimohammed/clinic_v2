@@ -22,7 +22,7 @@ class MedicalBilling extends Model<
   // declare billingDate: Date;
   declare hasAdvancedPayment?: boolean;
   declare isAdvancedPaymentAmountCompleted?: boolean;
-  declare status: string;
+  declare status?: boolean;
 }
 
 MedicalBilling.init(
@@ -58,8 +58,9 @@ MedicalBilling.init(
       allowNull: true,
     },
     status: {
-      type: DataTypes.STRING,
+      type: DataTypes.BOOLEAN,
       allowNull: false,
+      defaultValue: true,
     },
   },
   {
