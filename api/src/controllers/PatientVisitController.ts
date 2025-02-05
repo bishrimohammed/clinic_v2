@@ -1,6 +1,10 @@
 import { Request } from "express";
 import { visitService } from "../services";
-import { createPatientVisitType, patientVisitQueryType } from "../types/visit";
+import {
+  createPatientVisitType,
+  patientVisitQueryType,
+  updatePatientVisitType,
+} from "../types/visit";
 import asyncHandler from "../utils/asyncHandler";
 
 // const asyncHandler = require("express-async-handler");
@@ -367,7 +371,17 @@ export const createPatientVisit = asyncHandler(
     });
   }
 );
-// updatePatientVisit= asyncHandler(async (req, res) => {}),
+export const updatePatientVisit = asyncHandler(
+  async (req: Request & { validatedData: updatePatientVisitType }, res) => {
+    res.json({
+      status: "success",
+      message: "patient visit updated successfully",
+      data: {
+        visit: req.validatedData,
+      },
+    });
+  }
+);
 // deletePatientVisit; asyncHandler(async (req, res) => {}),
 export const getUpcomingPatientvisits = asyncHandler(async (req, res) => {
   // const page = parseInt(req.query.page) || 1;

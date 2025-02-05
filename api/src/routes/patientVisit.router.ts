@@ -2,7 +2,10 @@ import express from "express";
 import * as PatientVisitController from "../controllers/PatientVisitController";
 import { protect } from "../middleware/authMiddleWare";
 import { validate } from "../middleware/validate";
-import { createPatientVisitSchema } from "../types/visit";
+import {
+  createPatientVisitSchema,
+  updatepatientVisitSchema,
+} from "../types/visit";
 const router = express.Router();
 
 router.get("/", protect, PatientVisitController.getPatientVisits);
@@ -27,7 +30,12 @@ router.post(
   PatientVisitController.createPatientVisit
 );
 
-// router.put("/:id", PatientVisitController.updatePatientVisit);
+router.put(
+  "/:id",
+  protect,
+  validate(updatepatientVisitSchema),
+  PatientVisitController.updatePatientVisit
+);
 router.patch(
   "/:id/cancel",
   protect,

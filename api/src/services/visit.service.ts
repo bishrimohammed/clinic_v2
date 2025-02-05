@@ -1,6 +1,10 @@
 import { Op, Sequelize } from "sequelize";
 import sequelize from "../db";
-import { createPatientVisitType, patientVisitQueryType } from "../types/visit";
+import {
+  createPatientVisitType,
+  patientVisitQueryType,
+  updatePatientVisitType,
+} from "../types/visit";
 import { Employee, Patient, PatientVisit, User } from "../models";
 import { userService } from ".";
 import { ApiError } from "../shared/error/ApiError";
@@ -388,11 +392,11 @@ export const createPatientVisit = async (
   if (activeVisit) {
     throw new ApiError(400, "Patient already have active medical record");
   }
-  console.log(visitDate, visitTime);
+  // console.log(visitDate, visitTime);
 
   const doctorId = parseInt(data.doctorId);
   const doctor = await userService.getUserById(doctorId); // Assuming getUserById is a method in your user service
-  return data;
+
   if (!(await doctor.isDoctorRole())) {
     throw new ApiError(
       400,
@@ -436,7 +440,7 @@ export const createPatientVisit = async (
       ? "Waiting for triage"
       : "Waiting for doctor";
     if (lastVisit) {
-      const lastVisitData = lastVisit?.createdAt!;
+      const lastVisitData = lastVisit.createdAt!;
 
       const dayDifference = differenceInDays(new Date(), lastVisitData);
       // if (dayDifference < clinicInfo.min_days_between_visits) {
@@ -491,12 +495,53 @@ export const createPatientVisit = async (
   }
 };
 
+/**
+ * Update visit
+ * @param visitId - visit id
+ * @param  data - update patient visit data
+ * @param userId - logged in user id
+ * @returns {PatinetVisit} - it returns updated patient visit
+ */
+
 export const updatePatientVisit = async (
   visitId: string,
-  data: createPatientVisitType,
+  data: updatePatientVisitType,
   userId: number
-) => {
+): Promise<PatientVisit> => {
+  const { visitDate, visitType, modeOfArrival } = data;
+  const visitTime = visitDate.toISOString().split("T")[1];
   const visit = await getPatientVisitById(visitId);
+
+  // const doctorId = parseInt(visit.doctorId);
+  const doctor = await userService.getUserById(visit.doctorId); // Assuming getUserById is a method in your user service
+
+  await checkDoctorConflictWithPatient(
+    visit.doctorId,
+    visitDate,
+    visitTime,
+    visit.id
+  );
+  const day_of_week = new Date(visitDate).toLocaleString("en-us", {
+    weekday: "long",
+  }) as dayOfWeekType;
+
+  const isDoctorAvailable = await userService.isDoctorAvailable({
+    date: visitDate,
+    dayOfWeek: day_of_week,
+    doctor: doctor,
+    time: visitTime,
+  });
+  if (!isDoctorAvailable) {
+    throw new ApiError(400, "Doctor is not available at the specified time.");
+  }
+
+  await visit.update({
+    visitDate: visitDate || visit.visitDate,
+    visitTime: visitTime || visit.visitTime,
+    visitType: visitType || visit.visitType,
+    modeOfArrival: modeOfArrival || visit.modeOfArrival,
+  });
+  return visit;
 };
 
 /**
