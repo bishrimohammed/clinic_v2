@@ -62,6 +62,15 @@ export const addressSchema = z.object({
 });
 export const phoneRegex = /^(07|09)\d{8}$/;
 
+export type dayOfWeekType =
+  | "Sunday"
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday";
+
 export const createEmergencyContactSchema = z
   .object({
     firstName: z

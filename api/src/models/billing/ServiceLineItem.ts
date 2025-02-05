@@ -19,7 +19,7 @@ class ServiceLineItem extends Model<
   declare id: CreationOptional<string>;
   declare billingId: string;
   declare serviceItemId: number;
-  declare quantity: number;
+  declare quantity: CreationOptional<number>;
   declare unitPrice: number;
   declare discount: CreationOptional<number>;
   declare tax: CreationOptional<number>;

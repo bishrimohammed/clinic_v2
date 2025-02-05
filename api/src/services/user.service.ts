@@ -11,6 +11,7 @@ import {
   Appointment,
 } from "../models";
 import { ApiError } from "../shared/error/ApiError";
+import { dayOfWeekType } from "../types/shared";
 import {
   addDoctorWorkingHoursInput,
   changePasswordInput,
@@ -466,14 +467,7 @@ export const isDoctor = async (userId: number) => {
 interface isDoctorAvailableParam {
   doctor: User;
   date: Date;
-  dayOfWeek:
-    | "Monday"
-    | "Tuesday"
-    | "Wednesday"
-    | "Thursday"
-    | "Friday"
-    | "Saturday"
-    | "Sunday";
+  dayOfWeek: dayOfWeekType;
   time: string;
 }
 export const isDoctorAvailable = async (data: isDoctorAvailableParam) => {
