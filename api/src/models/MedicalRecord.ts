@@ -86,6 +86,6 @@ MedicalRecord.hasMany(DiscontinuedMedication, {
 });
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// MedicalRecord.sync({ force: false, alter: false });
+MedicalRecord.sync({ force: false, alter: false });
 
 export default MedicalRecord;

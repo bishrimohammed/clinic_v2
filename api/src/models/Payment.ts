@@ -76,6 +76,6 @@ Payment.init(
 
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// Payment.sync({ alter: false, force: false });
+Payment.sync({ alter: false, force: false });
 
 export default Payment;

@@ -467,6 +467,19 @@ export const createPatientVisit = async (
         //   `Patient can only visit after ${clinicInfo.card_valid_date} days`
         // );
       }
+    } else {
+      const registationFeeServiceItem = await getRegistationFeeServiceItem();
+      const item = {
+        price: registationFeeServiceItem.price,
+        serviceItemId: registationFeeServiceItem.id,
+      };
+      await addSingleBillingItemToMedicalBilling(
+        billing.id,
+        item,
+        userId,
+        transaction
+      );
+      visitStage = "Waiting for service fee";
     }
     if (visitType === "emergency") {
       visitStage = "Waiting for doctor";
@@ -509,9 +522,14 @@ export const updatePatientVisit = async (
   userId: number
 ): Promise<PatientVisit> => {
   const { visitDate, visitType, modeOfArrival } = data;
-  const visitTime = visitDate.toISOString().split("T")[1];
+  const visitTime = visitDate.toISOString().substring(11, 19);
   const visit = await getPatientVisitById(visitId);
-
+  if (visit.stage !== "Waiting for service fee") {
+    throw new ApiError(
+      400,
+      "visit stage is passed Waiting for service fee you can not update it"
+    );
+  }
   // const doctorId = parseInt(visit.doctorId);
   const doctor = await userService.getUserById(visit.doctorId); // Assuming getUserById is a method in your user service
 

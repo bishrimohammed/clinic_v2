@@ -373,11 +373,18 @@ export const createPatientVisit = asyncHandler(
 );
 export const updatePatientVisit = asyncHandler(
   async (req: Request & { validatedData: updatePatientVisitType }, res) => {
+    const userId = req.user?.id!;
+    const visitId = req.params.id;
+    const visit = await visitService.updatePatientVisit(
+      visitId,
+      req.validatedData,
+      userId
+    );
     res.json({
       status: "success",
       message: "patient visit updated successfully",
       data: {
-        visit: req.validatedData,
+        visit,
       },
     });
   }
