@@ -556,7 +556,7 @@ export const checkDoctorConflictWithPatient = async (
   doctorId: number,
   visitDate: Date,
   visitTime: string,
-  visitId?: number // optional parameter to exclude the current visit from the check if it's provided
+  visitId?: string // optional parameter to exclude the current visit from the check if it's provided
 ) => {
   const whereClause: any = {
     doctorId: doctorId,

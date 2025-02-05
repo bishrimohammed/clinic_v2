@@ -141,9 +141,6 @@ export const updatepatientVisitSchema = z
     const today = new Date(); // Normalize today's date to remove time
     // const visitDate = startOfDay(new Date(data.visitDate)); // Ensure visitDate has no time
     const visitDate = data.visitDate; // Ensure visitDate has no time
-    console.log(visitDate, today);
-    // visitDate.setHours(visitDate.getHours() - 3);
-    console.log(visitDate);
 
     // Ensure visitDate is today or in the future
     if (isBefore(visitDate, today)) {

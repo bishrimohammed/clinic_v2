@@ -17,7 +17,7 @@ class PatientVisit extends Model<
 > {
   declare medicalRecordId: string;
   // declare visitType_id?: number | null;
-  declare id: CreationOptional<number>;
+  declare id: CreationOptional<string>;
   declare patientId: number;
   declare doctorId: number;
   declare referredTo: number | null;
@@ -54,9 +54,9 @@ class PatientVisit extends Model<
 PatientVisit.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
     patientId: {
@@ -69,7 +69,7 @@ PatientVisit.init(
     },
     referredTo: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       // references: {
       //   model: User,
       //   key: "id",
@@ -182,14 +182,17 @@ PatientVisit.belongsTo(Patient, {
   foreignKey: "patientId",
   as: "patient",
 });
+
 PatientVisit.belongsTo(User, {
   foreignKey: "doctorId",
   as: "doctor",
 });
+
 PatientVisit.belongsTo(User, {
   foreignKey: "refferedTo",
   as: "refferedto",
 });
-PatientVisit.sync({ force: false, alter: true });
+
+PatientVisit.sync({ force: false, alter: false });
 
 export default PatientVisit;
