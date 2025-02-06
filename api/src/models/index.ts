@@ -32,6 +32,9 @@ import ExternalService from "./ExternalService";
 import MedicalRecord from "./MedicalRecord";
 import CurrentMedication from "./medicalRecords/CurrentMedication";
 import DiscontinuedMedication from "./medicalRecords/DiscontinuedMedication";
+import VitalSign from "./medicalRecords/VitalSign";
+import VitalSignField from "./VitalSignField";
+import VitalSignResult from "./medicalRecords/VitalSignResult";
 
 // PatientCreditDetail
 // Role.hasMany(User, {
@@ -73,6 +76,7 @@ Invoice.belongsTo(MedicalBilling, {
 //   scope: { billableType: "MedicalRecord" },
 //   as: "billableMedicalRecord",
 // });
+
 export {
   User,
   ClinicProfile,
@@ -101,4 +105,11 @@ export {
   CreditCompanyProfile,
   PatientCreditDetail,
   Invoice,
+  MedicalRecord,
+  VitalSign,
+  VitalSignField,
+  VitalSignResult,
+  CurrentMedication,
+  DiscontinuedMedication,
+  ExternalService,
 };

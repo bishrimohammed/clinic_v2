@@ -1,32 +1,3 @@
-// const { sequelize } = require(".");
-
-// module.exports = (sequelize, DataTypes) => {
-//   const VitalSignField = sequelize.define("vital_sign_field", {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//       allowNull: false,
-//     },
-//     name: {
-//       type: DataTypes.STRING,
-//       required: true,
-//       unique: true,
-//     },
-//     inputType: {
-//       type: DataTypes.ENUM,
-//       values: ["number", "text", "date", "select", "radio", "checkbox"],
-//       defaultValue: "number",
-//     },
-//     status: {
-//       type: DataTypes.BOOLEAN,
-//       defaultValue: true,
-//     },
-//   });
-//   VitalSignField.sync({ alter: false, force: false });
-//   return VitalSignField;
-// };
-
 import {
   Model,
   DataTypes,
@@ -40,9 +11,9 @@ class VitalSignField extends Model<
   InferAttributes<VitalSignField>,
   InferCreationAttributes<VitalSignField>
 > {
-  declare id: CreationOptional<number>;
+  declare id: CreationOptional<string>;
   declare name: string;
-  declare inputType:
+  declare inputType?:
     | "number"
     | "text"
     | "date"
@@ -57,9 +28,9 @@ class VitalSignField extends Model<
 VitalSignField.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
     name: {
@@ -93,7 +64,6 @@ VitalSignField.init(
   },
   {
     sequelize,
-    modelName: "vital_sign_field",
     tableName: "vital_sign_fields",
     timestamps: true,
   }
@@ -101,6 +71,6 @@ VitalSignField.init(
 
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// VitalSignField.sync({ alter: false, force: false });
+VitalSignField.sync({ alter: false, force: false });
 
 export default VitalSignField;
