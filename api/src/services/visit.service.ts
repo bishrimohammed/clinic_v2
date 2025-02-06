@@ -1,6 +1,7 @@
-import { Op, Sequelize } from "sequelize";
+import { Op } from "sequelize";
 import sequelize from "../db";
 import {
+  addTraigeType,
   createPatientVisitType,
   patientVisitQueryType,
   updatePatientVisitType,
@@ -9,6 +10,7 @@ import { Employee, Patient, PatientVisit, User } from "../models";
 import { userService } from ".";
 import { ApiError } from "../shared/error/ApiError";
 import {
+  addVitalSigns,
   createMedicalRecord,
   getPatientLastMedicalRecord,
   parientActiveMedicalRecord,
@@ -21,7 +23,7 @@ import {
 } from "./billing.service";
 import logger from "../config/logger";
 import { getRegistationFeeServiceItem } from "./clinic-service.service";
-import { dayOfWeekType } from "../types/shared";
+import { dayOfWeekType, loggedInUserId } from "../types/shared";
 
 /**
  * Get All patient visits
@@ -594,6 +596,87 @@ export const checkDoctorConflictWithPatient = async (
 
   return false;
 };
+
+/**
+ *
+ * @param visitId - visit id
+ * @param userId - logged in user id
+ * @returns
+ */
+export const startVisitTraige = async (
+  visitId: string,
+  userId: loggedInUserId
+) => {
+  const visit = await getPatientVisitById(visitId);
+  // if (!visit) {
+  //   throw new ApiError(404, "visit not found");
+  // }
+  if (visit.stage !== "Waiting for triage") {
+    throw new ApiError(
+      400,
+      "visit stage is not Waiting for triage you can't start triage"
+    );
+  }
+  await visit.update({ stage: "Performing triage" });
+  return visit;
+};
+/**
+ * Add Visit triage
+ * @param visitId - visit id
+ * @param data - add triage data
+ * @param userId - logged in user id
+ * @returns
+ */
+export const addVisitTriage = async (
+  visitId: string,
+  data: addTraigeType,
+  userId: loggedInUserId
+) => {
+  const { vitalSigns } = data;
+
+  const visit = await getPatientVisitById(visitId);
+  if (visit.stage !== "Performing triage") {
+    throw new ApiError(
+      400,
+      "Visit stage is not Performing triage you can't add triage"
+    );
+  }
+  const transaction = await sequelize.transaction();
+  try {
+    const vitalSign = await addVitalSigns(
+      visit.medicalRecordId,
+      vitalSigns,
+      userId,
+      transaction
+    );
+    if (
+      data.visit?.doctorId ||
+      data.visit?.visitDate ||
+      data.visit?.visitType
+    ) {
+      await visit.update(
+        {
+          doctorId: data.visit?.doctorId || visit.doctorId,
+          visitDate: data.visit?.visitDate || visit.visitDate,
+          visitType: data.visit?.visitType || visit.visitType,
+        },
+        { transaction }
+      );
+    }
+    await visit.update(
+      {
+        stage: "Waiting for doctor",
+      },
+      { transaction }
+    );
+    await transaction.commit();
+    return vitalSign;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
 // export const updatePatientVisit = async (
 //   id: number,
 //   data: UpdatePatientVisitType

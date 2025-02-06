@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { visitService } from "../services";
 import {
+  addTraigeType,
   createPatientVisitType,
   patientVisitQueryType,
   updatePatientVisitType,
@@ -541,26 +542,48 @@ export const cancelPatientAssignment = asyncHandler(async (req, res) => {
 });
 export const startTraige = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const visit = await db.PatientAssignment.findByPk(id);
-  if (!visit) {
-    res.status(404);
-    throw new Error("Patient visit not found");
-  }
-  visit.stage = "Performing triage";
-  await visit.save({ userId: req.user?.id });
-  res.json(visit);
+  const userId = req.user?.id!;
+  const visit = await visitService.startVisitTraige(id, userId);
+  // db.PatientAssignment.findByPk(id);
+  // if (!visit) {
+  //   res.status(404);
+  //   throw new Error("Patient visit not found");
+  // }
+  // visit.stage = "Performing triage";
+  // await visit.save({ userId: req.user?.id });
+  res.json({
+    status: "success",
+    message: "",
+    data: {
+      visit,
+    },
+  });
 });
-export const finishTraige = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const visit = await db.PatientAssignment.findByPk(id);
-  if (!visit) {
-    res.status(404);
-    throw new Error("Patient visit not found");
+export const finishTraige = asyncHandler(
+  async (req: Request & { validatedData: addTraigeType }, res) => {
+    const { id } = req.params;
+    const userId = req.user?.id!;
+    const triage = await visitService.addVisitTriage(
+      id,
+      req.validatedData,
+      userId
+    );
+    // db.PatientAssignment.findByPk(id);
+    // if (!visit) {
+    //   res.status(404);
+    //   throw new Error("Patient visit not found");
+    // }
+    // visit.stage = "Waiting for examiner";
+    // await visit.save({ userId: req.user?.id });
+    res.json({
+      status: "success",
+      message: "",
+      data: {
+        triage,
+      },
+    });
   }
-  visit.stage = "Waiting for examiner";
-  await visit.save({ userId: req.user?.id });
-  res.json(visit);
-});
+);
 export const admitVisit = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const visit = await db.PatientAssignment.findByPk(id);
