@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z, ZodIssueCode } from "zod";
 import { preprocessNumber } from "./shared";
 import { timePattern } from "../utils/constants";
 import { isBefore, isEqual, startOfDay } from "date-fns";
@@ -177,6 +177,52 @@ export const updatepatientVisitSchema = z
       }
     }
   });
+
+export const addTraigeSchema = z
+  .object({
+    vitalSigns: z.array(
+      z.object({
+        vitalSignFieldId: z.string().trim(),
+        value: z.string().trim().optional(),
+      })
+    ),
+    visit: z
+      .object({
+        visitType: z
+          .enum([
+            "consultation",
+            "follow-up",
+            "emergency",
+            "checkup",
+            "vaccination",
+            "therapy",
+            "diagnostic",
+            "surgery",
+          ])
+          .optional(),
+        visitDate: z
+          .string()
+          .transform((val) => new Date(val))
+          .refine(isValidDate, { message: "Invalid date" })
+          .optional(),
+        doctorId: z.number().optional(),
+      })
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    // at least one vitalsigns has both vitalSignFieldId and value is not empty
+    if (data.vitalSigns) {
+      const hasVitalSignFieldId = data.vitalSigns.some(
+        (vitalSign) => vitalSign.vitalSignFieldId && vitalSign.value
+      );
+      ctx.addIssue({
+        path: ["vitalSigns", 0],
+        code: ZodIssueCode.custom,
+        message: "",
+      });
+    }
+  });
 export type patientVisitQueryType = z.infer<typeof patientVisitQuerySchema>;
 export type createPatientVisitType = z.infer<typeof createPatientVisitSchema>;
 export type updatePatientVisitType = z.infer<typeof updatepatientVisitSchema>;
+export type addTraigeType = z.infer<typeof addTraigeSchema>;

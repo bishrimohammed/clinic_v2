@@ -1,4 +1,6 @@
-import { z } from "zod";
+import { number, z } from "zod";
+
+export type loggedInUserId = number;
 
 export const addressSchema = z.object({
   id: z
