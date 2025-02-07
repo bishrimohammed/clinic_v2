@@ -229,85 +229,92 @@ export const addPlanAndAssessment = async (
   return medicalRecordDetail;
 };
 //#endregion
-//#region Vital Signs
-// export const getVitalSigns = async (
-//   medicalRecordId: string,
-//   userId: loggedInUserId
-// ) => {
-//   // const medicalRecord = await getMedicalRecordById(medicalRecordId);
-//   // const visit = await PatientVisit.findOne({
-//   //   where: {
-//   //     medicalRecordId: medicalRecordId,
-//   //     doctorId: userId,
-//   //   },
-//   // });
-//   // if (!visit) {
-//   //   throw new ApiError(400, "This medical record is not assigned to you");
-//   // }
-//   const vitalSigns = await VitalSign.findAll({
-//     where: {
-//       medicalRecordId,
-//     },
-//     include:[
-//       {
-//         model: VitalSignResult,
-//         as: "vitalResults",
-//         include:[
-//           {
-//             model: VitalSignField,
-//             as: "vitalSignField",
-//             attributes:["id","name"]
-//           }
-//         ]
-//       }
-//     ]
-//   });
-//   return vitalSigns;
-// };
-// /**
-//  * Add vital signs
-//  * @param medicalRecordId - medical record id
-//  * @param vitalSigns - vital signs
-//  * @param userId - logged in user id
-//  * @param transaction - transaction
-//  * @returns
-//  */
-// export const addVitalSigns = async (
-//   medicalRecordId: string,
-//   vitalSigns: addVitalSignType,
-//   userId: loggedInUserId,
-//   transaction?: Transaction
-// ) => {
-//   // const medicalRecord = await getMedicalRecordById(medicalRecordId);
-//   // const visit = await PatientVisit.findOne({
-//   //   where:{medicalRecordId:medicalRecordId, doctorId:userId}
-//   // })
-//   // const transaction = await sequelize.transaction();
-//   // try {
-//   const createdVitalSigns = await VitalSign.create(
-//     {
-//       medicalRecordId,
-//       examinerId: userId,
-//     },
-//     { transaction }
-//   );
 
-//   const transformVitalSigns = vitalSigns.map((vitalSign) => ({
-//     result: vitalSign.value || "",
-//     vitalSignFieldId: vitalSign.vitalSignFieldId,
-//     vitalId: createdVitalSigns.id,
-//   }));
-//   await VitalSignResult.bulkCreate(transformVitalSigns, { transaction });
-//   await createdVitalSigns.getVitalResults();
-//   // await transaction.commit();
-//   return createdVitalSigns;
-//   // } catch (error) {
-//   //   await transaction.rollback();
-//   //   throw error;
-//   // }
-// };
+//#region Vital Signs
+/**
+ * 
+ * @param medicalRecordId - medical record id
+
+ * @returns {Promise<VitalSign[]>}
+ */
+export const getVitalSigns = async (
+  medicalRecordId: string
+): Promise<VitalSign[]> => {
+  // const medicalRecord = await getMedicalRecordById(medicalRecordId);
+  // const visit = await PatientVisit.findOne({
+  //   where: {
+  //     medicalRecordId: medicalRecordId,
+  //     doctorId: userId,
+  //   },
+  // });
+  // if (!visit) {
+  //   throw new ApiError(400, "This medical record is not assigned to you");
+  // }
+  const vitalSigns = await VitalSign.findAll({
+    where: {
+      medicalRecordId,
+    },
+    include: [
+      {
+        model: VitalSignResult,
+        as: "vitalResults",
+        include: [
+          {
+            model: VitalSignField,
+            as: "vitalSignField",
+            attributes: ["id", "name"],
+          },
+        ],
+      },
+    ],
+  });
+  return vitalSigns;
+};
+/**
+ * Add vital signs
+ * @param medicalRecordId - medical record id
+ * @param vitalSigns - vital signs
+ * @param userId - logged in user id
+ * @param transaction - transaction
+ * @returns
+ */
+export const addVitalSigns = async (
+  medicalRecordId: string,
+  vitalSigns: addVitalSignType,
+  userId: loggedInUserId,
+  transaction?: Transaction
+) => {
+  // const medicalRecord = await getMedicalRecordById(medicalRecordId);
+  // const visit = await PatientVisit.findOne({
+  //   where:{medicalRecordId:medicalRecordId, doctorId:userId}
+  // })
+  // const transaction = await sequelize.transaction();
+  // try {
+  const createdVitalSigns = await VitalSign.create(
+    {
+      medicalRecordId,
+      examinerId: userId,
+    },
+    { transaction }
+  );
+
+  const transformVitalSigns = vitalSigns.map((vitalSign) => ({
+    result: vitalSign.value || "",
+    vitalSignFieldId: vitalSign.vitalSignFieldId,
+    vitalId: createdVitalSigns.id,
+  }));
+  await VitalSignResult.bulkCreate(transformVitalSigns, { transaction });
+  await createdVitalSigns.getVitalResults();
+  // await transaction.commit();
+  return createdVitalSigns;
+  // } catch (error) {
+  //   await transaction.rollback();
+  //   throw error;
+  // }
+};
 
 //#endregion
+
 // export const createMedicalRecord = async (
 //   data: createMedicalRecordType,
 //   userId: number
