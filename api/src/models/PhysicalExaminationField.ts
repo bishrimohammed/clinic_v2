@@ -1,35 +1,3 @@
-// const { sequelize } = require(".");
-
-// module.exports = (sequelize, DataTypes) => {
-//   const PhysicalExaminationField = sequelize.define(
-//     "physical_examination_field",
-//     {
-//       id: {
-//         type: DataTypes.INTEGER,
-//         primaryKey: true,
-//         autoIncrement: true,
-//         allowNull: false,
-//       },
-//       name: {
-//         type: DataTypes.STRING,
-//         required: true,
-//         unique: true,
-//       },
-//       inputType: {
-//         type: DataTypes.ENUM,
-//         values: ["number", "text", "date", "select", "radio", "checkbox"],
-//         defaultValue: "text",
-//       },
-//       status: {
-//         type: DataTypes.BOOLEAN,
-//         defaultValue: true,
-//       },
-//     }
-//   );
-
-//   return PhysicalExaminationField;
-// };
-
 import {
   Model,
   DataTypes,
@@ -43,7 +11,7 @@ class PhysicalExaminationField extends Model<
   InferAttributes<PhysicalExaminationField>,
   InferCreationAttributes<PhysicalExaminationField>
 > {
-  declare id: CreationOptional<number>;
+  declare id: CreationOptional<string>;
   declare name: string;
   declare inputType:
     | "number"
@@ -60,9 +28,9 @@ class PhysicalExaminationField extends Model<
 PhysicalExaminationField.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
     name: {
@@ -96,7 +64,6 @@ PhysicalExaminationField.init(
   },
   {
     sequelize,
-    modelName: "physical_examination_field",
     tableName: "physical_examination_fields",
     timestamps: true,
   }
@@ -104,6 +71,6 @@ PhysicalExaminationField.init(
 
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// PhysicalExaminationField.sync({ alter: false, force: false });
+PhysicalExaminationField.sync({ alter: false, force: false });
 
 export default PhysicalExaminationField;

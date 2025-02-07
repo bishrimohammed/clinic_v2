@@ -4,16 +4,19 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  ForeignKey,
 } from "sequelize";
 import sequelize from "../../db/index"; // Ensure the correct path
+import PhysicalExamination from "./physicalExamination";
+import PhysicalExaminationField from "../PhysicalExaminationField";
 
 class PhysicalExaminationResult extends Model<
   InferAttributes<PhysicalExaminationResult>,
   InferCreationAttributes<PhysicalExaminationResult>
 > {
-  declare id: CreationOptional<number>;
-  declare physicalExamination_id: number;
-  declare physical_ExaminationField_id: number;
+  declare id: CreationOptional<string>;
+  declare physicalExaminationId: ForeignKey<PhysicalExamination["id"]>;
+  declare examinationFieldId: ForeignKey<PhysicalExaminationField["id"]>;
   declare result: string;
   declare deletedAt?: Date | null;
 }
@@ -21,23 +24,27 @@ class PhysicalExaminationResult extends Model<
 PhysicalExaminationResult.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
-    physicalExamination_id: {
-      type: DataTypes.INTEGER,
+    physicalExaminationId: {
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: "physical_examinations",
+        model: PhysicalExamination,
         key: "id",
       },
       onDelete: "CASCADE",
     },
-    physical_ExaminationField_id: {
-      type: DataTypes.INTEGER,
+    examinationFieldId: {
+      type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: PhysicalExaminationField,
+        key: "id",
+      },
     },
     result: {
       type: DataTypes.STRING,
@@ -51,16 +58,19 @@ PhysicalExaminationResult.init(
   },
   {
     sequelize,
-    modelName: "physical_examination_result",
     tableName: "physical_examination_result",
     paranoid: true, // Enables soft deletes
-    // freezeTableName: true, // Prevents Sequelize from pluralizing the table name
+    freezeTableName: true, // Prevents Sequelize from pluralizing the table name
     timestamps: false, // No automatic timestamps
   }
 );
 
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// PhysicalExaminationResult.sync({ alter: false });
+PhysicalExaminationResult.sync({ alter: false });
 
+PhysicalExaminationResult.belongsTo(PhysicalExaminationField, {
+  foreignKey: "examinationFieldId",
+  as: "examinationField",
+});
 export default PhysicalExaminationResult;
