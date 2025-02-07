@@ -35,6 +35,7 @@ import DiscontinuedMedication from "./medicalRecords/DiscontinuedMedication";
 import VitalSign from "./medicalRecords/VitalSign";
 import VitalSignField from "./VitalSignField";
 import VitalSignResult from "./medicalRecords/VitalSignResult";
+import MedicalRecordDetail from "./MedicalRecordDetail";
 
 // PatientCreditDetail
 // Role.hasMany(User, {
@@ -106,6 +107,7 @@ export {
   PatientCreditDetail,
   Invoice,
   MedicalRecord,
+  MedicalRecordDetail,
   VitalSign,
   VitalSignField,
   VitalSignResult,
