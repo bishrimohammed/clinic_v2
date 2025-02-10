@@ -1,4 +1,6 @@
-import { z } from "zod";
+import { number, z } from "zod";
+
+export type loggedInUserId = number;
 
 export const addressSchema = z.object({
   id: z
@@ -61,6 +63,15 @@ export const addressSchema = z.object({
     ),
 });
 export const phoneRegex = /^(07|09)\d{8}$/;
+
+export type dayOfWeekType =
+  | "Sunday"
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday";
 
 export const createEmergencyContactSchema = z
   .object({

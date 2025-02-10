@@ -2,11 +2,11 @@ import http, { Server } from "http";
 import express from "express";
 import loaders from "./loaders";
 import logger from "./config/logger";
-import { ConnectionError } from "sequelize";
 
 const unExpectedErrorHandler = (server: Server) => {
   return function (error: any) {
     logger.error("Unexpected Error:", { error });
+    console.log(error);
 
     exitHandler(server);
   };

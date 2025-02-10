@@ -1,12 +1,18 @@
+import { Request } from "express";
 import { visitService } from "../services";
-import { patientVisitQueryType } from "../types/visit";
+import {
+  addTraigeType,
+  createPatientVisitType,
+  patientVisitQueryType,
+  updatePatientVisitType,
+} from "../types/visit";
 import asyncHandler from "../utils/asyncHandler";
 
 // const asyncHandler = require("express-async-handler");
 const db = require("../models");
-const { differenceInDays, format } = require("date-fns");
-const getClinicInformation = require("../helpers/getClinicInformation");
-const { Op } = require("sequelize");
+// const { differenceInDays, format } = require("date-fns");
+// const getClinicInformation = require("../helpers/getClinicInformation");
+// const { Op } = require("sequelize");
 
 export const getPatientVisits = asyncHandler(async (req, res) => {
   const query = req.query as patientVisitQueryType;
@@ -35,8 +41,8 @@ export const getActivePatientVisits = asyncHandler(async (req, res) => {
 });
 export const getPatientVisitById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const visitId = parseInt(id, 10);
-  const visit = await visitService.getPatientVisitById(visitId);
+  // const visitId = parseInt(id, 10);
+  const visit = await visitService.getPatientVisitById(id);
   res.json({
     status: "success",
     data: {
@@ -264,96 +270,126 @@ export const getPreviousPatientVisitByDoctorId = asyncHandler(
     // });
   }
 );
-export const createPatientVisit = asyncHandler(async (req, res) => {
-  const { patient_id, doctor_id, date, reason, type, mode_of_arrival } =
-    req.body;
-  // console.log(req.body);
-  // console.log(req.user);
-  const lastMedicalRecord = await db.MedicalRecord.findAll({
-    where: {
-      patient_id,
-    },
-    order: [["id", "DESC"]],
-    limit: 1,
-  });
+export const createPatientVisit = asyncHandler(
+  async (req: Request & { validatedData: createPatientVisitType }, res) => {
+    // const { patient_id, doctor_id, date, reason, type, mode_of_arrival } =
+    //   req.body;
+    const userId = req.user?.id!;
 
-  const clinic = await getClinicInformation(4);
-
-  let stage;
-
-  if (lastMedicalRecord.length > 0) {
-    if (
-      differenceInDays(new Date(lastMedicalRecord.updatedAt), new Date()) >
-      clinic.card_valid_date
-    ) {
-      stage = "Waiting for service fee";
-    } else if (
-      clinic.has_triage ||
-      String(type).toLowerCase() === "emergency"
-    ) {
-      stage = "Waiting for triage";
-    } else {
-      stage = "Waiting for examiner";
-    }
-  } else {
-    stage = "Waiting for service fee";
-  }
-  if (String(type).toLowerCase() === "emergency") {
-    stage = "Waiting for triage";
-  }
-  const medicalRecord = await db.MedicalRecord.create(
-    {
-      patient_id,
-    },
-    { userId: req.user?.id }
-  );
-  if (!medicalRecord) {
-    res.status(400);
-    throw new Error("medical record not created");
-  }
-  const patientVisit = await db.PatientAssignment.create(
-    {
-      patient_id,
-      doctor_id,
-      assignment_date: date,
-      visit_time: date.substring(11, 16),
-      visit_type: type,
-      mode_of_arrival: type === "Emergency" ? mode_of_arrival : null,
-      reason,
-      medicalRecord_id: medicalRecord.id,
-      stage: stage,
-      created_by: req?.user?.id,
-    },
-    { userId: req?.user?.id }
-  );
-
-  if (
-    stage === "Waiting for service fee" ||
-    String(type).toLowerCase() === "emergency"
-  ) {
-    const medicalBilling = await db.MedicalBilling.create(
-      {
-        medical_record_id: medicalRecord.id,
-        patient_id,
-        visit_id: patientVisit.id,
-      },
-      { userId: req?.user?.id }
+    const visit = await visitService.createPatientVisit(
+      req.validatedData,
+      userId
     );
-    if (!medicalBilling) {
-      res.status(500);
-      throw new Error("unable to create MedicalBilling");
-    }
-    const payment = await db.Payment.create(
-      {
-        medical_billing_id: medicalBilling.id,
-        item_id: 1,
+
+    // const lastMedicalRecord = await db.MedicalRecord.findAll({
+    //   where: {
+    //     patient_id,
+    //   },
+    //   order: [["id", "DESC"]],
+    //   limit: 1,
+    // });
+
+    // const clinic = await getClinicInformation(4);
+
+    // let stage;
+
+    // if (lastMedicalRecord.length > 0) {
+    //   if (
+    //     differenceInDays(new Date(lastMedicalRecord.updatedAt), new Date()) >
+    //     clinic.card_valid_date
+    //   ) {
+    //     stage = "Waiting for service fee";
+    //   } else if (
+    //     clinic.has_triage ||
+    //     String(type).toLowerCase() === "emergency"
+    //   ) {
+    //     stage = "Waiting for triage";
+    //   } else {
+    //     stage = "Waiting for examiner";
+    //   }
+    // } else {
+    //   stage = "Waiting for service fee";
+    // }
+    // if (String(type).toLowerCase() === "emergency") {
+    //   stage = "Waiting for triage";
+    // }
+    // const medicalRecord = await db.MedicalRecord.create(
+    //   {
+    //     patient_id,
+    //   },
+    //   { userId: req.user?.id }
+    // );
+    // if (!medicalRecord) {
+    //   res.status(400);
+    //   throw new Error("medical record not created");
+    // }
+    // const patientVisit = await db.PatientAssignment.create(
+    //   {
+    //     patient_id,
+    //     doctor_id,
+    //     assignment_date: date,
+    //     visit_time: date.substring(11, 16),
+    //     visit_type: type,
+    //     mode_of_arrival: type === "Emergency" ? mode_of_arrival : null,
+    //     reason,
+    //     medicalRecord_id: medicalRecord.id,
+    //     stage: stage,
+    //     created_by: req?.user?.id,
+    //   },
+    //   { userId: req?.user?.id }
+    // );
+
+    // if (
+    //   stage === "Waiting for service fee" ||
+    //   String(type).toLowerCase() === "emergency"
+    // ) {
+    //   const medicalBilling = await db.MedicalBilling.create(
+    //     {
+    //       medical_record_id: medicalRecord.id,
+    //       patient_id,
+    //       visit_id: patientVisit.id,
+    //     },
+    //     { userId: req?.user?.id }
+    //   );
+    //   if (!medicalBilling) {
+    //     res.status(500);
+    //     throw new Error("unable to create MedicalBilling");
+    //   }
+    //   const payment = await db.Payment.create(
+    //     {
+    //       medical_billing_id: medicalBilling.id,
+    //       item_id: 1,
+    //     },
+    //     { userId: req?.user?.id }
+    //   );
+    // }
+    res.status(201).json({
+      status: "success",
+      message: "",
+      data: {
+        visit,
       },
-      { userId: req?.user?.id }
-    );
+    });
   }
-  res.status(201).json(patientVisit);
-});
-// updatePatientVisit= asyncHandler(async (req, res) => {}),
+);
+export const updatePatientVisit = asyncHandler(
+  async (req: Request & { validatedData: updatePatientVisitType }, res) => {
+    const userId = req.user?.id!;
+    const visitId = req.params.id;
+    const visit = await visitService.updatePatientVisit(
+      visitId,
+      req.validatedData,
+      userId
+    );
+    res.json({
+      status: "success",
+      message: "patient visit updated successfully",
+      data: {
+        visit,
+      },
+    });
+  }
+);
 // deletePatientVisit; asyncHandler(async (req, res) => {}),
 export const getUpcomingPatientvisits = asyncHandler(async (req, res) => {
   // const page = parseInt(req.query.page) || 1;
@@ -506,26 +542,48 @@ export const cancelPatientAssignment = asyncHandler(async (req, res) => {
 });
 export const startTraige = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const visit = await db.PatientAssignment.findByPk(id);
-  if (!visit) {
-    res.status(404);
-    throw new Error("Patient visit not found");
-  }
-  visit.stage = "Performing triage";
-  await visit.save({ userId: req.user?.id });
-  res.json(visit);
+  const userId = req.user?.id!;
+  const visit = await visitService.startVisitTraige(id, userId);
+  // db.PatientAssignment.findByPk(id);
+  // if (!visit) {
+  //   res.status(404);
+  //   throw new Error("Patient visit not found");
+  // }
+  // visit.stage = "Performing triage";
+  // await visit.save({ userId: req.user?.id });
+  res.json({
+    status: "success",
+    message: "",
+    data: {
+      visit,
+    },
+  });
 });
-export const finishTraige = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const visit = await db.PatientAssignment.findByPk(id);
-  if (!visit) {
-    res.status(404);
-    throw new Error("Patient visit not found");
+export const finishTraige = asyncHandler(
+  async (req: Request & { validatedData: addTraigeType }, res) => {
+    const { id } = req.params;
+    const userId = req.user?.id!;
+    const triage = await visitService.addVisitTriage(
+      id,
+      req.validatedData,
+      userId
+    );
+    // db.PatientAssignment.findByPk(id);
+    // if (!visit) {
+    //   res.status(404);
+    //   throw new Error("Patient visit not found");
+    // }
+    // visit.stage = "Waiting for examiner";
+    // await visit.save({ userId: req.user?.id });
+    res.json({
+      status: "success",
+      message: "",
+      data: {
+        triage,
+      },
+    });
   }
-  visit.stage = "Waiting for examiner";
-  await visit.save({ userId: req.user?.id });
-  res.json(visit);
-});
+);
 export const admitVisit = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const visit = await db.PatientAssignment.findByPk(id);

@@ -35,7 +35,7 @@ class Database {
           host: dbConfig.HOST,
           port: 3306,
           dialect: dbConfig.dialect,
-          logging: false,
+          logging: true,
         }
       );
     }

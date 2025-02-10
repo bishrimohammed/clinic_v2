@@ -15,7 +15,6 @@ import Patient from "./Patient";
 import PatientVisit from "./PatientVisit";
 import InvestigationOrder from "./medicalRecords/InvestigationOrder";
 import Schedule from "./Schedule";
-import MedicalBilling from "./MedicalBilling";
 
 // Adresss
 import Region from "./address/Region";
@@ -27,6 +26,15 @@ import EmergencyContact from "./EmergencyContact";
 import CreditCompanyProfile from "./creditCompanyProfile";
 import CreditAgreement from "./creditAgreement";
 import PatientCreditDetail from "./patientCreditDetail";
+import MedicalBilling from "./MedicalBilling";
+import Invoice from "./billing/Invoice";
+import ExternalService from "./ExternalService";
+import MedicalRecord from "./MedicalRecord";
+import CurrentMedication from "./medicalRecords/CurrentMedication";
+import DiscontinuedMedication from "./medicalRecords/DiscontinuedMedication";
+import VitalSign from "./medicalRecords/VitalSign";
+import VitalSignField from "./VitalSignField";
+import VitalSignResult from "./medicalRecords/VitalSignResult";
 
 // PatientCreditDetail
 // Role.hasMany(User, {
@@ -51,6 +59,23 @@ Employee.hasOne(User, {
   foreignKey: "employee_id",
   as: "user",
 });
+Invoice.belongsTo(MedicalBilling, {
+  foreignKey: "medicalBillingId",
+  as: "medicalBilling",
+});
+
+// MedicalBilling.belongsTo(ExternalService, {
+//   foreignKey: "billableId",
+//   constraints: false,
+//   scope: { billableType: "ExternalService" },
+//   as: "billableExternalService",
+// });
+// MedicalBilling.belongsTo(MedicalRecord, {
+//   foreignKey: "billableId",
+//   constraints: false,
+//   scope: { billableType: "MedicalRecord" },
+//   as: "billableMedicalRecord",
+// });
 
 export {
   User,
@@ -79,4 +104,12 @@ export {
   CreditAgreement,
   CreditCompanyProfile,
   PatientCreditDetail,
+  Invoice,
+  MedicalRecord,
+  VitalSign,
+  VitalSignField,
+  VitalSignResult,
+  CurrentMedication,
+  DiscontinuedMedication,
+  ExternalService,
 };

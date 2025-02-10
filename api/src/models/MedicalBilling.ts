@@ -1,137 +1,3 @@
-// module.exports = (sequelize, DataTypes) => {
-//   const MedicalBilling = sequelize.define(
-//     "medicalbilling",
-//     {
-//       id: {
-//         type: DataTypes.INTEGER,
-//         primaryKey: true,
-//         autoIncrement: true,
-//         allowNull: false,
-//       },
-//       patient_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: true,
-//         references: {
-//           model: "patients",
-//           key: "id",
-//         },
-//         onDelete: "SET NULL",
-//       },
-//       visit_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: true,
-//         references: {
-//           model: "patientassignments",
-//           key: "id",
-//         },
-//         onDelete: "SET NULL",
-//       },
-//       medical_record_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: true,
-//         references: {
-//           model: "medicalrecords",
-//           key: "id",
-//         },
-//         onDelete: "CASCADE",
-//       },
-//       externalService_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: true,
-//         references: {
-//           model: "external_services",
-//           key: "id",
-//         },
-//         onDelete: "SET NULL",
-//       },
-//       is_internal_service: {
-//         type: DataTypes.BOOLEAN,
-//         defaultValue: true,
-//       },
-//       date: {
-//         type: DataTypes.DATE,
-//         allowNull: false,
-//         defaultValue: new Date(),
-//       },
-//       has_advanced_payment: {
-//         type: DataTypes.BOOLEAN,
-//         defaultValue: false,
-//       },
-//       is_advanced_payment_amount_completed: {
-//         type: DataTypes.BOOLEAN,
-//         allowNull: true,
-//         default: false,
-//       },
-//       status: {
-//         type: DataTypes.STRING,
-//         allowNull: false,
-//         defaultValue: true,
-//       },
-//     },
-//     {
-//       hooks: {
-//         afterCreate: async (billings, options) => {
-//           await sequelize.models.medical_billings_audit.create({
-//             medicalBilling_id: billings.id,
-//             patient_id: billings.patient_id,
-//             visit_id: billings.visit_id,
-//             medical_record_id: billings.medical_record_id,
-//             externalService_id: billings.externalService_id,
-//             is_internal_service: billings.is_internal_service,
-//             date: billings.date,
-//             has_advanced_payment: billings.has_advanced_payment,
-//             is_advanced_payment_amount_completed:
-//               billings.is_advanced_payment_amount_completed,
-//             status: billings.status,
-//             operation_type: "I",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//         beforeUpdate: async (billings, options) => {
-//           const previousValue = billings._previousDataValues;
-//           await sequelize.models.medical_billings_audit.create({
-//             medicalBilling_id: previousValue.id,
-//             patient_id: previousValue.patient_id,
-//             visit_id: previousValue.visit_id,
-//             medical_record_id: previousValue.medical_record_id,
-//             externalService_id: previousValue.externalService_id,
-//             is_internal_service: previousValue.is_internal_service,
-//             date: previousValue.date,
-//             has_advanced_payment: previousValue.has_advanced_payment,
-//             is_advanced_payment_amount_completed:
-//               previousValue.is_advanced_payment_amount_completed,
-//             status: previousValue.status,
-//             operation_type: "U",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//         beforeDestroy: async (billings, options) => {
-//           await sequelize.models.medical_billings_audit.create({
-//             medicalBilling_id: billings.id,
-//             patient_id: billings.patient_id,
-//             visit_id: billings.visit_id,
-//             medical_record_id: billings.medical_record_id,
-//             externalService_id: billings.externalService_id,
-//             is_internal_service: billings.is_internal_service,
-//             date: billings.date,
-//             has_advanced_payment: billings.has_advanced_payment,
-//             is_advanced_payment_amount_completed:
-//               billings.is_advanced_payment_amount_completed,
-//             status: billings.status,
-//             operation_type: "I",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//       },
-//     }
-//   );
-//   MedicalBilling.sync({ alter: false, force: false });
-//   return MedicalBilling;
-// };
-
 import {
   Model,
   DataTypes,
@@ -140,165 +6,93 @@ import {
   InferCreationAttributes,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
+import ExternalService from "./ExternalService";
+import MedicalRecord from "./MedicalRecord";
+import Invoice from "./billing/Invoice";
+import ServiceLineItem from "./billing/ServiceLineItem";
 
 class MedicalBilling extends Model<
   InferAttributes<MedicalBilling>,
   InferCreationAttributes<MedicalBilling>
 > {
-  declare id: CreationOptional<number>;
-  declare patient_id?: number | null;
-  declare visit_id?: number | null;
-  declare medical_record_id?: number | null;
-  declare externalService_id?: number | null;
-  declare is_internal_service?: boolean;
-  declare date: Date; // DATE as Date type
-  declare has_advanced_payment?: boolean;
-  declare is_advanced_payment_amount_completed?: boolean | null;
-  declare status: string;
-  declare createdAt?: CreationOptional<Date>;
-  declare updatedAt?: CreationOptional<Date>;
+  declare id: CreationOptional<string>;
+  declare billableId: string; // UUID of the associated record
+  declare billableType: "MedicalRecord" | "ExternalService"; // Type of associated record
+  declare isInternalService?: boolean;
+  // declare billingDate: Date;
+  declare hasAdvancedPayment?: boolean;
+  declare isAdvancedPaymentAmountCompleted?: boolean;
+  declare status?: boolean;
 }
 
 MedicalBilling.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
+    },
+    billableId: {
+      type: DataTypes.UUID,
       allowNull: false,
     },
-    patient_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "patients",
-        key: "id",
-      },
-      onDelete: "SET NULL",
-    },
-    visit_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "patientassignments",
-        key: "id",
-      },
-      onDelete: "SET NULL",
-    },
-    medical_record_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "medicalrecords",
-        key: "id",
-      },
-      onDelete: "CASCADE",
-    },
-    externalService_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "external_services",
-        key: "id",
-      },
-      onDelete: "SET NULL",
-    },
-    is_internal_service: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-    },
-    date: {
-      type: DataTypes.DATE,
+    billableType: {
+      type: DataTypes.ENUM("MedicalRecord", "ExternalService"),
       allowNull: false,
-      defaultValue: new Date(),
     },
-    has_advanced_payment: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    is_advanced_payment_amount_completed: {
+    isInternalService: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
-      defaultValue: false,
+    },
+    // billingDate: {
+    //   type: DataTypes.DATE,
+    //   allowNull: false,
+    // },
+    hasAdvancedPayment: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    isAdvancedPaymentAmountCompleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
     },
     status: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: true, // Changed to string to match the type
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      defaultValue: true,
     },
   },
   {
     sequelize,
-    modelName: "medicalbilling",
     tableName: "medicalbillings",
     timestamps: true, // Enable timestamps for createdAt and updatedAt
-    // hooks: {
-    //   afterCreate: async (billings, options) => {
-    //     await sequelize.models.medical_billings_audit.create({
-    //       medicalBilling_id: billings.id,
-    //       patient_id: billings.patient_id,
-    //       visit_id: billings.visit_id,
-    //       medical_record_id: billings.medical_record_id,
-    //       externalService_id: billings.externalService_id,
-    //       is_internal_service: billings.is_internal_service,
-    //       date: billings.date,
-    //       has_advanced_payment: billings.has_advanced_payment,
-    //       is_advanced_payment_amount_completed: billings.is_advanced_payment_amount_completed,
-    //       status: billings.status,
-    //       operation_type: "I",
-    //       changed_by: options.userId,
-    //       changed_at: new Date(),
-    //     });
-    //   },
-    //   beforeUpdate: async (billings, options) => {
-    //     const previousValue = billings._previousDataValues;
-    //     await sequelize.models.medical_billings_audit.create({
-    //       medicalBilling_id: previousValue.id,
-    //       patient_id: previousValue.patient_id,
-    //       visit_id: previousValue.visit_id,
-    //       medical_record_id: previousValue.medical_record_id,
-    //       externalService_id: previousValue.externalService_id,
-    //       is_internal_service: previousValue.is_internal_service,
-    //       date: previousValue.date,
-    //       has_advanced_payment: previousValue.has_advanced_payment,
-    //       is_advanced_payment_amount_completed: previousValue.is_advanced_payment_amount_completed,
-    //       status: previousValue.status,
-    //       operation_type: "U",
-    //       changed_by: options.userId,
-    //       changed_at: new Date(),
-    //     });
-    //   },
-    //   beforeDestroy: async (billings, options) => {
-    //     await sequelize.models.medical_billings_audit.create({
-    //       medicalBilling_id: billings.id,
-    //       patient_id: billings.patient_id,
-    //       visit_id: billings.visit_id,
-    //       medical_record_id: billings.medical_record_id,
-    //       externalService_id: billings.externalService_id,
-    //       is_internal_service: billings.is_internal_service,
-    //       date: billings.date,
-    //       has_advanced_payment: billings.has_advanced_payment,
-    //       is_advanced_payment_amount_completed: billings.is_advanced_payment_amount_completed,
-    //       status: billings.status,
-    //       operation_type: "D", // Changed to represent deletion
-    //       changed_by: options.userId,
-    //       changed_at: new Date(),
-    //     });
-    //   },
-    // },
   }
 );
 
+MedicalBilling.hasMany(Invoice, {
+  foreignKey: "medicalBillingId",
+  as: "invoice",
+});
+MedicalBilling.hasMany(ServiceLineItem, {
+  foreignKey: "billingId",
+  as: "serviceLineItems",
+});
+// MedicalBilling.belongsTo(ExternalService, {
+//   foreignKey: "billableId",
+//   constraints: false,
+//   scope: { billableType: "ExternalService" },
+//   as: "billableExternalService",
+// });
+// MedicalBilling.belongsTo(MedicalRecord, {
+//   foreignKey: "billableId",
+//   constraints: false,
+//   scope: { billableType: "MedicalRecord" },
+//   as: "billableMedicalRecord",
+// });
+
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// MedicalBilling.sync({ alter: false, force: false });
+MedicalBilling.sync({ alter: false, force: false });
 
 export default MedicalBilling;

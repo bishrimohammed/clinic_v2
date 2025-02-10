@@ -390,4 +390,26 @@ export const activateServiceItem = async (id: string) => {
   await serviceItem.update({ status: true });
   return serviceItem;
 };
+export const getRegistationFeeServiceItem = async () => {
+  // Registration Fee
+  const clinicservice = await ClinicService.findOne({
+    where: { is_registration: true },
+  });
+  if (!clinicservice) {
+    throw new ApiError(404, "Registration Card service is not found");
+  }
+  const category = await ServiceCategory.findOne({
+    where: { clinicService_id: clinicservice.id },
+  });
+  if (!category) {
+    throw new ApiError(404, "Registration Card service category is not found");
+  }
+  const serviceItem = await ServiceItem.findOne({
+    where: { serviceCategory_id: category.id },
+  });
+  if (!serviceItem) {
+    throw new ApiError(404, "Registration Card service item is not found");
+  }
+  return serviceItem;
+};
 //#endregion
