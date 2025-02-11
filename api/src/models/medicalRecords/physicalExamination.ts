@@ -4,10 +4,13 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  HasManyCreateAssociationMixin,
+  HasManyAddAssociationsMixin,
 } from "sequelize";
 import sequelize from "../../db/index"; // Ensure the correct path
 import MedicalRecord from "../MedicalRecord";
 import PhysicalExaminationResult from "./physicalExaminationResult";
+import User from "../User";
 
 class PhysicalExamination extends Model<
   InferAttributes<PhysicalExamination>,
@@ -20,6 +23,8 @@ class PhysicalExamination extends Model<
   declare deletedAt?: CreationOptional<Date>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+
+  // declare createExaminationResults : HasManyAddAssociationsMixin<PhysicalExaminationResult>
 }
 
 PhysicalExamination.init(
@@ -86,5 +91,10 @@ PhysicalExamination.belongsTo(MedicalRecord, {
 PhysicalExamination.hasMany(PhysicalExaminationResult, {
   foreignKey: "physicalExaminationId",
   as: "examinationResults",
+});
+
+PhysicalExamination.belongsTo(User, {
+  foreignKey: "examinerId",
+  as: "examiner",
 });
 export default PhysicalExamination;

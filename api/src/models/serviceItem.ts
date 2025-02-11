@@ -48,6 +48,8 @@ class ServiceItem extends Model<
     PanelUnderpanel,
     number
   >;
+
+  declare labTestProfile?: LabTestProfile;
 }
 
 ServiceItem.init(
