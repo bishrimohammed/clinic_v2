@@ -3,12 +3,19 @@ import MedicalRecord from "../models/MedicalRecord";
 import {
   addMedicalRecordSymptomsType,
   addVitalSignType,
+  addVPhysicalExaminationType,
 } from "../types/medical-record";
 import { loggedInUserId } from "../types/shared";
 import { ApiError } from "../shared/error/ApiError";
 import {
+  LabTestProfile,
   MedicalRecordDetail,
   PatientVisit,
+  PhysicalExamination,
+  PhysicalExaminationField,
+  PhysicalExaminationResult,
+  ServiceItem,
+  User,
   VitalSign,
   VitalSignField,
   VitalSignResult,
@@ -232,9 +239,8 @@ export const addPlanAndAssessment = async (
 
 //#region Vital Signs
 /**
- * 
+ * Get vital signs by medical record id
  * @param medicalRecordId - medical record id
-
  * @returns {Promise<VitalSign[]>}
  */
 export const getVitalSigns = async (
@@ -299,7 +305,7 @@ export const addVitalSigns = async (
   );
 
   const transformVitalSigns = vitalSigns.map((vitalSign) => ({
-    result: vitalSign.value || "",
+    result: vitalSign.value || "n",
     vitalSignFieldId: vitalSign.vitalSignFieldId,
     vitalId: createdVitalSigns.id,
   }));
@@ -315,6 +321,94 @@ export const addVitalSigns = async (
 
 //#endregion
 
+//#region Physical Examination
+/**
+ * Get physical examinations by medical record id
+ * @param medicalRecordId - medical record id
+ * @returns {Promise<PhysicalExamination[]>}
+ */
+export const getPhysicalExaminations = async (
+  medicalRecordId: string
+): Promise<PhysicalExamination[]> => {
+  const physicalExaminations = await PhysicalExamination.findAll({
+    where: {
+      medicalRecordId,
+    },
+    include: [
+      {
+        model: PhysicalExaminationResult,
+        as: "examinationResults",
+        include: [
+          {
+            model: PhysicalExaminationField,
+            as: "examinationField",
+            attributes: ["id", "name"],
+          },
+        ],
+      },
+      {
+        model: User,
+        as: "examiner",
+        attributes: ["id", "name"],
+      },
+    ],
+  });
+  return physicalExaminations;
+};
+
+export const addPhysicalExaminations = async (
+  medicalRecordId: string,
+  physicalExaminations: addVPhysicalExaminationType,
+  userId: loggedInUserId,
+  transaction?: Transaction
+) => {
+  const createdPhysicalExamination = await PhysicalExamination.create(
+    {
+      medicalRecordId,
+      examinerId: userId,
+    },
+    { transaction }
+  );
+
+  const transformedPhysicalExaminations = physicalExaminations.map(
+    (examination) => ({
+      physicalExaminationId: createdPhysicalExamination.id,
+      result: examination.result || "bh",
+      examinationFieldId: examination.examinationFieldId,
+    })
+  );
+  const examinationResults = await PhysicalExaminationResult.bulkCreate(
+    transformedPhysicalExaminations,
+    { transaction }
+  );
+  return examinationResults;
+};
+
+//#endregion
+//#region  Lab Investigation
+export const submitLabInvestigation = async (
+  tests: string[],
+  userId: loggedInUserId,
+  transaction?: Transaction
+) => {
+  // const serviceItems = await ServiceItem.findAll({
+  //   where: {
+  //     id: tests,
+  //   },
+  //   include: [
+  //     {
+  //       model: LabTestProfile,
+  //       as: "labTestProfile",
+  //     },
+  //   ],
+  // });
+  // const hasItemsNotLabtest = serviceItems.some((item) => !item?.labTestProfile);
+  // if (hasItemsNotLabtest) {
+  //   throw new ApiError(400, "");
+  // }
+};
+
+//#endregion
 // export const createMedicalRecord = async (
 //   data: createMedicalRecordType,
 //   userId: number
