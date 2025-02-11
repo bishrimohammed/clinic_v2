@@ -35,6 +35,10 @@ import DiscontinuedMedication from "./medicalRecords/DiscontinuedMedication";
 import VitalSign from "./medicalRecords/VitalSign";
 import VitalSignField from "./VitalSignField";
 import VitalSignResult from "./medicalRecords/VitalSignResult";
+import MedicalRecordDetail from "./MedicalRecordDetail";
+import PhysicalExamination from "./medicalRecords/physicalExamination";
+import PhysicalExaminationField from "./PhysicalExaminationField";
+import PhysicalExaminationResult from "./medicalRecords/physicalExaminationResult";
 
 // PatientCreditDetail
 // Role.hasMany(User, {
@@ -105,10 +109,14 @@ export {
   CreditCompanyProfile,
   PatientCreditDetail,
   Invoice,
-  MedicalRecord,
-  VitalSign,
   VitalSignField,
+  PhysicalExaminationField,
+  MedicalRecord,
+  MedicalRecordDetail,
+  VitalSign,
   VitalSignResult,
+  PhysicalExamination,
+  PhysicalExaminationResult,
   CurrentMedication,
   DiscontinuedMedication,
   ExternalService,

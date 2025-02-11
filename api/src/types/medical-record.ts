@@ -8,7 +8,7 @@ const addMedicalRecordSymptomsSchema = z.object({
   HPI: z.string().trim(),
 });
 
-const addVitalSignSchema = z
+export const addVitalSignSchema = z
   .array(
     z.object({
       vitalSignFieldId: z.string().trim(),
@@ -30,7 +30,33 @@ const addVitalSignSchema = z
     }
   });
 
+export const addPhysicalExaminationSchema = z
+  .array(
+    z.object({
+      examinationFieldId: z.string().trim(),
+      result: z.string().trim().optional(),
+    })
+  )
+  .superRefine((data, ctx) => {
+    // at least one vitalsigns has both vitalSignFieldId and value is not empty
+    if (data.length) {
+      const hasOnePhysicalExaminationResult = data.some(
+        (examination) => examination.examinationFieldId && examination.result
+      );
+      if (!hasOnePhysicalExaminationResult) {
+        ctx.addIssue({
+          path: [0],
+          code: ZodIssueCode.custom,
+          message: " ",
+        });
+      }
+    }
+  });
+
 export type addVitalSignType = z.infer<typeof addVitalSignSchema>;
+export type addVPhysicalExaminationType = z.infer<
+  typeof addPhysicalExaminationSchema
+>;
 export type addMedicalRecordSymptomsType = z.infer<
   typeof addMedicalRecordSymptomsSchema
 >;

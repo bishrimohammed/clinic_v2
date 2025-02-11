@@ -677,6 +677,18 @@ export const addVisitTriage = async (
   }
 };
 
+export const checkPatientMedicalRecordAssignedDoctorToVisit = async (
+  medicalRecordId: string,
+  doctorId: loggedInUserId
+) => {
+  const visit = await PatientVisit.findOne({
+    where: {
+      medicalRecordId,
+      doctorId,
+    },
+  });
+  return visit;
+};
 // export const updatePatientVisit = async (
 //   id: number,
 //   data: UpdatePatientVisitType

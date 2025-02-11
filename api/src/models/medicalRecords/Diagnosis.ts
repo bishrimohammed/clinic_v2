@@ -1,91 +1,3 @@
-// module.exports = (sequelize, DataTypes) => {
-//   const Diagnosis = sequelize.define(
-//     "diagnosis",
-//     {
-//       id: {
-//         type: DataTypes.INTEGER,
-//         primaryKey: true,
-//         autoIncrement: true,
-//         allowNull: false,
-//       },
-//       medical_record_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: false,
-//       },
-//       doctor_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: false,
-//       },
-//       diagnosis: {
-//         type: DataTypes.STRING,
-//         allowNull: false,
-//       },
-//       sick_leave_note_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: true,
-//       },
-//       status: {
-//         type: DataTypes.ENUM,
-//         values: ["Suspected", "Confirmed", "Ruled out"],
-//         defaultValue: "Suspected",
-//       },
-//       deletedAt: {
-//         type: DataTypes.DATE,
-//         allowNull: true,
-//         defaultValue: null,
-//       },
-//     },
-//     {
-//       paranoid: true,
-//       hooks: {
-//         afterCreate: async (diagnosis, options) => {
-//           await sequelize.models.diagnoses_audit.create({
-//             diagnosis_id: diagnosis.id,
-//             medical_record_id: diagnosis.medical_record_id,
-//             doctor_id: diagnosis.doctor_id,
-//             diagnosis: diagnosis.diagnosis,
-//             sick_leave_note_id: diagnosis.sick_leave_note_id,
-//             status: diagnosis.status,
-//             operation_type: "I",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//         beforeUpdate: async (diagnosis, options) => {
-//           const previousValue = diagnosis._previousDataValues;
-//           await sequelize.models.diagnoses_audit.create({
-//             diagnosis_id: previousValue.id,
-//             medical_record_id: previousValue.medical_record_id,
-//             doctor_id: previousValue.doctor_id,
-//             diagnosis: previousValue.diagnosis,
-//             sick_leave_note_id: previousValue.sick_leave_note_id,
-//             old_status: previousValue.status,
-//             new_status: diagnosis.status,
-//             operation_type: "U",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//         beforeDestroy: async (diagnosis, options) => {
-//           await sequelize.models.diagnoses_audit.create({
-//             diagnosis_id: diagnosis.id,
-//             medical_record_id: diagnosis.medical_record_id,
-//             doctor_id: diagnosis.doctor_id,
-//             diagnosis: diagnosis.diagnosis,
-//             sick_leave_note_id: diagnosis.sick_leave_note_id,
-//             status: diagnosis.status,
-//             operation_type: "D",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//       },
-//     }
-//   );
-//   Diagnosis.sync({ alter: false, force: false });
-//   return Diagnosis;
-// };
-
 import {
   Model,
   DataTypes,
@@ -99,12 +11,12 @@ class Diagnosis extends Model<
   InferAttributes<Diagnosis>,
   InferCreationAttributes<Diagnosis>
 > {
-  declare id: CreationOptional<number>;
-  declare medical_record_id: number;
-  declare doctor_id: number;
+  declare id: CreationOptional<string>;
+  declare medicalRecordId: string;
+  declare doctorId: number;
   declare diagnosis: string;
-  declare sick_leave_note_id?: CreationOptional<number>;
-  declare status: "Suspected" | "Confirmed" | "Ruled out";
+  declare sickLeaveNoteId?: CreationOptional<number>;
+  declare status?: "Suspected" | "Confirmed" | "Ruled out";
   declare deletedAt?: CreationOptional<Date>;
   declare createdAt?: CreationOptional<Date>;
   declare updatedAt?: CreationOptional<Date>;
@@ -113,16 +25,16 @@ class Diagnosis extends Model<
 Diagnosis.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
-    medical_record_id: {
-      type: DataTypes.INTEGER,
+    medicalRecordId: {
+      type: DataTypes.UUID,
       allowNull: false,
     },
-    doctor_id: {
+    doctorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -130,7 +42,7 @@ Diagnosis.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    sick_leave_note_id: {
+    sickLeaveNoteId: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
@@ -150,49 +62,6 @@ Diagnosis.init(
     tableName: "diagnoses",
     paranoid: true, // Enables soft deletes
     timestamps: true, // Automatically manage createdAt and updatedAt
-    // hooks: {
-    //   afterCreate: async (diagnosis, options) => {
-    //     await sequelize.models.diagnoses_audit.create({
-    //       diagnosis_id: diagnosis.id,
-    //       medical_record_id: diagnosis.medical_record_id,
-    //       doctor_id: diagnosis.doctor_id,
-    //       diagnosis: diagnosis.diagnosis,
-    //       sick_leave_note_id: diagnosis.sick_leave_note_id,
-    //       status: diagnosis.status,
-    //       operation_type: "I",
-    //       changed_by: options.userId,
-    //       changed_at: new Date(),
-    //     });
-    //   },
-    //   beforeUpdate: async (diagnosis, options) => {
-    //     const previousValue = diagnosis._previousDataValues;
-    //     await sequelize.models.diagnoses_audit.create({
-    //       diagnosis_id: previousValue.id,
-    //       medical_record_id: previousValue.medical_record_id,
-    //       doctor_id: previousValue.doctor_id,
-    //       diagnosis: previousValue.diagnosis,
-    //       sick_leave_note_id: previousValue.sick_leave_note_id,
-    //       old_status: previousValue.status,
-    //       new_status: diagnosis.status,
-    //       operation_type: "U",
-    //       changed_by: options.userId,
-    //       changed_at: new Date(),
-    //     });
-    //   },
-    //   beforeDestroy: async (diagnosis, options) => {
-    //     await sequelize.models.diagnoses_audit.create({
-    //       diagnosis_id: diagnosis.id,
-    //       medical_record_id: diagnosis.medical_record_id,
-    //       doctor_id: diagnosis.doctor_id,
-    //       diagnosis: diagnosis.diagnosis,
-    //       sick_leave_note_id: diagnosis.sick_leave_note_id,
-    //       status: diagnosis.status,
-    //       operation_type: "D",
-    //       changed_by: options.userId,
-    //       changed_at: new Date(),
-    //     });
-    //   },
-    // },
   }
 );
 

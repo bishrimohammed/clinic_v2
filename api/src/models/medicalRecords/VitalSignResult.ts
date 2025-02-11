@@ -4,6 +4,7 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  ForeignKey,
 } from "sequelize";
 import sequelize from "../../db/index"; // Ensure the correct path
 import VitalSign from "./VitalSign";
@@ -14,8 +15,8 @@ class VitalSignResult extends Model<
   InferCreationAttributes<VitalSignResult>
 > {
   declare id: CreationOptional<string>;
-  declare vitalId: string;
-  declare vitalSignFieldId: string;
+  declare vitalId: ForeignKey<VitalSign["id"]>;
+  declare vitalSignFieldId: ForeignKey<VitalSignField["id"]>;
   declare result: string;
   declare deletedAt?: CreationOptional<Date>;
 }
@@ -66,5 +67,14 @@ VitalSignResult.init(
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
 VitalSignResult.sync({ alter: false });
+
+// VitalSignField.belongsTo(VitalSign, {
+//   foreignKey: "vitalId",
+//   as: "vitalSign",
+// });
+VitalSignResult.belongsTo(VitalSignField, {
+  foreignKey: "vitalSignFieldId",
+  as: "vitalSignField",
+});
 
 export default VitalSignResult;

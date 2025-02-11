@@ -32,8 +32,8 @@ const startServer = async () => {
   const server = httpServer.listen(5001, () => {
     logger.info(`server listening on port ${5001}`);
   });
-  process.on("uncaughtException", unExpectedErrorHandler(server));
-  process.on("unhandledRejection", unExpectedErrorHandler(server));
+  // process.on("uncaughtException", unExpectedErrorHandler(server));
+  // process.on("unhandledRejection", unExpectedErrorHandler(server));
 
   process.on("SIGTERM", () => {
     logger.info("SIGTERM recieved");
