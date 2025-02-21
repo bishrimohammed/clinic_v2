@@ -12,6 +12,7 @@ import DiscontinuedMedication from "./medicalRecords/DiscontinuedMedication";
 import Patient from "./Patient";
 import PatientVisit from "./PatientVisit";
 import MedicalBilling from "./MedicalBilling";
+import InvestigationOrder from "./medicalRecords/InvestigationOrder";
 
 class MedicalRecord extends Model<
   InferAttributes<MedicalRecord>,
@@ -24,6 +25,16 @@ class MedicalRecord extends Model<
   declare updatedAt?: CreationOptional<Date>;
   declare getDiscontinuedMedications: HasManyGetAssociationsMixin<DiscontinuedMedication>;
   declare getCurrentMedications: HasManyGetAssociationsMixin<CurrentMedication>;
+
+  static associate() {
+    this.hasMany(InvestigationOrder, {
+      foreignKey: "orderableId",
+      constraints: false,
+      scope: {
+        orderableType: "MedicalRecord",
+      },
+    });
+  }
 }
 
 MedicalRecord.init(
