@@ -34,7 +34,10 @@ export const getUploadedFilePath = (
   }
   return `uploads/${file.filename}`;
 };
-
+/**
+ * Removes files on error.
+ * @param request -
+ */
 export const removeUnusedMulterImageFilesOnError = (request: Request) => {
   const req = request;
   const multerFile = req.file;
@@ -55,7 +58,11 @@ export const removeUnusedMulterImageFilesOnError = (request: Request) => {
     });
   }
 };
-
+/**
+ * Parses a stringfied JSON as JSON.
+ * @param value -
+ * @returns
+ */
 export const parseJSON = (value: string): any => {
   try {
     return JSON.parse(value);
@@ -107,3 +114,14 @@ export const combineAndFormatDateTime = (
  * @returns
  */
 export const isValidDate = (date: Date) => !isNaN(date.getTime());
+
+/**
+ * Checks if an array has duplicate elements.
+ * @param arr
+ * @returns {boolean}
+ */
+
+export const hasDuplicate = (arr: any[]): boolean => {
+  const uniqueSet = new Set(arr);
+  return uniqueSet.size !== arr.length;
+};
