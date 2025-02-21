@@ -1,144 +1,89 @@
-// module.exports = (sequelize, DataTypes) => {
-//   const InvestigationOrder = sequelize.define(
-//     "investigationorder",
-//     {
-//       medicalRecord_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: true,
-//         references: {
-//           model: "medicalrecords",
-//           key: "id",
-//         },
-//         onDelete: "",
-//       },
-//       externalService_id: {
-//         type: DataTypes.INTEGER,
-//         allowNull: true,
-//         references: {
-//           model: "external_services",
-//           key: "id",
-//         },
-//         onDelete: "CASCADE",
-//       },
-//       is_internal_service: {
-//         type: DataTypes.BOOLEAN,
-//         defaultValue: true,
-//       },
-//       // clinical_finding: DataTypes.STRING,
-//       status: {
-//         type: DataTypes.BOOLEAN,
-//         allowNull: true,
-//         defaultValue: true,
-//       },
-//       deletedAt: {
-//         type: DataTypes.DATE,
-//         allowNull: true,
-//         defaultValue: null,
-//       },
-//     },
-//     {
-//       paranoid: true,
-//       hooks: {
-//         afterCreate: async (investigationOrder, options) => {
-//           await sequelize.models.investigation_orders_audit.create({
-//             investigationOrder_id: investigationOrder.id,
-//             medicalRecord_id: investigationOrder.medicalRecord_id,
-//             externalService_id: investigationOrder.externalService_id,
-//             is_internal_service: investigationOrder.is_internal_service,
-//             // clinical_finding: investigationOrder.clinical_finding,
-//             status: investigationOrder.status,
-//             operation_type: "I",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//         beforeUpdate: async (investigationOrder, options) => {
-//           const previousValue = investigationOrder._previousDataValues;
-//           await sequelize.models.investigation_orders_audit.create({
-//             investigationOrder_id: previousValue.id,
-//             medicalRecord_id: previousValue.medicalRecord_id,
-//             externalService_id: investigationOrder.externalService_id,
-//             is_internal_service: investigationOrder.is_internal_service,
-//             // clinical_finding: previousValue.clinical_finding,
-//             old_status: previousValue.status,
-//             new_status: investigationOrder.status,
-//             operation_type: "U",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//         beforeDestroy: async (investigationOrder, options) => {
-//           await sequelize.models.investigation_orders_audit.create({
-//             investigationOrder_id: investigationOrder.id,
-//             medicalRecord_id: investigationOrder.medicalRecord_id,
-//             externalService_id: investigationOrder.externalService_id,
-//             is_internal_service: investigationOrder.is_internal_service,
-//             // clinical_finding: investigationOrder.clinical_finding,
-//             status: investigationOrder.status,
-//             operation_type: "D",
-//             changed_by: options.userId,
-//             changed_at: Date.now(),
-//           });
-//         },
-//       },
-//     }
-//   );
-//   InvestigationOrder.sync({ force: false, alter: false });
-//   return InvestigationOrder;
-// };
 import {
   Model,
   DataTypes,
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  ForeignKey,
 } from "sequelize";
 import sequelize from "../../db/index"; // Ensure the correct path
+import User from "../User";
+import MedicalRecord from "../MedicalRecord";
+import ExternalService from "../ExternalService";
 
 class InvestigationOrder extends Model<
   InferAttributes<InvestigationOrder>,
   InferCreationAttributes<InvestigationOrder>
 > {
-  declare id: CreationOptional<number>; // Assuming there's an auto-generated ID
-  declare medicalRecord_id?: number;
-  declare externalService_id?: number;
-  declare is_internal_service: boolean;
+  declare id: CreationOptional<string>;
+  declare orderableId: string;
+  declare orderableType: "MedicalRecord" | "ExternalService";
+  declare isInternalService: boolean;
+  declare orderTime: Date;
+  declare orderedBy: ForeignKey<User["id"]>;
+  declare stage?: "pending" | "completed" | "cancelled" | "partially_completed";
   declare status?: boolean;
   declare deletedAt?: Date | null;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+
+  // Define method to get associated model dynamically
+  async getOrderable() {
+    if (this.orderableType === "MedicalRecord") {
+      return await MedicalRecord.findByPk(this.orderableId);
+    }
+    if (this.orderableType === "ExternalService") {
+      return await ExternalService.findByPk(this.orderableId);
+    }
+    return null;
+  }
 }
 
 InvestigationOrder.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
-    medicalRecord_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "medicalrecords",
-        key: "id",
-      },
-      // onDelete: "", // Specify onDelete behavior if needed
+    orderableId: {
+      type: DataTypes.UUID,
+      allowNull: false,
     },
-    externalService_id: {
+    orderableType: {
+      type: DataTypes.ENUM("MedicalRecord", "ExternalService"),
+      allowNull: false,
+    },
+    isInternalService: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    orderTime: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: DataTypes.NOW,
+    },
+    orderedBy: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: "external_services",
+        model: User,
         key: "id",
       },
       onDelete: "CASCADE",
     },
-    is_internal_service: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+    stage: {
+      type: DataTypes.ENUM(
+        "pending",
+        "completed",
+        "cancelled",
+        "partially_completed"
+      ),
+      allowNull: true,
+      defaultValue: "pending",
     },
+
     status: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
@@ -160,49 +105,8 @@ InvestigationOrder.init(
   },
   {
     sequelize,
-    modelName: "investigationorder",
     tableName: "investigationorders",
     paranoid: true, // Enables soft deletes
-    // hooks: {
-    //   afterCreate: async (investigationOrder, options) => {
-    //     await sequelize.models.investigation_orders_audit.create({
-    //       investigationOrder_id: investigationOrder.id,
-    //       medicalRecord_id: investigationOrder.medicalRecord_id,
-    //       externalService_id: investigationOrder.externalService_id,
-    //       is_internal_service: investigationOrder.is_internal_service,
-    //       status: investigationOrder.status,
-    //       operation_type: "I",
-    //       changed_by: options.userId,
-    //       changed_at: new Date(),
-    //     });
-    //   },
-    //   beforeUpdate: async (investigationOrder, options) => {
-    //     const previousValue = investigationOrder._previousDataValues;
-    //     await sequelize.models.investigation_orders_audit.create({
-    //       investigationOrder_id: previousValue.id,
-    //       medicalRecord_id: previousValue.medicalRecord_id,
-    //       externalService_id: investigationOrder.externalService_id,
-    //       is_internal_service: investigationOrder.is_internal_service,
-    //       old_status: previousValue.status,
-    //       new_status: investigationOrder.status,
-    //       operation_type: "U",
-    //       changed_by: options.userId,
-    //       changed_at: new Date(),
-    //     });
-    //   },
-    //   beforeDestroy: async (investigationOrder, options) => {
-    //     await sequelize.models.investigation_orders_audit.create({
-    //       investigationOrder_id: investigationOrder.id,
-    //       medicalRecord_id: investigationOrder.medicalRecord_id,
-    //       externalService_id: investigationOrder.externalService_id,
-    //       is_internal_service: investigationOrder.is_internal_service,
-    //       status: investigationOrder.status,
-    //       operation_type: "D",
-    //       changed_by: options.userId,
-    //       changed_at: new Date(),
-    //     });
-    //   },
-    // },
   }
 );
 

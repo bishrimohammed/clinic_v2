@@ -79,13 +79,14 @@ import {
   InferCreationAttributes,
 } from "sequelize";
 import sequelize from "../../db/index"; // Ensure the correct path
+import MedicalRecord from "../MedicalRecord";
 
 class DiscontinuedMedication extends Model<
   InferAttributes<DiscontinuedMedication>,
   InferCreationAttributes<DiscontinuedMedication>
 > {
-  declare id: CreationOptional<number>;
-  declare medical_record_id: number;
+  declare id: CreationOptional<string>;
+  declare medicalRecordId: string;
   declare created_by: number;
   declare medication_name: string;
   declare deletedAt?: Date | null;
@@ -94,14 +95,18 @@ class DiscontinuedMedication extends Model<
 DiscontinuedMedication.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
-    medical_record_id: {
-      type: DataTypes.INTEGER,
+    medicalRecordId: {
+      type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: MedicalRecord,
+        key: "id",
+      },
     },
     created_by: {
       type: DataTypes.INTEGER,
@@ -119,9 +124,9 @@ DiscontinuedMedication.init(
   },
   {
     sequelize,
-    modelName: "discontinued_medication",
     tableName: "discontinued_medications",
     paranoid: true, // Enables soft deletes
+    timestamps: true,
     // hooks: {
     //   afterCreate: async (discontinuedMedication, options) => {
     //     await sequelize.models.discontinued_medications_audit.create({
@@ -164,6 +169,6 @@ DiscontinuedMedication.init(
 
 // Syncing the model is generally done in the database initialization
 // Commented out to avoid potential issues during migrations
-// DiscontinuedMedication.sync({ alter: false });
+DiscontinuedMedication.sync({ alter: false });
 
 export default DiscontinuedMedication;

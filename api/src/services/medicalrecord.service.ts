@@ -22,6 +22,7 @@ import {
 } from "../models";
 import sequelize from "../db";
 import { checkPatientMedicalRecordAssignedDoctorToVisit } from "./visit.service";
+import { hasDuplicate } from "../utils/helpers";
 
 /**
  * Get patient active medical record
@@ -296,6 +297,13 @@ export const addVitalSigns = async (
   // })
   // const transaction = await sequelize.transaction();
   // try {
+  const vitalSignFieldIds = vitalSigns.map(
+    (vitalSign) => vitalSign.vitalSignFieldId
+  );
+  const hasDuplicateVitalSignFieldId = hasDuplicate(vitalSignFieldIds);
+  if (hasDuplicateVitalSignFieldId) {
+    throw new ApiError(400, "Duplicate vital sign field id");
+  }
   const createdVitalSigns = await VitalSign.create(
     {
       medicalRecordId,
@@ -362,6 +370,17 @@ export const addPhysicalExaminations = async (
   userId: loggedInUserId,
   transaction?: Transaction
 ) => {
+  //
+  const physicalExaminationFieldIds = physicalExaminations.map(
+    (examination) => examination.examinationFieldId
+  );
+  const hasDuplicatePhysicalExaminationFieldId = hasDuplicate(
+    physicalExaminationFieldIds
+  );
+  if (hasDuplicatePhysicalExaminationFieldId) {
+    throw new ApiError(400, "Duplicate physical examination field id");
+  }
+
   const createdPhysicalExamination = await PhysicalExamination.create(
     {
       medicalRecordId,
