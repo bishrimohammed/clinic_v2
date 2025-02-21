@@ -19,14 +19,9 @@ class InvestigationOrder extends Model<
   declare orderableId: string;
   declare orderableType: "MedicalRecord" | "ExternalService";
   declare isInternalService: boolean;
-  declare orderTime: CreationOptional<Date>;
+  declare orderTime: Date;
   declare orderedBy: ForeignKey<User["id"]>;
-  declare stage?:
-    | "pending"
-    | "completed"
-    | "cancelled"
-    | "in_progress"
-    | "partially_completed";
+  declare stage?: "pending" | "completed" | "cancelled" | "partially_completed";
   declare status?: boolean;
   declare deletedAt?: Date | null;
   declare createdAt: CreationOptional<Date>;
@@ -83,7 +78,6 @@ InvestigationOrder.init(
         "pending",
         "completed",
         "cancelled",
-        "in_progress",
         "partially_completed"
       ),
       allowNull: true,
