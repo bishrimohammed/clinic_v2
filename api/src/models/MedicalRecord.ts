@@ -77,11 +77,11 @@ MedicalRecord.belongsTo(Patient, {
   as: "patient",
 });
 MedicalRecord.hasMany(CurrentMedication, {
-  foreignKey: "medical_record_id",
+  foreignKey: "medicalRecordId",
   as: "currentMedication",
 });
 MedicalRecord.hasMany(DiscontinuedMedication, {
-  foreignKey: "medical_record_id",
+  foreignKey: "medicalRecordId",
   as: "discontinuedMedication",
 });
 // Syncing the model is generally done in the database initialization
