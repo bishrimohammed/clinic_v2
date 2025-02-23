@@ -8,6 +8,7 @@ import {
 import { loggedInUserId } from "../types/shared";
 import { ApiError } from "../shared/error/ApiError";
 import {
+  InvestigationOrder,
   LabTestProfile,
   MedicalRecordDetail,
   PatientVisit,
@@ -23,6 +24,7 @@ import {
 import sequelize from "../db";
 import { checkPatientMedicalRecordAssignedDoctorToVisit } from "./visit.service";
 import { hasDuplicate } from "../utils/helpers";
+import OrderedTest from "../models/medicalRecords/orderedTest";
 
 /**
  * Get patient active medical record
@@ -407,24 +409,84 @@ export const addPhysicalExaminations = async (
 //#region  Lab Investigation
 export const submitLabInvestigation = async (
   tests: string[],
+  orderableId: string,
+  orderableType: "MedicalRecord" | "ExternalService" = "MedicalRecord",
   userId: loggedInUserId,
   transaction?: Transaction
 ) => {
-  // const serviceItems = await ServiceItem.findAll({
-  //   where: {
-  //     id: tests,
-  //   },
-  //   include: [
-  //     {
-  //       model: LabTestProfile,
-  //       as: "labTestProfile",
-  //     },
-  //   ],
-  // });
-  // const hasItemsNotLabtest = serviceItems.some((item) => !item?.labTestProfile);
-  // if (hasItemsNotLabtest) {
-  //   throw new ApiError(400, "");
-  // }
+  const panelTests = await ServiceItem.findAll({
+    where: {
+      id: tests,
+      "$labTestProfile.isPanel$": true,
+    },
+    include: [
+      {
+        model: LabTestProfile,
+        as: "labTestProfile",
+      },
+      {
+        model: ServiceItem,
+        as: "underPanels",
+        attributes: ["id", "service_name", "price"],
+      },
+    ],
+  });
+
+  const nonPanelTests = await ServiceItem.findAll({
+    where: {
+      id: tests,
+      "$labTestProfile.isPanel$": false,
+    },
+    include: [
+      {
+        model: LabTestProfile,
+        as: "labTestProfile",
+      },
+    ],
+  });
+  const hasPanelItemsNotLabtest = nonPanelTests.some(
+    (item) => !item?.labTestProfile
+  );
+  if (hasPanelItemsNotLabtest) {
+    throw new ApiError(400, "Submitted lab has non lab test");
+  }
+  const hasItemsNotLabtest = panelTests.some((item) => !item?.labTestProfile);
+  if (hasItemsNotLabtest) {
+    throw new ApiError(400, "Submitted lab has non lab test");
+  }
+  const hasDuplicateTest = hasDuplicate(tests);
+  if (hasDuplicateTest) {
+    throw new ApiError(400, "Duplicate test");
+  }
+
+  const createdLabInvestigation = await InvestigationOrder.create(
+    {
+      orderableId,
+      orderableType,
+      isInternalService: orderableType === "MedicalRecord",
+      orderTime: new Date(),
+      orderedBy: userId,
+    },
+    { transaction }
+  );
+
+  if (panelTests.length) {
+    const underPanels = panelTests.flatMap((test) => test.underPanels);
+
+    const underPanelsOrderTests = await Promise.all(
+      underPanels?.map((item) => {
+        OrderedTest.create(
+          {
+            investigationOrderId: createdLabInvestigation.id,
+            serviceItemId: item?.id!,
+            is_underpanel: true,
+            status: "pending",
+          },
+          { transaction }
+        );
+      })
+    );
+  }
 };
 
 //#endregion
