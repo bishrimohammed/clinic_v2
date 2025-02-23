@@ -25,6 +25,7 @@ import sequelize from "../db";
 import { checkPatientMedicalRecordAssignedDoctorToVisit } from "./visit.service";
 import { hasDuplicate } from "../utils/helpers";
 import OrderedTest from "../models/medicalRecords/orderedTest";
+import { boolean } from "zod";
 
 /**
  * Get patient active medical record
@@ -473,22 +474,32 @@ export const submitLabInvestigation = async (
   if (panelTests.length) {
     const underPanels = panelTests.flatMap((test) => test.underPanels);
 
-    const underPanelsOrderTests = await Promise.all(
-      underPanels?.map((item) => {
-        OrderedTest.create(
-          {
-            investigationOrderId: createdLabInvestigation.id,
-            serviceItemId: item?.id!,
-            is_underpanel: true,
-            status: "pending",
-          },
-          { transaction }
-        );
-      })
+    const underPanelIds = underPanels?.map((test) => test?.id!);
+    await createOrderedTests(
+      underPanelIds,
+      createdLabInvestigation.id,
+      true,
+      transaction
     );
   }
 };
 
+const createOrderedTests = async (
+  tests: number[],
+  investigationOrderId: string,
+  isUnderpanel: boolean,
+  transaction?: Transaction
+) => {
+  const testsToCreate = tests.map((test) => ({
+    investigationOrderId,
+    serviceItemId: test,
+    isUnderpanel: isUnderpanel,
+  }));
+  const orderedTests = await OrderedTest.bulkCreate(testsToCreate, {
+    transaction,
+  });
+  return orderedTests;
+};
 //#endregion
 // export const createMedicalRecord = async (
 //   data: createMedicalRecordType,
