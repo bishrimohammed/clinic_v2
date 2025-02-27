@@ -1,7 +1,17 @@
 import { Transaction } from "sequelize";
 import { MedicalBilling } from "../models";
 import ServiceLineItem from "../models/billing/ServiceLineItem";
+import { getMedicalRecordById } from "./medicalrecord.service";
+import { getExternalServiceById } from "./external.service";
+import { ApiError } from "../shared/error/ApiError";
 
+export const getMedicalBillingById = async (id: string) => {
+  const medicalBilling = await MedicalBilling.findByPk(id);
+  if (!medicalBilling) {
+    throw new ApiError(404, "Medical billing not found");
+  }
+  return medicalBilling;
+};
 /**
  * Create medical billing
  * @param data
@@ -47,4 +57,27 @@ export const addSingleBillingItemToMedicalBilling = async (
     { transaction }
   );
   return billingItem;
+};
+
+export const addBulkBillingItemsToMedicalBilling = async (
+  medicalBillingId: string,
+  billableType: "MedicalRecord" | "ExternalService",
+  items: { serviceItemId: number; price: number }[],
+  userId: number,
+  transaction?: Transaction
+) => {
+  const medicalBilling = await getMedicalBillingById(medicalBillingId);
+  if (billableType !== medicalBilling.billableType) {
+    throw new ApiError(400, "Billable type does not match");
+  }
+  const transformedItems = items.map((item) => ({
+    billingId: medicalBillingId,
+    unitPrice: item.price,
+    createdBy: userId,
+    serviceItemId: item.serviceItemId,
+  }));
+  const billingItems = await ServiceLineItem.bulkCreate(transformedItems, {
+    transaction,
+  });
+  return billingItems;
 };
