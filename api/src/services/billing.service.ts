@@ -59,25 +59,44 @@ export const addSingleBillingItemToMedicalBilling = async (
   return billingItem;
 };
 
-export const addBulkBillingItemsToMedicalBilling = async (
-  medicalBillingId: string,
-  billableType: "MedicalRecord" | "ExternalService",
-  items: { serviceItemId: number; price: number }[],
-  userId: number,
-  transaction?: Transaction
-) => {
-  const medicalBilling = await getMedicalBillingById(medicalBillingId);
-  if (billableType !== medicalBilling.billableType) {
-    throw new ApiError(400, "Billable type does not match");
-  }
-  const transformedItems = items.map((item) => ({
-    billingId: medicalBillingId,
-    unitPrice: item.price,
-    createdBy: userId,
-    serviceItemId: item.serviceItemId,
-  }));
-  const billingItems = await ServiceLineItem.bulkCreate(transformedItems, {
+/**
+ * Add
+ * @param data
+ */
+
+export const addBulkBillingItemsToMedicalBilling = async (data: {
+  billableId: string;
+  billableType: "MedicalRecord" | "ExternalService";
+  items: { serviceItemId: number; price: number }[];
+  userId: number;
+  transaction?: Transaction;
+}) => {
+  const { billableId, billableType, items, userId, transaction } = data;
+
+  // Atomic billing record handling with transaction
+  const [medicalBilling] = await MedicalBilling.findOrCreate({
+    where: { billableId },
+    defaults: {
+      billableId,
+      billableType,
+      // isInternalService:false
+      isInternalService: billableType === "MedicalRecord" ? true : false,
+    },
     transaction,
   });
-  return billingItems;
+
+  if (medicalBilling.billableType !== billableType) {
+    throw new ApiError(400, "Billable type mismatch for existing record");
+  }
+
+  // Create billing line items
+  await ServiceLineItem.bulkCreate(
+    items.map((item) => ({
+      billingId: medicalBilling.id,
+      unitPrice: item.price,
+      serviceItemId: item.serviceItemId,
+      createdBy: userId,
+    })),
+    { transaction }
+  );
 };
