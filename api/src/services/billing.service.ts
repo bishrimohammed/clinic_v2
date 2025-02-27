@@ -5,6 +5,11 @@ import { getMedicalRecordById } from "./medicalrecord.service";
 import { getExternalServiceById } from "./external.service";
 import { ApiError } from "../shared/error/ApiError";
 
+/**
+ * Get medical billing by id
+ * @param id
+ * @returns
+ */
 export const getMedicalBillingById = async (id: string) => {
   const medicalBilling = await MedicalBilling.findByPk(id);
   if (!medicalBilling) {
@@ -39,7 +44,14 @@ export const createMedicalBilling = async (
   );
   return medicalBilling;
 };
-
+/**
+ * Add billing item to medical billing
+ * @param medicalBillingId
+ * @param item
+ * @param userId
+ * @param transaction
+ * @returns
+ */
 export const addSingleBillingItemToMedicalBilling = async (
   medicalBillingId: string,
   item: { serviceItemId: number; price: number },
@@ -60,7 +72,7 @@ export const addSingleBillingItemToMedicalBilling = async (
 };
 
 /**
- * Add
+ * Add bulk billing items to medical billing
  * @param data
  */
 
