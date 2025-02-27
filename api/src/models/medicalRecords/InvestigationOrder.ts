@@ -21,8 +21,12 @@ class InvestigationOrder extends Model<
   declare isInternalService: boolean;
   declare orderTime: Date;
   declare orderedBy: ForeignKey<User["id"]>;
-  declare stage?: "pending" | "completed" | "cancelled" | "partially_completed";
-  declare status?: boolean;
+  declare status?:
+    | "pending"
+    | "completed"
+    | "cancelled"
+    | "partially_completed";
+  // declare status?: boolean;
   declare deletedAt?: Date | null;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -73,7 +77,7 @@ InvestigationOrder.init(
       },
       onDelete: "CASCADE",
     },
-    stage: {
+    status: {
       type: DataTypes.ENUM(
         "pending",
         "completed",
@@ -84,11 +88,11 @@ InvestigationOrder.init(
       defaultValue: "pending",
     },
 
-    status: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      defaultValue: true,
-    },
+    // status: {
+    //   type: DataTypes.BOOLEAN,
+    //   allowNull: true,
+    //   defaultValue: true,
+    // },
     deletedAt: {
       type: DataTypes.DATE,
       allowNull: true,

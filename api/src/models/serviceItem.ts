@@ -50,6 +50,7 @@ class ServiceItem extends Model<
   >;
 
   declare labTestProfile?: LabTestProfile;
+  declare underPanels?: ServiceItem[];
 }
 
 ServiceItem.init(

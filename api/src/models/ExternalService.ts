@@ -102,7 +102,7 @@ class ExternalService extends Model<
   InferAttributes<ExternalService>,
   InferCreationAttributes<ExternalService>
 > {
-  declare id: CreationOptional<number>;
+  declare id: CreationOptional<string>;
   declare patient_name: string;
   declare examiner?: number | null;
   declare service_type: "procedure" | "lab";
@@ -117,9 +117,9 @@ class ExternalService extends Model<
 ExternalService.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
     },
     patient_name: {

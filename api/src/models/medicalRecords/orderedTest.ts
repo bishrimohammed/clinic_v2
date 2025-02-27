@@ -22,8 +22,8 @@ class OrderedTest extends Model<
   declare comment?: string;
 
   declare reportedBy?: number;
-  declare is_underpanel: boolean;
-  declare status: "pending" | "completed";
+  declare isUnderpanel: boolean;
+  declare status?: "pending" | "completed";
   declare deletedAt?: Date | null;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
@@ -74,7 +74,7 @@ OrderedTest.init(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    is_underpanel: {
+    isUnderpanel: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
       defaultValue: false,

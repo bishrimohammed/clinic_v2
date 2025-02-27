@@ -8,6 +8,7 @@ import {
 import { loggedInUserId } from "../types/shared";
 import { ApiError } from "../shared/error/ApiError";
 import {
+  InvestigationOrder,
   LabTestProfile,
   MedicalRecordDetail,
   PatientVisit,
@@ -23,6 +24,9 @@ import {
 import sequelize from "../db";
 import { checkPatientMedicalRecordAssignedDoctorToVisit } from "./visit.service";
 import { hasDuplicate } from "../utils/helpers";
+import OrderedTest from "../models/medicalRecords/orderedTest";
+import { boolean } from "zod";
+import { addBulkBillingItemsToMedicalBilling } from "./billing.service";
 
 /**
  * Get patient active medical record
@@ -405,28 +409,165 @@ export const addPhysicalExaminations = async (
 
 //#endregion
 //#region  Lab Investigation
+/**
+ * Submit lab investigation
+ * @param tests - tests
+ * @param orderableId - orderable id
+ * @param orderableType -  orderable type
+ * @param userId
+ * @param transaction
+ */
 export const submitLabInvestigation = async (
-  tests: string[],
+  testIds: number[],
+  orderableId: string,
+  orderableType: "MedicalRecord" | "ExternalService" = "MedicalRecord",
   userId: loggedInUserId,
   transaction?: Transaction
 ) => {
-  // const serviceItems = await ServiceItem.findAll({
-  //   where: {
-  //     id: tests,
-  //   },
-  //   include: [
-  //     {
-  //       model: LabTestProfile,
-  //       as: "labTestProfile",
-  //     },
-  //   ],
-  // });
-  // const hasItemsNotLabtest = serviceItems.some((item) => !item?.labTestProfile);
-  // if (hasItemsNotLabtest) {
-  //   throw new ApiError(400, "");
-  // }
+  // Validate input for duplicates
+  if (new Set(testIds).size !== testIds.length) {
+    throw new ApiError(400, "Duplicate test IDs in request");
+  }
+
+  // Fetch all tests with required lab profiles in single query
+  const allTests = await ServiceItem.findAll({
+    where: { id: testIds },
+    include: [
+      {
+        model: LabTestProfile,
+        as: "labTestProfile",
+        required: true, // Ensures only tests with lab profiles are returned
+      },
+      {
+        model: ServiceItem,
+        as: "underPanels",
+        attributes: ["id", "service_name", "price"],
+      },
+    ],
+    transaction,
+  });
+
+  // Verify all requested tests were found
+  const foundIds = new Set(allTests.map((t) => t.id));
+  const missingIds = testIds.filter((id) => !foundIds.has(id));
+  if (missingIds.length) {
+    throw new ApiError(
+      400,
+      `Invalid or missing tests: ${missingIds.join(", ")}`
+    );
+  }
+
+  // Categorize tests into panels and individual tests
+  const panelTests = allTests.filter((t) => t.labTestProfile?.isPanel);
+  const individualTests = allTests.filter((t) => !t.labTestProfile?.isPanel);
+
+  // Create investigation order record
+  const createdLabInvestigation = await InvestigationOrder.create(
+    {
+      orderableId,
+      orderableType,
+      isInternalService: orderableType === "MedicalRecord",
+      orderTime: new Date(),
+      orderedBy: userId,
+    },
+    { transaction }
+  );
+
+  // Prepare billing items and test entries
+  const paymentItems: Array<{ serviceItemId: number; price: number }> = [];
+  const testCreationPromises: Promise<void>[] = [];
+
+  // Process panel tests and their sub-tests
+  if (panelTests.length) {
+    const underPanelIds = panelTests
+      .flatMap((p) => p.underPanels || [])
+      .map((up) => up.id)
+      .filter((id): id is number => !!id);
+
+    testCreationPromises.push(
+      createOrderedTests(
+        underPanelIds,
+        createdLabInvestigation.id,
+        true, // Mark as underpanel
+        transaction
+      ).then(() => {
+        panelTests.forEach((panel) => {
+          paymentItems.push({
+            serviceItemId: panel.id,
+            price: panel.price,
+          });
+        });
+      })
+    );
+  }
+
+  // Process individual tests
+  if (individualTests.length) {
+    const individualTestIds = individualTests.map((t) => t.id);
+
+    testCreationPromises.push(
+      createOrderedTests(
+        individualTestIds,
+        createdLabInvestigation.id,
+        false, // Not underpanel
+        transaction
+      ).then(() => {
+        individualTests.forEach((test) => {
+          paymentItems.push({
+            serviceItemId: test.id,
+            price: test.price,
+          });
+        });
+      })
+    );
+  }
+
+  // Execute all test creation in parallel
+  await Promise.all(testCreationPromises);
+
+  // Verify billing items uniqueness
+  const billingIds = paymentItems.map((p) => p.serviceItemId);
+  if (new Set(billingIds).size !== billingIds.length) {
+    throw new ApiError(400, "Duplicate tests in billing items");
+  }
+
+  // Create billing records
+  await addBulkBillingItemsToMedicalBilling({
+    billableId: orderableId,
+    billableType: orderableType,
+    items: paymentItems,
+    userId,
+    transaction,
+  });
+
+  return createdLabInvestigation;
 };
 
+/**
+ * Create ordered tests
+ * @param testIds
+ * @param investigationOrderId
+ * @param isUnderpanel
+ * @param transaction
+ * @returns
+ */
+const createOrderedTests = async (
+  testIds: number[],
+  investigationOrderId: string,
+  isUnderpanel: boolean,
+  transaction?: Transaction
+) => {
+  if (testIds.length === 0) return;
+
+  await OrderedTest.bulkCreate(
+    testIds.map((testId) => ({
+      investigationOrderId,
+      serviceItemId: testId,
+      isUnderpanel,
+    })),
+    { transaction }
+  );
+};
 //#endregion
 // export const createMedicalRecord = async (
 //   data: createMedicalRecordType,
