@@ -4,6 +4,7 @@ import {
   addMedicalRecordSymptomsType,
   addVitalSignType,
   addVPhysicalExaminationType,
+  createDiagnosisType,
 } from "../types/medical-record";
 import { loggedInUserId } from "../types/shared";
 import { ApiError } from "../shared/error/ApiError";
@@ -11,7 +12,6 @@ import {
   InvestigationOrder,
   LabTestProfile,
   MedicalRecordDetail,
-  PatientVisit,
   PhysicalExamination,
   PhysicalExaminationField,
   PhysicalExaminationResult,
@@ -25,8 +25,8 @@ import sequelize from "../db";
 import { checkPatientMedicalRecordAssignedDoctorToVisit } from "./visit.service";
 import { hasDuplicate } from "../utils/helpers";
 import OrderedTest from "../models/medicalRecords/orderedTest";
-import { boolean } from "zod";
 import { addBulkBillingItemsToMedicalBilling } from "./billing.service";
+import Diagnosis from "../models/medicalRecords/Diagnosis";
 
 /**
  * Get patient active medical record
@@ -569,29 +569,77 @@ const createOrderedTests = async (
   );
 };
 //#endregion
-// export const createMedicalRecord = async (
-//   data: createMedicalRecordType,
-//   userId: number
-// ) => {
-//   const {
-//     patientId,
-//     chiefComplaint,
-//     historyOfPresentIllness,
-//     pastMedicalHistory,
-//     familyHistory,
-//     socialHistory,
-//     physicalExamination,
-//     diagnosis,
-//     treatmentPlan,
-//     followUpPlan,
-//     medication,
-//     allergies,
-//     immunizations,
-//     labTests,
-//     radiologyTests,
-//     imagingTests,
-//     procedures,
-//     notes,
-//     status,
-//   } = data;
-// }
+
+//#region Diagnosis
+export const getDiagnosisByMedicalRecordId = async (
+  medicalRecordId: string
+) => {
+  const diagnoses = await Diagnosis.findAll({ where: { medicalRecordId } });
+  return diagnoses;
+};
+export const getDiagnosisById = async (diagnosisId: string) => {
+  const diagnosis = await Diagnosis.findByPk(diagnosisId);
+  if (!diagnosis) {
+    throw new ApiError(404, "Diagnosis not found");
+  }
+  return diagnosis;
+};
+export const createDiagnosis = async (
+  medicalRecordId: string,
+  diagnoses: createDiagnosisType,
+  userId: loggedInUserId
+) => {
+  const createdDiagnoses = await Diagnosis.bulkCreate(
+    diagnoses.map((diagnosis) => ({
+      diagnosis,
+      doctorId: userId,
+      medicalRecordId,
+    }))
+  );
+  return createdDiagnoses;
+};
+
+export const updateDiagnosis = async (
+  diagnosisId: string,
+  newDiagnosis: string,
+  userId: loggedInUserId
+) => {
+  const updatedDiagnosis = await Diagnosis.update(
+    { diagnosis: newDiagnosis },
+    { where: { id: diagnosisId } }
+  );
+  return updatedDiagnosis;
+};
+
+export const confirmDiagnosis = async (
+  diagnosisId: string,
+  userId: loggedInUserId
+) => {
+  const diagnosis = await getDiagnosisById(diagnosisId);
+  if (diagnosis.status !== "Suspected") {
+    throw new ApiError(400, "");
+  }
+  await diagnosis.update({ status: "Confirmed" });
+  return diagnosis;
+};
+
+export const ruledOutDiagnosis = async (
+  diagnosisId: string,
+  userId: loggedInUserId
+) => {
+  const diagnosis = await getDiagnosisById(diagnosisId);
+  if (diagnosis.status !== "Suspected") {
+    throw new ApiError(400, "");
+  }
+  await diagnosis.update({ status: "Ruled out" });
+  return diagnosis;
+};
+export const deleteDiagnosis = async (
+  diagnosisId: string,
+  userId: loggedInUserId
+) => {
+  const diagnosis = await getDiagnosisById(diagnosisId);
+  await diagnosis.destroy();
+  return diagnosis;
+};
+//#endregion
