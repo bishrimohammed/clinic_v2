@@ -11,7 +11,6 @@ import {
   Optional,
 } from "sequelize";
 
-import { RoleEntity } from "./types";
 import sequelize from "../db";
 import User from "./User";
 import Permission from "./Permission";
