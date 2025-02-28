@@ -1,4 +1,4 @@
-import { Role, RolePermission } from "../models";
+import { Permission, Role, RolePermission } from "../models";
 import { ApiError } from "../shared/error/ApiError";
 import { createRoleT } from "../types/role";
 
@@ -14,9 +14,17 @@ export const getRoles = async (query: {
   });
   return roles;
 };
-
+export const getActiveRoles = async () => {
+  const roles = await Role.findAll({
+    where: { status: true },
+    order: [["name", "ASC"]],
+  });
+  return roles;
+};
 export const getRoleById = async (id: string) => {
-  const role = await Role.findByPk(id);
+  const role = await Role.findByPk(id, {
+    include: [{ model: Permission, as: "permissions" }],
+  });
   if (!role) {
     throw new ApiError(404, "Role is not found");
   }
