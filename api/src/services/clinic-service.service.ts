@@ -21,6 +21,18 @@ import {
 export const getClinicServices = async (filter: { status?: boolean }) => {
   const clinicServices = await ClinicService.findAll({
     where: filter,
+    // include: [
+    //   {
+    //     model: ServiceCategory,
+    //     as: "serviceCategories",
+    //     include: [
+    //       {
+    //         model: ServiceItem,
+    //         as: "items",
+    //       },
+    //     ],
+    //   },
+    // ],
   });
   return clinicServices;
 };
