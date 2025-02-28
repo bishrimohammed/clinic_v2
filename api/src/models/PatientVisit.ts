@@ -15,9 +15,9 @@ class PatientVisit extends Model<
   InferAttributes<PatientVisit>,
   InferCreationAttributes<PatientVisit>
 > {
+  declare id: CreationOptional<string>;
   declare medicalRecordId: string;
   // declare visitType_id?: number | null;
-  declare id: CreationOptional<string>;
   declare patientId: number;
   declare doctorId: number;
   declare referredTo: number | null;
