@@ -30,8 +30,7 @@ router.get(
 
   clinicServiceController.getServiceItemsByClinicServiceId
 );
-// router.get("/:id/gggg", clinicServiceController.ggggg);
-router.get("/withdetail", clinicServiceController.getClinicServiceDetail);
+
 router.get("/getLabServiceItems", clinicServiceController.getLabServiceItems);
 router.get(
   "/getImagingServiceItems",
@@ -76,14 +75,6 @@ router.put(
   "/service-category/:category_id",
   validate(updateServiceCategorySchema),
   clinicServiceController.updateServiceCategory
-);
-router.put(
-  "/:id/updateLabService",
-  clinicServiceController.updateLabServiceItem
-);
-router.put(
-  "/:id/updateimagingService",
-  clinicServiceController.updateImagingServiceItem
 );
 
 router.put(
