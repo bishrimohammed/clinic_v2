@@ -1,7 +1,12 @@
 import { RequestHandler } from "express";
 
 // import asyncHandler from "express-async-handler";
-import { ClinicService, LabTestProfile, ServiceItem } from "../models";
+import {
+  ClinicService,
+  LabTestProfile,
+  ServiceCategory,
+  ServiceItem,
+} from "../models";
 import { clinicserviceService } from "../services";
 import asyncHandler from "../utils/asyncHandler";
 import {
@@ -18,7 +23,13 @@ const db = require("../models");
 import { Op } from "sequelize";
 import { serviceItemFilterType } from "../services/clinic-service.service";
 
-// module.exports.clinicServiceController = {
+/**
+ * @desc get clinic services
+ * @route GET /api/v1/clinic-services
+ * @access Public
+ * @returns {ClinicService[]}
+ *
+ */
 export const getClinicServices = asyncHandler(async (req, res) => {
   const { status } = req.query as { status: "true" | "false" | undefined };
   let filter: { status?: boolean } = {};
@@ -30,7 +41,14 @@ export const getClinicServices = asyncHandler(async (req, res) => {
   const clinicServices = await clinicserviceService.getClinicServices(filter);
   res.json(clinicServices);
 });
-// export const getServiceCategories = asyncHandler(async (req, res) => {
+
+/**
+ * @desc get clinic service by id
+ * @route GET /api/v1/clinic-services/:id/service-category
+ * @access Public
+ * @returns {ServiceCategory[]}
+ */
+
 export const getClinicServiceCategoriesByServiceId = asyncHandler(
   async (req, res) => {
     const { id } = req.params;
@@ -40,7 +58,12 @@ export const getClinicServiceCategoriesByServiceId = asyncHandler(
     res.json(serviceCategories);
   }
 );
-
+/**
+ * @desc get service category by id
+ * @route GET /api/v1/clinic-services/service-category/:category_id
+ * @access Public
+ * @returns {ServiceCategory}
+ */
 export const getServiceCategoryById = asyncHandler(async (req, res) => {
   // export const getClinicServiceCategoriesByServiceId = asyncHandler(async (req, res) => {
   const { category_id } = req.params;
@@ -50,6 +73,12 @@ export const getServiceCategoryById = asyncHandler(async (req, res) => {
   );
   res.json(serviceCategory);
 });
+/**
+ * @desc create  clinic service category
+ * @route POST /api/v1/clinic-services/:id/service-category
+ * @access Public
+ * @returns {ServiceCategory}
+ */
 export const createServiceCategory = asyncHandler<{
   validatedData: typeof createServiceCategorySchema._type;
 }>(async (req, res) => {
@@ -79,6 +108,12 @@ export const createServiceCategory = asyncHandler<{
     data: serviceCategory,
   });
 });
+/**
+ * @desc update service category
+ * @route PUT /api/v1/clinic-services/service-category/:category_id
+ * @access Public
+ * @returns {ServiceCategory}
+ */
 export const updateServiceCategory = asyncHandler<{
   validatedData: typeof updateServiceCategorySchema._type;
 }>(async (req, res) => {
@@ -94,7 +129,12 @@ export const updateServiceCategory = asyncHandler<{
     data: serviceCategory,
   });
 });
-// @desk activate service group
+/**
+ * @desc activate service category
+ * @route PUT /api/v1/clinic-services/service-category/:category_id/activate
+ * @access Public
+ * @returns {ServiceCategory}
+ */
 export const activateServiceCategory = asyncHandler(async (req, res) => {
   const { category_id } = req.params;
   const serviceCategory = await clinicserviceService.activateClinicCategory(
@@ -117,7 +157,12 @@ export const activateServiceCategory = asyncHandler(async (req, res) => {
   });
 });
 
-// @desk deactivate service group
+/**
+ * @desc deactivate service category
+ * @route PUT /api/v1/clinic-services/service-category/:category_id/deactivate
+ * @access Public
+ * @returns {ServiceCategory}
+ */
 export const deactiveServiceCategory = asyncHandler(async (req, res) => {
   const { category_id } = req.params;
   const serviceCategory = await clinicserviceService.deactivateClinicCategory(
@@ -139,7 +184,12 @@ export const deactiveServiceCategory = asyncHandler(async (req, res) => {
     data: serviceCategory,
   });
 });
-
+/**
+ * @desc delete service category
+ * @route DELETE /api/v1/clinic-services/service-category/:category_id
+ * @access Public
+ * @returns {ServiceCategory}
+ */
 export const deleteServiceCategory = asyncHandler(async (req, res) => {
   const { category_id } = req.params;
   const serviceGroup = await clinicserviceService.deleteServiceCategory(
@@ -147,8 +197,12 @@ export const deleteServiceCategory = asyncHandler(async (req, res) => {
   );
   res.json(serviceGroup);
 });
-// @desk delete service group
-// @desc get clinic service by id
+/**
+ * @desc get service item by id
+ * @route GET /api/v1/clinic-services/service-items/:item_id
+ * @access Public
+ * @returns {ServiceItem}
+ */
 export const getServiceItemById = asyncHandler(async (req, res) => {
   const { item_id } = req.params;
 
@@ -169,6 +223,12 @@ export const getServiceItemById = asyncHandler(async (req, res) => {
     data: serviceItem,
   });
 });
+/**
+ * @desc get service items
+ * @route GET /api/v1/clinic-services/service-items
+ * @access Public
+ * @returns {ServiceItem[]}
+ */
 export const getServiceItems = asyncHandler(async (req, res) => {
   const query = req.query as serviceItemFilterType;
   const serviceItems = await clinicserviceService.getServiceItems(query);
@@ -177,6 +237,12 @@ export const getServiceItems = asyncHandler(async (req, res) => {
     data: serviceItems,
   });
 });
+/**
+ * @desc get service items by clinic service id
+ * @route GET /api/v1/clinic-services/:id//service-items
+ * @access Public
+ * @returns {ServiceItem[]}
+ */
 export const getServiceItemsByClinicServiceId = asyncHandler(
   async (req, res) => {
     const { id: clinicService_id } = req.params;
@@ -194,7 +260,9 @@ export const getServiceItemsByClinicServiceId = asyncHandler(
     });
   }
 );
-// @desc get all laboratory services
+/**
+ * @desc Get service item
+ */
 export const getLabServiceItems = asyncHandler(async (req, res) => {
   const labServiceItems = await db.ServiceItem.findAll({
     where: { is_laboratory: true },
@@ -214,33 +282,12 @@ export const getLabServiceItems = asyncHandler(async (req, res) => {
   });
   res.json(labServiceItems);
 });
-export const ggggg = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const clinicService = await db.ClinicService.findByPk(id);
-  if (!clinicService) {
-    res.status(404);
-    throw new Error("Clinic service not found");
-  }
-  const categorys = await clinicService.getServiceCategory();
-  const categoryIds = categorys.map((category: any) => category.id);
-  const labServiceItems = await db.ServiceItem.findAll({
-    where: {
-      serviceCategory_id: categoryIds,
-      // is_laboratory: true,
-    },
-  });
-  await Promise.all(
-    labServiceItems.map((item: any) => {
-      return db.LabTestProfile.create({
-        labTest_id: item.id,
-        isPanel: false,
-        isFixed: false,
-        parentId: null,
-      });
-    })
-  );
-});
-// @desc add service items
+/**
+ * @desc create service item
+ * @route POST /api/v1/clinic-services/:id/service-items
+ * @access Public
+ * @returns {ServiceItem}
+ */
 export const createServiceItems = asyncHandler<{
   validatedData: typeof createServiceItemSchema._type;
 }>(async (req, res) => {
@@ -268,7 +315,12 @@ export const createServiceItems = asyncHandler<{
     data: serviceItem,
   });
 });
-// @desc update service items
+/**
+ * @desc update service item
+ * @route PUT /api/v1/clinic-services/:id/service-items/:item_id
+ * @access Public
+ * @returns {ServiceItem}
+ */
 export const updateServiceItems = asyncHandler<{
   validatedData: createServiceItemT;
 }>(async (req, res) => {
@@ -364,40 +416,6 @@ export const updateServiceItems = asyncHandler<{
   res.json({ success: true, data: serviceItem });
 });
 
-// @desc create lab service items item
-
-export const createLabServiceItem = asyncHandler(async (req, res) => {
-  const { test_name, price, unit } = req.body;
-  // console.log(req.body);
-  const labServiceItem = await db.ServiceItem.create({
-    service_name: test_name,
-    price,
-    is_laboratory: true,
-    unit_id: unit,
-    serviceCategory_id: req.body.lab_category,
-  });
-  res.status(201).json(labServiceItem);
-});
-// @desc update lab service items item
-export const updateLabServiceItem = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { test_name, price, unit } = req.body;
-  console.log(req.body);
-
-  const labServiceItem = await db.ServiceItem.update(
-    {
-      service_name: test_name,
-      price,
-      is_laboratory: true,
-      unit_id: unit,
-      serviceCategory_id: req.body.lab_category,
-    },
-    {
-      where: { id },
-    }
-  );
-  res.json(labServiceItem);
-});
 // @desc get all laboratory category
 export const getLabServiceCategories = asyncHandler(async (req, res) => {
   const labServiceCategory = await db.ClinicService.findOne({
@@ -413,14 +431,7 @@ export const getLabServiceCategories = asyncHandler(async (req, res) => {
   const labServiceCategories = labServiceCategory.serviceCategory;
   res.json(labServiceCategories);
 });
-// @desc delete lab service items item
-export const deleteLabServiceItem = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const labServiceItem = await db.ServiceItem.destroy({
-    where: { id },
-  });
-  res.json(labServiceItem);
-});
+
 // @desc get all imaging service items
 export const getImagingServiceItems = asyncHandler(async (req, res) => {
   const imagingServiceItems = await db.ServiceItem.findAll({
@@ -434,27 +445,6 @@ export const getImagingServiceItems = asyncHandler(async (req, res) => {
     ],
   });
   res.json(imagingServiceItems);
-});
-// @desc create imaging service item
-export const createImagingServiceItem = asyncHandler(async (req, res) => {
-  const { test_name, price, unit } = req.body;
-  console.log(req.body);
-  const imagingServiceItem = await db.ServiceItem.create({
-    service_name: test_name,
-    price,
-    is_imaging: true,
-    unit_id: unit,
-    serviceCategory_id: req.body.imaging_category,
-  });
-  res.status(201).json(imagingServiceItem);
-});
-// @desc delete imaging service items item
-export const deleteImagingServiceItem = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const imagingServiceItem = await db.ServiceItem.destroy({
-    where: { id },
-  });
-  res.json(imagingServiceItem);
 });
 
 // @desc get all imaging category
@@ -472,27 +462,13 @@ export const getImagingServiceCategories = asyncHandler(async (req, res) => {
   const imagingServiceCategories = imagingServiceCategory.serviceCategory;
   res.json(imagingServiceCategories);
 });
-// @desc update imaging service items
-export const updateImagingServiceItem = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { test_name, price, unit } = req.body;
-  console.log(req.body);
-  const imagingServiceItem = await db.ServiceItem.update(
-    {
-      service_name: test_name,
-      price,
-      is_imaging: true,
-      unit_id: unit,
-      serviceCategory_id: req.body.imaging_category,
-    },
-    {
-      where: { id },
-    }
-  );
-  res.json(imagingServiceItem);
-});
-// @desc delete imaging service items
 
+/**
+ * @desc get clinic service by id
+ * @route GET /api/clinic-services/:id
+ * @access Public
+ * @returns {ClinicService}
+ */
 export const getClinicServiceById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const clinicService = await clinicserviceService.getClinicServiceById(id);
@@ -503,35 +479,13 @@ export const getClinicServiceById = asyncHandler(async (req, res) => {
     data: clinicService,
   });
 });
-export const getClinicServiceDetail = asyncHandler(async (req, res) => {
-  const { query } = req.query;
-  const clinicService = await db.ClinicService.findOne({
-    where: {
-      service_name: {
-        [Op.like]: `${query}%`,
-      },
-    },
-    include: [
-      {
-        model: db.ServiceCategory,
-        as: "serviceCategory",
-        include: [
-          {
-            model: db.ServiceItem,
-            as: "serviceItem",
-          },
-        ],
-      },
-    ],
-  });
-  if (!clinicService) {
-    throw new Error("ClinicService not found");
-  }
-  res.json(clinicService);
-});
-// <{
-//   ValidatedData: createClinicServiceT;
-// }>
+
+/**
+ * @desc create clinic service
+ * @route POST /api/clinic-services
+ * @access Private
+ * @returns {ClinicService}
+ */
 export const createClinicService = asyncHandler<{
   validatedData: typeof createClinicServiceSchema._type;
 }>(async (req, res) => {
@@ -548,6 +502,14 @@ export const createClinicService = asyncHandler<{
 
   res.json({ success: true, data: clinicService });
 });
+
+/**
+ * @desc update clinic service
+ * @route PUT /api/clinic-services/:id
+ * @access Private
+ * @returns {ClinicService}
+ */
+
 export const updateClinicService = asyncHandler<{
   validatedData: typeof updateClinicServiceSchema._type;
 }>(async (req, res) => {
@@ -586,6 +548,12 @@ export const deleteClinicService = asyncHandler(async (req, res) => {
     // data: clinicService,
   });
 });
+/**
+ * @desc deactivate clinic service
+ * @route Patch /api/v1/clinic-services/:id/deactivate
+ * @access Private
+ * @returns {ClinicService}
+ */
 export const deactiveClinicService = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const clinicService = await clinicserviceService.deactivateClinicService(id);
@@ -596,6 +564,12 @@ export const deactiveClinicService = asyncHandler(async (req, res) => {
     data: clinicService,
   });
 });
+/**
+ * @desc activate clinic service
+ * @route Put /api/v1/clinic-services/:id/activate
+ * @access Private
+ * @returns {ClinicService}
+ */
 export const activateClinicService = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const clinicService = await clinicserviceService.activateClinicService(id);
@@ -606,28 +580,29 @@ export const activateClinicService = asyncHandler(async (req, res) => {
     data: clinicService,
   });
 });
-// @desc deactivate  service items
+/**
+ * @desc deactivate service item
+ * @route Put /api/v1/clinic-services/service-items/:item_id/deactivate
+ * @access Private
+ * @returns {ServiceItem}
+ *
+ */
 export const deactivateServiceItem = asyncHandler(async (req, res) => {
   const { item_id } = req.params;
 
   const serviceItem = await clinicserviceService.deactivateServiceItem(item_id);
-  // const serviceItem = await db.ServiceItem.update(
-  //   {
-  //     status: false,
-  //   },
-  //   {
-  //     where: {
-  //       id,
-  //     },
-  //   }
-  // );
   res.json({
     success: true,
     message: `${serviceItem.service_name} deactivated successfully`,
     data: serviceItem,
   });
 });
-// @desc activate  service items
+/**
+ * @desc activate service item
+ * @route Put /api/v1/clinic-services/service-items/:item_id/activate
+ * @access Private
+ * @returns {ServiceItem}
+ */
 export const activateServiceItem = asyncHandler(async (req, res) => {
   const { item_id } = req.params;
   const serviceItem = await clinicserviceService.activateServiceItem(item_id);

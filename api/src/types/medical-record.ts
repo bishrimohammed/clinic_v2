@@ -53,6 +53,8 @@ export const addPhysicalExaminationSchema = z
     }
   });
 
+export const createDiagnosisSchema = z.array(z.string().trim()).min(1);
+
 export type addVitalSignType = z.infer<typeof addVitalSignSchema>;
 export type addVPhysicalExaminationType = z.infer<
   typeof addPhysicalExaminationSchema
@@ -60,3 +62,5 @@ export type addVPhysicalExaminationType = z.infer<
 export type addMedicalRecordSymptomsType = z.infer<
   typeof addMedicalRecordSymptomsSchema
 >;
+
+export type createDiagnosisType = z.infer<typeof createDiagnosisSchema>;
