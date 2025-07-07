@@ -4,13 +4,13 @@ import {
   InferCreationAttributes,
   CreationOptional,
   DataTypes,
-  Op,
 } from "sequelize";
 import sequelize from "../../db";
 import ServiceItem from "../serviceItem";
 import MedicalBilling from "../MedicalBilling";
 import User from "../User";
 import Payment from "../Payment";
+import Invoice from "./Invoice";
 
 class ServiceLineItem extends Model<
   InferAttributes<ServiceLineItem>,
@@ -25,6 +25,8 @@ class ServiceLineItem extends Model<
   declare tax: CreationOptional<number>;
   declare total?: number;
   declare paymentId: string | null;
+  declare invoiceId: string | null;
+
   // declare a user who created the line item
   declare createdBy: number;
 }
@@ -42,6 +44,15 @@ ServiceLineItem.init(
       allowNull: false,
       references: {
         model: MedicalBilling,
+        key: "id",
+      },
+      onDelete: "CASCADE",
+    },
+    invoiceId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: Invoice,
         key: "id",
       },
       onDelete: "CASCADE",
