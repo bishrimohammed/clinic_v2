@@ -4,6 +4,7 @@ import {
   CreationOptional,
   InferAttributes,
   InferCreationAttributes,
+  HasManyGetAssociationsMixin,
 } from "sequelize";
 import sequelize from "../db/index"; // Ensure the correct path
 import ExternalService from "./ExternalService";
@@ -23,6 +24,10 @@ class MedicalBilling extends Model<
   declare hasAdvancedPayment?: boolean;
   declare isAdvancedPaymentAmountCompleted?: boolean;
   declare status?: boolean;
+
+  declare invoice?: Invoice[]; // Association with Invoice
+  declare serviceLineItems?: ServiceLineItem[]; // Association with ServiceLineItem
+  declare getServiceLineItems: HasManyGetAssociationsMixin<ServiceLineItem>; // Method to get service line items
 }
 
 MedicalBilling.init(
