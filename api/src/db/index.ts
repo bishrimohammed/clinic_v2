@@ -1,22 +1,3 @@
-// db/index.ts
-// import { Sequelize } from "sequelize";
-// import dbConfig from "../config/dbConfig";
-
-// const sequelize = new Sequelize(
-//   dbConfig.DB!,
-//   dbConfig.USER!,
-//   dbConfig?.PASSWORD || "",
-//   {
-//     host: dbConfig.HOST,
-//     port: 3306,
-//     dialect: dbConfig.dialect,
-//     logging: true,
-//   }
-// );
-
-// export default sequelize;
-
-// db/index.ts
 import { Sequelize } from "sequelize";
 import dbConfig from "../config/dbConfig";
 
@@ -28,11 +9,11 @@ class Database {
   public static getInstance(): Sequelize {
     if (!Database.instance) {
       Database.instance = new Sequelize(
-        dbConfig.DB!,
-        dbConfig.USER!,
-        dbConfig?.PASSWORD || "",
+        dbConfig.DB_NAME!,
+        dbConfig.DB_USER!,
+        dbConfig?.DB_PASSWORD || "",
         {
-          host: dbConfig.HOST,
+          host: dbConfig.DB_HOST,
           port: 3306,
           dialect: dbConfig.dialect,
           logging: true,

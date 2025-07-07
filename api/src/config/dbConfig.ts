@@ -2,11 +2,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 interface DbConfig {
-  HOST: string | undefined;
-  USER: string | undefined;
-  DB: string | undefined;
-  PASSWORD?: string;
-  PORT: number;
+  DB_HOST: string | undefined;
+  DB_USER: string | undefined;
+  DB_NAME: string | undefined;
+  DB_PASSWORD?: string;
+  DB_PORT: number;
   dialect: "mysql"; // You can expand this to include other dialects if needed
 
   pool: {
@@ -17,10 +17,10 @@ interface DbConfig {
   };
 }
 const config: DbConfig = {
-  HOST: process.env.DATABASE_HOST,
-  USER: process.env.DATABASE_USER,
-  DB: process.env.DATABASE_NAME,
-  PORT: 3306,
+  DB_HOST: process.env.DATABASE_HOST,
+  DB_USER: process.env.DATABASE_USER,
+  DB_NAME: process.env.DATABASE_NAME,
+  DB_PORT: 3306,
   dialect: "mysql",
   pool: {
     max: 10,
